@@ -6,18 +6,14 @@ import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.ExecutorService;
 
-import com.amazonaws.services.codepipeline.model.JobData;
 import org.fogbowcloud.app.datastore.JobDataStore;
 import org.fogbowcloud.app.model.JDFJob;
 import org.fogbowcloud.blowout.core.BlowoutController;
 import org.fogbowcloud.blowout.core.model.*;
 import org.fogbowcloud.blowout.infrastructure.exception.InfrastructureException;
-import org.fogbowcloud.blowout.infrastructure.manager.InfrastructureManager;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.amazonaws.auth.policy.Resource;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 
 import static org.mockito.Mockito.*;
@@ -65,7 +61,7 @@ public class TestExecutionMonitorWithDB {
 		TaskProcess tp = mock(TaskProcess.class);
 		List<TaskProcess> processes = new ArrayList<>();
 		processes.add(tp);
-		doReturn(TaskState.FINNISHED).when(tp).getStatus();
+		doReturn(TaskState.FINISHED).when(tp).getStatus();
 	}
 
 	@Test

@@ -300,7 +300,7 @@ public class TestArrebolController {
 		job.addTask(task);
 
 		task = new TaskImpl("TaskNumber-" + 2 + "-" + UUID.randomUUID(), spec, "0000");
-		task.setState(TaskState.FINNISHED);
+		task.setState(TaskState.FINISHED);
 		taskIds.add(task.getId());
 		task.finish();
 		job.addTask(task);
