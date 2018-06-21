@@ -14,7 +14,7 @@ import org.fogbowcloud.app.model.JDFJob;
 import org.fogbowcloud.app.utils.DataStoreHelper;
 import org.json.JSONObject;
 
-public class JobDataStore {
+public class JobDataStore extends DataStore<JDFJob> {
 
 	private static final String JOB_DATASTORE_DRIVER = "org.sqlite.JDBC";
 	private static final String JOBS_TABLE_NAME = "arrebol_jobs";
@@ -23,9 +23,9 @@ public class JobDataStore {
 	private static final String JOB_OWNER = "job_owner";
 
 	private static final String CREATE_TABLE_STATEMENT = "CREATE TABLE IF NOT EXISTS " + JOBS_TABLE_NAME + "("
-					+ JOB_ID + " VARCHAR(255) PRIMARY KEY, "
-					+ JOB_OWNER + " VARCHAR(255), "
-					+ JOB_JSON + " TEXT)";
+			+ JOB_ID + " VARCHAR(255) PRIMARY KEY, "
+			+ JOB_OWNER + " VARCHAR(255), "
+			+ JOB_JSON + " TEXT)";
 
 	private static final String INSERT_JOB_TABLE_SQL = "INSERT INTO " + JOBS_TABLE_NAME
 			+ " VALUES(?, ?, ?)";
@@ -47,16 +47,13 @@ public class JobDataStore {
 	private static final String ERROR_WHILE_INITIALIZING_THE_DATA_STORE = "Error while initializing the Job DataStore.";
 	private static final String DEFAULT_DATASTORE_NAME = "datastore_jobs.slite";
 
-	private String jobDataStoreURL;
-	
-	public JobDataStore(String jobDataStoreURL) {
-		this.jobDataStoreURL = DataStoreHelper.getDataStoreUrl(jobDataStoreURL,
-				DEFAULT_DATASTORE_NAME);
+	public JobDataStore(String dataStoreURL) {
+		super(dataStoreURL);
 
 		Statement statement = null;
 		Connection connection = null;
 		try {
-			LOGGER.debug("jobDataStoreURL: " + this.jobDataStoreURL);
+			LOGGER.debug("jobDataStoreURL: " + super.dataStoreURL);
 
 			Class.forName(JOB_DATASTORE_DRIVER);
 
@@ -229,76 +226,9 @@ public class JobDataStore {
 		}
 	}
 
-	private List<JDFJob> executeQueryStatement(String queryStatement, String... params) {
-		PreparedStatement preparedStatement = null;
-		Connection conn = null;
-		List<JDFJob> jdfJobList = new ArrayList<>();
-
-		try {
-			conn = getConnection();
-			preparedStatement = conn.prepareStatement(queryStatement);
-
-			if (params != null && params.length > 0) {
-				for (int index = 0; index < params.length; index++) {
-					preparedStatement.setString(index + 1, params[index]);
-				}
-			}
-
-			ResultSet rs = preparedStatement.executeQuery();
-			
-			if (rs != null) {
-				try {
-					while (rs.next()) {
-						JDFJob job = JDFJob.fromJSON(new JSONObject(rs.getString(JOB_JSON)));
-						jdfJobList.add(job);
-					}
-				} catch (Exception e) {
-					LOGGER.error("Error while mounting job from DB.", e);
-				}
-			}
-
-		} catch (SQLException e) {
-			LOGGER.error("Couldn't get Jobs from DB.", e);
-			return new ArrayList<>();
-		} finally {
-			close(preparedStatement, conn);
-		}
-		LOGGER.debug("There are " + jdfJobList.size() + " jobs at DB to this query (" + preparedStatement.toString() + ").");
-		return jdfJobList;
+	public JDFJob getObjFromDataStoreResult(ResultSet rs) throws SQLException {
+		JDFJob job = JDFJob.fromJSON(new JSONObject(rs.getString(JOB_JSON)));
+		return job;
 	}
 
-	/**
-	 * @return the connection
-	 * @throws SQLException
-	 */
-	public Connection getConnection() throws SQLException {
-		try {
-			return DriverManager.getConnection(jobDataStoreURL);
-		} catch (SQLException e) {
-			LOGGER.error("Error while getting a new connection from the connection pool.", e);
-			throw e;
-		}
-	}
-
-	private void close(Statement statement, Connection conn) {
-		if (statement != null) {
-			try {
-				if (!statement.isClosed()) {
-					statement.close();
-				}
-			} catch (SQLException e) {
-				LOGGER.error("Couldn't close statement");
-			}
-		}
-
-		if (conn != null) {
-			try {
-				if (!conn.isClosed()) {
-					conn.close();
-				}
-			} catch (SQLException e) {
-				LOGGER.error("Couldn't close connection");
-			}
-		}
-	}
 }
