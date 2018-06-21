@@ -79,7 +79,7 @@ public class TestAsyncJobBuilder {
 
             JDFJob job = arrebol.getJobById(id, user);
             Assert.assertEquals(JDFJob.JDFJobState.SUBMITTED, job.getState());
-            Assert.assertEquals(1, job.getTasks().size());
+            Assert.assertEquals(0, job.getTasks().size());
 
             arrebol.stopJob(id, user);
 
