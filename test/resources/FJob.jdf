@@ -1,0 +1,21 @@
+job:
+    label: SimpleJob4
+    requirements: Glue2RAM >= 1024 AND Glue2CPU == 4
+    init:
+        put /home/fubica/common-in /tmp/common-in
+    put /home/fubica/bin/my-simulator /tmp/my-simulator
+    cd /tmp
+    final:
+        rm /tmp/intermediate* /tmp/in-scenario*
+task:
+    put /home/fubica/in-scenario1 /tmp/in-scenario1
+    my-simulator common-in in-scenario1 > out-scenario1
+    get /tmp/out-scenario1 /home/fubica/out-scneario1
+task:
+    put /home/fubica/in-scenario2 /tmp/in-scenario2
+    my-simulator common-in in-scenario2 > out-scenario2
+    get /tmp/out-scenario2 /home/fubica/out-scneario2
+task:
+    put /home/fubica/in-scenario1000 /tmp/in-scenario1000
+    my-simulator common-in in-scenario1000 > out-scenario1000
+    get /tmp/out-scenario1000 /home/fubica/out-scneario1000

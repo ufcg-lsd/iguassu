@@ -1,0 +1,6 @@
+job : 
+label 	: SleepJob
+requirements: Glue2RAM >= 1024
+
+task :
+	  sleep 36000

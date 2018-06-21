@@ -1,0 +1,7 @@
+job:
+label: job555
+requirements: Glue2RAM >= 1024 AND Glue2CloudComputeManagerID=="servers.lsd.ufcg.edu.br"
+task:
+PUT /local/ubuntu/filetotransfer transferedfile
+GET transferedfile /local/ubuntu/filetotransfer
+sleep 10

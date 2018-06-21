@@ -1,0 +1,17 @@
+/home/italobatista/repositories/iguassu/arrebol/src/test/java/org/fogbowcloud/app/resource/TestJobResource.java
+/home/italobatista/repositories/iguassu/arrebol/src/test/java/org/fogbowcloud/app/integration/ArrebolControllerIT.java
+/home/italobatista/repositories/iguassu/arrebol/src/test/java/org/fogbowcloud/app/model/TestJDFJobBuilder.java
+/home/italobatista/repositories/iguassu/arrebol/src/test/java/org/fogbowcloud/app/CurrentThreadExecutorService.java
+/home/italobatista/repositories/iguassu/arrebol/src/test/java/org/fogbowcloud/app/jdfcompiler/FakeConfiguration.java
+/home/italobatista/repositories/iguassu/arrebol/src/test/java/org/fogbowcloud/app/TestExecutionMonitorWithDB.java
+/home/italobatista/repositories/iguassu/arrebol/src/test/java/org/fogbowcloud/app/integration/FakeAuthenticationPlugin.java
+/home/italobatista/repositories/iguassu/arrebol/src/test/java/org/fogbowcloud/app/jdfcompiler/Configuration.java
+/home/italobatista/repositories/iguassu/arrebol/src/test/java/org/fogbowcloud/app/datastore/TestOAuthTokenDataStore.java
+/home/italobatista/repositories/iguassu/arrebol/src/test/java/org/fogbowcloud/app/integration/FakeUser.java
+/home/italobatista/repositories/iguassu/arrebol/src/test/java/org/fogbowcloud/app/jdfcompiler/TestJobSpec.java
+/home/italobatista/repositories/iguassu/arrebol/src/test/java/org/fogbowcloud/app/utils/TestRSAUtilsAdditions.java
+/home/italobatista/repositories/iguassu/arrebol/src/test/java/org/fogbowcloud/app/TestArrebolController.java
+/home/italobatista/repositories/iguassu/arrebol/src/test/java/org/fogbowcloud/app/integration/FakeTokenUpdatePlugin.java
+/home/italobatista/repositories/iguassu/arrebol/src/test/java/org/fogbowcloud/app/resource/ResourceTestUtil.java
+/home/italobatista/repositories/iguassu/arrebol/src/test/java/org/fogbowcloud/app/TestAsyncJobBuilder.java
+/home/italobatista/repositories/iguassu/arrebol/src/test/java/org/fogbowcloud/app/datastore/TestJobDataStore.java

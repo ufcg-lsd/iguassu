@@ -1,0 +1,147 @@
+#!/bin/bash
+
+. arrebol.properties
+
+print_menu() {
+	echo "Usage: $0 COMMAND [OPTIONS]"
+	echo "Commands are GET, POST, STOP or GETUI"
+	echo "GET | GET [job_id || friendly_name] -u | --username username -p | --privateKeyFile /privateKey/file/path"
+	echo "POST jdffilepath [s | --schedpath path] -u | --username username -p | --privateKeyFile /privateKey/file/path"
+	echo "STOP [job_id || friendly_name] -u | --username username -p | --privateKeyFile /privateKey/file/path"
+	echo "CREATEUSER -u | --username username"
+	exit 1
+}
+
+do_get() {
+	define_parameters $@
+	if [ $# -eq 4 ]
+	then
+		hash=$(echo -n $username$nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
+		response=$(curl -G -H "X-auth-nonce: $nonce" -H "X-auth-username: $username" -H "X-auth-hash: $hash" "$host/arrebol/job" 2> /dev/null)
+		echo $response
+	elif [ $# -eq 5 ]
+	then
+		hash=$(echo -n $username$nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
+        	response=$(curl -G -H "X-auth-nonce: $nonce" -H "X-auth-username: $username" -H "X-auth-hash: $hash" "$host/arrebol/job/$1" 2> /dev/null)
+        	echo $response
+	else
+		print_menu
+		exit 1
+	fi
+}
+
+do_get_nonce() {
+	nonce=$(curl -G "$host/arrebol/nonce" 2> /dev/null)
+}
+
+define_parameters() {
+	while [ ! -z $1 ]; do
+		case $1 in
+			-s | --schedpath)
+				shift;
+				schedpath=$1;
+				;;
+			-f | --friendly)
+				shift;
+				friendly=$1;
+				;;
+			-u | --username)
+				shift;
+				username=$1;
+				;;
+			-p | --privateKeyFile)
+				shift;
+				privateKeyFile=$1;
+				;;
+		esac
+		shift
+	done
+}
+
+do_post() {
+	local jdffilepath=$1
+        if [ -f $jdffilepath ]
+	then
+		shift
+        	define_parameters $@
+		hash=$(echo -n $username$nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
+		base_curl_cmd="curl -X POST --form jdffilepath=${jdffilepath} --form X-auth-nonce=$nonce --form X-auth-username=$username --form X-auth-hash=$hash"
+                if [[ $schedpath ]]
+		then
+			base_curl_cmd="${base_curl_cmd} --form schedpath=${schedpath}"
+		fi
+		base_curl_cmd="${base_curl_cmd} $host/arrebol/job"
+        	response=$($base_curl_cmd 2> /dev/null)
+                echo $response
+	else
+        	echo "Error: jdffilepath<$jdffilepath> not found."
+                exit 1
+        fi
+}
+
+do_stop() {
+	if [ $# -eq 5 ]
+	then
+		define_parameters $@
+		hash=$(echo -n $username$nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
+        	response=$(curl -X DELETE -H "X-auth-nonce: $nonce" -H "X-auth-username: $username" -H "X-auth-hash: $hash" "$host/arrebol/job/$1" 2> /dev/null)
+                echo $response
+        else
+		print_menu
+		exit 1
+        fi
+}
+
+create_user() {
+	if [ $# -eq 2 ]
+	then
+		define_parameters $@
+		arrebol_certificates_dir="$HOME/.arrebol/$username"
+		echo "Creating certificates directory for the user $username: $arrebol_certificates_dir"
+		mkdir -p $arrebol_certificates_dir
+		echo "Generating your private key file in RSA format"
+		openssl genrsa -out "$arrebol_certificates_dir/private.rsa" 2048
+		echo "Generating your public key file in RSA format"
+		openssl rsa -in "$arrebol_certificates_dir/private.rsa" -outform PEM -pubout -out "$arrebol_certificates_dir/public.rsa"
+		echo "Your public and private keys are in: $arrebol_certificates_dir"
+		echo "Requesting the creation of the user $username with the public key in $arrebol_certificates_dir/public.rsa"
+		response=$(curl -X POST --form "username=$username" --form "publicKey=@$arrebol_certificates_dir/public.rsa" "$host/arrebol/user" 2> /dev/null)
+		echo $response
+	else
+		print_menu
+		exit 1
+	fi
+}
+
+if [ $# -gt 0 ]
+then
+    op=$1
+    case "$op" in
+        GET)
+            shift
+            do_get_nonce
+            do_get $@
+        ;;
+        POST)
+            shift
+            do_get_nonce
+            do_post $@
+        ;;
+        STOP)
+            shift
+            do_get_nonce
+            do_stop $@
+        ;;
+        CREATEUSER)
+            shift
+            create_user $@
+        ;;
+        *)
+            print_menu
+            exit 1
+        ;;
+    esac
+else
+	print_menu
+	exit 1
+fi

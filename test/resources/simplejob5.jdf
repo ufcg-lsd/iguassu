@@ -1,0 +1,12 @@
+job : 
+label : SimpleJob5
+
+task :
+	  put helloWorld.txt tmp/init-$JOB.$TASK
+	  cat tmp/init-$JOB.$TASK >> output-$JOB.$TASK
+	  get output-$JOB.$TASK tmp/final-$JOB.$TASK
+
+task :
+	  put helloWorld.txt tmp/init-$JOB.$TASK
+	  cat tmp/init-$JOB.$TASK >> output-$JOB.$TASK
+	  get output-$JOB.$TASK tmp/final-$JOB.$TASK
