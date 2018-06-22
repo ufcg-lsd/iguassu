@@ -30,6 +30,10 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
     private static final String INSERT_TOKEN_TABLE_SQL = "INSERT INTO " + TOKENS_TABLE_NAME
             + " VALUES(?, ?, ?, ?)";
 
+    private static final String UPDATE_TOKEN_TABLE_SQL = "UPDATE " + TOKENS_TABLE_NAME + " SET "
+            + ACCESS_TOKEN + " = ?, " + REFRESH_TOKEN + " = ?, " + TOKEN_OWNER_USERNAME + " = ?, " + EXPIRATION_TIME
+            + " = ? WHERE " + ACCESS_TOKEN + " = ?";
+
     private static final String GET_ALL_TOKENS = "SELECT * FROM " + TOKENS_TABLE_NAME;
 
     private static final Logger LOGGER = Logger.getLogger(OAuthTokenDataStore.class);
@@ -81,6 +85,45 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
             return true;
         } catch (SQLException e) {
             LOGGER.error("Couldn't execute statement : " + INSERT_TOKEN_TABLE_SQL, e);
+            try {
+                if (connection != null) {
+                    connection.rollback();
+                }
+            } catch (SQLException e1) {
+                LOGGER.error("Couldn't rollback transaction.", e1);
+            }
+            return false;
+        } finally {
+            close(preparedStatement, connection);
+        }
+    }
+
+    public boolean update(String oldAccessToken, OAuthToken token) {
+        LOGGER.debug("Updating access token [" + token.getAccessToken() + "] from owner [" + token.getUsernameOwner() + "]");
+
+        if (token.getAccessToken() == null || token.getAccessToken().isEmpty()
+                || token.getUsernameOwner() == null || token.getUsernameOwner().isEmpty()) {
+            LOGGER.warn("Access token and owner must not be null.");
+            return false;
+        }
+
+        PreparedStatement preparedStatement = null;
+        Connection connection = null;
+        try {
+            connection = getConnection();
+            connection.setAutoCommit(false);
+            preparedStatement = connection.prepareStatement(UPDATE_TOKEN_TABLE_SQL);
+            preparedStatement.setString(1, token.getAccessToken());
+            preparedStatement.setString(2, token.getRefreshToken());
+            preparedStatement.setString(3, token.getUsernameOwner());
+            preparedStatement.setDate(4, token.getExpirationDate());
+            preparedStatement.setString(5, oldAccessToken);
+
+            preparedStatement.execute();
+            connection.commit();
+            return true;
+        } catch (SQLException e) {
+            LOGGER.error("Couldn't execute statement : " + UPDATE_TOKEN_TABLE_SQL, e);
             try {
                 if (connection != null) {
                     connection.rollback();
