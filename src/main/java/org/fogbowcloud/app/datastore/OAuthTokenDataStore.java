@@ -35,6 +35,7 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
             + " = ? WHERE " + ACCESS_TOKEN + " = ?";
 
     private static final String GET_ALL_TOKENS = "SELECT * FROM " + TOKENS_TABLE_NAME;
+    private static final String GET_TOKEN_BY_ACCESS_TOKEN = GET_ALL_TOKENS + " WHERE " + ACCESS_TOKEN + " = ? ";
 
     private static final String DELETE_ALL_TOKENS_TABLE_SQL = "DELETE FROM " + TOKENS_TABLE_NAME;
 
@@ -144,6 +145,14 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
         return executeQueryStatement(GET_ALL_TOKENS);
     }
 
+    public OAuthToken getTokenByAccessToken(String accessToken) {
+        List<OAuthToken> tokensList = executeQueryStatement(GET_TOKEN_BY_ACCESS_TOKEN, accessToken);
+        if (tokensList != null && !tokensList.isEmpty()) {
+            return tokensList.get(0);
+        }
+        return null;
+    }
+
     public boolean deleteAll() {
         LOGGER.debug("Deleting all tokens.");
 
@@ -171,7 +180,7 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
         Date expirationTime = rs.getDate(EXPIRATION_TIME);
         String strJson = "{" + ACCESS_TOKEN + ":" + accessToken + ","
                 + REFRESH_TOKEN + ":" + refreshToken + ","
-                + TOKENS_TABLE_NAME + ":" + ownerUsername + ","
+                + TOKEN_OWNER_USERNAME + ":" + ownerUsername + ","
                 + EXPIRATION_TIME + ":" + expirationTime + "}";
         JSONObject tokenJson = new JSONObject(strJson);
         OAuthToken token = OAuthToken.fromJSON(tokenJson);

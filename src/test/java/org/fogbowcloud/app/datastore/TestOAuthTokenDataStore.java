@@ -49,13 +49,30 @@ public class TestOAuthTokenDataStore {
 
         String oldAccessToken = token.getAccessToken();
         String newAcessToken = "new-fake-access-token";
+        String newRefreshToken = "new-fake-refresh-token";
+        Date newExpirationDate = Date.valueOf("1900-01-01");
         token.setAccessToken(newAcessToken);
+        token.setRefreshToken(newRefreshToken);
+        token.setExpirationDate(newExpirationDate);
+
         this.datastore.update(oldAccessToken, token);
 
         List<OAuthToken> tokenList = this.datastore.getAll();
         assertEquals(1, tokenList.size());
         assertEquals(newAcessToken, tokenList.get(0).getAccessToken());
+        assertEquals(newRefreshToken, token.getRefreshToken());
+        assertEquals(newExpirationDate, token.getExpirationDate());
+    }
+    @Test
+    public void testGetTokenByAccessToken() {
+        OAuthToken token = new OAuthToken(FAKE_ACCESS_TOKEN, FAKE_REFRESH_TOKEN, FAKE_OWNER_USERNAME, FAKE_EXPIRATION_DATE);
+        this.datastore.insert(token);
 
+        OAuthToken retrievedToken = this.datastore.getTokenByAccessToken(FAKE_ACCESS_TOKEN);
+        assertNotNull(retrievedToken);
+        assertEquals(token.getRefreshToken(), retrievedToken.getRefreshToken());
+        assertEquals(token.getUsernameOwner(), retrievedToken.getUsernameOwner());
+        assertEquals(token.getExpirationDate(), retrievedToken.getExpirationDate());
     }
 
 }
