@@ -25,8 +25,7 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
             + ACCESS_TOKEN + " VARCHAR(255) PRIMARY KEY, "
             + REFRESH_TOKEN + " VARCHAR(255), "
             + TOKEN_OWNER_USERNAME + " VARCHAR(255), "
-            + EXPIRATION_TIME + " DATE, "
-            + "UNIQUE (" + TOKEN_OWNER_USERNAME + "))";
+            + EXPIRATION_TIME + " DATE )";
 
     private static final String INSERT_TOKEN_TABLE_SQL = "INSERT INTO " + TOKENS_TABLE_NAME
             + " VALUES(?, ?, ?, ?)";
@@ -57,14 +56,14 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
         }
     }
 
-    public boolean insert(OAuthToken accessToken) {
-        LOGGER.debug("Inserting access token [" + accessToken.getAccessToken() + "] with owner [" + accessToken.getUsernameOwner() + "]");
+    public boolean insert(OAuthToken token) {
+        LOGGER.debug("Inserting access token [" + token.getAccessToken() + "] with owner [" + token.getUsernameOwner() + "]");
 
-//        if (job.getId() == null || job.getId().isEmpty()
-//                || job.getOwner() == null || job.getOwner().isEmpty()) {
-//            LOGGER.warn("Job Id and owner must not be null.");
-//            return false;
-//        }
+        if (token.getAccessToken() == null || token.getAccessToken().isEmpty()
+                || token.getUsernameOwner() == null || token.getUsernameOwner().isEmpty()) {
+            LOGGER.warn("Access token and owner must not be null.");
+            return false;
+        }
 
         PreparedStatement preparedStatement = null;
         Connection connection = null;
@@ -72,10 +71,10 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
             connection = getConnection();
             connection.setAutoCommit(false);
             preparedStatement = connection.prepareStatement(INSERT_TOKEN_TABLE_SQL);
-            preparedStatement.setString(1, accessToken.getAccessToken());
-            preparedStatement.setString(2, accessToken.getRefreshToken());
-            preparedStatement.setString(3, accessToken.getUsernameOwner());
-            preparedStatement.setDate (4, accessToken.getExpirationDate());
+            preparedStatement.setString(1, token.getAccessToken());
+            preparedStatement.setString(2, token.getRefreshToken());
+            preparedStatement.setString(3, token.getUsernameOwner());
+            preparedStatement.setDate (4, token.getExpirationDate());
 
             preparedStatement.execute();
             connection.commit();
