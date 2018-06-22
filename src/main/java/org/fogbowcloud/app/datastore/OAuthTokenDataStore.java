@@ -36,6 +36,8 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
 
     private static final String GET_ALL_TOKENS = "SELECT * FROM " + TOKENS_TABLE_NAME;
 
+    private static final String DELETE_ALL_TOKENS_TABLE_SQL = "DELETE FROM " + TOKENS_TABLE_NAME;
+
     private static final Logger LOGGER = Logger.getLogger(OAuthTokenDataStore.class);
 
     public OAuthTokenDataStore(String dataStoreURL) {
@@ -140,6 +142,26 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
     public List<OAuthToken> getAll() {
         LOGGER.debug("Getting all instances id with related orders.");
         return executeQueryStatement(GET_ALL_TOKENS);
+    }
+
+    public boolean deleteAll() {
+        LOGGER.debug("Deleting all tokens.");
+
+        Statement statement = null;
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            statement = conn.createStatement();
+
+            boolean result = statement.execute(DELETE_ALL_TOKENS_TABLE_SQL);
+            conn.commit();
+            return result;
+        } catch (SQLException e) {
+            LOGGER.error("Couldn't delete all registres on " + TOKENS_TABLE_NAME, e);
+            return false;
+        } finally {
+            close(statement, conn);
+        }
     }
 
     public OAuthToken getObjFromDataStoreResult(ResultSet rs) throws SQLException {
