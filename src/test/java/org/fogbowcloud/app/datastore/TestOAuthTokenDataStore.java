@@ -30,7 +30,7 @@ public class TestOAuthTokenDataStore {
 
     @After
     public void tearDown() {
-        //this.datastore.deleteAll();
+        this.datastore.deleteAll();
     }
 
     @Test
@@ -40,6 +40,22 @@ public class TestOAuthTokenDataStore {
         List<OAuthToken> tokenList = this.datastore.getAll();
         assertEquals(1, tokenList.size());
         assertEquals(token.getAccessToken(), tokenList.get(0).getAccessToken());
+    }
+
+    @Test
+    public void testUpdateToken() {
+        OAuthToken token = new OAuthToken(FAKE_ACCESS_TOKEN, FAKE_REFRESH_TOKEN, FAKE_OWNER_USERNAME, FAKE_EXPIRATION_DATE);
+        this.datastore.insert(token);
+
+        String oldAccessToken = token.getAccessToken();
+        String newAcessToken = "new-fake-access-token";
+        token.setAccessToken(newAcessToken);
+        this.datastore.update(oldAccessToken, token);
+
+        List<OAuthToken> tokenList = this.datastore.getAll();
+        assertEquals(1, tokenList.size());
+        assertEquals(newAcessToken, tokenList.get(0).getAccessToken());
+
     }
 
 }

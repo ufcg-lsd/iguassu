@@ -93,12 +93,12 @@ public abstract class DataStore<T> {
             }
 
         } catch (SQLException e) {
-            LOGGER.error("Couldn't get Tokens from DB.", e);
+            LOGGER.error("Couldn't get data from DB.", e);
             return new ArrayList<>();
         } finally {
             close(preparedStatement, conn);
         }
-        LOGGER.debug("There are " + dataList.size() + " tokens at DB to this query (" + preparedStatement.toString() + ").");
+        LOGGER.debug("There are " + dataList.size() + " rows at DB to this query (" + preparedStatement.toString() + ").");
         return dataList;
     }
 

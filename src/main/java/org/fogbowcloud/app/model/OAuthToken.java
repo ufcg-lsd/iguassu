@@ -35,8 +35,16 @@ public class OAuthToken {
         return accessToken;
     }
 
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
+    }
+
     public String getRefreshToken() {
         return refreshToken;
+    }
+
+    public void setRefreshToken(String refreshToken) {
+        this.refreshToken = refreshToken;
     }
 
     public String getUsernameOwner() {
@@ -45,6 +53,10 @@ public class OAuthToken {
 
     public Date getExpirationDate() {
         return expirationDate;
+    }
+
+    public void setExpirationDate(Date expirationDate) {
+        this.expirationDate = expirationDate;
     }
 
     public static OAuthToken fromJSON(JSONObject tokenJson) {
