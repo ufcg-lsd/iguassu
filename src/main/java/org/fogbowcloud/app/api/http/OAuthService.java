@@ -26,5 +26,30 @@ public class OAuthService {
         boolean saved = this.oAuthTokenDataStore.insert(oAuthToken);
         return saved;
     }
-    
+
+    public List<OAuthToken> getAll() {
+        return this.oAuthTokenDataStore.getAll();
+    }
+
+    public String getAccessTokenByOwnerUsername(String ownerUsername) {
+        List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(ownerUsername);
+
+        // TODO: if list is empty (there is no token for user) throws error to be catched and return appropriate http status code
+        for (OAuthToken token: tokensList) {
+            if (!token.hasExpired()) {
+                return token.getAccessToken();
+            }
+        }
+        // TODO refact to method
+        OAuthToken someToken = tokensList.get(0);
+        String someRefreshToken = someToken.getRefreshToken();
+        OAuthToken newOAuthToken = this.oAuthController.refreshToken(someRefreshToken);
+        String accessToken = newOAuthToken.getAccessToken();
+        deleteTokens(tokensList);
+        System.out.println(getAll().size());
+        this.oAuthTokenDataStore.insert(newOAuthToken);
+
+        return accessToken;
+    }
+
 }

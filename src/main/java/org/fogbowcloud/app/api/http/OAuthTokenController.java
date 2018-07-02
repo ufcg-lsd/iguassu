@@ -28,10 +28,17 @@ public class OAuthTokenController {
         this.oAuthService.storeOAuthToken(oAuthToken);
         return new ResponseEntity<OAuthToken>(oAuthToken, HttpStatus.CREATED);
     }
-    
-    @Autowired
-    public void setOAuthService(Properties properties) {
-        this.oAuthService = new OAuthService(properties);
+
+    @RequestMapping(value = "/{ownerUsername}", method = RequestMethod.GET)
+    public ResponseEntity<String> getAccessTokenBy(@PathVariable String ownerUsername) {
+        LOGGER.info("Retrieving OAuth token from user [" + ownerUsername + "]");
+
+        String accessToken = this.oAuthService.getAccessTokenByOwnerUsername(ownerUsername);
+        return new ResponseEntity<String>(accessToken, HttpStatus.OK);
     }
+
+    // TODO: Think about it: does it make sense to have a Post createToken passing userOwner and AuthCode?
+
+
 
 }

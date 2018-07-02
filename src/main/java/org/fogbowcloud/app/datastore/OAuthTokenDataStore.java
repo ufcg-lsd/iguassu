@@ -36,6 +36,7 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
 
     private static final String GET_ALL_TOKENS = "SELECT * FROM " + TOKENS_TABLE_NAME;
     private static final String GET_TOKEN_BY_ACCESS_TOKEN = GET_ALL_TOKENS + " WHERE " + ACCESS_TOKEN + " = ? ";
+    private static final String GET_TOKEN_BY_OWNER_USERNAME = GET_ALL_TOKENS + " WHERE " + TOKEN_OWNER_USERNAME + " = ? ";
 
     private static final String DELETE_ALL_TOKENS_TABLE_SQL = "DELETE FROM " + TOKENS_TABLE_NAME;
 
@@ -151,6 +152,11 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
             return tokensList.get(0);
         }
         return null;
+    }
+
+    public List<OAuthToken> getAccessTokenByOwnerUsername(String ownerUsername) {
+        List<OAuthToken> tokensList = executeQueryStatement(GET_TOKEN_BY_OWNER_USERNAME, ownerUsername);
+        return tokensList;
     }
 
     public boolean deleteAll() {

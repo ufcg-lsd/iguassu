@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class OAuthToken {
 
     private static final String JSON_HEADER_ACCESS_TOKEN = "access_token";
     private static final String JSON_HEADER_REFRESH_TOKEN = "refresh_token";
-    private static final String JSON_HEADER_USERNAME_OWNER = "username_owner";
+    private static final String JSON_HEADER_USERNAME_OWNER = "token_owner_username";
     private static final String JSON_HEADER_EXPIRATION_DATE = "expiration_date";
 
     private String accessToken;
