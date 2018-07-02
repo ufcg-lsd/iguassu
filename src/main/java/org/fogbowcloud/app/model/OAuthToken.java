@@ -19,7 +19,7 @@ public class OAuthToken {
 
     private String accessToken;
     private String refreshToken;
-    private final String usernameOwner;
+    private String usernameOwner;
     private Date expirationDate;
 
     public static final Logger LOGGER = Logger.getLogger(OAuthToken.class);
@@ -51,29 +51,23 @@ public class OAuthToken {
         return usernameOwner;
     }
 
+    public void setUsernameOwner(String usernameOwner) {
+        this.usernameOwner = usernameOwner;
+    }
+
     public Date getExpirationDate() {
         return expirationDate;
     }
 
-    public void setExpirationDate(Date expirationDate) {
-        this.expirationDate = expirationDate;
+    public void setExpirationDate(long expiresIn) {
+        Timestamp stamp = new Timestamp(System.currentTimeMillis());
+        long expiresInMillisecond = expiresIn * 1000;
+        //TODO check if is setting date (and time like hour min sec) correctly
+        this.expirationDate = new Date(stamp.getTime() + expiresInMillisecond);
     }
 
-    public static OAuthToken fromJSON(JSONObject tokenJson) {
-        LOGGER.info("Reading Token from JSON");
-        List<Task> tasks = new ArrayList<>();
-
-        String dateStr = tokenJson.optString(JSON_HEADER_EXPIRATION_DATE);
-        Date expirationDate = Date.valueOf(dateStr);
-
-        OAuthToken token = new OAuthToken(
-                tokenJson.optString(JSON_HEADER_ACCESS_TOKEN),
-                tokenJson.optString(JSON_HEADER_REFRESH_TOKEN),
-                tokenJson.optString(JSON_HEADER_USERNAME_OWNER),
-                expirationDate);
-
-        LOGGER.debug("Job read from JSON is from owner: " + token.getUsernameOwner());
-        return token;
+    public void setExpirationDate(Date expirationDate) {
+        this.expirationDate = expirationDate;
     }
 
 }
