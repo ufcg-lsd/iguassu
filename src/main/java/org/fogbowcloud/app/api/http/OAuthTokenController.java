@@ -39,6 +39,26 @@ public class OAuthTokenController {
 
     // TODO: Think about it: does it make sense to have a Post createToken passing userOwner and AuthCode?
 
+    @RequestMapping(method = RequestMethod.GET)
+    public ResponseEntity<List<OAuthToken>> getAllOAuthTokens() {
+        LOGGER.info("Retrieving all OAuth tokens.");
 
+        List<OAuthToken> list = this.oAuthService.getAll();
+        return new ResponseEntity<List<OAuthToken>>(list, HttpStatus.CREATED);
+    }
+
+    // TODO: delete this endpoints after tests
+    @RequestMapping(method = RequestMethod.DELETE)
+    public ResponseEntity deleteAllOAuthTokens() {
+        LOGGER.info("Deleting all OAuth tokens.");
+
+        this.oAuthService.deleteAllTokens();
+        return new ResponseEntity<List<OAuthToken>>(HttpStatus.CREATED);
+    }
+
+    @Autowired
+    public void setOAuthService(Properties properties) {
+        this.oAuthService = new OAuthService(properties);
+    }
 
 }

@@ -52,4 +52,13 @@ public class OAuthService {
         return accessToken;
     }
 
+    private void deleteTokens(List<OAuthToken> tokenList) {
+        for (OAuthToken token: tokenList) {
+            this.oAuthTokenDataStore.deleteByAccessToken(token.getAccessToken());
+        }
+    }
+
+    public void deleteAllTokens() {
+        this.oAuthTokenDataStore.deleteAll();
+    }
 }

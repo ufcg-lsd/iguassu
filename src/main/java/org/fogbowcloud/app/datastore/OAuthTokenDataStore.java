@@ -26,6 +26,7 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
             + REFRESH_TOKEN + " VARCHAR(255), "
             + TOKEN_OWNER_USERNAME + " VARCHAR(255), "
             + EXPIRATION_TIME + " DATE )";
+    // TODO: check if makes sense add constraint to unique token_owner_username
 
     private static final String INSERT_TOKEN_TABLE_SQL = "INSERT INTO " + TOKENS_TABLE_NAME
             + " VALUES(?, ?, ?, ?)";
@@ -39,6 +40,8 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
     private static final String GET_TOKEN_BY_OWNER_USERNAME = GET_ALL_TOKENS + " WHERE " + TOKEN_OWNER_USERNAME + " = ? ";
 
     private static final String DELETE_ALL_TOKENS_TABLE_SQL = "DELETE FROM " + TOKENS_TABLE_NAME;
+    private static final String DELETE_TOKEN_BY_ACCESS_TOKEN_SQL = DELETE_ALL_TOKENS_TABLE_SQL
+            + " WHERE " + ACCESS_TOKEN + " + ? ";
 
     private static final Logger LOGGER = Logger.getLogger(OAuthTokenDataStore.class);
 
@@ -176,6 +179,27 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
             return false;
         } finally {
             close(statement, conn);
+        }
+    }
+
+    // TODO: test
+    public boolean deleteByAccessToken(String accessToken) {
+        LOGGER.debug("Deleting token with accessToken [" + accessToken + "]");
+
+        PreparedStatement preparedStatement = null;
+        Connection conn = null;
+        try {
+            conn = getConnection();
+            preparedStatement = conn.prepareStatement(DELETE_TOKEN_BY_ACCESS_TOKEN_SQL);
+            preparedStatement.setString(1, accessToken);
+            ResultSet rs = preparedStatement.executeQuery();
+            conn.commit();
+            return true;
+        } catch (SQLException e) {
+            LOGGER.error("Couldn't delete.", e);
+            return false;
+        } finally {
+            close(preparedStatement, conn);
         }
     }
 
