@@ -25,6 +25,32 @@ public class OAuthToken {
 
     public static final Logger LOGGER = Logger.getLogger(OAuthToken.class);
 
+    public OAuthToken() {
+
+    }
+
+    public static OAuthToken fromJSON(JSONObject tokenJson) {
+        LOGGER.info("Reading Token from JSON");
+
+        String dateStr = tokenJson.optString(JSON_HEADER_EXPIRATION_DATE);
+        Date expirationDate = Date.valueOf(dateStr);
+
+        OAuthToken token = new OAuthToken(
+                tokenJson.optString(JSON_HEADER_ACCESS_TOKEN),
+                tokenJson.optString(JSON_HEADER_REFRESH_TOKEN),
+                tokenJson.optString(JSON_HEADER_USERNAME_OWNER),
+                expirationDate);
+
+        LOGGER.debug("Job read from JSON is from owner: " + token.getUsernameOwner());
+        return token;
+    }
+
+    public boolean hasExpired() {
+        Timestamp stamp = new Timestamp(System.currentTimeMillis());
+        Date currentDate = new Date(stamp.getTime());
+        return currentDate.getTime() > this.expirationDate.getTime();
+    }
+
     public OAuthToken(String accessToken, String refreshToken, String usernameOwner, Date expirationDate) {
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
