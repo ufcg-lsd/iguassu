@@ -13,7 +13,8 @@ public class DataStoreHelper {
 	 */
 	public static String getDataStoreUrl(String dataStoreUrl, String dataStoreName) {
 		if (dataStoreUrl == null || dataStoreUrl.isEmpty()) {
-			dataStoreUrl = PREFIX_DATASTORE_URL + DATASTORES_FOLDER + "/" + dataStoreName;
+			String projectAbsolutePath = System.getProperty("user.dir");
+			dataStoreUrl = PREFIX_DATASTORE_URL + projectAbsolutePath + "/" + DATASTORES_FOLDER + "/" + dataStoreName;
 			File datastoreDir = new File(DATASTORES_FOLDER);
 			if (!datastoreDir.exists()) {
 				datastoreDir.mkdirs();

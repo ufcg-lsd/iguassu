@@ -46,7 +46,6 @@ public class OAuthService {
         OAuthToken newOAuthToken = this.oAuthController.refreshToken(someRefreshToken);
         String accessToken = newOAuthToken.getAccessToken();
         deleteTokens(tokensList);
-        System.out.println(getAll().size());
         this.oAuthTokenDataStore.insert(newOAuthToken);
 
         return accessToken;
