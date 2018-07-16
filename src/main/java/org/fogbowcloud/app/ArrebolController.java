@@ -178,7 +178,6 @@ public class ArrebolController {
 			throws CompilerException, NameAlreadyInUseException, BlowoutException, IOException {
 		LOGGER.debug("Adding job  of owner " + owner.getUsername() + " to scheduler" );
 		JDFJob job = createJobFromJDFFile(jdfFilePath, owner);
-
 		if (job.getName() != null &&
 				!job.getName().trim().isEmpty() &&
 				getJobByName(job.getName(), owner.getUser()) != null) {

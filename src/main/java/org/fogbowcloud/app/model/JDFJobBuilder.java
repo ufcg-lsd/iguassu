@@ -125,7 +125,6 @@ public class JDFJobBuilder {
 					String inputLine;
 					StringBuilder resultBuilder = new StringBuilder();
 					while ((inputLine = in.readLine()) != null) {
-				        System.out.println(inputLine);
 				        resultBuilder.append(inputLine);
 				    }
 					String result = resultBuilder.toString();

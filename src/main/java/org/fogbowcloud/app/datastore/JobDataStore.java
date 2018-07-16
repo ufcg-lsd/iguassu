@@ -49,15 +49,16 @@ public class JobDataStore extends DataStore<JDFJob> {
 
 	public JobDataStore(String dataStoreURL) {
 		super(dataStoreURL);
-
 		Statement statement = null;
 		Connection connection = null;
+
 		try {
 			LOGGER.debug("jobDataStoreURL: " + super.dataStoreURL);
 
 			Class.forName(JOB_DATASTORE_DRIVER);
 
 			connection = getConnection();
+
 			statement = connection.createStatement();
 			statement.execute(CREATE_TABLE_STATEMENT);
 			statement.close();

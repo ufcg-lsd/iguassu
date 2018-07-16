@@ -96,7 +96,6 @@ public class ArrebolControllerIT {
 			String responseStr = EntityUtils.toString(response.getEntity(), "UTF-8");
 			assertTrue(this.ac.getJobById(responseStr, ResourceTestUtil.DEFAULT_OWNER) != null);
 		
-			System.out.println("Chegou aqui");
 			this.app.stop();
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

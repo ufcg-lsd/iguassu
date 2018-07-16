@@ -1,14 +1,16 @@
 package org.fogbowcloud.app;
 
-import org.apache.log4j.Logger;
+import org.fogbowcloud.app.utils.authenticator.IguassuGeneralConstants;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.fogbowcloud.app.exception.ArrebolException;
+import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerInitializedEvent;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
-import org.springframework.stereotype.Component;
+import org.springframework.context.annotation.Lazy;
 
 import java.io.FileInputStream;
 import java.util.Properties;
@@ -18,7 +20,7 @@ import java.util.Properties;
 @SpringBootApplication
 public class IguassuApplication {
 
-    public static final Logger LOGGER = Logger.getLogger(IguassuApplication.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(IguassuApplication.class);
 
     @Bean
     CommandLineRunner cmdRunner() {
@@ -30,15 +32,30 @@ public class IguassuApplication {
         return new Properties();
     }
 
+    @Bean
+    @Lazy
+    public ArrebolController arrebolController(Properties properties) throws BlowoutException, ArrebolException {
+        ArrebolController arrebolController = new ArrebolController(properties);
+        try {
+            arrebolController.init(); //TODO: resolve this problem with authentication
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return arrebolController;
+    }
+
     public static void main(String[] args) {
         SpringApplication.run(IguassuApplication.class, args);
     }
-
 
     public class IguassuMainRunner implements CommandLineRunner {
 
         @Autowired
         private Properties properties;
+
+        @Lazy
+        @Autowired
+        ArrebolController arrebolController;
 
         @Override
         public void run(String...args) throws Exception {

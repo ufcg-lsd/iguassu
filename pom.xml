@@ -92,7 +92,6 @@
 	</parent>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>org.restlet.jse</groupId>
 			<artifactId>org.restlet.ext.fileupload</artifactId>

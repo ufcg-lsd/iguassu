@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.api.http;
+package org.fogbowcloud.app.api.http.services;
 
 import org.fogbowcloud.app.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.external.oauth.OAuthController;
@@ -34,7 +34,6 @@ public class OAuthService {
     public String getAccessTokenByOwnerUsername(String ownerUsername) {
         List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(ownerUsername);
 
-        // TODO: if list is empty (there is no token for user) throws error to be catched and return appropriate http status code
         for (OAuthToken token: tokensList) {
             if (!token.hasExpired()) {
                 return token.getAccessToken();

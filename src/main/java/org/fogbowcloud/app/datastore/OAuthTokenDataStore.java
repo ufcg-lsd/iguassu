@@ -7,10 +7,8 @@ import org.fogbowcloud.app.utils.DataStoreHelper;
 import org.json.JSONObject;
 
 import java.sql.*;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.Date;
-import java.util.List;
-import java.util.Properties;
 
 
 public class OAuthTokenDataStore extends DataStore<OAuthToken> {
@@ -47,7 +45,6 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
 
     public OAuthTokenDataStore(String dataStoreURL) {
         super(dataStoreURL);
-
         Statement statement = null;
         Connection connection = null;
         try {

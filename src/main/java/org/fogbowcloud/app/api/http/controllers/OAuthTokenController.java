@@ -1,6 +1,7 @@
-package org.fogbowcloud.app.api.http;
+package org.fogbowcloud.app.api.http.controllers;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.api.http.services.OAuthService;
 import org.fogbowcloud.app.model.OAuthToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
