@@ -32,8 +32,8 @@ public class OAuthToken {
     public static OAuthToken fromJSON(JSONObject tokenJson) {
         LOGGER.info("Reading Token from JSON");
 
-        String dateStr = tokenJson.optString(JSON_HEADER_EXPIRATION_DATE);
-        Date expirationDate = Date.valueOf(dateStr);
+        long dateStr = tokenJson.getLong(JSON_HEADER_EXPIRATION_DATE);
+        Date expirationDate = new Date(dateStr);
 
         OAuthToken token = new OAuthToken(
                 tokenJson.optString(JSON_HEADER_ACCESS_TOKEN),
@@ -86,10 +86,9 @@ public class OAuthToken {
         return expirationDate;
     }
 
-    public void setExpirationDate(long expiresIn) {
+    public void setExpirationDate(long secondsToExpires) {
         Timestamp stamp = new Timestamp(System.currentTimeMillis());
-        long expiresInMillisecond = expiresIn * 1000;
-        //TODO check if is setting date (and time like hour min sec) correctly
+        long expiresInMillisecond = secondsToExpires * 1000;
         this.expirationDate = new Date(stamp.getTime() + expiresInMillisecond);
     }
 

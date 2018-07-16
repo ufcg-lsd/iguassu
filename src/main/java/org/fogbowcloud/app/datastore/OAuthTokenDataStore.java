@@ -208,10 +208,12 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
         String refreshToken = rs.getString(REFRESH_TOKEN);
         String ownerUsername = rs.getString(TOKEN_OWNER_USERNAME);
         Date expirationTime = rs.getDate(EXPIRATION_TIME);
+        long expirationTimeInMillisecondes = expirationTime.getTime();
+
         String strJson = "{" + ACCESS_TOKEN + ":" + accessToken + ","
                 + REFRESH_TOKEN + ":" + refreshToken + ","
                 + TOKEN_OWNER_USERNAME + ":" + ownerUsername + ","
-                + EXPIRATION_TIME + ":" + expirationTime + "}";
+                + EXPIRATION_TIME + ":" + expirationTimeInMillisecondes + "}";
         JSONObject tokenJson = new JSONObject(strJson);
         OAuthToken token = OAuthToken.fromJSON(tokenJson);
         return token;
