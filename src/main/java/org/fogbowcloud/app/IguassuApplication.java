@@ -42,14 +42,17 @@ public class IguassuApplication {
 
         @Override
         public void run(String...args) throws Exception {
-            if (args.length < 1) {
-                System.err.println(
-                        "Incomplete arguments. Necessary to pass two args. (1) arrebol.conf path and (2) blowout.conf path.");
-                System.exit(1);
-            }
 
-            String arrebolConfPath = args[0];
-            String schedConfPath = args[1];
+            String arrebolConfPath;
+            String schedConfPath;
+
+            if (args.length > 0) {
+                arrebolConfPath = args[0];
+                schedConfPath = args[1];
+            } else {
+                arrebolConfPath = IguassuGeneralConstants.DEFAULT_ARREBOL_CONF_FILE_PATH;
+                schedConfPath = IguassuGeneralConstants.DEFAULT_SCHED_CONF_FILE_PATH;
+            }
 
             try {
                 properties.load(new FileInputStream(arrebolConfPath));
