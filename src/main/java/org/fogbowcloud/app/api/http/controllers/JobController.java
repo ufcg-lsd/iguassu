@@ -125,7 +125,22 @@ public class JobController {
         return new ResponseEntity<>(mJobId, HttpStatus.CREATED);
     }
 
+    @RequestMapping(value = JOB_PATH, method = RequestMethod.DELETE)
+    public ResponseEntity stopJob(@PathVariable String jobId,
+                                  @RequestHeader(value=ArrebolPropertiesConstants.X_CREDENTIALS) String credentials) throws InvalidParameterException {
+        LOGGER.info("Deleting all Job with Id " + jobId + ".");
 
+        User owner = this.jobService.authenticateUser(credentials);
+
+        String stoppedJobId = this.jobService.stopJob(jobId, owner.getUser());
+
+        if (stoppedJobId == null) {
+            LOGGER.debug("Could not find job with id " + jobId + " for user " + owner.getUsername());
+            throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
+        }
+
+        return new ResponseEntity<>(stoppedJobId, HttpStatus.OK);
+    }
 
     public class StringResponse {
 

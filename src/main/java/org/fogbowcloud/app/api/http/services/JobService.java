@@ -51,7 +51,9 @@ public class JobService {
         return this.arrebolController.getJobByName(jobName, owner);
     }
 
-
+    public String stopJob(String jobId, String owner) {
+        return this.arrebolController.stopJob(jobId, owner);
+    }
 
     public String addJob(String jdfFilePath, User owner)
             throws CompilerException, NameAlreadyInUseException, BlowoutException, IOException {
