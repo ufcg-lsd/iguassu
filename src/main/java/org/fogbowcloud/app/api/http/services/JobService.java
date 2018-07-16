@@ -53,4 +53,37 @@ public class JobService {
 
 
 
+    public String addJob(String jdfFilePath, User owner)
+            throws CompilerException, NameAlreadyInUseException, BlowoutException, IOException {
+        return this.arrebolController.addJob(jdfFilePath, owner);
+    }
+
+    public User authenticateUser(String credentials) {
+        User owner;
+        return new LDAPUser("arrebolservice", "arrebolservice"); // TODO
+//        try {
+//            owner = this.arrebolController.authUser(credentials);
+//        } catch (GeneralSecurityException e) {
+//            LOGGER.error("Error trying to authenticate", e);
+//            throw new ResourceException(
+//                    Status.CLIENT_ERROR_UNAUTHORIZED,
+//                    "There was an error trying to authenticate.\nTry again later."
+//            );
+//        } catch (IOException e) {
+//            LOGGER.error("Error trying to authenticate", e);
+//            throw new ResourceException(
+//                    Status.CLIENT_ERROR_BAD_REQUEST,
+//                    "Failed to read request header."
+//            );
+//        }
+//        if (owner == null) {
+//            LOGGER.error("Authentication failed. Wrong username/password.");
+//            throw new ResourceException(
+//                    Status.CLIENT_ERROR_UNAUTHORIZED,
+//                    "Incorrect username/password."
+//            );
+//        }
+//        return owner;
+    }
+
 }

@@ -80,6 +80,62 @@ public class JobController {
         return new ResponseEntity<>(job, HttpStatus.OK);
     }
 
+    // TODO check in front-end if it is the proper return type
+    @RequestMapping(method = RequestMethod.POST, produces = "application/json")
+    public ResponseEntity<StringResponse> addJob(@RequestParam(JobController.JDF_FILE_PATH) MultipartFile file, RedirectAttributes redirectAttributes,
+                                                 @RequestHeader(value=ArrebolPropertiesConstants.X_CREDENTIALS) String credentials) {
+        LOGGER.info("Saving new Job.");
+
+        LOGGER.debug(file.toString());
+
+        // Credentials
+        Map<String, String> fieldMap = new HashMap<>();
+        fieldMap.put(JDF_FILE_PATH, null);
+        fieldMap.put(ArrebolPropertiesConstants.X_CREDENTIALS, null);
+
+        // handle file upload
+        this.storageService.store(file, fieldMap);
+        User owner = this.jobService.authenticateUser(credentials);
+
+        // Creating job
+        String jdf = fieldMap.get(JDF_FILE_PATH);
+        if (jdf == null) {
+            LOGGER.debug("Could not store  new job from user " + owner.getUsername());
+            throw new StorageException("Could not store  new job from user " + owner.getUsername());
+        }
+
+        String jobId;
+        String jdfAbsolutePath = fieldMap.get(JDF_FILE_PATH);
+        try {
+            LOGGER.debug("jdfpath <" + jdfAbsolutePath + ">");
+            jobId = this.jobService.addJob(jdfAbsolutePath, owner);
+            LOGGER.debug("Job "+ jobId + " created at time: "+ System.currentTimeMillis() );
+        } catch (CompilerException ce) {
+            LOGGER.error(ce.getMessage(), ce);
+            throw new StorageException("Could not compile JDF file.", ce);
+        } catch (NameAlreadyInUseException | BlowoutException iae) {
+            LOGGER.error(iae.getMessage(), iae);
+            throw new StorageException(iae.getMessage());
+        } catch (IOException e) {
+            LOGGER.error("Could not read JDF file.", e);
+            throw new StorageException("Could not read JDF file.");
+        }
+        // TODO: change to return json with id
+        StringResponse mJobId = new StringResponse(jobId);
+        return new ResponseEntity<>(mJobId, HttpStatus.CREATED);
+    }
+
+
+
+    public class StringResponse {
+
+        private String id;
+
+        public StringResponse(String s) {
+            this.id = s;
+        }
+    }
+
 }
 
 
