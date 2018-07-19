@@ -9,13 +9,16 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.datastore.JobDataStore;
+import org.fogbowcloud.app.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.exception.ArrebolException;
+import org.fogbowcloud.app.external.oauth.OAuthController;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
 import org.fogbowcloud.app.model.JDFJob;
 import org.fogbowcloud.app.model.JDFJobBuilder;
+import org.fogbowcloud.app.model.OAuthToken;
 import org.fogbowcloud.app.model.User;
 import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
 import org.fogbowcloud.app.utils.authenticator.ArrebolAuthenticator;
@@ -78,7 +81,9 @@ public class ArrebolController {
 	private HashMap<String, Task> finishedTasks;
 	private HashMap<String, Thread> creatingJobs;
 	private JobDataStore jobDataStore;
+	private OAuthTokenDataStore oAuthTokenDataStore;
 	private ArrebolAuthenticator auth;
+	private OAuthController externalOAuthTokenController;
 
     private static ManagerTimer executionMonitorTimer = new ManagerTimer(Executors.newScheduledThreadPool(1));
 
@@ -93,6 +98,7 @@ public class ArrebolController {
 		this.properties = properties;
 		this.blowoutController = new BlowoutController(properties);
 		this.creatingJobs = new HashMap<>();
+		this.externalOAuthTokenController = new OAuthController(properties);
 	}
 
 	public Properties getProperties() {
@@ -104,6 +110,7 @@ public class ArrebolController {
 		this.auth = createAuthenticatorPluginInstance();
 		// FIXME: replace by a proper
 		this.jobDataStore = new JobDataStore(properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL));
+		this.oAuthTokenDataStore = new OAuthTokenDataStore(this.properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL));
 
 		Boolean removePreviousResources = Boolean.valueOf(
 				this.properties.getProperty(ArrebolPropertiesConstants.REMOVE_PREVIOUS_RESOURCES)
@@ -419,4 +426,30 @@ public class ArrebolController {
 			return 0;
 		}
 	}
+
+	public boolean storeOAuthToken(OAuthToken oAuthToken) {
+		boolean saved = this.oAuthTokenDataStore.insert(oAuthToken);
+		return saved;
+	}
+
+	public List<OAuthToken> getAllOAuthTokens() {
+		return this.oAuthTokenDataStore.getAll();
+	}
+
+	public List<OAuthToken> getAccessTokensByOwnerUsername(String ownerUsername) {
+		return this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(ownerUsername);
+	}
+
+	public void deleteOAuthTokenByAcessToken(String accessToken) {
+		this.oAuthTokenDataStore.deleteByAccessToken(accessToken);
+	}
+
+	public void deleteAllExternalOAuthTokens() {
+		this.oAuthTokenDataStore.deleteAll();
+	}
+
+	public OAuthToken refreshExternalOAuthToken(String refreshToken) {
+		return this.externalOAuthTokenController.refreshToken(refreshToken);
+	}
+
 }

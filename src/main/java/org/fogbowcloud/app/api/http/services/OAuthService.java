@@ -1,38 +1,35 @@
 package org.fogbowcloud.app.api.http.services;
 
+import org.fogbowcloud.app.ArrebolController;
 import org.fogbowcloud.app.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.external.oauth.OAuthController;
 import org.fogbowcloud.app.model.OAuthToken;
 import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 import java.util.Properties;
 
+@Lazy
 @Component
 public class OAuthService {
 
-    Properties properties;
-    OAuthController oAuthController;
-    OAuthTokenDataStore oAuthTokenDataStore;
-
-    public OAuthService(Properties properties) {
-        this.properties = properties;
-        this.oAuthController = new OAuthController(this.properties);
-        this.oAuthTokenDataStore = new OAuthTokenDataStore(this.properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL));
-    }
+    @Lazy
+    @Autowired
+    ArrebolController arrebolController;
 
     public boolean storeOAuthToken(OAuthToken oAuthToken) {
-        boolean saved = this.oAuthTokenDataStore.insert(oAuthToken);
-        return saved;
+        return this.arrebolController.storeOAuthToken(oAuthToken);
     }
 
     public List<OAuthToken> getAll() {
-        return this.oAuthTokenDataStore.getAll();
+        return this.arrebolController.getAllOAuthTokens();
     }
 
     public String getAccessTokenByOwnerUsername(String ownerUsername) {
-        List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(ownerUsername);
+        List<OAuthToken> tokensList = this.arrebolController.getAccessTokensByOwnerUsername(ownerUsername);
 
         for (OAuthToken token: tokensList) {
             if (!token.hasExpired()) {
@@ -42,21 +39,21 @@ public class OAuthService {
         // TODO refact to method
         OAuthToken someToken = tokensList.get(0);
         String someRefreshToken = someToken.getRefreshToken();
-        OAuthToken newOAuthToken = this.oAuthController.refreshToken(someRefreshToken);
+        OAuthToken newOAuthToken = this.arrebolController.refreshExternalOAuthToken(someRefreshToken);
         String accessToken = newOAuthToken.getAccessToken();
         deleteTokens(tokensList);
-        this.oAuthTokenDataStore.insert(newOAuthToken);
+        this.arrebolController.storeOAuthToken(newOAuthToken);
 
         return accessToken;
     }
 
     private void deleteTokens(List<OAuthToken> tokenList) {
         for (OAuthToken token: tokenList) {
-            this.oAuthTokenDataStore.deleteByAccessToken(token.getAccessToken());
+            this.arrebolController.deleteOAuthTokenByAcessToken(token.getAccessToken());
         }
     }
 
     public void deleteAllTokens() {
-        this.oAuthTokenDataStore.deleteAll();
+        this.arrebolController.deleteAllExternalOAuthTokens();
     }
 }

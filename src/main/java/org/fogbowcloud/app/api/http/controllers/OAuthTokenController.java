@@ -1,9 +1,12 @@
 package org.fogbowcloud.app.api.http.controllers;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.api.http.services.FileSystemStorageService;
+import org.fogbowcloud.app.api.http.services.JobService;
 import org.fogbowcloud.app.api.http.services.OAuthService;
 import org.fogbowcloud.app.model.OAuthToken;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +23,13 @@ public class OAuthTokenController {
 
     private final Logger LOGGER = Logger.getLogger(OAuthTokenController.class);
 
+    @Lazy
     OAuthService oAuthService;
+
+    @Autowired
+    public OAuthTokenController(OAuthService oAuthService) {
+        this.oAuthService = oAuthService;
+    }
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<OAuthToken> storeOAuthToken(@RequestBody OAuthToken oAuthToken) {
@@ -55,11 +64,6 @@ public class OAuthTokenController {
 
         this.oAuthService.deleteAllTokens();
         return new ResponseEntity<List<OAuthToken>>(HttpStatus.CREATED);
-    }
-
-    @Autowired
-    public void setOAuthService(Properties properties) {
-        this.oAuthService = new OAuthService(properties);
     }
 
 }
