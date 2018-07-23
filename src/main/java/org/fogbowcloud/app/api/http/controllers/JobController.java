@@ -80,9 +80,8 @@ public class JobController {
         return new ResponseEntity<>(job, HttpStatus.OK);
     }
 
-    // TODO check in front-end if it is the proper return type
-    @RequestMapping(method = RequestMethod.POST, produces = "application/json")
-    public ResponseEntity<StringResponse> addJob(@RequestParam(JobController.JDF_FILE_PATH) MultipartFile file, RedirectAttributes redirectAttributes,
+    @RequestMapping(method = RequestMethod.POST)
+    public ResponseEntity<JobPostResponse> addJob(@RequestParam(JobController.JDF_FILE_PATH) MultipartFile file, RedirectAttributes redirectAttributes,
                                                  @RequestHeader(value=ArrebolPropertiesConstants.X_CREDENTIALS) String credentials) {
         LOGGER.info("Saving new Job.");
 
@@ -142,15 +141,18 @@ public class JobController {
         return new ResponseEntity<>(stoppedJobId, HttpStatus.OK);
     }
 
-    public class StringResponse {
-
+    public class JobPostResponse {
         private String id;
-
-        public StringResponse(String s) {
-            this.id = s;
+        public JobPostResponse() {}
+        public JobPostResponse(String id) {
+            this.id = id;
+        }
+        public String getId() {
+            return this.id;
+        }
+        public void setIt(String id) {
+            this.id = id;
         }
     }
 
 }
-
-
