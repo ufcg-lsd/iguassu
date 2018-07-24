@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.http.services.FileSystemStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
 import org.fogbowcloud.app.api.http.services.OAuthService;
+import org.fogbowcloud.app.exception.InvalidParameterException;
 import org.fogbowcloud.app.model.OAuthToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -40,14 +41,13 @@ public class OAuthTokenController {
     }
 
     @RequestMapping(value = "/{ownerUsername}", method = RequestMethod.GET)
-    public ResponseEntity<String> getAccessTokenBy(@PathVariable String ownerUsername) {
+    public ResponseEntity<OAuthTokenResponse> getAccessTokenBy(@PathVariable String ownerUsername) throws InvalidParameterException {
         LOGGER.info("Retrieving OAuth token from user [" + ownerUsername + "]");
 
         String accessToken = this.oAuthService.getAccessTokenByOwnerUsername(ownerUsername);
-        return new ResponseEntity<String>(accessToken, HttpStatus.OK);
+        OAuthTokenResponse dataResponse = new OAuthTokenResponse(accessToken);
+        return new ResponseEntity<>(dataResponse, HttpStatus.OK);
     }
-
-    // TODO: Think about it: does it make sense to have a Post createToken passing userOwner and AuthCode?
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<OAuthToken>> getAllOAuthTokens() {
@@ -64,6 +64,20 @@ public class OAuthTokenController {
 
         this.oAuthService.deleteAllTokens();
         return new ResponseEntity<List<OAuthToken>>(HttpStatus.CREATED);
+    }
+
+    public class OAuthTokenResponse {
+        private String token;
+        public OAuthTokenResponse() {}
+        public OAuthTokenResponse(String token) {
+            this.token = token;
+        }
+        public String getToken() {
+            return this.token;
+        }
+        public void setToken(String data) {
+            this.token = data;
+        }
     }
 
 }
