@@ -23,6 +23,10 @@ public class TestJDFJobBuilder {
 
 	public static final String EXSIMPLE_JOB = RESOURCE_DIR + File.separator + "SimpleJob2.jdf";
 
+	public static final String FAKE_USER_NAME = "fake-username";
+
+	public static final String FAKE_EXTERNAL_OAUTH_TOKEN = "fake-external-oauth-token";
+
 	@Test
 	public void testJDFCompilation () throws CompilerException, IOException, InterruptedException {
 		Properties properties = new Properties();
@@ -34,12 +38,14 @@ public class TestJDFJobBuilder {
 		CommonCompiler commonCompiler = new CommonCompiler();
 		commonCompiler.compile(EXSIMPLE_JOB, FileType.JDF);
 		JobSpecification jobSpec = (JobSpecification) commonCompiler.getResult().get(0);
-		
-		JDFJobBuilder.createJobFromJDFFile(
+
+		JDFJobBuilder jdfJobBuilder = new JDFJobBuilder(properties);
+		jdfJobBuilder.createJobFromJDFFile(
 				testJob,
 				EXSIMPLE_JOB,
-				properties,
-				jobSpec
+				jobSpec,
+				FAKE_USER_NAME,
+				FAKE_EXTERNAL_OAUTH_TOKEN
 		);
 		List<Task> tasks = testJob.getTasks();
 		
