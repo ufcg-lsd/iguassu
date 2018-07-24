@@ -119,14 +119,15 @@ public class JobController {
             LOGGER.error("Could not read JDF file.", e);
             throw new StorageException("Could not read JDF file.");
         }
-        // TODO: change to return json with id
-        StringResponse mJobId = new StringResponse(jobId);
+
+        JobPostResponse mJobId = new JobPostResponse(jobId);
         return new ResponseEntity<>(mJobId, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = JOB_PATH, method = RequestMethod.DELETE)
     public ResponseEntity stopJob(@PathVariable String jobId,
-                                  @RequestHeader(value=ArrebolPropertiesConstants.X_CREDENTIALS) String credentials) throws InvalidParameterException {
+                                  @RequestHeader(value=ArrebolPropertiesConstants.X_CREDENTIALS) String credentials)
+            throws InvalidParameterException {
         LOGGER.info("Deleting all Job with Id " + jobId + ".");
 
         User owner = this.jobService.authenticateUser(credentials);
