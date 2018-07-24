@@ -171,7 +171,8 @@ public class JDFJobBuilder {
 	 * @param task The output expression containing the JDL job
 	 * @param schedPath Root path where commands should be executed
 	 */
-	private static void parseTaskCommands(String jobId, TaskSpecification taskSpec, Task task, String schedPath) {
+	private void parseTaskCommands(String jobId, TaskSpecification taskSpec, Task task, String schedPath, String userName,
+								   String externalOAuthToken) {
 		List<JDLCommand> initBlocks = taskSpec.getTaskBlocks();
 		if (initBlocks == null) {
 			return;
@@ -193,7 +194,8 @@ public class JDFJobBuilder {
 	 * @param task The output expression containing the JDL job
 	 * @param schedPath Root path where commands should be executed
 	 */
-	private static void parseInitCommands(String jobId, TaskSpecification taskSpec, Task task, String schedPath) {
+	private void parseInitCommands(String jobId, TaskSpecification taskSpec, Task task, String schedPath, String userName,
+								   String externalOAuthToken) {
 		List<JDLCommand> initBlocks = taskSpec.getInitBlocks();
 		if (initBlocks == null) {
 			return;
@@ -207,7 +209,8 @@ public class JDFJobBuilder {
 		}
 	}
 
-	private static void addIOCommand(String jobId, Task task, IOCommand command, String schedPath) {
+	private void addIOCommands(String jobId, Task task, IOCommand command, String schedPath, String userName,
+							   String externalOAuthToken) {
 		String sourceFile = command.getEntry().getSourceFile();
 		String destination = command.getEntry().getDestination();
 		String IOType = command.getEntry().getCommand();
@@ -232,16 +235,15 @@ public class JDFJobBuilder {
 			LOGGER.debug("JobId: " + jobId + " task: " + task.getId() + " output command:"
 					+ stageOutCommand(schedPath + sourceFile, destination).getCommand());
 		}
-
 	}
 
-	private static void addRemoteCommand(String jobId, Task task, RemoteCommand remCommand) {
+	private void addRemoteCommand(String jobId, Task task, RemoteCommand remCommand) {
 		Command command = new Command("\"" + remCommand.getContent() + "\"", Command.Type.REMOTE);
 		LOGGER.debug("JobId: " + jobId + " task: " + task.getId() + " remote command: " + remCommand.getContent());
 		task.addCommand(command);
 	}
 
-	private static String getDirectoryTree(String destination) {
+	private String getDirectoryTree(String destination) {
 		int lastDir = destination.lastIndexOf(File.separator);
 		if (lastDir == -1 ) {
 			return "";
@@ -249,7 +251,7 @@ public class JDFJobBuilder {
 		return destination.substring(0, lastDir);
 	}
 
-	private static Command mkdirRemoteFolder(String folder) {
+	private Command mkdirRemoteFolder(String folder) {
 		if (folder.equals("")) {
 			return null;
 		}
@@ -257,7 +259,7 @@ public class JDFJobBuilder {
 		return new Command(mkdirCommand, Command.Type.REMOTE);
 	}
 
-	private static Command stageInCommand(String localFile, String remoteFile) {
+	private Command stageInCommand(String localFile, String remoteFile) {
 		//String scpCommand = "su $UUID ; " + "scp " + SSH_SCP_PRECOMMAND + " -P $" + AbstractResource.ENV_SSH_PORT
 		String scpCommand = "scp " + SSH_SCP_PRECOMMAND + " -P $" + AbstractResource.ENV_SSH_PORT
 				+ " -i $" + AbstractResource.ENV_PRIVATE_KEY_FILE + " " + localFile + " $"
@@ -273,7 +275,8 @@ public class JDFJobBuilder {
 	 * @param task The output expression containing the JDL job
 	 * @param schedPath Root path where commands should be executed
 	 */
-	private static void parseFinalCommands(String jobId, TaskSpecification taskSpec, Task task, String schedPath) {
+	private void parseFinalCommands(String jobId, TaskSpecification taskSpec, Task task, String schedPath, String userName,
+									String externalOAuthToken) {
 		List<JDLCommand> initBlocks = taskSpec.getFinalBlocks();
 		if (initBlocks == null) {
 			return;
@@ -287,7 +290,7 @@ public class JDFJobBuilder {
 		}
 	}
 
-	private static Command stageOutCommand(String remoteFile, String localFile) {
+	private Command stageOutCommand(String remoteFile, String localFile) {
 		String scpCommand = "scp " + SSH_SCP_PRECOMMAND + " -P $" + AbstractResource.ENV_SSH_PORT
 				+ " -i $" + AbstractResource.ENV_PRIVATE_KEY_FILE + " $" + AbstractResource.ENV_SSH_USER + "@" + "$"
 				+ AbstractResource.ENV_HOST + ": " + remoteFile + " " + localFile;
