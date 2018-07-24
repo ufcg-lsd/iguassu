@@ -32,19 +32,24 @@ public class JDFJobBuilder {
 	// private static final String standardImage = "fogbow-ubuntu";
 	private static final String standardImage = "fogbow-fake";
 	private static final String SSH_SCP_PRECOMMAND = "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no";
+	private Properties properties;
 
 	private static final Logger LOGGER = Logger.getLogger(JDFJobBuilder.class);
+
+	public JDFJobBuilder(Properties properties) {
+		this.properties = properties;
+	}
 
 	/**
 	 * @param job Job being created
 	 * @param jdfFilePath Path to the jdf file that describes the job
-	 * @param properties Arrebol config
 	 * @throws IllegalArgumentException If path to jdf is empty
 	 * @throws CompilerException If file does not describe a jdf Job
 	 * @throws IOException If a problem during the reading of the file occurs
 	 */
-	public static void createJobFromJDFFile(JDFJob job, String jdfFilePath, Properties properties, JobSpecification jobSpec)
-			throws CompilerException, IOException, InterruptedException {
+	public void createJobFromJDFFile(JDFJob job, String jdfFilePath, JobSpecification jobSpec, String userName,
+									 String externalOAuthToken)
+			throws IOException, InterruptedException {
 		if (jdfFilePath == null || jdfFilePath.isEmpty()) {
 			throw new IllegalArgumentException("jdfFilePath cannot be null");
 		}
