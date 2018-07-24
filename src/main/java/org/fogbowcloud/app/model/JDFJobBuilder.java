@@ -25,6 +25,7 @@ import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirements
 import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.springframework.http.HttpStatus;
 
+// TODO: remove unused methods
 public class JDFJobBuilder {
 
 	// FIXME: what is this?
