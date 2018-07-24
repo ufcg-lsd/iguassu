@@ -473,8 +473,24 @@ public class ArrebolController {
 		this.oAuthTokenDataStore.deleteAll();
 	}
 
-	public OAuthToken refreshExternalOAuthToken(String refreshToken) {
-		return this.externalOAuthTokenController.refreshToken(refreshToken);
+	public String refreshExternalOAuthToken(String ownerUsername) {
+		List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(ownerUsername);
+		if (tokensList.size() == 0) {
+
+		}
+		OAuthToken someToken = tokensList.get(0);
+		String someRefreshToken = someToken.getRefreshToken();
+		OAuthToken newOAuthToken = this.externalOAuthTokenController.refreshToken(someRefreshToken);
+		String accessToken = newOAuthToken.getAccessToken();
+		deleteTokens(tokensList);
+		storeOAuthToken(newOAuthToken);
+		return accessToken;
+	}
+
+	private void deleteTokens(List<OAuthToken> tokenList) {
+		for (OAuthToken token: tokenList) {
+			deleteOAuthTokenByAcessToken(token.getAccessToken());
+		}
 	}
 
 }
