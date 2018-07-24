@@ -52,4 +52,7 @@ public class ArrebolPropertiesConstants {
 	//___________ ARREBOL CONSTANTS ____//
 	public static final String JOB_ID  = "jobID";
 	public static final String OWNER = "owner";
+
+	public static final String M_IP = "m_public_ip"; // machine's public ip where this app will be deployed
+	public static final String FILE_DRIVER_HOST_IP = "file_driver_host_ip";
 }
