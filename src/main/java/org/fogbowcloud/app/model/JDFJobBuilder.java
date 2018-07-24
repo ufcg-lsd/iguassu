@@ -76,13 +76,13 @@ public class JDFJobBuilder {
 
 				Specification spec = new Specification(
 						image,
-						properties.getProperty(ArrebolPropertiesConstants.INFRA_RESOURCE_USERNAME),
-						properties.getProperty(ArrebolPropertiesConstants.PUBLIC_KEY_CONSTANT),
-						properties.getProperty(ArrebolPropertiesConstants.PRIVATE_KEY_FILEPATH),
+						this.properties.getProperty(ArrebolPropertiesConstants.INFRA_RESOURCE_USERNAME),
+						this.properties.getProperty(ArrebolPropertiesConstants.PUBLIC_KEY_CONSTANT),
+						this.properties.getProperty(ArrebolPropertiesConstants.PRIVATE_KEY_FILEPATH),
 						"",
 						""
 				);
-				LOGGER.debug(properties.getProperty(ArrebolPropertiesConstants.INFRA_RESOURCE_USERNAME));
+				LOGGER.debug(this.properties.getProperty(ArrebolPropertiesConstants.INFRA_RESOURCE_USERNAME));
 
 				int i = 0;
 				for (String req : jobRequirements.split("and")) {
@@ -134,12 +134,12 @@ public class JDFJobBuilder {
 
 					Task task = new TaskImpl("TaskNumber" + "-" + taskID + "-" + UUID.randomUUID(), spec, result);
 					task.putMetadata(TaskImpl.METADATA_REMOTE_OUTPUT_FOLDER,
-							properties.getProperty(ArrebolPropertiesConstants.REMOTE_OUTPUT_FOLDER));
+							this.properties.getProperty(ArrebolPropertiesConstants.REMOTE_OUTPUT_FOLDER));
 					task.putMetadata(TaskImpl.METADATA_LOCAL_OUTPUT_FOLDER,
-							schedPath + properties.getProperty(ArrebolPropertiesConstants.LOCAL_OUTPUT_FOLDER));
+							schedPath + this.properties.getProperty(ArrebolPropertiesConstants.LOCAL_OUTPUT_FOLDER));
 					task.putMetadata(TaskImpl.METADATA_SANDBOX, SANDBOX);
 					task.putMetadata(TaskImpl.METADATA_REMOTE_COMMAND_EXIT_PATH,
-							properties.getProperty(ArrebolPropertiesConstants.REMOTE_OUTPUT_FOLDER) + "/exit");
+							this.properties.getProperty(ArrebolPropertiesConstants.REMOTE_OUTPUT_FOLDER) + "/exit");
 					task.putMetadata(ArrebolPropertiesConstants.JOB_ID, job.getId());
 					task.putMetadata(ArrebolPropertiesConstants.OWNER, job.getOwner());
 
