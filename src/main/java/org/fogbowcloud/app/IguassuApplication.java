@@ -19,7 +19,6 @@ import org.springframework.stereotype.Component;
 import java.io.FileInputStream;
 import java.util.Properties;
 
-
 // TODO: change script bin/start-arrebol-service to run this class instead of old ArrebolMain
 @SpringBootApplication
 public class IguassuApplication {
@@ -52,7 +51,7 @@ public class IguassuApplication {
         SpringApplication.run(IguassuApplication.class, args);
     }
 
-    public class IguassuMainRunner implements CommandLineRunner {
+    public class IguassuMainRunner implements CommandLineRunner, ApplicationListener<EmbeddedServletContainerInitializedEvent> {
 
         @Autowired
         private Properties properties;
@@ -62,7 +61,7 @@ public class IguassuApplication {
         ArrebolController arrebolController;
 
         @Override
-        public void run(String...args) throws Exception {
+        public void run(String...args) {
 
             String arrebolConfPath;
             String schedConfPath;
@@ -81,49 +80,13 @@ public class IguassuApplication {
             } catch (Exception e) {
                 System.exit(1);
             }
-            /*
-            try {
-                final JDFSchedulerApplication app = new JDFSchedulerApplication(
-                        new ArrebolController(properties)
-                );
-                final Thread mainThread = Thread.currentThread();
-                Runtime.getRuntime().addShutdownHook(
-                        new Thread() {
-                            @Override
-                            public void run() {
-                                System.out.println("Exiting server");
-                                try {
-                                    app.stopServer();
-                                    mainThread.join();
-                                } catch (Exception e) {
-                                    System.err.println(e.getMessage() + "-----");
-                                    e.printStackTrace();
-                                }
-                            }
-                        }
-                );
-                app.startServer();
-            } catch (BlowoutException e) {
-                LOGGER.error("Failed to initialize Blowout.", e);
-                System.exit(1);
-            } catch (Exception e) {
-                LOGGER.error("Failed to initialize Arrebol.", e);
-                System.exit(1);
-            }
-            */
+
         }
-
-    }
-
-    @Component
-    public class PortListener implements ApplicationListener<EmbeddedServletContainerInitializedEvent> {
 
         @Override
         public void onApplicationEvent(final EmbeddedServletContainerInitializedEvent event) {
-            int thePort = event.getEmbeddedServletContainer().getPort();
-            LOGGER.info("Serving on port " + String.valueOf(thePort));
-            System.out.println("Serving on port " + String.valueOf(thePort));
+            int port = event.getEmbeddedServletContainer().getPort();
+            properties.setProperty(ArrebolPropertiesConstants.REST_SERVER_PORT, String.valueOf(port));
         }
     }
-
 }
