@@ -44,13 +44,18 @@ public class ArrebolController {
 		private BlowoutController blowoutController;
 		private JobDataStore db;
 		private JobSpecification jobSpec;
+		private JDFJobBuilder jdfJobBuilder;
+		private String userName;
+		private String externalOAuthToken;
 
 		AsyncJobBuilder(JDFJob job,
 						String jdfFilePath,
 						Properties properties,
 						BlowoutController blowoutController,
-						JobDataStore db, 
-						JobSpecification jobSpec) {
+						JobDataStore db,
+						JobSpecification jobSpec,
+						String userName,
+						String externalOAuthToken) {
 			this.job = job;
 			this.jdfFilePath = jdfFilePath;
 			this.properties = properties;
@@ -209,8 +214,10 @@ public class ArrebolController {
 		commonCompiler.compile(jdfFilePath, FileType.JDF);
 		LOGGER.debug("Job "+ job.getId() + " compilation ended at time: "+ System.currentTimeMillis() );
 		JobSpecification jobSpec = (JobSpecification) commonCompiler.getResult().get(0);
+		String userName = owner.getUsername();
+		String externalOAuthToken = getAccessTokenByOwnerUsername(userName);
 
-		Thread t = new Thread(new AsyncJobBuilder(job, jdfFilePath, properties, blowoutController, jobDataStore, jobSpec));
+		Thread t = new Thread(new AsyncJobBuilder(job, jdfFilePath, properties, blowoutController, jobDataStore, jobSpec, userName, externalOAuthToken));
 		t.start();
 		creatingJobs.put(job.getId(), t);
 		return job;
