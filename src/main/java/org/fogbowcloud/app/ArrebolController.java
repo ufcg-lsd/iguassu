@@ -62,20 +62,24 @@ public class ArrebolController {
 			this.blowoutController = blowoutController;
 			this.db = db;
 			this.jobSpec = jobSpec;
+			this.jdfJobBuilder = new JDFJobBuilder(this.properties);
+			this.userName = userName;
+			this.externalOAuthToken = externalOAuthToken;
 		}
 
 		@Override
 		public void run() {
 			try {
-				JDFJobBuilder.createJobFromJDFFile(job, jdfFilePath, properties, jobSpec);
-				blowoutController.addTaskList(job.getTasks());
+
+				this.jdfJobBuilder.createJobFromJDFFile(this.job, this.jdfFilePath, this.jobSpec, this.userName, this.externalOAuthToken);
+				this.blowoutController.addTaskList(job.getTasks());
 				LOGGER.debug("Submitted " +job.getId()+ " to blowout at time: "+ System.currentTimeMillis());
-				job.finishCreation();
+				this.job.finishCreation();
 			} catch (Exception e) {
 				LOGGER.debug("Failed to Submitt " +job.getId()+ " to blowout at time: "+ System.currentTimeMillis(), e);
-				job.failCreation();
+				this.job.failCreation();
 			}
-			db.update(job);
+			this.db.update(job);
 		}
 	}
 
