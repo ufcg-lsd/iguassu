@@ -448,8 +448,21 @@ public class ArrebolController {
 		return this.oAuthTokenDataStore.getAll();
 	}
 
-	public List<OAuthToken> getAccessTokensByOwnerUsername(String ownerUsername) {
-		return this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(ownerUsername);
+	public String getAccessTokenByOwnerUsername(String ownerUsername) {
+		List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(ownerUsername);
+
+		String accessToken = null;
+		for (OAuthToken token: tokensList) {
+			if (!token.hasExpired()) {
+				accessToken =  token.getAccessToken();
+			}
+		}
+
+		if (accessToken == null && tokensList.size() != 0) {
+			accessToken = refreshExternalOAuthToken(ownerUsername);
+		}
+
+		return accessToken;
 	}
 
 	public void deleteOAuthTokenByAcessToken(String accessToken) {
