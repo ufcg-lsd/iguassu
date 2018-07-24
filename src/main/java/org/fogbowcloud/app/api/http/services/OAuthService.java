@@ -22,6 +22,8 @@ public class OAuthService {
     @Autowired
     ArrebolController arrebolController;
 
+    private static final Logger LOGGER = Logger.getLogger(OAuthService.class);
+
     public boolean storeOAuthToken(OAuthToken oAuthToken) {
         return this.arrebolController.storeOAuthToken(oAuthToken);
     }
@@ -30,29 +32,17 @@ public class OAuthService {
         return this.arrebolController.getAllOAuthTokens();
     }
 
-    public String getAccessTokenByOwnerUsername(String ownerUsername) {
-        List<OAuthToken> tokensList = this.arrebolController.getAccessTokensByOwnerUsername(ownerUsername);
+    public String getAccessTokenByOwnerUsername(String ownerUsername) throws InvalidParameterException {
+        String accessToken = this.arrebolController.getAccessTokenByOwnerUsername(ownerUsername);
 
-        for (OAuthToken token: tokensList) {
-            if (!token.hasExpired()) {
-                return token.getAccessToken();
-            }
+        if (accessToken != null) {
+            return accessToken;
         }
-        // TODO refact to method
-        OAuthToken someToken = tokensList.get(0);
-        String someRefreshToken = someToken.getRefreshToken();
-        OAuthToken newOAuthToken = this.arrebolController.refreshExternalOAuthToken(someRefreshToken);
-        String accessToken = newOAuthToken.getAccessToken();
-        deleteTokens(tokensList);
-        this.arrebolController.storeOAuthToken(newOAuthToken);
 
-        return accessToken;
-    }
-
-    private void deleteTokens(List<OAuthToken> tokenList) {
-        for (OAuthToken token: tokenList) {
-            this.arrebolController.deleteOAuthTokenByAcessToken(token.getAccessToken());
-        }
+		String messageError = "There is no access token for external file driver for user " + ownerUsername
+				+ ". Request failed.";
+		LOGGER.error(messageError);
+		throw new InvalidParameterException(messageError);
     }
 
     public void deleteAllTokens() {
