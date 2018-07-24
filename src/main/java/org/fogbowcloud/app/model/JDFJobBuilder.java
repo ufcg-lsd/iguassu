@@ -58,12 +58,6 @@ public class JDFJobBuilder {
 
 		if (file.exists()) {
 			if (file.canRead()) {
-				// Compiling JDF
-//				CommonCompiler commonCompiler = new CommonCompiler();
-//				LOGGER.debug("Job "+ job.getId() + " compilation started at time: "+ System.currentTimeMillis() );
-//				commonCompiler.compile(jdfFilePath, FileType.JDF);
-//				LOGGER.debug("Job "+ job.getId() + " compilation ended at time: "+ System.currentTimeMillis() );
-//				JobSpecification jobSpec = (JobSpecification) commonCompiler.getResult().get(0);
 
 				job.setFriendlyName(jobSpec.getLabel());
 
