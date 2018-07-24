@@ -11,6 +11,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.datastore.JobDataStore;
 import org.fogbowcloud.app.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.exception.ArrebolException;
+import org.fogbowcloud.app.exception.InvalidParameterException;
 import org.fogbowcloud.app.external.oauth.OAuthController;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;

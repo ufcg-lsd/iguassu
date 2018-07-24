@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
@@ -12,8 +11,6 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.job.TaskSpecification;
-import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
-import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.semantic.IOCommand;
 import org.fogbowcloud.app.jdfcompiler.semantic.JDLCommand;
@@ -26,12 +23,13 @@ import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskImpl;
 import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
 import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.springframework.http.HttpStatus;
 
 public class JDFJobBuilder {
 
 	// FIXME: what is this?
 	private static final String SANDBOX = "sandbox";
-//	private static final String standardImage = "fogbow-ubuntu";
+	// private static final String standardImage = "fogbow-ubuntu";
 	private static final String standardImage = "fogbow-fake";
 	private static final String SSH_SCP_PRECOMMAND = "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no";
 

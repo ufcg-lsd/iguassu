@@ -2,7 +2,7 @@ package org.fogbowcloud.app.jdfcompiler.semantic;
 
 public class JDLCommand {
 	public enum JDLCommandType {
-		IO, REMOTE
+		IO, REMOTE,
 	}
 
 	private JDLCommandType blockType;

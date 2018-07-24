@@ -1,5 +1,6 @@
 package org.fogbowcloud.app;
 
+import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
 import org.fogbowcloud.app.utils.authenticator.IguassuGeneralConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,8 +10,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.embedded.EmbeddedServletContainerInitializedEvent;
+import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
 import java.util.Properties;
