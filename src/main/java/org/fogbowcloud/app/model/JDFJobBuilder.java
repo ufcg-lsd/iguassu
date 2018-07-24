@@ -143,9 +143,9 @@ public class JDFJobBuilder {
 					task.putMetadata(ArrebolPropertiesConstants.JOB_ID, job.getId());
 					task.putMetadata(ArrebolPropertiesConstants.OWNER, job.getOwner());
 
-					parseInitCommands(job.getId(), taskSpec, task, schedPath);
-					parseTaskCommands(job.getId(), taskSpec, task, schedPath);
-					parseFinalCommands(job.getId(), taskSpec, task, schedPath);
+					parseInitCommands(job.getId(), taskSpec, task, schedPath, userName, externalOAuthToken);
+					parseTaskCommands(job.getId(), taskSpec, task, schedPath, userName, externalOAuthToken);
+					parseFinalCommands(job.getId(), taskSpec, task, schedPath, userName, externalOAuthToken);
 
 					job.addTask(task);
 					LOGGER.debug("Task spec:\n" + task.getSpecification().toString());
@@ -179,7 +179,7 @@ public class JDFJobBuilder {
 		}
 		for (JDLCommand jdlCommand : initBlocks) {
 			if (jdlCommand.getBlockType().equals(JDLCommandType.IO)) {
-				addIOCommand(jobId, task, (IOCommand) jdlCommand, schedPath);
+				addIOCommands(jobId, task, (IOCommand) jdlCommand, schedPath, userName, externalOAuthToken);
 			} else {
 				addRemoteCommand(jobId, task, (RemoteCommand) jdlCommand);
 			}
@@ -202,7 +202,7 @@ public class JDFJobBuilder {
 		}
 		for (JDLCommand jdlCommand : initBlocks) {
 			if (jdlCommand.getBlockType().equals(JDLCommandType.IO)) {
-				addIOCommand(jobId, task, (IOCommand) jdlCommand, schedPath);
+				addIOCommands(jobId, task, (IOCommand) jdlCommand, schedPath, userName, externalOAuthToken);
 			} else {
 				addRemoteCommand(jobId, task, (RemoteCommand) jdlCommand);
 			}
@@ -213,27 +213,19 @@ public class JDFJobBuilder {
 							   String externalOAuthToken) {
 		String sourceFile = command.getEntry().getSourceFile();
 		String destination = command.getEntry().getDestination();
-		String IOType = command.getEntry().getCommand();
-		if (IOType.toUpperCase().equals("PUT") || IOType.toUpperCase().equals("STORE")) {
-			Command mkdirComm = mkdirRemoteFolder(getDirectoryTree(destination));
-			if (mkdirComm != null )	task.addCommand(mkdirComm);
-			if (sourceFile.startsWith("/")) {
-				task.addCommand(stageInCommand(sourceFile, destination));
-			} else {
-				task.addCommand(stageInCommand(schedPath + sourceFile, destination));
-			}
-			LOGGER.debug("JobId: " + jobId + " task: " + task.getId() + " input command:"
-					+ stageInCommand(schedPath + sourceFile, destination).getCommand());
-		} else {
-			Command mkdirComm = mkdirLocalFolder(getDirectoryTree(destination));
-			if (mkdirComm != null )	task.addCommand(mkdirComm);
-			if (sourceFile.startsWith("/")) {
-				task.addCommand(stageOutCommand(sourceFile, destination));
-			} else {
-				task.addCommand(stageOutCommand(schedPath + sourceFile, destination));
-			}
-			LOGGER.debug("JobId: " + jobId + " task: " + task.getId() + " output command:"
-					+ stageOutCommand(schedPath + sourceFile, destination).getCommand());
+		String IOType = command.getEntry().getCommand().toUpperCase();
+
+		switch (IOType) {
+			case "PUT": case "STORE":
+				task.addCommand(uploadFileCommands(sourceFile, destination, userName, externalOAuthToken));
+				LOGGER.debug("JobId: " + jobId + " task: " + task.getId() + " upload command:"
+						+ uploadFileCommands(schedPath + sourceFile, destination, userName, externalOAuthToken).getCommand());
+				break;
+			case "GET":
+				task.addCommand(downloadFileCommands(sourceFile, destination, userName, externalOAuthToken));
+				LOGGER.debug("JobId: " + jobId + " task: " + task.getId() + " download command:"
+						+ downloadFileCommands(schedPath + sourceFile, destination, userName, externalOAuthToken).getCommand());
+				break;
 		}
 	}
 
@@ -283,7 +275,7 @@ public class JDFJobBuilder {
 		}
 		for (JDLCommand jdlCommand : initBlocks) {
 			if (jdlCommand.getBlockType().equals(JDLCommandType.IO)) {
-				addIOCommand(jobId, task, (IOCommand) jdlCommand, schedPath);
+				addIOCommands(jobId, task, (IOCommand) jdlCommand, schedPath, userName, externalOAuthToken);
 			} else {
 				addRemoteCommand(jobId, task, (RemoteCommand) jdlCommand);
 			}
@@ -297,11 +289,55 @@ public class JDFJobBuilder {
 		return new Command(scpCommand, Command.Type.LOCAL);
 	}
 
-	private static Command mkdirLocalFolder(String folder) {
+	private Command uploadFileCommands(String localFilePath, String filePathToUpload, String userName, String token) {
+		String fileDriverHostIp = this.properties.getProperty(ArrebolPropertiesConstants.FILE_DRIVER_HOST_IP);
+		String requestTokenCommand = getUserExternalOAuthTokenRequestCommand(userName);
+		String uploadCommand = "http_code=$(curl --write-out %{http_code} -X PUT --header Authorization:Bearer $token"
+				+ " --data-binary @" + localFilePath + " --silent --output /dev/null "
+				+ "http://$server/remote.php/webdav/" + filePathToUpload + ");";
+
+		String scpCommand = "server=" + fileDriverHostIp + ";"
+				+ "token=" + token + ";"
+				+ uploadCommand
+				+ "if [ $http_code == " + String.valueOf(HttpStatus.UNAUTHORIZED) + " ]; then " + requestTokenCommand
+				+ uploadCommand + " fi";
+
+		return new Command(scpCommand, Command.Type.LOCAL);
+	}
+
+	private Command downloadFileCommands(String localFilePath, String filePathToDownload, String userName, String token) {
+		String fileDriverHostIp = this.properties.getProperty(ArrebolPropertiesConstants.FILE_DRIVER_HOST_IP);
+		String requestTokenCommand = getUserExternalOAuthTokenRequestCommand(userName);
+		String downloadCommand = "full_response=$(curl --write-out %{http_code} --header Authorization:Bearer $token"
+				+ "http://$server/remote.php/webdav/" + filePathToDownload
+				+ " --silent --output " + localFilePath + "/dev/null);";
+		String extractHttpStatusCode = "http_code=${full_response:0:3};";
+
+		String scpCommand = "server=" + fileDriverHostIp + ";"
+				+ "token=" + token + ";"
+				+ downloadCommand
+				+ extractHttpStatusCode
+				+ "if [ $http_code == " + String.valueOf(HttpStatus.UNAUTHORIZED) + " ]; then " + requestTokenCommand
+				+ downloadCommand + " fi";
+
+		return new Command(scpCommand, Command.Type.LOCAL);
+	}
+
+	private Command mkdirLocalFolder(String folder) {
 		if (folder.equals("")) {
 			return null;
 		}
 		String mkdirCommand = "su $UserID ; " + "mkdir -p " + folder;
 		return new Command(mkdirCommand, Command.Type.LOCAL);
+	}
+
+	private String getUserExternalOAuthTokenRequestCommand(String userName) {
+		String myIguassuHttpServiceIp = getAppServiceIp();
+		return "token=$(curl --request GET --url " + myIguassuHttpServiceIp + "/oauthtoken/" + userName + ");";
+	}
+
+	private String getAppServiceIp() {
+		return "http://" + this.properties.getProperty(ArrebolPropertiesConstants.M_IP)
+				+ ":" + this.properties.getProperty(ArrebolPropertiesConstants.REST_SERVER_PORT);
 	}
 }
