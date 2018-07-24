@@ -16,15 +16,14 @@ public abstract class DataStore<T> {
 
     protected static final String JOB_DATASTORE_DRIVER = "org.sqlite.JDBC";
     protected static final String ERROR_WHILE_INITIALIZING_THE_DATA_STORE = "Error while initializing the Job DataStore.";
-    protected static final String DEFAULT_DATASTORE_NAME = "datastore_jobs.slite";
+    protected static final String DEFAULT_DATASTORE_NAME = "datastore.slite";
 
     String dataStoreURL;
 
     private static final Logger LOGGER = Logger.getLogger(DataStore.class);
 
     public DataStore(String dataStoreURL) {
-        this.dataStoreURL = DataStoreHelper.getDataStoreUrl(dataStoreURL,
-                DEFAULT_DATASTORE_NAME);
+        this.dataStoreURL = DataStoreHelper.getDataStoreUrl(dataStoreURL, DEFAULT_DATASTORE_NAME);
     }
 
     /**
