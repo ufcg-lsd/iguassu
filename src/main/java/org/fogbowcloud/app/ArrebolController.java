@@ -367,10 +367,6 @@ public class ArrebolController {
 
 	private static boolean checkProperties(Properties properties) {
 		// Arrebol required properties
-		if (!properties.containsKey(ArrebolPropertiesConstants.REST_SERVER_PORT)) {
-			LOGGER.error(requiredPropertyMessage(ArrebolPropertiesConstants.REST_SERVER_PORT));
-			return false;
-		}
 		if (!properties.containsKey(ArrebolPropertiesConstants.EXECUTION_MONITOR_PERIOD)) {
 			LOGGER.error(requiredPropertyMessage(ArrebolPropertiesConstants.EXECUTION_MONITOR_PERIOD));
 			return false;
