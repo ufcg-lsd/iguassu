@@ -19,7 +19,7 @@ import org.fogbowcloud.app.model.LDAPUser;
 import org.fogbowcloud.app.model.User;
 import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
 
-public class LDAPAuthenticator implements ArrebolAuthenticator {
+public class LDAPAuthenticator implements IguassuAuthenticator {
 
 	public static final String AUTH_NAME = "ldapauth";
 	private static final String ENCRYPT_TYPE = ":TYPE:";
@@ -41,7 +41,8 @@ public class LDAPAuthenticator implements ArrebolAuthenticator {
 	@Override
 	public User authenticateUser(Credential credential){
 		String username = credential.getUsername();
-		String password = credential.getPassword();
+//		String password = credential.getPassword();
+		String password = credential.getToken();
 		LOGGER.debug("Authenticating LDAP user: " + username);
 		User user = null;
 		try {

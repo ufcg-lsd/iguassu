@@ -50,7 +50,8 @@ public class CommonAuthenticator implements IguassuAuthenticator {
 	@Override
 	public User authenticateUser(Credential credential) {
 		User user = getUserByUsername(credential.getUsername());
-		String hash = credential.getPassword();
+//		String hash = credential.getPassword();
+		String hash = credential.getToken();
 		int nonce = credential.getNonce();
 		try {
 			if (checkUserSignature(hash, user, nonce)) {

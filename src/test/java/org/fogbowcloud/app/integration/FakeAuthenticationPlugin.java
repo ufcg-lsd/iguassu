@@ -3,10 +3,10 @@ package org.fogbowcloud.app.integration;
 import java.util.Properties;
 
 import org.fogbowcloud.app.model.User;
-import org.fogbowcloud.app.utils.authenticator.ArrebolAuthenticator;
+import org.fogbowcloud.app.utils.authenticator.IguassuAuthenticator;
 import org.fogbowcloud.app.utils.authenticator.Credential;
 
-public class FakeAuthenticationPlugin implements ArrebolAuthenticator {
+public class FakeAuthenticationPlugin implements IguassuAuthenticator {
 
 	boolean authenticate;
 	
