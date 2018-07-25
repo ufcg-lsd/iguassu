@@ -31,8 +31,8 @@ public class ArrebolPropertiesConstants {
 	//___________ DB CONSTANTS ______________//
 	public static final String DB_MAP_NAME = "jobMap";
 	public static final String DB_FILE_NAME = "legacyJobs.db";
-	public static final String DB_MAP_USERS = "users";
-	public static final String DB_FILE_USERS = "users.db";	
+	public static final String DB_MAP_USERS = "datastores/users";
+	public static final String DB_FILE_USERS = "datastores/users.db";
 	
 	public static final String PUBLIC_KEY_CONSTANT = "public_key";	
 	public static final String PRIVATE_KEY_FILEPATH = "private_key_filepath";
