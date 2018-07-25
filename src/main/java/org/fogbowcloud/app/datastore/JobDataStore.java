@@ -16,7 +16,6 @@ import org.json.JSONObject;
 
 public class JobDataStore extends DataStore<JDFJob> {
 
-	private static final String JOB_DATASTORE_DRIVER = "org.sqlite.JDBC";
 	private static final String JOBS_TABLE_NAME = "arrebol_jobs";
 	private static final String JOB_ID = "job_id";
 	private static final String JOB_JSON = "job_json";
@@ -54,7 +53,7 @@ public class JobDataStore extends DataStore<JDFJob> {
 		try {
 			LOGGER.debug("jobDataStoreURL: " + super.dataStoreURL);
 
-			Class.forName(JOB_DATASTORE_DRIVER);
+			Class.forName(DATASTORE_DRIVER);
 
 			connection = getConnection();
 

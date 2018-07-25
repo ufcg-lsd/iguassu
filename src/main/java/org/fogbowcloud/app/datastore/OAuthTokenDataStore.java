@@ -50,7 +50,7 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
         try {
             LOGGER.debug("tokenDataStoreURL: " + super.dataStoreURL);
 
-            Class.forName(JOB_DATASTORE_DRIVER);
+            Class.forName(DATASTORE_DRIVER);
 
             connection = getConnection();
             statement = connection.createStatement();

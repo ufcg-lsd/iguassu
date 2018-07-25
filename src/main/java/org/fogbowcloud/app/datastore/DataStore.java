@@ -14,7 +14,7 @@ import java.util.Properties;
 
 public abstract class DataStore<T> {
 
-    protected static final String JOB_DATASTORE_DRIVER = "org.sqlite.JDBC";
+    protected static final String DATASTORE_DRIVER = "org.sqlite.JDBC";
     protected static final String ERROR_WHILE_INITIALIZING_THE_DATA_STORE = "Error while initializing the Job DataStore.";
     protected static final String DEFAULT_DATASTORE_NAME = "datastore.slite";
 

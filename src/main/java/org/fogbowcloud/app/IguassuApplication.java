@@ -79,7 +79,6 @@ public class IguassuApplication {
             } catch (Exception e) {
                 System.exit(1);
             }
-
         }
 
         @Override
