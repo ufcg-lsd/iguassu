@@ -81,7 +81,7 @@ public class JobController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<JobPostResponse> addJob(@RequestParam(JobController.JDF_FILE_PATH) MultipartFile file, RedirectAttributes redirectAttributes,
+    public ResponseEntity<JobResponse> addJob(@RequestParam(JobController.JDF_FILE_PATH) MultipartFile file, RedirectAttributes redirectAttributes,
                                                  @RequestHeader(value=ArrebolPropertiesConstants.X_CREDENTIALS) String credentials) {
         LOGGER.info("Saving new Job.");
 
@@ -120,15 +120,15 @@ public class JobController {
             throw new StorageException("Could not read JDF file.");
         }
 
-        JobPostResponse mJobId = new JobPostResponse(jobId);
+        JobResponse mJobId = new JobResponse(jobId);
         return new ResponseEntity<>(mJobId, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = JOB_PATH, method = RequestMethod.DELETE)
-    public ResponseEntity stopJob(@PathVariable String jobId,
+    public ResponseEntity<JobResponse> stopJob(@PathVariable String jobId,
                                   @RequestHeader(value=ArrebolPropertiesConstants.X_CREDENTIALS) String credentials)
             throws InvalidParameterException {
-        LOGGER.info("Deleting all Job with Id " + jobId + ".");
+        LOGGER.info("Deleting job with Id " + jobId + ".");
 
         User owner = this.jobService.authenticateUser(credentials);
 
@@ -139,13 +139,14 @@ public class JobController {
             throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
         }
 
-        return new ResponseEntity<>(stoppedJobId, HttpStatus.OK);
+        JobResponse jobResponse = new JobResponse(stoppedJobId);
+        return new ResponseEntity<JobResponse>(jobResponse, HttpStatus.OK);
     }
 
-    public class JobPostResponse {
+    public class JobResponse {
         private String id;
-        public JobPostResponse() {}
-        public JobPostResponse(String id) {
+        public JobResponse() {}
+        public JobResponse(String id) {
             this.id = id;
         }
         public String getId() {
