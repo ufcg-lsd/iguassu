@@ -1,7 +1,7 @@
 package org.fogbowcloud.app;
 
 import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
-import org.fogbowcloud.app.utils.authenticator.IguassuGeneralConstants;
+import org.fogbowcloud.app.utils.IguassuGeneralConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.fogbowcloud.app.exception.ArrebolException;
@@ -14,7 +14,6 @@ import org.springframework.boot.context.embedded.EmbeddedServletContainerInitial
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
 
 import java.io.FileInputStream;
 import java.util.Properties;
