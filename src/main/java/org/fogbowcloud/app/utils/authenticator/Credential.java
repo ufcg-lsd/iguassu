@@ -4,14 +4,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Credential {
-	
+
+	private static final String USER_NAME_KEY = "username";
+	private static final String USER_TOKEN_KEY = "token";
+	private static final String NONCE_KEY = "nonce";
+
 	private String username;
-	private String password;
+	private String token;
 	private Integer nonce;
 	
-	public Credential(String username, String password, Integer nonce) {
+	public Credential(String username, String token, Integer nonce) {
 		this.username = username;
-		this.password = password;
+		this.token = token;
 		this.nonce = nonce;
 	}
 
@@ -23,12 +27,12 @@ public class Credential {
 		this.username = username;
 	}
 
-	public String getPassword() {
-		return password;
+	public String getToken() {
+		return token;
 	}
 
-	public void setPassword(String password) {
-		this.password = password;
+	public void setToken(String token) {
+		this.token = token;
 	}
 
 	public Integer getNonce() {
@@ -41,17 +45,17 @@ public class Credential {
 	
 	public static Credential fromJSON(JSONObject credential) {
 		return new Credential(
-				credential.optString("username"), 
-				credential.optString("password"), 
-				credential.optInt("nonce"));
+				credential.optString(USER_NAME_KEY),
+				credential.optString(USER_TOKEN_KEY),
+				credential.optInt(NONCE_KEY));
 	}
 	
 	public JSONObject toJSON() {
 		JSONObject credential = new JSONObject();
 		try {
-			credential.put("username", this.username);
-			credential.put("password", this.password);
-			credential.put("nonce", this.nonce);
+			credential.put(USER_NAME_KEY, this.username);
+			credential.put(	USER_TOKEN_KEY, this.token);
+			credential.put(NONCE_KEY, this.nonce);
 		} catch (JSONException e) {
 			return null;
 		}
