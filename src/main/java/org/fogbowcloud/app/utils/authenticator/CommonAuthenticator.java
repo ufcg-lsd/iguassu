@@ -17,7 +17,7 @@ import org.json.JSONObject;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
-public class CommonAuthenticator implements ArrebolAuthenticator {
+public class CommonAuthenticator implements IguassuAuthenticator {
 	public static final Logger LOGGER = Logger.getLogger(CommonAuthenticator.class);
 
 	public static final String AUTH_NAME = "commonauth";

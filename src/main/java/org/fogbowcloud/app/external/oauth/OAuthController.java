@@ -35,6 +35,7 @@ public class OAuthController {
             HttpPost request = new HttpPost(request_query);
             String encoding = Base64.getEncoder().encodeToString((clientId +":" + clientSecret).getBytes("UTF-8"));
             request.setHeader("Authorization", "Basic " + encoding);
+            request.setHeader("Content-Type", "application/json");
             HttpResponse response = client.execute(request);
             String responseJsonString = EntityUtils.toString(response.getEntity());
             JSONObject responseJson = new JSONObject(responseJsonString);

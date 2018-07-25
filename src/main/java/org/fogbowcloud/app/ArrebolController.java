@@ -92,7 +92,7 @@ public class ArrebolController {
 	private HashMap<String, Thread> creatingJobs;
 	private JobDataStore jobDataStore;
 	private OAuthTokenDataStore oAuthTokenDataStore;
-	private ArrebolAuthenticator auth;
+	private IguassuAuthenticator auth;
 	private OAuthController externalOAuthTokenController;
 
     private static ManagerTimer executionMonitorTimer = new ManagerTimer(Executors.newScheduledThreadPool(1));
@@ -117,7 +117,7 @@ public class ArrebolController {
 
 	public void init() throws Exception {
 		// FIXME: add as constructor param?
-		this.auth = createAuthenticatorPluginInstance();
+		this.auth = new ThirdAppAuthenticator();
 		// FIXME: replace by a proper
 		this.jobDataStore = new JobDataStore(properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL));
 		this.oAuthTokenDataStore = new OAuthTokenDataStore(this.properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL));
@@ -176,16 +176,16 @@ public class ArrebolController {
 		}
 	}
 
-	private ArrebolAuthenticator createAuthenticatorPluginInstance() throws Exception {
-		String providerClassName = this.properties.getProperty(ArrebolPropertiesConstants.AUTHENTICATION_PLUGIN);
-		Class<?> forName = Class.forName(providerClassName);
-		Object clazz = forName.getConstructor(Properties.class).newInstance(this.properties);
-		if (!(clazz instanceof ArrebolAuthenticator)) {
-			throw new Exception("Authenticator Class Name is not a ArrebolAuthenticator implementation");
-		}
-
-		return (ArrebolAuthenticator) clazz;
-	}
+//	private IguassuAuthenticator createAuthenticatorPluginInstance() throws Exception {
+//		String providerClassName = this.properties.getProperty(ArrebolPropertiesConstants.AUTHENTICATION_PLUGIN);
+//		Class<?> forName = Class.forName(providerClassName);
+//		Object clazz = forName.getConstructor(Properties.class).newInstance(this.properties);
+//		if (!(clazz instanceof IguassuAuthenticator)) {
+//			throw new Exception("Authenticator Class Name is not a ArrebolAuthenticator implementation");
+//		}
+//
+//		return (IguassuAuthenticator) clazz;
+//	}
 
 	public JDFJob getJobById(String jobId, String owner) {
         return this.jobDataStore.getByJobId(jobId, owner);
@@ -312,7 +312,8 @@ public class ArrebolController {
 
 		Credential credential;
 		try {
-			credential = Credential.fromJSON(new JSONObject(credentials));
+			JSONObject jsonObject = new JSONObject(credentials);
+			credential = Credential.fromJSON(jsonObject);
 		} catch (JSONException e) {
 			LOGGER.error("Invalid credentials format", e);
 			return null;
@@ -401,22 +402,22 @@ public class ArrebolController {
 				return false;
 			}
 		}
-		if (!properties.containsKey(ArrebolPropertiesConstants.AUTHENTICATION_PLUGIN)) {
-			LOGGER.error(requiredPropertyMessage(ArrebolPropertiesConstants.AUTHENTICATION_PLUGIN));
-			return false;
-		} else {
-			String authenticationPlugin = properties.getProperty(ArrebolPropertiesConstants.AUTHENTICATION_PLUGIN);
-			if (authenticationPlugin.equals("org.fogbowcloud.app.utils.LDAPAuthenticator")) {
-				if (!properties.containsKey(ArrebolPropertiesConstants.LDAP_AUTHENTICATION_URL)) {
-					LOGGER.error(requiredPropertyMessage(ArrebolPropertiesConstants.LDAP_AUTHENTICATION_URL));
-					return false;
-				}
-				if (!properties.containsKey(ArrebolPropertiesConstants.LDAP_AUTHENTICATION_BASE)) {
-					LOGGER.error(requiredPropertyMessage(ArrebolPropertiesConstants.LDAP_AUTHENTICATION_BASE));
-					return false;
-				}
-			}
-		}
+//		if (!properties.containsKey(ArrebolPropertiesConstants.AUTHENTICATION_PLUGIN)) {
+//			LOGGER.error(requiredPropertyMessage(ArrebolPropertiesConstants.AUTHENTICATION_PLUGIN));
+//			return false;
+//		} else {
+//			String authenticationPlugin = properties.getProperty(ArrebolPropertiesConstants.AUTHENTICATION_PLUGIN);
+//			if (authenticationPlugin.equals("org.fogbowcloud.app.utils.LDAPAuthenticator")) {
+//				if (!properties.containsKey(ArrebolPropertiesConstants.LDAP_AUTHENTICATION_URL)) {
+//					LOGGER.error(requiredPropertyMessage(ArrebolPropertiesConstants.LDAP_AUTHENTICATION_URL));
+//					return false;
+//				}
+//				if (!properties.containsKey(ArrebolPropertiesConstants.LDAP_AUTHENTICATION_BASE)) {
+//					LOGGER.error(requiredPropertyMessage(ArrebolPropertiesConstants.LDAP_AUTHENTICATION_BASE));
+//					return false;
+//				}
+//			}
+//		}
 		LOGGER.debug("All properties are set");
 		return true;
 	}
