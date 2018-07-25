@@ -64,7 +64,6 @@ public class JobService {
 
     public User authenticateUser(String credentials) {
         User owner;
-//        return new LDAPUser("arrebolservice", "arrebolservice"); // TODO
         try {
             owner = this.arrebolController.authUser(credentials);
         } catch (GeneralSecurityException e) {

@@ -177,18 +177,7 @@ public class ArrebolController {
 			blowoutController.addTaskList(taskList);
 		}
 	}
-
-//	private IguassuAuthenticator createAuthenticatorPluginInstance() throws Exception {
-//		String providerClassName = this.properties.getProperty(ArrebolPropertiesConstants.AUTHENTICATION_PLUGIN);
-//		Class<?> forName = Class.forName(providerClassName);
-//		Object clazz = forName.getConstructor(Properties.class).newInstance(this.properties);
-//		if (!(clazz instanceof IguassuAuthenticator)) {
-//			throw new Exception("Authenticator Class Name is not a ArrebolAuthenticator implementation");
-//		}
-//
-//		return (IguassuAuthenticator) clazz;
-//	}
-
+	
 	public JDFJob getJobById(String jobId, String owner) {
         return this.jobDataStore.getByJobId(jobId, owner);
 	}
