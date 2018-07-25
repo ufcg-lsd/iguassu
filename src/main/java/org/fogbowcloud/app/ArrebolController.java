@@ -7,11 +7,11 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.Executors;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.fogbowcloud.app.datastore.JobDataStore;
 import org.fogbowcloud.app.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.exception.ArrebolException;
-import org.fogbowcloud.app.exception.InvalidParameterException;
 import org.fogbowcloud.app.external.oauth.OAuthController;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
@@ -22,8 +22,9 @@ import org.fogbowcloud.app.model.JDFJobBuilder;
 import org.fogbowcloud.app.model.OAuthToken;
 import org.fogbowcloud.app.model.User;
 import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
-import org.fogbowcloud.app.utils.authenticator.ArrebolAuthenticator;
+import org.fogbowcloud.app.utils.authenticator.IguassuAuthenticator;
 import org.fogbowcloud.app.utils.authenticator.Credential;
+import org.fogbowcloud.app.utils.authenticator.ThirdAppAuthenticator;
 import org.fogbowcloud.blowout.core.BlowoutController;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.model.Task;
@@ -33,6 +34,7 @@ import org.fogbowcloud.blowout.core.util.ManagerTimer;
 import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 
 public class ArrebolController {
 
@@ -83,7 +85,7 @@ public class ArrebolController {
 		}
 	}
 
-	private static final Logger LOGGER = Logger.getLogger(ArrebolController.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(ArrebolController.class);
 
 	private BlowoutController blowoutController;
 	private Properties properties;
@@ -119,7 +121,7 @@ public class ArrebolController {
 		// FIXME: add as constructor param?
 		this.auth = new ThirdAppAuthenticator();
 		// FIXME: replace by a proper
-		this.jobDataStore = new JobDataStore(properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL));
+		this.jobDataStore = new JobDataStore(this.properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL));
 		this.oAuthTokenDataStore = new OAuthTokenDataStore(this.properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL));
 
 		Boolean removePreviousResources = Boolean.valueOf(
