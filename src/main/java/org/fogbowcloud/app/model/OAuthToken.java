@@ -1,16 +1,11 @@
 package org.fogbowcloud.app.model;
 
-import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.core.model.Task;
-import org.fogbowcloud.blowout.core.model.TaskImpl;
-import org.json.JSONArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.json.JSONObject;
 
 import java.sql.Date;
 import java.sql.Timestamp;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 
 public class OAuthToken {
 
@@ -24,7 +19,7 @@ public class OAuthToken {
     private String usernameOwner;
     private Date expirationDate;
 
-    public static final Logger LOGGER = Logger.getLogger(OAuthToken.class);
+    public static final Logger LOGGER = LoggerFactory.getLogger(OAuthToken.class);
 
     public OAuthToken() {
 

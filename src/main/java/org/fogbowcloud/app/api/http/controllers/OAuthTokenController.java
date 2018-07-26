@@ -1,8 +1,7 @@
 package org.fogbowcloud.app.api.http.controllers;
 
-import org.apache.log4j.Logger;
-import org.fogbowcloud.app.api.http.services.FileSystemStorageService;
-import org.fogbowcloud.app.api.http.services.JobService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.fogbowcloud.app.api.http.services.OAuthService;
 import org.fogbowcloud.app.exception.InvalidParameterException;
 import org.fogbowcloud.app.model.OAuthToken;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Properties;
 
 @CrossOrigin
 @RestController
@@ -22,7 +20,7 @@ public class OAuthTokenController {
 
     public static final String OAUTH_TOKEN_ENDPOINT = "oauthtoken";
 
-    private final Logger LOGGER = Logger.getLogger(OAuthTokenController.class);
+    private final Logger LOGGER = LoggerFactory.getLogger(OAuthTokenController.class);
 
     @Lazy
     OAuthService oAuthService;

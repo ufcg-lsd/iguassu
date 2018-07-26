@@ -1,9 +1,8 @@
 package org.fogbowcloud.app.datastore;
 
-import org.apache.log4j.Logger;
-import org.fogbowcloud.app.model.JDFJob;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.fogbowcloud.app.model.OAuthToken;
-import org.fogbowcloud.app.utils.DataStoreHelper;
 import org.json.JSONObject;
 
 import java.sql.*;
@@ -41,7 +40,7 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
     private static final String DELETE_TOKEN_BY_ACCESS_TOKEN_SQL = DELETE_ALL_TOKENS_TABLE_SQL
             + " WHERE " + ACCESS_TOKEN + " + ? ";
 
-    private static final Logger LOGGER = Logger.getLogger(OAuthTokenDataStore.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OAuthTokenDataStore.class);
 
     public OAuthTokenDataStore(String dataStoreURL) {
         super(dataStoreURL);

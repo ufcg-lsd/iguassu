@@ -1,19 +1,16 @@
 package org.fogbowcloud.app.api.http.services;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.fogbowcloud.app.ArrebolController;
-import org.fogbowcloud.app.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.exception.InvalidParameterException;
-import org.fogbowcloud.app.external.oauth.OAuthController;
 import org.fogbowcloud.app.model.OAuthToken;
 import org.fogbowcloud.app.model.User;
-import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Properties;
 
 @Lazy
 @Component
@@ -23,7 +20,7 @@ public class OAuthService {
     @Autowired
     ArrebolController arrebolController;
 
-    private static final Logger LOGGER = Logger.getLogger(OAuthService.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(OAuthService.class);
 
     public void storeOAuthToken(OAuthToken oAuthToken) {
         User user = this.arrebolController.getUser(oAuthToken.getUsernameOwner());

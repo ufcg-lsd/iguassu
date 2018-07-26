@@ -7,7 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.fogbowcloud.blowout.core.model.Task;
 
 public abstract class Job implements Serializable {
@@ -31,7 +32,7 @@ public abstract class Job implements Serializable {
 		}
 	}
 	
-	public static final Logger LOGGER = Logger.getLogger(Job.class);
+	public static final Logger LOGGER = LoggerFactory.getLogger(Job.class);
 	
 	private ReentrantReadWriteLock taskReadyLock = new ReentrantReadWriteLock();
 

@@ -1,17 +1,15 @@
 package org.fogbowcloud.app.datastore;
 
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.fogbowcloud.app.model.JDFJob;
-import org.fogbowcloud.app.utils.DataStoreHelper;
 import org.json.JSONObject;
 
 public class JobDataStore extends DataStore<JDFJob> {
@@ -42,7 +40,7 @@ public class JobDataStore extends DataStore<JDFJob> {
 	private static final String DELETE_BY_JOB_ID_SQL = "DELETE FROM " + JOBS_TABLE_NAME + " WHERE "
 			+ JOB_ID + " = ? AND " + JOB_OWNER + " = ?";
 
-	private static final Logger LOGGER = Logger.getLogger(JobDataStore.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(JobDataStore.class);
 	private static final String ERROR_WHILE_INITIALIZING_THE_DATA_STORE = "Error while initializing the Job DataStore.";
 
 	public JobDataStore(String dataStoreURL) {

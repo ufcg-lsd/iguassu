@@ -14,7 +14,8 @@ import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.fogbowcloud.app.model.LDAPUser;
 import org.fogbowcloud.app.model.User;
 import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
@@ -29,7 +30,7 @@ public class LDAPAuthenticator implements IguassuAuthenticator {
 	private String ldapBase;
 	private String encryptType;
 
-	private static final Logger LOGGER = Logger.getLogger(LDAPAuthenticator.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(LDAPAuthenticator.class);
 	private String ldapUrl;
 
 	public LDAPAuthenticator(Properties properties) {

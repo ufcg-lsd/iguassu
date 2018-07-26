@@ -1,16 +1,11 @@
 package org.fogbowcloud.app.datastore;
 
-import org.apache.log4j.Logger;
-import org.fogbowcloud.app.model.OAuthToken;
 import org.fogbowcloud.app.utils.DataStoreHelper;
-import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
-import org.json.JSONObject;
-
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Properties;
 
 public abstract class DataStore<T> {
 
@@ -20,7 +15,7 @@ public abstract class DataStore<T> {
 
     String dataStoreURL;
 
-    private static final Logger LOGGER = Logger.getLogger(DataStore.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DataStore.class);
 
     public DataStore(String dataStoreURL) {
         this.dataStoreURL = DataStoreHelper.getDataStoreUrl(dataStoreURL, DEFAULT_DATASTORE_NAME);

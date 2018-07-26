@@ -7,7 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.commons.fileupload.FileUploadException;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.fogbowcloud.app.NameAlreadyInUseException;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.model.JDFJob;
@@ -37,7 +38,7 @@ public class JobResource extends ServerResource {
 
 	private static final String COMPLETION = "completion";
 
-	private static final Logger LOGGER = Logger.getLogger(JobResource.class);
+	private static final Logger LOGGER = LoggerFactory.getLogger(JobResource.class);
 	
 	static final String JOB_LIST = "Jobs";
 	private static final String JOB_TASKS = "Tasks";

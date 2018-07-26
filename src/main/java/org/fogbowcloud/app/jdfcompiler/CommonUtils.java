@@ -30,11 +30,12 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class CommonUtils {
 	
-	private static final transient Logger LOG = Logger.getLogger( CommonUtils.class );
+	private static final transient Logger LOG = LoggerFactory.getLogger(CommonUtils.class );
 	
 	/**
 	 * Loads properties from a persistent File
@@ -49,7 +50,7 @@ public class CommonUtils {
 				fileInputStream = new FileInputStream(propFile);
 				properties.load(fileInputStream);
 			} catch (IOException e) {
-				LOG.warn(e);//If it is not possible to load the file, we're assuming there are no properties set
+				LOG.warn(e.getMessage());//If it is not possible to load the file, we're assuming there are no properties set
 			} finally {
 				try {
 					fileInputStream.close();
