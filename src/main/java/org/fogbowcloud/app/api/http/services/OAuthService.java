@@ -1,7 +1,6 @@
 package org.fogbowcloud.app.api.http.services;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.fogbowcloud.app.ArrebolController;
 import org.fogbowcloud.app.exception.InvalidParameterException;
 import org.fogbowcloud.app.model.OAuthToken;
@@ -20,7 +19,7 @@ public class OAuthService {
     @Autowired
     ArrebolController arrebolController;
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(OAuthService.class);
+    private static final Logger LOGGER = Logger.getLogger(OAuthService.class);
 
     public void storeOAuthToken(OAuthToken oAuthToken) {
         User user = this.arrebolController.getUser(oAuthToken.getUsernameOwner());

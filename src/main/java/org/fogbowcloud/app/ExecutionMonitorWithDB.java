@@ -4,8 +4,7 @@ import java.util.ArrayList;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.fogbowcloud.app.datastore.JobDataStore;
 import org.fogbowcloud.app.model.JDFJob;
 import org.fogbowcloud.blowout.core.model.Task;
@@ -13,7 +12,7 @@ import org.fogbowcloud.blowout.core.model.TaskState;
 
 public class ExecutionMonitorWithDB implements Runnable {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(ExecutionMonitorWithDB.class);
+    private static final Logger LOGGER = Logger.getLogger(ExecutionMonitorWithDB.class);
 
 	private ArrebolController arrebolController;
 	private ExecutorService service;

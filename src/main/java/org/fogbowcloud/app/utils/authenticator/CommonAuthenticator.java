@@ -7,8 +7,7 @@ import java.security.interfaces.RSAPublicKey;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentMap;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.fogbowcloud.app.model.User;
 import org.fogbowcloud.app.model.UserImpl;
 import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
@@ -19,7 +18,7 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
 public class CommonAuthenticator implements IguassuAuthenticator {
-	public static final Logger LOGGER = LoggerFactory.getLogger(CommonAuthenticator.class);
+	public static final Logger LOGGER = Logger.getLogger(CommonAuthenticator.class);
 
 	public static final String AUTH_NAME = "commonauth";
 	private DB usersDB;

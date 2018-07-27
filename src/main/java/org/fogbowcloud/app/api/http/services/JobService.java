@@ -1,7 +1,6 @@
 package org.fogbowcloud.app.api.http.services;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.fogbowcloud.app.ArrebolController;
 import org.fogbowcloud.app.NameAlreadyInUseException;
 import org.fogbowcloud.app.exception.InvalidParameterException;
@@ -28,7 +27,7 @@ public class JobService {
     @Autowired
     ArrebolController arrebolController;
 
-    private final Logger LOGGER = LoggerFactory.getLogger(JobService.class);
+    private final Logger LOGGER = Logger.getLogger(JobService.class);
 
     public List<JDFJob> getAllJobs(User owner) {
         return this.arrebolController.getAllJobs(owner.getUser());

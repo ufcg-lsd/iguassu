@@ -7,8 +7,7 @@ import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.Executors;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.fogbowcloud.app.datastore.JobDataStore;
 import org.fogbowcloud.app.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.exception.ArrebolException;
@@ -85,7 +84,7 @@ public class ArrebolController {
 		}
 	}
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(ArrebolController.class);
+	private static final Logger LOGGER = Logger.getLogger(ArrebolController.class);
 
 	private BlowoutController blowoutController;
 	private Properties properties;
@@ -177,7 +176,7 @@ public class ArrebolController {
 			blowoutController.addTaskList(taskList);
 		}
 	}
-	
+
 	public JDFJob getJobById(String jobId, String owner) {
         return this.jobDataStore.getByJobId(jobId, owner);
 	}

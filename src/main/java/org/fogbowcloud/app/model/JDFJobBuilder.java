@@ -8,8 +8,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.job.TaskSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
@@ -36,7 +35,7 @@ public class JDFJobBuilder {
 	private static final String SSH_SCP_PRECOMMAND = "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no";
 	private Properties properties;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(JDFJobBuilder.class);
+	private static final Logger LOGGER = Logger.getLogger(JDFJobBuilder.class);
 
 	public JDFJobBuilder(Properties properties) {
 		this.properties = properties;

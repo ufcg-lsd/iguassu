@@ -29,13 +29,11 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeMap;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 
 public class CommonUtils {
 	
-	private static final transient Logger LOG = LoggerFactory.getLogger(CommonUtils.class );
+	private static final transient Logger LOG = Logger.getLogger(CommonUtils.class );
 	
 	/**
 	 * Loads properties from a persistent File

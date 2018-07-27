@@ -1,7 +1,6 @@
 package org.fogbowcloud.app.utils.authenticator;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.fogbowcloud.app.model.User;
 import org.fogbowcloud.app.model.UserImpl;
 import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
@@ -15,7 +14,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class ThirdAppAuthenticator implements IguassuAuthenticator {
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(ThirdAppAuthenticator.class);
+    public static final Logger LOGGER = Logger.getLogger(ThirdAppAuthenticator.class);
 
     public static final String AUTH_NAME = "third_app_auth";
 

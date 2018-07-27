@@ -1,7 +1,6 @@
 package org.fogbowcloud.app.model;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
 import java.sql.Date;
@@ -19,7 +18,7 @@ public class OAuthToken {
     private String usernameOwner;
     private Date expirationDate;
 
-    public static final Logger LOGGER = LoggerFactory.getLogger(OAuthToken.class);
+    public static final Logger LOGGER = Logger.getLogger(OAuthToken.class);
 
     public OAuthToken() {
 

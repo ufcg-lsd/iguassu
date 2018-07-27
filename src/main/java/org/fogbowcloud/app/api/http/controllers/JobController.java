@@ -1,5 +1,6 @@
 package org.fogbowcloud.app.api.http.controllers;
 
+import org.apache.log4j.Logger;
 import org.fogbowcloud.app.NameAlreadyInUseException;
 import org.fogbowcloud.app.api.http.exceptions.StorageException;
 import org.fogbowcloud.app.api.http.services.FileSystemStorageService;
@@ -11,10 +12,6 @@ import org.fogbowcloud.app.model.JDFJob;
 import org.fogbowcloud.app.model.User;
 import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
-import org.restlet.data.Status;
-import org.restlet.resource.ResourceException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -24,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +34,7 @@ public class JobController {
     private final String JOB_PATH = "/{jobId}";
     public static final String JDF_FILE_PATH = "jdffilepath";
 
-    private final Logger LOGGER = LoggerFactory.getLogger(JobController.class);
+    private final Logger LOGGER = Logger.getLogger(JobController.class);
 
     @Lazy
     JobService jobService;

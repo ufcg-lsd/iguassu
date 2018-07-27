@@ -1,7 +1,6 @@
 package org.fogbowcloud.app.api.http.controllers;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.http.services.OAuthService;
 import org.fogbowcloud.app.exception.InvalidParameterException;
 import org.fogbowcloud.app.model.OAuthToken;
@@ -20,7 +19,7 @@ public class OAuthTokenController {
 
     public static final String OAUTH_TOKEN_ENDPOINT = "oauthtoken";
 
-    private final Logger LOGGER = LoggerFactory.getLogger(OAuthTokenController.class);
+    private final Logger LOGGER = Logger.getLogger(OAuthTokenController.class);
 
     @Lazy
     OAuthService oAuthService;

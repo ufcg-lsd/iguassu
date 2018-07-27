@@ -2,8 +2,7 @@ package org.fogbowcloud.app;
 
 import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
 import org.fogbowcloud.app.utils.IguassuGeneralConstants;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.log4j.Logger;
 import org.fogbowcloud.app.exception.ArrebolException;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +21,7 @@ import java.util.Properties;
 @SpringBootApplication
 public class IguassuApplication {
 
-    private final Logger LOGGER = LoggerFactory.getLogger(IguassuApplication.class);
+    private final Logger LOGGER = Logger.getLogger(IguassuApplication.class);
 
     @Bean
     CommandLineRunner cmdRunner() {
