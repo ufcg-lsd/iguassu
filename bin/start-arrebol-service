@@ -7,4 +7,4 @@ CONF_LOG=-Dlog4j.configuration=file:$LOG4J
 else
 CONF_LOG=
 fi
-java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=4001,suspend=n $CONF_LOG -cp target/arrebol-0.0.1.jar:target/lib/* org.fogbowcloud.app.ArrebolMain arrebol.conf blowout.conf > /dev/null &
+java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=4001,suspend=n $CONF_LOG -cp target/iguassu-0.0.1.jar:target/lib/* org.fogbowcloud.app.IguassuApplication > /dev/null &

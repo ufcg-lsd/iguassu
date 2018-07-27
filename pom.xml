@@ -43,6 +43,17 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-jar-plugin</artifactId>
+				<configuration>
+					<archive>
+						<manifest>
+							<mainClass>org.fogbowcloud.app.IguassuApplication</mainClass>
+						</manifest>
+					</archive>
+				</configuration>
+			</plugin>
 		</plugins>
 		<pluginManagement>
 			<plugins>
@@ -143,7 +154,7 @@
 			<artifactId>log4j</artifactId>
 			<version>1.2.17</version>
 		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/commons-codec/commons-codec -->
 		<dependency>
 			<groupId>commons-codec</groupId>
