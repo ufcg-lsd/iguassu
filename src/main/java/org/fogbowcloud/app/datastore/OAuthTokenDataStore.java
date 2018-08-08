@@ -22,7 +22,6 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
             + REFRESH_TOKEN + " VARCHAR(255), "
             + TOKEN_OWNER_USERNAME + " VARCHAR(255), "
             + EXPIRATION_TIME + " DATE )";
-    // TODO: check if makes sense add constraint to unique token_owner_username
 
     private static final String INSERT_TOKEN_TABLE_SQL = "INSERT INTO " + TOKENS_TABLE_NAME
             + " VALUES(?, ?, ?, ?)";
@@ -37,7 +36,7 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
 
     private static final String DELETE_ALL_TOKENS_TABLE_SQL = "DELETE FROM " + TOKENS_TABLE_NAME;
     private static final String DELETE_TOKEN_BY_ACCESS_TOKEN_SQL = DELETE_ALL_TOKENS_TABLE_SQL
-            + " WHERE " + ACCESS_TOKEN + " + ? ";
+            + " WHERE " + ACCESS_TOKEN + " = ? ";
 
     private static final Logger LOGGER = Logger.getLogger(OAuthTokenDataStore.class);
 
@@ -164,20 +163,24 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
         Connection conn = null;
         try {
             conn = getConnection();
+            conn.setAutoCommit(false);
             statement = conn.createStatement();
-
             boolean result = statement.execute(DELETE_ALL_TOKENS_TABLE_SQL);
             conn.commit();
             return result;
         } catch (SQLException e) {
             LOGGER.error("Couldn't delete all registres on " + TOKENS_TABLE_NAME, e);
+            if (conn != null) {
+                try {
+                    conn.rollback();
+                } catch(SQLException excep) {}
+            }
             return false;
         } finally {
             close(statement, conn);
         }
     }
 
-    // TODO: test
     public boolean deleteByAccessToken(String accessToken) {
         LOGGER.debug("Deleting token with accessToken [" + accessToken + "]");
 
@@ -185,9 +188,10 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
         Connection conn = null;
         try {
             conn = getConnection();
+            conn.setAutoCommit(false);
             preparedStatement = conn.prepareStatement(DELETE_TOKEN_BY_ACCESS_TOKEN_SQL);
             preparedStatement.setString(1, accessToken);
-            ResultSet rs = preparedStatement.executeQuery();
+            preparedStatement.executeUpdate();
             conn.commit();
             return true;
         } catch (SQLException e) {

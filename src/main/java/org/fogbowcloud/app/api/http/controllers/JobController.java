@@ -5,7 +5,6 @@ import org.fogbowcloud.app.NameAlreadyInUseException;
 import org.fogbowcloud.app.api.http.exceptions.StorageException;
 import org.fogbowcloud.app.api.http.services.FileSystemStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
-import org.fogbowcloud.app.exception.ArrebolException;
 import org.fogbowcloud.app.exception.InvalidParameterException;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.model.JDFJob;
