@@ -118,7 +118,7 @@ public class IguassuController {
 
 	public void init() throws Exception {
 		// FIXME: add as constructor param?
-		this.auth = new ThirdAppAuthenticator();
+		this.auth = new ThirdAppAuthenticator(this.properties);
 		// FIXME: replace by a proper
 		this.jobDataStore = new JobDataStore(this.properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL));
 		this.oAuthTokenDataStore = new OAuthTokenDataStore(this.properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL));
@@ -357,7 +357,7 @@ public class IguassuController {
 	}
 
 	private static boolean checkProperties(Properties properties) {
-		// Arrebol required properties
+		// Required properties
 		if (!properties.containsKey(ArrebolPropertiesConstants.EXECUTION_MONITOR_PERIOD)) {
 			LOGGER.error(requiredPropertyMessage(ArrebolPropertiesConstants.EXECUTION_MONITOR_PERIOD));
 			return false;

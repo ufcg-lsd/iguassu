@@ -1,6 +1,7 @@
 package org.fogbowcloud.app.utils.authenticator;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.external.oauth.ExternalOAuthController;
 import org.fogbowcloud.app.model.User;
 import org.fogbowcloud.app.model.UserImpl;
 import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
@@ -10,6 +11,7 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
 import java.io.File;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentMap;
 
 public class ThirdAppAuthenticator implements IguassuAuthenticator {
@@ -20,25 +22,28 @@ public class ThirdAppAuthenticator implements IguassuAuthenticator {
 
     private DB usersDB;
     private ConcurrentMap<String, String> userList;
+    private ExternalOAuthController externalOAuthTokenController;
 
-    public ThirdAppAuthenticator() {
+    public ThirdAppAuthenticator(Properties properties) {
         final File usersFile = new File(ArrebolPropertiesConstants.DB_FILE_USERS);
         this.usersDB = DBMaker.newFileDB(usersFile).make();
         this.usersDB.checkShouldCreate(ArrebolPropertiesConstants.DB_MAP_USERS);
         this.userList = this.usersDB.getHashMap(ArrebolPropertiesConstants.DB_MAP_USERS);
+        this.externalOAuthTokenController = new ExternalOAuthController(properties);
     }
 
     @Override
     public User authenticateUser(Credential credential) {
         User user = getUserByUsername(credential.getUsername());
-        String hash = credential.getToken();
-        int nonce = credential.getNonce();
         try {
-            // TODO check if user is in db or if is on owncloud
-            return user;
+            boolean userHasAccountInFileDriver = this.externalOAuthTokenController.userExists(credential.getUsername());
+            if (userHasAccountInFileDriver) {
+                return user;
+            }
         } catch (Exception e) {
             return null;
         }
+        return null;
     }
 
     @Override

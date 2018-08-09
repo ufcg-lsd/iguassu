@@ -1,5 +1,6 @@
 package org.fogbowcloud.app.external.oauth;
 
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.fogbowcloud.app.model.OAuthToken;
 import org.apache.http.HttpResponse;
@@ -7,6 +8,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONObject;
+import org.json.XML;
 
 import java.io.IOException;
 import java.sql.Date;
@@ -60,6 +62,40 @@ public class ExternalOAuthController {
         }
 
         return refreshedToken;
+    }
+
+    public boolean userExists(String username) {
+        String user_provisioning_url = this.properties.getProperty(ExternalOAuthConstants.USER_PROVISIONING_BASE_ENDPOINT);
+        String request_query = user_provisioning_url + "?search=" + username;
+        String fileDriverAdminUsername = this.properties.getProperty(ExternalOAuthConstants.FILE_DRIVER_ADMIN_USERNAME);
+        String fileDriverAdminPassword = this.properties.getProperty(ExternalOAuthConstants.FILE_DRIVER_ADMIN_PASSWORD);
+
+        String statusCodeOk = "100";
+        boolean hasUser = false;
+        String resSatusCode = "";
+        try {
+            HttpClient client = HttpClientBuilder.create().build();
+            HttpGet request = new HttpGet(request_query);
+
+            String encoding = Base64.getEncoder().encodeToString((fileDriverAdminUsername + ":" + fileDriverAdminPassword).getBytes("UTF-8"));
+            request.setHeader("Authorization", "Basic " + encoding);
+
+            HttpResponse response = client.execute(request);
+            String responseXMLString = EntityUtils.toString(response.getEntity());
+
+            JSONObject responseJsonObj = XML.toJSONObject(responseXMLString);
+            resSatusCode = responseJsonObj.getJSONObject("ocs")
+                    .getJSONObject("meta")
+                    .optString("statuscode");
+            hasUser = !responseJsonObj.getJSONObject("ocs")
+                    .getJSONObject("data")
+                    .optString("users")
+                    .isEmpty();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return resSatusCode.equals(statusCodeOk) && hasUser;
     }
 
 }
