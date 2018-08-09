@@ -27,7 +27,7 @@ public class TestAsyncJobBuilder {
     private static final String user = "arrebolservice";
     private static final String username = "arrebolservice";
 
-    private ArrebolController arrebol;
+    private IguassuController arrebol;
     private BlowoutController blowout;
 
     @Before
@@ -36,7 +36,7 @@ public class TestAsyncJobBuilder {
             Properties properties = new Properties();
             properties.load(new FileInputStream(ARREBOL_CONF));
             properties.load(new FileInputStream(BLOWOUT_CONF));
-            arrebol = Mockito.spy(new ArrebolController(properties));
+            arrebol = Mockito.spy(new IguassuController(properties));
         } catch (BlowoutException | ArrebolException | IOException e) {
             e.printStackTrace();
         }

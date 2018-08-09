@@ -1,7 +1,7 @@
 package org.fogbowcloud.app.api.http.services;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.ArrebolController;
+import org.fogbowcloud.app.IguassuController;
 import org.fogbowcloud.app.exception.InvalidParameterException;
 import org.fogbowcloud.app.model.OAuthToken;
 import org.fogbowcloud.app.model.User;
@@ -17,24 +17,24 @@ public class OAuthService {
 
     @Lazy
     @Autowired
-    ArrebolController arrebolController;
+    IguassuController iguassuController;
 
     private static final Logger LOGGER = Logger.getLogger(OAuthService.class);
 
     public void storeOAuthToken(OAuthToken oAuthToken) {
-        User user = this.arrebolController.getUser(oAuthToken.getUsernameOwner());
+        User user = this.iguassuController.getUser(oAuthToken.getUsernameOwner());
         if (user == null) {
-            this.arrebolController.addUser(oAuthToken.getUsernameOwner(), oAuthToken.getAccessToken());
+            this.iguassuController.addUser(oAuthToken.getUsernameOwner(), oAuthToken.getAccessToken());
         }
-        this.arrebolController.storeOAuthToken(oAuthToken);
+        this.iguassuController.storeOAuthToken(oAuthToken);
     }
 
     public List<OAuthToken> getAll() {
-        return this.arrebolController.getAllOAuthTokens();
+        return this.iguassuController.getAllOAuthTokens();
     }
 
     public String getAccessTokenByOwnerUsername(String ownerUsername) throws InvalidParameterException {
-        String accessToken = this.arrebolController.getAccessTokenByOwnerUsername(ownerUsername);
+        String accessToken = this.iguassuController.getAccessTokenByOwnerUsername(ownerUsername);
 
         if (accessToken != null) {
             return accessToken;
@@ -47,6 +47,6 @@ public class OAuthService {
     }
 
     public void deleteAllTokens() {
-        this.arrebolController.deleteAllExternalOAuthTokens();
+        this.iguassuController.deleteAllExternalOAuthTokens();
     }
 }

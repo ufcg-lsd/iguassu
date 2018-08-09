@@ -35,7 +35,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 
-public class ArrebolController {
+public class IguassuController {
 
 	private class AsyncJobBuilder implements Runnable {
 
@@ -84,7 +84,7 @@ public class ArrebolController {
 		}
 	}
 
-	private static final Logger LOGGER = Logger.getLogger(ArrebolController.class);
+	private static final Logger LOGGER = Logger.getLogger(IguassuController.class);
 
 	private BlowoutController blowoutController;
 	private Properties properties;
@@ -98,7 +98,7 @@ public class ArrebolController {
 
     private static ManagerTimer executionMonitorTimer = new ManagerTimer(Executors.newScheduledThreadPool(1));
 
-	public ArrebolController(Properties properties)
+	public IguassuController(Properties properties)
 			throws BlowoutException, ArrebolException {
 		if (properties == null) {
 			throw new IllegalArgumentException("Properties cannot be null.");
@@ -130,8 +130,8 @@ public class ArrebolController {
 		LOGGER.debug("Properties: " + properties.getProperty(ArrebolPropertiesConstants.DEFAULT_SPECS_FILE_PATH));
 
 		blowoutController.start(removePreviousResources);
+		this.blowoutController.setStarted(true); // TODO
 
-		LOGGER.debug("Application to be started on port: " + properties.getProperty(ArrebolPropertiesConstants.REST_SERVER_PORT));
 		LOGGER.info("Properties: " + properties.getProperty(AppPropertiesConstants.INFRA_INITIAL_SPECS_FILE_PATH));
 
 		this.nonces = new ArrayList<>();

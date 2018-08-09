@@ -2,7 +2,7 @@ package org.fogbowcloud.app.resource;
 
 import java.util.Properties;
 
-import org.fogbowcloud.app.ArrebolController;
+import org.fogbowcloud.app.IguassuController;
 import org.fogbowcloud.app.model.User;
 import org.fogbowcloud.app.restlet.JDFSchedulerApplication;
 import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
@@ -20,33 +20,33 @@ public class ResourceTestUtil {
 	public static final String TASK_RESOURCE_SUFIX = "/arrebol/task/";
 
 	private JDFSchedulerApplication jdfSchedulerApplication;
-	private ArrebolController arrebolController;
+	private IguassuController iguassuController;
 
 	public ResourceTestUtil() throws Exception {
 
-		this.arrebolController = Mockito.mock(ArrebolController.class);
-		Mockito.doNothing().when(this.arrebolController).init();
+		this.iguassuController = Mockito.mock(IguassuController.class);
+		Mockito.doNothing().when(this.iguassuController).init();
 
 		Properties properties = new Properties();
 		properties.put(ArrebolPropertiesConstants.REST_SERVER_PORT, DEFAULT_SERVER_PORT);
-		Mockito.when(this.arrebolController.getProperties()).thenReturn(properties);
+		Mockito.when(this.iguassuController.getProperties()).thenReturn(properties);
 		User userMock = Mockito.mock(User.class);
 		
 		Mockito.doReturn(ResourceTestUtil.DEFAULT_OWNER).when(userMock).getUser();
 
-		Mockito.when(this.arrebolController.authUser(null)).thenReturn(userMock);
+		Mockito.when(this.iguassuController.authUser(null)).thenReturn(userMock);
 		
-		Mockito.when(this.arrebolController.authUser(WRONG_CRED)).thenReturn(null);
+		Mockito.when(this.iguassuController.authUser(WRONG_CRED)).thenReturn(null);
 		
-		this.jdfSchedulerApplication = new JDFSchedulerApplication(this.arrebolController);
+		this.jdfSchedulerApplication = new JDFSchedulerApplication(this.iguassuController);
 	}
 
 	public JDFSchedulerApplication getJdfSchedulerApplication() {
 		return jdfSchedulerApplication;
 	}
 
-	public ArrebolController getArrebolController() {
-		return arrebolController;
+	public IguassuController getIguassuController() {
+		return iguassuController;
 	}
 
 }

@@ -23,7 +23,7 @@ public class TestExecutionMonitorWithDB {
 	private static final String FAKE_UUID = "1234";
 	private Task task;
 	private BlowoutController blowout;
-	private ArrebolController arrebol;
+	private IguassuController arrebol;
 	private JDFJob job;
 	private String FAKE_TASK_ID = "FAKE_TASK_ID";
 	private CurrentThreadExecutorService executorService;
@@ -38,7 +38,7 @@ public class TestExecutionMonitorWithDB {
 		jobDB = mock(HashMap.class);
 		job = mock(JDFJob.class);
 		executorService = new CurrentThreadExecutorService();
-		arrebol = mock(ArrebolController.class);
+		arrebol = mock(IguassuController.class);
 		blowout = mock(BlowoutController.class);
 	}
 

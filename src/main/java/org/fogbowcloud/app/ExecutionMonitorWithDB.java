@@ -14,19 +14,19 @@ public class ExecutionMonitorWithDB implements Runnable {
 
     private static final Logger LOGGER = Logger.getLogger(ExecutionMonitorWithDB.class);
 
-	private ArrebolController arrebolController;
+	private IguassuController iguassuController;
 	private ExecutorService service;
     private JobDataStore db;
 
-	ExecutionMonitorWithDB(ArrebolController arrebolController,
+	ExecutionMonitorWithDB(IguassuController iguassuController,
                            JobDataStore dataStore) {
-		this(arrebolController, Executors.newFixedThreadPool(3), dataStore);
+		this(iguassuController, Executors.newFixedThreadPool(3), dataStore);
 	}
 
-	ExecutionMonitorWithDB(ArrebolController arrebolController,
+	ExecutionMonitorWithDB(IguassuController iguassuController,
                            ExecutorService service,
                            JobDataStore db) {
-		this.arrebolController = arrebolController;
+		this.iguassuController = iguassuController;
 		if (service == null) {
 			this.service = Executors.newFixedThreadPool(3);
 		} else {
@@ -46,7 +46,7 @@ public class ExecutionMonitorWithDB implements Runnable {
 				if (!task.isFinished()) {
 					count++;
 					LOGGER.debug("Task: " + task +" is being treated");
-					TaskState taskState = arrebolController.getTaskState(task.getId());
+					TaskState taskState = iguassuController.getTaskState(task.getId());
 					LOGGER.debug("Process " + task.getId() + " has state " + taskState.getDesc());
 					service.submit(new TaskExecutionChecker(task));
 				}
@@ -67,10 +67,10 @@ public class ExecutionMonitorWithDB implements Runnable {
 
 		@Override
 		public void run() {
-			TaskState state = arrebolController.getTaskState(task.getId());
+			TaskState state = iguassuController.getTaskState(task.getId());
 
 			if (TaskState.COMPLETED.equals(state)) {
-				arrebolController.moveTaskToFinished(task);
+				iguassuController.moveTaskToFinished(task);
 			}
 		}
 	}

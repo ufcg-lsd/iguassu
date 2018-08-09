@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Properties;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.ArrebolController;
+import org.fogbowcloud.app.IguassuController;
 import org.fogbowcloud.app.NameAlreadyInUseException;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.model.JDFJob;
@@ -34,19 +34,19 @@ public class JDFSchedulerApplication extends Application {
 	private static final String ARREBOL_AUTHENTICATOR_PATH = "/arrebol/authenticator";
 	private static final String ARREBOL_USER_PATH = "/arrebol/user";
 
-	private ArrebolController arrebolController;
+	private IguassuController iguassuController;
 	private Component restletComponent;
 	private static final Logger LOGGER = Logger
 			.getLogger(JDFSchedulerApplication.class);
 
-	public JDFSchedulerApplication(ArrebolController arrebolController)
+	public JDFSchedulerApplication(IguassuController iguassuController)
 			throws Exception {
-		this.arrebolController = arrebolController;
-		this.arrebolController.init();
+		this.iguassuController = iguassuController;
+		this.iguassuController.init();
 	}
 
 	public void startServer() throws Exception {
-		Properties properties = this.arrebolController.getProperties();
+		Properties properties = this.iguassuController.getProperties();
 		if (!properties.containsKey(ArrebolPropertiesConstants.REST_SERVER_PORT)) {
 			throw new IllegalArgumentException(
 					ArrebolPropertiesConstants.REST_SERVER_PORT
@@ -68,7 +68,7 @@ public class JDFSchedulerApplication extends Application {
 
 	public void stopServer() throws Exception {
 		this.restletComponent.stop();
-		this.arrebolController.stop();
+		this.iguassuController.stop();
 	}
 
 	@Override
@@ -83,57 +83,57 @@ public class JDFSchedulerApplication extends Application {
 	}
 
 	public JDFJob getJobById(String jobId, String owner) {
-		return this.arrebolController.getJobById(jobId, owner);
+		return this.iguassuController.getJobById(jobId, owner);
 	}
 
 	public String addJob(String jdfFilePath, User owner)
 			throws CompilerException, NameAlreadyInUseException, BlowoutException, IOException {
-		return this.arrebolController.addJob(jdfFilePath, owner);
+		return this.iguassuController.addJob(jdfFilePath, owner);
 	}
 
 	public ArrayList<JDFJob> getAllJobs(String owner) {
-		return this.arrebolController.getAllJobs(owner);
+		return this.iguassuController.getAllJobs(owner);
 	}
 
 	public String stopJob(String jobId, String owner) {
-		return this.arrebolController.stopJob(jobId, owner);
+		return this.iguassuController.stopJob(jobId, owner);
 	}
 
 	public JDFJob getJobByName(String jobName, String owner) {
-		return this.arrebolController.getJobByName(jobName, owner);
+		return this.iguassuController.getJobByName(jobName, owner);
 	}
 
 	public Task getTaskById(String taskId, String owner) {
-		return this.arrebolController.getTaskById(taskId, owner);
+		return this.iguassuController.getTaskById(taskId, owner);
 	}
 
 	public TaskState getTaskState(String taskId) {
-		return this.arrebolController.getTaskState(taskId);
+		return this.iguassuController.getTaskState(taskId);
 	}
 
 	public int getNonce() {
-		return this.arrebolController.getNonce();
+		return this.iguassuController.getNonce();
 	}
 
 	public User authUser(String credentials)
 			throws IOException, GeneralSecurityException {
-		return this.arrebolController.authUser(credentials);
+		return this.iguassuController.authUser(credentials);
 	}
 
 	public User getUser(String username) {
-		return this.arrebolController.getUser(username);
+		return this.iguassuController.getUser(username);
 	}
 
 	public User addUser(String username, String publicKey) {
-		return this.arrebolController.addUser(username, publicKey);
+		return this.iguassuController.addUser(username, publicKey);
 	}
 
 	public String getAuthenticatorName() {
 		
-		return this.arrebolController.getAuthenticatorName();
+		return this.iguassuController.getAuthenticatorName();
 	}
 
 	public int getTaskRetries(String taskId, String owner) {
-		return this.arrebolController.getTaskRetries(taskId, owner);
+		return this.iguassuController.getTaskRetries(taskId, owner);
 	}
 }

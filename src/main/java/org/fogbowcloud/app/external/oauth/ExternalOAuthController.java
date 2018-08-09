@@ -14,7 +14,6 @@ import java.sql.Timestamp;
 import java.util.Base64;
 import java.util.Properties;
 
-// TODO change class name to ExternalOAuthController
 public class ExternalOAuthController {
 
     private Properties properties;

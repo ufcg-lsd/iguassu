@@ -17,7 +17,6 @@ import org.springframework.context.annotation.Lazy;
 import java.io.FileInputStream;
 import java.util.Properties;
 
-// TODO: change script bin/start-arrebol-service to run this class instead of old ArrebolMain
 @SpringBootApplication
 public class IguassuApplication {
 
@@ -35,14 +34,14 @@ public class IguassuApplication {
 
     @Bean
     @Lazy
-    public ArrebolController arrebolController(Properties properties) throws BlowoutException, ArrebolException {
-        ArrebolController arrebolController = new ArrebolController(properties);
+    public IguassuController arrebolController(Properties properties) throws BlowoutException, ArrebolException {
+        IguassuController iguassuController = new IguassuController(properties);
         try {
-            arrebolController.init(); //TODO: resolve this problem with authentication
+            iguassuController.init(); //TODO: resolve this problem with authentication
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return arrebolController;
+        return iguassuController;
     }
 
     public static void main(String[] args) {
@@ -56,7 +55,7 @@ public class IguassuApplication {
 
         @Lazy
         @Autowired
-        ArrebolController arrebolController;
+        IguassuController iguassuController;
 
         @Override
         public void run(String...args) {

@@ -2,28 +2,6 @@ package org.fogbowcloud.app.integration;
 
 import static org.junit.Assert.assertTrue;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.Properties;
-
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicHeader;
-import org.apache.http.util.EntityUtils;
-import org.fogbowcloud.app.ArrebolController;
-import org.fogbowcloud.app.resource.JobResource;
-import org.fogbowcloud.app.resource.ResourceTestUtil;
-import org.fogbowcloud.app.restlet.JDFSchedulerApplication;
-import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
-import org.fogbowcloud.app.utils.authenticator.Credential;
-import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
-import org.junit.Test;
-
 public class ArrebolControllerIT {
 
 //	private ArrebolController ac;

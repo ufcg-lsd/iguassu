@@ -1,6 +1,6 @@
 package org.fogbowcloud.app.api.http.controllers;
 
-import org.fogbowcloud.app.ArrebolController;
+import org.fogbowcloud.app.IguassuController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -18,11 +18,11 @@ public class NonceController {
 
     @Lazy
     @Autowired
-    ArrebolController arrebolController;
+    IguassuController iguassuController;
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<String> getNonce() {
-        int nonce = this.arrebolController.getNonce();
+        int nonce = this.iguassuController.getNonce();
         String nonceStr = String.valueOf(nonce);
         return new ResponseEntity<String>(nonceStr, HttpStatus.OK);
     }
