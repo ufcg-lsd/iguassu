@@ -11,7 +11,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.datastore.JobDataStore;
 import org.fogbowcloud.app.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.exception.ArrebolException;
-import org.fogbowcloud.app.external.oauth.OAuthController;
+import org.fogbowcloud.app.external.oauth.ExternalOAuthController;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
@@ -94,7 +94,7 @@ public class ArrebolController {
 	private JobDataStore jobDataStore;
 	private OAuthTokenDataStore oAuthTokenDataStore;
 	private IguassuAuthenticator auth;
-	private OAuthController externalOAuthTokenController;
+	private ExternalOAuthController externalOAuthTokenController;
 
     private static ManagerTimer executionMonitorTimer = new ManagerTimer(Executors.newScheduledThreadPool(1));
 
@@ -109,7 +109,7 @@ public class ArrebolController {
 		this.properties = properties;
 		this.blowoutController = new BlowoutController(properties);
 		this.creatingJobs = new HashMap<>();
-		this.externalOAuthTokenController = new OAuthController(properties);
+		this.externalOAuthTokenController = new ExternalOAuthController(properties);
 	}
 
 	public Properties getProperties() {

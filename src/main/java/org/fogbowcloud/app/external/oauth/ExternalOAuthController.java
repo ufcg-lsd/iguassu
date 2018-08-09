@@ -15,19 +15,19 @@ import java.util.Base64;
 import java.util.Properties;
 
 // TODO change class name to ExternalOAuthController
-public class OAuthController {
+public class ExternalOAuthController {
 
     private Properties properties;
 
-    public OAuthController(Properties properties) {
+    public ExternalOAuthController(Properties properties) {
         this.properties = properties;
     }
 
     public OAuthToken refreshToken(String refreshToken) {
-        String server_url = this.properties.getProperty(OAuthConstants.SERVER_TOKEN_URL);
+        String server_url = this.properties.getProperty(ExternalOAuthConstants.SERVER_TOKEN_URL);
         String request_query = server_url + "?grant_type=refresh_token" + "&refresh_token=" + refreshToken;
-        String clientId = this.properties.getProperty(OAuthConstants.MY_CLIENT_ID);
-        String clientSecret = this.properties.getProperty(OAuthConstants.MY_SECRET_ID);
+        String clientId = this.properties.getProperty(ExternalOAuthConstants.MY_CLIENT_ID);
+        String clientSecret = this.properties.getProperty(ExternalOAuthConstants.MY_SECRET_ID);
 
         OAuthToken refreshedToken = null;
         try {

@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.api.http;
+package org.fogbowcloud.app.api.http.exceptions;
 
 
 import org.fogbowcloud.app.api.http.exceptions.StorageException;
