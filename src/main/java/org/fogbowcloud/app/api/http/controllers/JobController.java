@@ -67,7 +67,7 @@ public class JobController {
         if (job == null) {
             job = this.jobService.getJobByName(jobId, owner.getUser());
             if (job == null) {
-                LOGGER.debug("Could not find job with id " + jobId + " for user " + owner.getUsername());
+                LOGGER.info("Could not find job with id " + jobId + " for user " + owner.getUsername());
                 throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
             }
         }
@@ -80,7 +80,7 @@ public class JobController {
                                                  @RequestHeader(value=ArrebolPropertiesConstants.X_CREDENTIALS) String credentials) {
         LOGGER.info("Saving new Job.");
 
-        LOGGER.debug(file.toString());
+        LOGGER.info(file.toString());
 
         // Credentials
         Map<String, String> fieldMap = new HashMap<>();
@@ -94,16 +94,16 @@ public class JobController {
         // Creating job
         String jdf = fieldMap.get(JDF_FILE_PATH);
         if (jdf == null) {
-            LOGGER.debug("Could not store  new job from user " + owner.getUsername());
+            LOGGER.info("Could not store  new job from user " + owner.getUsername());
             throw new StorageException("Could not store  new job from user " + owner.getUsername());
         }
 
         String jobId;
         String jdfAbsolutePath = fieldMap.get(JDF_FILE_PATH);
         try {
-            LOGGER.debug("jdfpath <" + jdfAbsolutePath + ">");
+            LOGGER.info("jdfpath <" + jdfAbsolutePath + ">");
             jobId = this.jobService.addJob(jdfAbsolutePath, owner);
-            LOGGER.debug("Job "+ jobId + " created at time: "+ System.currentTimeMillis() );
+            LOGGER.info("Job "+ jobId + " created at time: "+ System.currentTimeMillis() );
         } catch (CompilerException ce) {
             LOGGER.error(ce.getMessage(), ce);
             throw new StorageException("Could not compile JDF file.", ce);
@@ -130,7 +130,7 @@ public class JobController {
         String stoppedJobId = this.jobService.stopJob(jobId, owner.getUser());
 
         if (stoppedJobId == null) {
-            LOGGER.debug("Could not find job with id " + jobId + " for user " + owner.getUsername());
+            LOGGER.info("Could not find job with id " + jobId + " for user " + owner.getUsername());
             throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
         }
 

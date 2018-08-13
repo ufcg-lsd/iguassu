@@ -37,12 +37,12 @@ public class JobService {
         if (job == null) {
             job = this.iguassuController.getJobByName(jobId, owner.getUser());
             if (job == null) {
-                LOGGER.debug("Could not find job with id " + jobId + " for user " + owner.getUsername());
+                LOGGER.info("Could not find job with id " + jobId + " for user " + owner.getUsername());
                 throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
             }
         }
 
-        LOGGER.debug("JobID " + jobId + " is of job " + job);
+        LOGGER.info("JobID " + jobId + " is of job " + job);
 
         return job;
     }

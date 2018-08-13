@@ -392,22 +392,6 @@ public class IguassuController {
 				return false;
 			}
 		}
-//		if (!properties.containsKey(ArrebolPropertiesConstants.AUTHENTICATION_PLUGIN)) {
-//			LOGGER.error(requiredPropertyMessage(ArrebolPropertiesConstants.AUTHENTICATION_PLUGIN));
-//			return false;
-//		} else {
-//			String authenticationPlugin = properties.getProperty(ArrebolPropertiesConstants.AUTHENTICATION_PLUGIN);
-//			if (authenticationPlugin.equals("org.fogbowcloud.app.utils.LDAPAuthenticator")) {
-//				if (!properties.containsKey(ArrebolPropertiesConstants.LDAP_AUTHENTICATION_URL)) {
-//					LOGGER.error(requiredPropertyMessage(ArrebolPropertiesConstants.LDAP_AUTHENTICATION_URL));
-//					return false;
-//				}
-//				if (!properties.containsKey(ArrebolPropertiesConstants.LDAP_AUTHENTICATION_BASE)) {
-//					LOGGER.error(requiredPropertyMessage(ArrebolPropertiesConstants.LDAP_AUTHENTICATION_BASE));
-//					return false;
-//				}
-//			}
-//		}
 		LOGGER.debug("All properties are set");
 		return true;
 	}

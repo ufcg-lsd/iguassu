@@ -70,7 +70,7 @@ public class ThirdAppAuthenticator implements IguassuAuthenticator {
         try {
             user = UserImpl.fromJSON(new JSONObject(userJSONString));
         } catch (JSONException e) {
-            LOGGER.debug("Could not retrieve the user from database.", e);
+            LOGGER.info("Could not retrieve the user from database.", e);
         }
         return user;
     }

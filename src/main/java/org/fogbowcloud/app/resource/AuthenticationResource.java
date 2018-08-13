@@ -16,7 +16,7 @@ public class AuthenticationResource extends ServerResource{
 	public Representation getAuth() {
 		JDFSchedulerApplication app = (JDFSchedulerApplication) getApplication();
 		String authStrt =  app.getAuthenticatorName();
-		LOGGER.debug("authStrat: " + authStrt);
+		LOGGER.info("authStrat: " + authStrt);
 		return new StringRepresentation(authStrt);
 	}
 	
