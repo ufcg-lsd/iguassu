@@ -37,7 +37,7 @@ public class IguassuApplication {
     public IguassuController arrebolController(Properties properties) throws BlowoutException, ArrebolException {
         IguassuController iguassuController = new IguassuController(properties);
         try {
-            iguassuController.init(); //TODO: resolve this problem with authentication
+            iguassuController.init();
         } catch (Exception e) {
             e.printStackTrace();
         }
