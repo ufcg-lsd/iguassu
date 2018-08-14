@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.http.controllers.JobController;
 import org.fogbowcloud.app.api.http.exceptions.StorageException;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 @Service
 public class FileSystemStorageService {
 
+    private final Logger LOGGER = Logger.getLogger(FileSystemStorageService.class);
 
     public FileSystemStorageService() {
 
@@ -22,15 +24,20 @@ public class FileSystemStorageService {
 
     public void store(MultipartFile file, Map<String, String> formFieldsToLoad) {
         String fileName = file.getOriginalFilename();
+
+        LOGGER.info("Storing file of name [" + fileName + "];");
+
         try {
             if (file.isEmpty()) {
-                throw new StorageException("Failed to store empty file " + fileName);
+                String errorMsg = "Failed to store empty file " + fileName;
+                LOGGER.error(errorMsg);
+                throw new StorageException(errorMsg);
             }
             try (InputStream inputStream = file.getInputStream()) {
                 if (formFieldsToLoad.containsKey(JobController.JDF_FILE_PATH)) {
                     String fileContent = IOUtils.toString(inputStream);
-                    formFieldsToLoad.put(JobController.JDF_FILE_PATH, fileName);
                     File tempFile = createTmpFile(fileContent, fileName);
+                    formFieldsToLoad.put(JobController.JDF_FILE_PATH, tempFile.getAbsolutePath());
                 }
             }
         }
@@ -42,6 +49,8 @@ public class FileSystemStorageService {
     private File createTmpFile(String content, String fileName) throws IOException {
         File tempFile = File.createTempFile(fileName, null);
         IOUtils.write(content, new FileOutputStream(tempFile));
+
+        LOGGER.info("Writing file of name [" + fileName + "] in " + tempFile.getAbsolutePath());
         return tempFile;
     }
 
