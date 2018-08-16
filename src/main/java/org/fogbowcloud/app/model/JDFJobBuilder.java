@@ -30,8 +30,7 @@ public class JDFJobBuilder {
 
 	// FIXME: what is this?
 	private static final String SANDBOX = "sandbox";
-	// private static final String standardImage = "fogbow-ubuntu";
-	private static final String standardImage = "fogbow-fake";
+	private static final String standardImage = "fogbow-ubuntu";
 	private static final String SSH_SCP_PRECOMMAND = "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no";
 	private Properties properties;
 
@@ -104,7 +103,6 @@ public class JDFJobBuilder {
 				for (TaskSpecification taskSpec : jobSpec.getTaskSpecs()) {
 					if (Thread.interrupted())
 						throw new InterruptedException();
-					LOGGER.debug("========================================================" + job.getUserId());
 					ProcessBuilder ps = new ProcessBuilder("id","-u", job.getUserId());
 
 					//From the DOC:  Initially, this property is false, meaning that the
@@ -127,11 +125,10 @@ public class JDFJobBuilder {
 				    }
 					String result = resultBuilder.toString();
 
-					LOGGER.debug("========================================================" +result);
-					if (result.contains("no such user")) {
-						throw new SecurityException("User "+job.getUserId()+" is not part of this security group");
-					}
-					in.close();
+//					if (result.contains("no such user")) {
+//						throw new SecurityException("User "+job.getUserId()+" is not part of this security group");
+//					}
+//					in.close();
 
 					Task task = new TaskImpl("TaskNumber" + "-" + taskID + "-" + UUID.randomUUID(), spec, result);
 					task.putMetadata(TaskImpl.METADATA_REMOTE_OUTPUT_FOLDER,
@@ -218,14 +215,14 @@ public class JDFJobBuilder {
 
 		switch (IOType) {
 			case "PUT": case "STORE":
-				task.addCommand(uploadFileCommands(sourceFile, destination, userName, externalOAuthToken));
-				LOGGER.debug("JobId: " + jobId + " task: " + task.getId() + " upload command:"
-						+ uploadFileCommands(schedPath + sourceFile, destination, userName, externalOAuthToken).getCommand());
+                Command uploadFileCommand = uploadFileCommands(sourceFile, destination, userName, externalOAuthToken);
+                task.addCommand(uploadFileCommand);
+				LOGGER.debug("JobId: " + jobId + " task: " + task.getId() + " upload command:" + uploadFileCommand.getCommand());
 				break;
 			case "GET":
-				task.addCommand(downloadFileCommands(sourceFile, destination, userName, externalOAuthToken));
-				LOGGER.debug("JobId: " + jobId + " task: " + task.getId() + " download command:"
-						+ downloadFileCommands(schedPath + sourceFile, destination, userName, externalOAuthToken).getCommand());
+                Command downloadFileCommand = downloadFileCommands(sourceFile, destination, userName, externalOAuthToken);
+                task.addCommand(downloadFileCommand);
+				LOGGER.debug("JobId: " + jobId + " task: " + task.getId() + " download command:" + downloadFileCommand.getCommand());
 				break;
 		}
 	}

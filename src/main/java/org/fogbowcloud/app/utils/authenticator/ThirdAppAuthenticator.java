@@ -35,6 +35,9 @@ public class ThirdAppAuthenticator implements IguassuAuthenticator {
     @Override
     public User authenticateUser(Credential credential) {
         User user = getUserByUsername(credential.getUsername());
+
+        LOGGER.debug("Authenticating user with userId: " + user.getUsername());
+
         try {
             boolean userHasAccountInFileDriver = this.externalOAuthTokenController.userExists(credential.getUsername());
             if (userHasAccountInFileDriver) {

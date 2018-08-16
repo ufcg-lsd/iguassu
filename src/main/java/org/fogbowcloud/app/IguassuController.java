@@ -288,7 +288,7 @@ public class IguassuController {
 				task.getMetadata(ArrebolPropertiesConstants.JOB_ID),
 				task.getMetadata(ArrebolPropertiesConstants.OWNER)
 		);
-		LOGGER.debug("Moving task " + task.getId() + "from job " + job.getName() +" to finished");
+		LOGGER.debug("Moving task " + task.getId() + " from job " + job.getName() +" to finished");
 		finishedTasks.put(task.getId(), task);
 		job.finish(task);
 		updateJob(job);
