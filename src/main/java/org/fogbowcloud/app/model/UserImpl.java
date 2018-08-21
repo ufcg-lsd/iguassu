@@ -55,7 +55,6 @@ public class UserImpl implements User {
 
 	@Override
 	public String getUsername() {
-		
-		return DEFAULT_USER;
+		return  (this.username != null) ? this.username : DEFAULT_USER;
 	}
 }

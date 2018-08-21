@@ -420,6 +420,8 @@ public class IguassuController {
 	}
 
 	public String getAccessTokenByOwnerUsername(String ownerUsername) {
+		LOGGER.debug("Getting access token of file driver for user " + ownerUsername);
+
 		List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(ownerUsername);
 
 		String accessToken = null;
@@ -446,15 +448,16 @@ public class IguassuController {
 
 	public String refreshExternalOAuthToken(String ownerUsername) {
 		List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(ownerUsername);
-		if (tokensList.size() == 0) {
 
+		String accessToken = null;
+		if (tokensList.size() != 0) {
+			OAuthToken someToken = tokensList.get(0);
+			String someRefreshToken = someToken.getRefreshToken();
+			OAuthToken newOAuthToken = this.externalOAuthTokenController.refreshToken(someRefreshToken);
+			accessToken = newOAuthToken.getAccessToken();
+			deleteTokens(tokensList);
+			storeOAuthToken(newOAuthToken);
 		}
-		OAuthToken someToken = tokensList.get(0);
-		String someRefreshToken = someToken.getRefreshToken();
-		OAuthToken newOAuthToken = this.externalOAuthTokenController.refreshToken(someRefreshToken);
-		String accessToken = newOAuthToken.getAccessToken();
-		deleteTokens(tokensList);
-		storeOAuthToken(newOAuthToken);
 		return accessToken;
 	}
 
