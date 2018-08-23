@@ -216,11 +216,9 @@ public class JDFJobBuilder {
 
 		switch (IOType) {
 			case "PUT": case "STORE":
-                List<Command> uploadFileCommands = uploadFileCommands(sourceFile, destination, userName, externalOAuthToken);
-				for (Command uploadFileCommand: uploadFileCommands) {
-					task.addCommand(uploadFileCommand);
-					LOGGER.debug("JobId: " + jobId + " task: " + task.getId() + " upload command:" + uploadFileCommand.getCommand());
-				}
+				Command uploadFileCommand = uploadFileCommands(sourceFile, destination, userName, externalOAuthToken);
+				task.addCommand(uploadFileCommand);
+				LOGGER.debug("JobId: " + jobId + " task: " + task.getId() + " upload command:" + uploadFileCommand.getCommand());
 				break;
 			case "GET":
                 Command downloadFileCommand = downloadFileCommands(sourceFile, destination, userName, externalOAuthToken);
@@ -290,29 +288,20 @@ public class JDFJobBuilder {
 		return new Command(scpCommand, Command.Type.LOCAL);
 	}
 
-	private List<Command> uploadFileCommands(String localFilePath, String filePathToUpload, String userName, String token) {
+	private Command uploadFileCommands(String localFilePath, String filePathToUpload, String userName, String token) {
 		String fileDriverHostIp = this.properties.getProperty(ArrebolPropertiesConstants.FILE_DRIVER_HOST_IP);
 		String requestTokenCommand = getUserExternalOAuthTokenRequestCommand(userName);
-		String uploadStatement = "http_code=$(curl --write-out %{http_code} -X PUT --header Authorization:Bearer $token"
+		String uploadCommand = "http_code=$(curl --write-out %{http_code} -X PUT --header Authorization:Bearer $token"
 				+ " --data-binary @" + localFilePath + " --silent --output /dev/null "
-				+ "http://$server/remote.php/webdav/" + filePathToUpload + ");";
+				+ "http://$server/remote.php/webdav/" + filePathToUpload + "); ";
 
-		String declareServerVar = "server=" + fileDriverHostIp + ";";
-		String declareTokenVar = "token=" + token + ";";
-		String ifStatement = "if [ $http_code == " + String.valueOf(HttpStatus.UNAUTHORIZED) + " ] ; then " + requestTokenCommand
-				+ " " + uploadStatement + " fi";
+		String scpCommand = "server=" + fileDriverHostIp + ";"
+				+ "token=" + token + ";"
+				+ uploadCommand
+				+ "if [ $http_code == " + String.valueOf(HttpStatus.UNAUTHORIZED) + " ] ; then " + requestTokenCommand
+				+ uploadCommand + " fi";
 
-		List<Command> uploadsCommands = new ArrayList<>();
-		Command declareServerVarCommand = new Command(declareServerVar, Command.Type.REMOTE);
-		uploadsCommands.add(declareServerVarCommand);
-		Command declareTokenVarCommand = new Command(declareTokenVar, Command.Type.REMOTE);
-		uploadsCommands.add(declareTokenVarCommand);
-		Command uploadCommand = new Command(uploadStatement, Command.Type.REMOTE);
-		uploadsCommands.add(uploadCommand);
-		Command ifStatementCommand = new Command(ifStatement, Command.Type.REMOTE);
-		uploadsCommands.add(ifStatementCommand);
-
-		return uploadsCommands;
+		return new Command(scpCommand, Command.Type.REMOTE);
 	}
 
 	private Command downloadFileCommands(String localFilePath, String filePathToDownload, String userName, String token) {
@@ -343,7 +332,7 @@ public class JDFJobBuilder {
 
 	private String getUserExternalOAuthTokenRequestCommand(String userName) {
 		String myIguassuHttpServiceIp = getAppServiceIp();
-		return "token=$(curl --request GET --url " + myIguassuHttpServiceIp + "/oauthtoken/" + userName + ");";
+		return "token=$(curl --request GET --url " + myIguassuHttpServiceIp + "/oauthtoken/" + userName + "); ";
 	}
 
 	private String getAppServiceIp() {
