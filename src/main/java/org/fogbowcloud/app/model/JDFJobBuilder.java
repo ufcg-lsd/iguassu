@@ -300,7 +300,7 @@ public class JDFJobBuilder {
 				+ "if [ $http_code == " + String.valueOf(HttpStatus.UNAUTHORIZED) + " ]; then " + requestTokenCommand
 				+ uploadCommand + " fi";
 
-		return new Command(scpCommand, Command.Type.LOCAL);
+		return new Command(scpCommand, Command.Type.REMOTE);
 	}
 
 	private Command downloadFileCommands(String localFilePath, String filePathToDownload, String userName, String token) {
@@ -318,7 +318,7 @@ public class JDFJobBuilder {
 				+ "if [ $http_code == " + String.valueOf(HttpStatus.UNAUTHORIZED) + " ]; then " + requestTokenCommand
 				+ downloadCommand + " fi";
 
-		return new Command(scpCommand, Command.Type.LOCAL);
+		return new Command(scpCommand, Command.Type.REMOTE);
 	}
 
 	private Command mkdirLocalFolder(String folder) {
