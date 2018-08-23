@@ -293,20 +293,22 @@ public class JDFJobBuilder {
 	private List<Command> uploadFileCommands(String localFilePath, String filePathToUpload, String userName, String token) {
 		String fileDriverHostIp = this.properties.getProperty(ArrebolPropertiesConstants.FILE_DRIVER_HOST_IP);
 		String requestTokenCommand = getUserExternalOAuthTokenRequestCommand(userName);
-		String uploadCommand = "http_code=$(curl --write-out %{http_code} -X PUT --header Authorization:Bearer $token"
+		String uploadStatement = "http_code=$(curl --write-out %{http_code} -X PUT --header Authorization:Bearer $token"
 				+ " --data-binary @" + localFilePath + " --silent --output /dev/null "
 				+ "http://$server/remote.php/webdav/" + filePathToUpload + ");";
 
 		String declareServerVar = "server=" + fileDriverHostIp + ";";
 		String declareTokenVar = "token=" + token + ";";
 		String ifStatement = "if [ $http_code == " + String.valueOf(HttpStatus.UNAUTHORIZED) + " ] ; then " + requestTokenCommand
-				+ " " + uploadCommand + " fi";
+				+ " " + uploadStatement + " fi";
 
 		List<Command> uploadsCommands = new ArrayList<>();
 		Command declareServerVarCommand = new Command(declareServerVar, Command.Type.REMOTE);
 		uploadsCommands.add(declareServerVarCommand);
 		Command declareTokenVarCommand = new Command(declareTokenVar, Command.Type.REMOTE);
 		uploadsCommands.add(declareTokenVarCommand);
+		Command uploadCommand = new Command(uploadStatement, Command.Type.REMOTE);
+		uploadsCommands.add(uploadCommand);
 		Command ifStatementCommand = new Command(ifStatement, Command.Type.REMOTE);
 		uploadsCommands.add(ifStatementCommand);
 
