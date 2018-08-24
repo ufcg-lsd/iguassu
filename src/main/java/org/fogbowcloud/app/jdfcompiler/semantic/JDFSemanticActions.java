@@ -518,19 +518,19 @@ public class JDFSemanticActions implements SemanticActions {
 		if ( command.equals( "" ) || filePath.equals( "" ) || place.equals( "" ) ) {
 			throw new SemanticException( CompilerMessages.SEMANTIC_MALFORMED_IO_COMMAND );
 		}
-		String localParentDir = CommonCompiler.getSourceParentDir();
-		if ( command.equalsIgnoreCase( "GET" ) ) {
-			// To insert the JDF parent directory in relative path
-			File temp = new File( place );
-			if ( !temp.isAbsolute() )
-				place = localParentDir + File.separator + place;
-
-		} else { // command is PUT or STORE
-			// To insert the JDF parent directory in relative path
-			File temp = new File( filePath );
-			if ( !temp.isAbsolute() )
-				filePath = localParentDir + File.separator + filePath;
-		}
+//		String localParentDir = CommonCompiler.getSourceParentDir();
+//		if ( command.equalsIgnoreCase( "GET" ) ) {
+//			// To insert the JDF parent directory in relative path
+//			File temp = new File( place );
+//			if ( !temp.isAbsolute() )
+//				place = localParentDir + File.separator + place;
+//
+//		} else { // command is PUT or STORE
+//			// To insert the JDF parent directory in relative path
+//			File temp = new File( filePath );
+//			if ( !temp.isAbsolute() )
+//				filePath = localParentDir + File.separator + filePath;
+//		} //TODO
 
 		return new IOEntry( command, filePath, place );
 	}
