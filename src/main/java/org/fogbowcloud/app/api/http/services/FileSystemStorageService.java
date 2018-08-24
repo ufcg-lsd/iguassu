@@ -13,10 +13,13 @@ import org.fogbowcloud.app.api.http.exceptions.StorageException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.swing.filechooser.FileSystemView;
+
 @Service
 public class FileSystemStorageService {
 
     private final Logger LOGGER = Logger.getLogger(FileSystemStorageService.class);
+    private final File FILES_DEFAULT_DIRECTORY = FileSystemView.getFileSystemView().getHomeDirectory();
 
     public FileSystemStorageService() {
 
@@ -47,7 +50,7 @@ public class FileSystemStorageService {
     }
 
     private File createTmpFile(String content, String fileName) throws IOException {
-        File tempFile = File.createTempFile(fileName, null);
+        File tempFile = File.createTempFile(fileName, null, FILES_DEFAULT_DIRECTORY);
         IOUtils.write(content, new FileOutputStream(tempFile));
 
         LOGGER.info("Writing file of name [" + fileName + "] in " + tempFile.getAbsolutePath());

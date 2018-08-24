@@ -291,14 +291,14 @@ public class JDFJobBuilder {
 	private Command uploadFileCommands(String localFilePath, String filePathToUpload, String userName, String token) {
 		String fileDriverHostIp = this.properties.getProperty(ArrebolPropertiesConstants.FILE_DRIVER_HOST_IP);
 		String requestTokenCommand = getUserExternalOAuthTokenRequestCommand(userName);
-		String uploadCommand = "http_code=$(curl --write-out %{http_code} -X PUT --header \"Authorization:Bearer $token\""
+		String uploadCommand = " http_code=$(curl --write-out %{http_code} -X PUT --header \"Authorization:Bearer $token\" "
 				+ " --data-binary @" + localFilePath + " --silent --output /dev/null "
-				+ "http://$server/remote.php/webdav/" + filePathToUpload + "); ";
+				+ " http://$server/remote.php/webdav/" + filePathToUpload + "); ";
 
-		String scpCommand = "\'server=" + fileDriverHostIp + ";"
-				+ "token=" + token + ";"
+		String scpCommand = "\'server=" + fileDriverHostIp + "; "
+				+ "token=" + token + "; "
 				+ uploadCommand
-				+ "if [ \\$http_code == " + String.valueOf(HttpStatus.UNAUTHORIZED) + " ] ; then " + requestTokenCommand
+				+ " if [ \\$http_code == " + String.valueOf(HttpStatus.UNAUTHORIZED) + " ] ; then " + requestTokenCommand
 				+ uploadCommand + " fi \'";
 
 		return new Command(scpCommand, Command.Type.REMOTE);
@@ -307,16 +307,16 @@ public class JDFJobBuilder {
 	private Command downloadFileCommands(String localFilePath, String filePathToDownload, String userName, String token) {
 		String fileDriverHostIp = this.properties.getProperty(ArrebolPropertiesConstants.FILE_DRIVER_HOST_IP);
 		String requestTokenCommand = getUserExternalOAuthTokenRequestCommand(userName);
-		String downloadCommand = "full_response=$(curl --write-out %{http_code} --header \"Authorization:Bearer $token\""
-				+ "http://$server/remote.php/webdav/" + filePathToDownload
-				+ " --silent --output " + localFilePath + "/dev/null);";
-		String extractHttpStatusCode = "http_code=${full_response:0:3};";
+		String downloadCommand = " full_response=$(curl --write-out %{http_code} --header \"Authorization:Bearer $token\" "
+				+ " http://$server/remote.php/webdav/" + filePathToDownload
+				+ " --silent --output " + localFilePath + "/dev/null); ";
+		String extractHttpStatusCode = "http_code=${full_response:0:3}; ";
 
-		String scpCommand = "\'server=" + fileDriverHostIp + ";"
-				+ "token=" + token + ";"
+		String scpCommand = "\'server=" + fileDriverHostIp + "; "
+				+ "token=" + token + "; "
 				+ downloadCommand
 				+ extractHttpStatusCode
-				+ "if [ \\$http_code == " + String.valueOf(HttpStatus.UNAUTHORIZED) + " ] ; then " + requestTokenCommand
+				+ " if [ \\$http_code == " + String.valueOf(HttpStatus.UNAUTHORIZED) + " ] ; then " + requestTokenCommand
 				+ " " + downloadCommand + " fi \'";
 
 		return new Command(scpCommand, Command.Type.REMOTE);
