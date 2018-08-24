@@ -309,7 +309,7 @@ public class JDFJobBuilder {
 		String requestTokenCommand = getUserExternalOAuthTokenRequestCommand(userName);
 		String downloadCommand = " full_response=$(curl --write-out %{http_code} --header \"Authorization:Bearer $token\" "
 				+ " http://$server/remote.php/webdav/" + filePathToDownload
-				+ " --silent --output " + localFilePath + "/dev/null); ";
+				+ " --silent --output " + localFilePath + " /dev/null); ";
 		String extractHttpStatusCode = "http_code=${full_response:0:3}; ";
 
 		String scpCommand = "\'server=" + fileDriverHostIp + "; "
