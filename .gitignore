@@ -8,6 +8,7 @@ bigjob.py
 datastores/
 
 arrebol.conf
+iguassu.conf
 sched.conf
 
 test/test.conf

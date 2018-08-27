@@ -103,7 +103,7 @@ public class IguassuController {
 		if (properties == null) {
 			throw new IllegalArgumentException("Properties cannot be null.");
 		} else if (!checkProperties(properties)) {
-			throw new IguassuException("Error while initializing Arrebol Controller.");
+			throw new IguassuException("Error while initializing Iguassu Controller.");
 		}
 		this.finishedTasks = new HashMap<>();
 		this.properties = properties;

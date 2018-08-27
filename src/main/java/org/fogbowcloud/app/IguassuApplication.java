@@ -34,7 +34,7 @@ public class IguassuApplication {
 
     @Bean
     @Lazy
-    public IguassuController arrebolController(Properties properties) throws BlowoutException, IguassuException {
+    public IguassuController iguassuController(Properties properties) throws BlowoutException, IguassuException {
         IguassuController iguassuController = new IguassuController(properties);
         try {
             iguassuController.init();
@@ -60,19 +60,19 @@ public class IguassuApplication {
         @Override
         public void run(String...args) {
 
-            String arrebolConfPath;
+            String iguassuConfPath;
             String schedConfPath;
 
             if (args.length > 0) {
-                arrebolConfPath = args[0];
+                iguassuConfPath = args[0];
                 schedConfPath = args[1];
             } else {
-                arrebolConfPath = IguassuGeneralConstants.DEFAULT_ARREBOL_CONF_FILE_PATH;
+                iguassuConfPath = IguassuGeneralConstants.DEFAULT_IGUASSU_CONF_FILE_PATH;
                 schedConfPath = IguassuGeneralConstants.DEFAULT_SCHED_CONF_FILE_PATH;
             }
 
             try {
-                properties.load(new FileInputStream(arrebolConfPath));
+                properties.load(new FileInputStream(iguassuConfPath));
                 properties.load(new FileInputStream(schedConfPath));
             } catch (Exception e) {
                 System.exit(1);
