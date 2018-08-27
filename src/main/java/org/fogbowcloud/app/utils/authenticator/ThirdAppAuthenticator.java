@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.external.oauth.ExternalOAuthController;
 import org.fogbowcloud.app.model.User;
 import org.fogbowcloud.app.model.UserImpl;
-import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
+import org.fogbowcloud.app.utils.IguassuPropertiesConstants;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mapdb.DB;
@@ -25,10 +25,10 @@ public class ThirdAppAuthenticator implements IguassuAuthenticator {
     private ExternalOAuthController externalOAuthTokenController;
 
     public ThirdAppAuthenticator(Properties properties) {
-        final File usersFile = new File(ArrebolPropertiesConstants.DB_FILE_USERS);
+        final File usersFile = new File(IguassuPropertiesConstants.DB_FILE_USERS);
         this.usersDB = DBMaker.newFileDB(usersFile).make();
-        this.usersDB.checkShouldCreate(ArrebolPropertiesConstants.DB_MAP_USERS);
-        this.userList = this.usersDB.getHashMap(ArrebolPropertiesConstants.DB_MAP_USERS);
+        this.usersDB.checkShouldCreate(IguassuPropertiesConstants.DB_MAP_USERS);
+        this.userList = this.usersDB.getHashMap(IguassuPropertiesConstants.DB_MAP_USERS);
         this.externalOAuthTokenController = new ExternalOAuthController(properties);
     }
 

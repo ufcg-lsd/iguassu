@@ -530,7 +530,7 @@ public class JDFSemanticActions implements SemanticActions {
 //			File temp = new File( filePath );
 //			if ( !temp.isAbsolute() )
 //				filePath = localParentDir + File.separator + filePath;
-//		} //TODO
+//		} //TODO remote_folder_path
 
 		return new IOEntry( command, filePath, place );
 	}

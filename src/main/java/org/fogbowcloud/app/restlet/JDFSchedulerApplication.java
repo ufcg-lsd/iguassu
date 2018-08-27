@@ -15,7 +15,7 @@ import org.fogbowcloud.app.resource.AuthenticationResource;
 import org.fogbowcloud.app.resource.JobResource;
 import org.fogbowcloud.app.resource.NonceResource;
 import org.fogbowcloud.app.resource.UserResource;
-import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
+import org.fogbowcloud.app.utils.IguassuPropertiesConstants;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskState;
@@ -47,13 +47,13 @@ public class JDFSchedulerApplication extends Application {
 
 	public void startServer() throws Exception {
 		Properties properties = this.iguassuController.getProperties();
-		if (!properties.containsKey(ArrebolPropertiesConstants.REST_SERVER_PORT)) {
+		if (!properties.containsKey(IguassuPropertiesConstants.REST_SERVER_PORT)) {
 			throw new IllegalArgumentException(
-					ArrebolPropertiesConstants.REST_SERVER_PORT
+					IguassuPropertiesConstants.REST_SERVER_PORT
 							+ " is missing on properties.");
 		}
 		Integer restServerPort = Integer.valueOf((String) properties
-				.get(ArrebolPropertiesConstants.REST_SERVER_PORT));
+				.get(IguassuPropertiesConstants.REST_SERVER_PORT));
 
 		LOGGER.info("Starting service on port: " + restServerPort);
 

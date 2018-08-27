@@ -9,7 +9,7 @@ import org.fogbowcloud.app.datastore.JobDataStore;
 import org.fogbowcloud.app.model.JDFJob;
 import org.fogbowcloud.app.model.LDAPUser;
 import org.fogbowcloud.app.model.User;
-import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
+import org.fogbowcloud.app.utils.IguassuPropertiesConstants;
 import org.fogbowcloud.blowout.core.BlowoutController;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.model.Specification;
@@ -41,16 +41,16 @@ public class TestIguassuController {
 	@Before
 	public void setUp() throws Exception {
 		Properties properties = new Properties();
-		properties.put(ArrebolPropertiesConstants.REST_SERVER_PORT, "4444");
-		properties.put(ArrebolPropertiesConstants.EXECUTION_MONITOR_PERIOD, "60000");
+		properties.put(IguassuPropertiesConstants.REST_SERVER_PORT, "4444");
+		properties.put(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD, "60000");
 		properties.put(
-				ArrebolPropertiesConstants.AUTHENTICATION_PLUGIN,
+				IguassuPropertiesConstants.AUTHENTICATION_PLUGIN,
 				"org.fogbowcloud.app.utils.authenticator.CommonAuthenticator"
 		);
-		properties.put(ArrebolPropertiesConstants.PUBLIC_KEY_CONSTANT, testPublicKey);
-		properties.put(ArrebolPropertiesConstants.PRIVATE_KEY_FILEPATH, testPrivateKeyPath);
-		properties.put(ArrebolPropertiesConstants.REMOTE_OUTPUT_FOLDER, "/tmp");
-		properties.put(ArrebolPropertiesConstants.LOCAL_OUTPUT_FOLDER, "/tmp");
+		properties.put(IguassuPropertiesConstants.PUBLIC_KEY_CONSTANT, testPublicKey);
+		properties.put(IguassuPropertiesConstants.PRIVATE_KEY_FILEPATH, testPrivateKeyPath);
+		properties.put(IguassuPropertiesConstants.REMOTE_OUTPUT_FOLDER, "/tmp");
+		properties.put(IguassuPropertiesConstants.LOCAL_OUTPUT_FOLDER, "/tmp");
 
 		properties.put(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT, "300000000");
 		properties.put(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, "30000");

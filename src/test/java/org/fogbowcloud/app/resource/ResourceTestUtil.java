@@ -5,7 +5,7 @@ import java.util.Properties;
 import org.fogbowcloud.app.IguassuController;
 import org.fogbowcloud.app.model.User;
 import org.fogbowcloud.app.restlet.JDFSchedulerApplication;
-import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
+import org.fogbowcloud.app.utils.IguassuPropertiesConstants;
 import org.mockito.Mockito;
 
 public class ResourceTestUtil {
@@ -28,7 +28,7 @@ public class ResourceTestUtil {
 		Mockito.doNothing().when(this.iguassuController).init();
 
 		Properties properties = new Properties();
-		properties.put(ArrebolPropertiesConstants.REST_SERVER_PORT, DEFAULT_SERVER_PORT);
+		properties.put(IguassuPropertiesConstants.REST_SERVER_PORT, DEFAULT_SERVER_PORT);
 		Mockito.when(this.iguassuController.getProperties()).thenReturn(properties);
 		User userMock = Mockito.mock(User.class);
 		

@@ -1,6 +1,6 @@
 package org.fogbowcloud.app;
 
-import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
+import org.fogbowcloud.app.utils.IguassuPropertiesConstants;
 import org.fogbowcloud.app.utils.IguassuGeneralConstants;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.exception.ArrebolException;
@@ -82,7 +82,7 @@ public class IguassuApplication {
         @Override
         public void onApplicationEvent(final EmbeddedServletContainerInitializedEvent event) {
             int port = event.getEmbeddedServletContainer().getPort();
-            properties.setProperty(ArrebolPropertiesConstants.REST_SERVER_PORT, String.valueOf(port));
+            properties.setProperty(IguassuPropertiesConstants.REST_SERVER_PORT, String.valueOf(port));
         }
     }
 }

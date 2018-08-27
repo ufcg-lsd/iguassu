@@ -9,7 +9,7 @@ import org.fogbowcloud.app.exception.InvalidParameterException;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.model.JDFJob;
 import org.fogbowcloud.app.model.User;
-import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
+import org.fogbowcloud.app.utils.IguassuPropertiesConstants;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -48,7 +48,7 @@ public class JobController {
 
     @RequestMapping(method = RequestMethod.GET)
     public ResponseEntity<List<JDFJob>> getAllJobs(
-            @RequestHeader(value=ArrebolPropertiesConstants.X_CREDENTIALS) String credentials) {
+            @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) {
         LOGGER.info("Retrieving all jobs.");
 
         User owner = this.jobService.authenticateUser(credentials);
@@ -58,7 +58,7 @@ public class JobController {
 
     @RequestMapping(value = JOB_PATH, method = RequestMethod.GET)
     public ResponseEntity<JDFJob> getJobById(@PathVariable String jobId,
-        @RequestHeader(value=ArrebolPropertiesConstants.X_CREDENTIALS) String credentials) throws InvalidParameterException {
+        @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) throws InvalidParameterException {
         LOGGER.info("Retrieving job with id " + jobId + "].");
 
         User owner = this.jobService.authenticateUser(credentials);
@@ -77,7 +77,7 @@ public class JobController {
 
     @RequestMapping(method = RequestMethod.POST)
     public ResponseEntity<JobResponse> addJob(@RequestParam(JobController.JDF_FILE_PATH) MultipartFile file, RedirectAttributes redirectAttributes,
-                                                 @RequestHeader(value=ArrebolPropertiesConstants.X_CREDENTIALS) String credentials) {
+                                                 @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) {
         LOGGER.info("Saving new Job.");
 
         LOGGER.info(file.toString());
@@ -85,7 +85,7 @@ public class JobController {
         // Credentials
         Map<String, String> fieldMap = new HashMap<>();
         fieldMap.put(JDF_FILE_PATH, null);
-        fieldMap.put(ArrebolPropertiesConstants.X_CREDENTIALS, null);
+        fieldMap.put(IguassuPropertiesConstants.X_CREDENTIALS, null);
 
         // handle file upload
         this.storageService.store(file, fieldMap);
@@ -121,7 +121,7 @@ public class JobController {
 
     @RequestMapping(value = JOB_PATH, method = RequestMethod.DELETE)
     public ResponseEntity<JobResponse> stopJob(@PathVariable String jobId,
-                                  @RequestHeader(value=ArrebolPropertiesConstants.X_CREDENTIALS) String credentials)
+                                  @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials)
             throws InvalidParameterException {
         LOGGER.info("Deleting job with Id " + jobId + ".");
 

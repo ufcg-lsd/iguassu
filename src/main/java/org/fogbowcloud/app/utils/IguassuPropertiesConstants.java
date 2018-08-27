@@ -1,6 +1,6 @@
 package org.fogbowcloud.app.utils;
 
-public class ArrebolPropertiesConstants {
+public class IguassuPropertiesConstants {
 
 	public static final String DEFAULT_SPECS_FILE_PATH = "default_specs_file_path";
 	public static final String REMOVE_PREVIOUS_RESOURCES = "remove_previous_resources";
