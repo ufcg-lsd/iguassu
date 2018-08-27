@@ -3,7 +3,7 @@ package org.fogbowcloud.app;
 import org.fogbowcloud.app.utils.IguassuPropertiesConstants;
 import org.fogbowcloud.app.utils.IguassuGeneralConstants;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.exception.ArrebolException;
+import org.fogbowcloud.app.exception.IguassuException;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -34,7 +34,7 @@ public class IguassuApplication {
 
     @Bean
     @Lazy
-    public IguassuController arrebolController(Properties properties) throws BlowoutException, ArrebolException {
+    public IguassuController arrebolController(Properties properties) throws BlowoutException, IguassuException {
         IguassuController iguassuController = new IguassuController(properties);
         try {
             iguassuController.init();

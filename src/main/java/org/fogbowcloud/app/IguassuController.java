@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.datastore.JobDataStore;
 import org.fogbowcloud.app.datastore.OAuthTokenDataStore;
-import org.fogbowcloud.app.exception.ArrebolException;
+import org.fogbowcloud.app.exception.IguassuException;
 import org.fogbowcloud.app.external.oauth.ExternalOAuthController;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
@@ -99,11 +99,11 @@ public class IguassuController {
     private static ManagerTimer executionMonitorTimer = new ManagerTimer(Executors.newScheduledThreadPool(1));
 
 	public IguassuController(Properties properties)
-			throws BlowoutException, ArrebolException {
+			throws BlowoutException, IguassuException {
 		if (properties == null) {
 			throw new IllegalArgumentException("Properties cannot be null.");
 		} else if (!checkProperties(properties)) {
-			throw new ArrebolException("Error while initializing Arrebol Controller.");
+			throw new IguassuException("Error while initializing Arrebol Controller.");
 		}
 		this.finishedTasks = new HashMap<>();
 		this.properties = properties;
