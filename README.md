@@ -1,15 +1,14 @@
-![alt logo](assets/ARREBOL-22.png)
+![alt logo](assets/IGUASSU.png)
 
-# Arrebol
-## What is Arrebol?
-  Arrebol is a tool for monitoring and executing jobs in a multi-cloud environment federated by the [fogbow middleware](http://www.fogbowcloud.org). Arrebol allows the user to harness cloud resources without bothering about the details of the cloud infrastructure.
+# Iguassu
+## What is Iguassu?
+  Iguassu is a tool for monitoring and executing jobs in a multi-cloud environment federated by the [fogbow middleware](http://www.fogbowcloud.org). Iguassu allows the user to harness cloud resources without bothering about the details of the cloud infrastructure.
 
-  Arrebol has three main components:
-  - **Submission service**: The submission service is the deamon responsible for receiving job submission and monitoring requests and interacting with the **fogbow middleware** to execute the jobs in the federated cloud resources. The submission services runs a **REST** interface acessed by two clients: **Arrebol CLI** and **Arrebol Dashboard**.
-  - **Arrebol CLI**: CLI is a bash script to easy interaction with the **submission service** in UNIX enviroments. It allows to submit jobs, retrieve status information about running jobs, and cancel them.
-  - **Arrebol Dashboard**: Dashboard is a web application that shows status information about the jobs controlled by a **submission service**.
+  Iguassu has three main components:
+  - **Submission service**: The submission service is the deamon responsible for receiving job submission and monitoring requests and interacting with the **fogbow middleware** to execute the jobs in the federated cloud resources. The submission services runs a **REST** interface acessed by two clients: **Iguassu CLI** and **Iguassu Dashboard**.
+  - **Iguassu Dashboard**: Dashboard is a web application that shows status information about the jobs controlled by a **submission service**.
 
-  This document provides a short guide to use the **Arrebol CLI** to interact with the **Submission Service**. It also describes how to install and configure the **Submission Service** and the **Arrebol Dashboard**.
+  This document describes how to install and configure the **Submission Service**. To install and configure **Iguassu Dashboard**, go to [its repository](https://github.com/ufcg-lsd/iguassu-dashboard).
 
 ##How to use it?
 
@@ -59,51 +58,10 @@ As with the Init clause, the final clause is part of the definition of a task, i
 There is one task clause to describe each task of a job. The number of tasks in a job is determined by the number of task clauses in the jdf. The task clause is used to describe the main behavior of a task. That said, the remain of it's behavior is identical to the Init and Final clauses
 
 #### Special operators PUT and GET
-This two commands are used to copy files from and to the VM that will run your task. the syntax is as follows: .
+This two commands are used to copy files from and to the file driver (ex: owncloud) where you can host files that you will produce or will use when run your task. the syntax is as follows: .
 ```
  PUT localfile remotefile - where the localfile is visible to the scheduler that will run the job
  GET remotefile localfile - where the localfile is writable to the scheduler that will run the job 
-```
-
-The file or files to be transfered must be inside a special directory that shares a group with the user that runs arrebol
-
-### Running a job via the Arrebol CLI
-
-After unpacking a **Arrebol** release package (listed [here](https://github.com/fogbow/arrebol/releases)), the **Arrebol CLI** script can be found in ```bin/```directory.
-
-all commands require authentications
-
-To submit a JDF-formatted job, run the arrebol script with the **POST** command:
-
-```bash
-job_id=`bin/arrebol.sh POST jdf_file_path optionals: -u [username]`
-```
-It is mandatory to specify the path of the JDF-formatted file which describes the job. The -u flag identifies the username that should be used for authentication. On sucessful execution, the **bin/arrebol.sh** script outputs a unique identifier to the submitted job.
-
-To retrieve status information about all running jobs, run the arrebol script with the **GET** command:
-
-```bash
-bash bin/arrebol.sh GET -u [username]
-```
-
-To retrieve information about a specific running job, run the arrebol script witht **GET** and specify the **job id** or the the **job friendly name**.
-
-```bash
-bash bin/arrebol.sh GET [job id or friendly name] -u [username]
-```
-
-To stop a running job, run the arrebol script with the **STOP** command with the associated **job id** or **friendly name**.
-
-```bash
-bash arrebol.sh STOP [job id or friendly name] -u [username]
-```
-
-##How to configure the **Arrebol CLI**?
-
-To configure the **Arrebol CLI**, simply assign the address of the **Submission Service** to the **host** property in the  **bin/arrebol.properties** configuration file:
-
-```
-host=http://ip:port
 ```
 
 ##How to configure the **Submission Service**?
@@ -119,43 +77,5 @@ In the second file, **sched.conf**, it is possible to tune the behaviour of the 
 To start the **Submission Service**, run the script:
 
 ```bash
-bash bin/start-arrebol-service
+bash bin/start-iguassu-service
 ```
-
-###Batch Jobs
-
-Batch jobs is a way to generate big repetitive jobs in a quick way, to make use to it to have to create two files: 
-
-The blueprint file specifies the placeholders:
-            
-            put $1 /tmp/$1
-            python mysimulation.py < /tmp/$1 > /tmp/$2
-            get /tmp/$2 $2
-
-it is the basic structure of each task you wish to run
-
-The parameter sweep file defines values to replace the placeholders:
-
-            simulationentries1 outputfile1
-            simulationentries2 outputfile2
-            
-The generated file will look like this:
-      
-            job:
-            task:
-            put simulationentries1 /tmp/simulationentries1
-            python mysimulation.py  /tmp/simulationentries1 > /tmp/outputfile1
-            get /tmp/outputfile1 outputfile1
-            task:
-            put simulationentries2 /tmp/simulationentries2
-            python mysimulation.py  /tmp/simulationentries2 > /tmp/outputfile2
-            get /tmp/outputfile2 outputfile2
-            
-            
-After that just run:
-
-```bash
-python bin/batch_arrebol jdf_blueprint_path param_sweep_pat > jobfilename.jdf
-```
-
-Then run the resulting file as usual
