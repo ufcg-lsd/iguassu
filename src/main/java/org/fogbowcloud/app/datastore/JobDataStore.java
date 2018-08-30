@@ -13,7 +13,7 @@ import org.json.JSONObject;
 
 public class JobDataStore extends DataStore<JDFJob> {
 
-	private static final String JOBS_TABLE_NAME = "arrebol_jobs";
+	private static final String JOBS_TABLE_NAME = "iguassu_jobs";
 	private static final String JOB_ID = "job_id";
 	private static final String JOB_JSON = "job_json";
 	private static final String JOB_OWNER = "job_owner";

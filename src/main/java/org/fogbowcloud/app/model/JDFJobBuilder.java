@@ -4,7 +4,6 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
@@ -17,7 +16,7 @@ import org.fogbowcloud.app.jdfcompiler.semantic.IOCommand;
 import org.fogbowcloud.app.jdfcompiler.semantic.JDLCommand;
 import org.fogbowcloud.app.jdfcompiler.semantic.JDLCommand.JDLCommandType;
 import org.fogbowcloud.app.jdfcompiler.semantic.RemoteCommand;
-import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
+import org.fogbowcloud.app.utils.IguassuPropertiesConstants;
 import org.fogbowcloud.blowout.core.model.Command;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.model.Task;
@@ -77,13 +76,13 @@ public class JDFJobBuilder {
 
 				Specification spec = new Specification(
 						image,
-						this.properties.getProperty(ArrebolPropertiesConstants.INFRA_RESOURCE_USERNAME),
-						this.properties.getProperty(ArrebolPropertiesConstants.PUBLIC_KEY_CONSTANT),
-						this.properties.getProperty(ArrebolPropertiesConstants.PRIVATE_KEY_FILEPATH),
+						this.properties.getProperty(IguassuPropertiesConstants.INFRA_RESOURCE_USERNAME),
+						this.properties.getProperty(IguassuPropertiesConstants.PUBLIC_KEY_CONSTANT),
+						this.properties.getProperty(IguassuPropertiesConstants.PRIVATE_KEY_FILEPATH),
 						"",
 						""
 				);
-				LOGGER.debug(this.properties.getProperty(ArrebolPropertiesConstants.INFRA_RESOURCE_USERNAME));
+				LOGGER.debug(this.properties.getProperty(IguassuPropertiesConstants.INFRA_RESOURCE_USERNAME));
 
 				int i = 0;
 				for (String req : jobRequirements.split("and")) {
@@ -133,14 +132,14 @@ public class JDFJobBuilder {
 
 					Task task = new TaskImpl("TaskNumber" + "-" + taskID + "-" + UUID.randomUUID(), spec, result);
 					task.putMetadata(TaskImpl.METADATA_REMOTE_OUTPUT_FOLDER,
-							this.properties.getProperty(ArrebolPropertiesConstants.REMOTE_OUTPUT_FOLDER));
+							this.properties.getProperty(IguassuPropertiesConstants.REMOTE_OUTPUT_FOLDER));
 					task.putMetadata(TaskImpl.METADATA_LOCAL_OUTPUT_FOLDER,
-							schedPath + this.properties.getProperty(ArrebolPropertiesConstants.LOCAL_OUTPUT_FOLDER));
+							schedPath + this.properties.getProperty(IguassuPropertiesConstants.LOCAL_OUTPUT_FOLDER));
 					task.putMetadata(TaskImpl.METADATA_SANDBOX, SANDBOX);
 					task.putMetadata(TaskImpl.METADATA_REMOTE_COMMAND_EXIT_PATH,
-							this.properties.getProperty(ArrebolPropertiesConstants.REMOTE_OUTPUT_FOLDER) + "/exit");
-					task.putMetadata(ArrebolPropertiesConstants.JOB_ID, job.getId());
-					task.putMetadata(ArrebolPropertiesConstants.OWNER, job.getOwner());
+							this.properties.getProperty(IguassuPropertiesConstants.REMOTE_OUTPUT_FOLDER) + "/exit");
+					task.putMetadata(IguassuPropertiesConstants.JOB_ID, job.getId());
+					task.putMetadata(IguassuPropertiesConstants.OWNER, job.getOwner());
 
 					parseInitCommands(job.getId(), taskSpec, task, schedPath, userName, externalOAuthToken);
 					parseTaskCommands(job.getId(), taskSpec, task, schedPath, userName, externalOAuthToken);
@@ -289,7 +288,7 @@ public class JDFJobBuilder {
 	}
 
 	private Command uploadFileCommands(String localFilePath, String filePathToUpload, String userName, String token) {
-		String fileDriverHostIp = this.properties.getProperty(ArrebolPropertiesConstants.FILE_DRIVER_HOST_IP);
+		String fileDriverHostIp = this.properties.getProperty(IguassuPropertiesConstants.FILE_DRIVER_HOST_IP);
 		String requestTokenCommand = getUserExternalOAuthTokenRequestCommand(userName);
 		String uploadCommand = " http_code=$(curl --write-out %{http_code} -X PUT --header \"Authorization:Bearer $token\" "
 				+ " --data-binary @" + localFilePath + " --silent --output /dev/null "
@@ -305,7 +304,7 @@ public class JDFJobBuilder {
 	}
 
 	private Command downloadFileCommands(String localFilePath, String filePathToDownload, String userName, String token) {
-		String fileDriverHostIp = this.properties.getProperty(ArrebolPropertiesConstants.FILE_DRIVER_HOST_IP);
+		String fileDriverHostIp = this.properties.getProperty(IguassuPropertiesConstants.FILE_DRIVER_HOST_IP);
 		String requestTokenCommand = getUserExternalOAuthTokenRequestCommand(userName);
 		String downloadCommand = " full_response=$(curl --write-out %{http_code} --header \"Authorization:Bearer $token\" "
 				+ " http://$server/remote.php/webdav/" + filePathToDownload
@@ -336,7 +335,7 @@ public class JDFJobBuilder {
 	}
 
 	private String getAppServiceIp() {
-		return "http://" + this.properties.getProperty(ArrebolPropertiesConstants.M_IP)
-				+ ":" + this.properties.getProperty(ArrebolPropertiesConstants.REST_SERVER_PORT);
+		return "http://" + this.properties.getProperty(IguassuPropertiesConstants.M_IP)
+				+ ":" + this.properties.getProperty(IguassuPropertiesConstants.REST_SERVER_PORT);
 	}
 }

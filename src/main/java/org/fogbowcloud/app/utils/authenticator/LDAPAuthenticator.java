@@ -17,7 +17,7 @@ import javax.naming.directory.SearchResult;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.model.LDAPUser;
 import org.fogbowcloud.app.model.User;
-import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
+import org.fogbowcloud.app.utils.IguassuPropertiesConstants;
 
 public class LDAPAuthenticator implements IguassuAuthenticator {
 
@@ -33,9 +33,9 @@ public class LDAPAuthenticator implements IguassuAuthenticator {
 	private String ldapUrl;
 
 	public LDAPAuthenticator(Properties properties) {
-		this.ldapUrl = properties.getProperty(ArrebolPropertiesConstants.LDAP_AUTHENTICATION_URL);
-		this.ldapBase = properties.getProperty(ArrebolPropertiesConstants.LDAP_AUTHENTICATION_BASE);
-		this.encryptType = properties.getProperty(ArrebolPropertiesConstants.ENCRYPTION_TYPE);
+		this.ldapUrl = properties.getProperty(IguassuPropertiesConstants.LDAP_AUTHENTICATION_URL);
+		this.ldapBase = properties.getProperty(IguassuPropertiesConstants.LDAP_AUTHENTICATION_BASE);
+		this.encryptType = properties.getProperty(IguassuPropertiesConstants.ENCRYPTION_TYPE);
 	}
 
 	@Override

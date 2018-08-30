@@ -1,7 +1,7 @@
 package org.fogbowcloud.app;
 
 import org.fogbowcloud.app.datastore.JobDataStore;
-import org.fogbowcloud.app.exception.ArrebolException;
+import org.fogbowcloud.app.exception.IguassuException;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.model.JDFJob;
 import org.fogbowcloud.app.model.LDAPUser;
@@ -37,7 +37,7 @@ public class TestAsyncJobBuilder {
             properties.load(new FileInputStream(ARREBOL_CONF));
             properties.load(new FileInputStream(BLOWOUT_CONF));
             arrebol = Mockito.spy(new IguassuController(properties));
-        } catch (BlowoutException | ArrebolException | IOException e) {
+        } catch (BlowoutException | IguassuException | IOException e) {
             e.printStackTrace();
         }
 
