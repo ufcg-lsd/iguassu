@@ -1,0 +1,7 @@
+job : 
+label 	: SimpleJobReq
+requirements :  Glue2Ram >= 2GB AND Glue2Location == "Glue2CloudComputeManagerID" 
+task :
+	  put Fat.class Fat.class
+	  java -cp . Fat 3 261147332 6819792792357414911 output-$JOB.$TASK
+	  get output-$JOB.$TASK output-$JOB.$TASK

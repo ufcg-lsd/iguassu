@@ -1,0 +1,14 @@
+job : 
+label 	: EchoJob
+
+task :
+    echo Hello World
+
+task :
+    echo Hello World
+
+task :
+    echo Hello World
+
+task :
+    echo Hello World

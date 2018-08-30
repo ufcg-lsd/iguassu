@@ -1,0 +1,20 @@
+job :
+label 	: UploadAndDownloadJob
+
+task :
+    echo THIS IS TEXT DATA >> uploadfile.txt
+
+    put uploadfile.txt uploadfile.txt
+
+    rm uploadfile.txt
+
+    get downloadedfile.txt uploadfile.txt
+
+    echo THIS IS MORE TEXT DATA >> downloadedfile.txt
+
+    mv downloadedfile.txt finalfile.txt
+
+    put finalfile.txt finalfile.txt
+
+
+

@@ -1,0 +1,6 @@
+To compile and install arrebol you must download Blowout and Arrebol repositories
+then open command line, go to Blowout and do "mvn clean install -DskipTests"
+Then go to Arrebol and do "mvn clean install -DskipTests"
+move that arrebol folder to the desired machine
+fill in the sched.conf and blowout.conf configuration files.
+run start-arrebol-service.sh on ./bin

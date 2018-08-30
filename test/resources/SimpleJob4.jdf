@@ -1,0 +1,7 @@
+job : 
+label 	: SimpleJob4
+
+task :
+	store mytask.sh $STORAGE/mytask-$JOB.sh
+	sh mytask-$JOB.sh mytask-$TASK.out
+	get mytask-$TASK.out mytask-$TASK.out

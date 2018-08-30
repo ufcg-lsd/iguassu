@@ -1,0 +1,9 @@
+job :
+label 	: UploadJob
+
+task :
+    echo OIIII >> uploadfiletest.txt
+    put uploadfiletest.txt Documents/uploadfiletest.txt
+
+
+

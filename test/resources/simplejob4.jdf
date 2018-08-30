@@ -1,0 +1,6 @@
+job : 
+label 	: SimpleJob4
+
+task :
+	  echo Hello World! >> $STORAGE/storageHelloWorld
+	  get $STORAGE/storageHelloWorld storageHelloWorld

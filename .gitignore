@@ -1,0 +1,17 @@
+/target
+.idea/
+
+jobgenerator.py
+bigjob.py
+
+*.db
+datastores/
+
+iguassu.conf
+sched.conf
+
+test/test.conf
+test/blowout.conf
+test/blowout2.conf
+
+*.log

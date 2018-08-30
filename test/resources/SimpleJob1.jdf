@@ -1,0 +1,16 @@
+job : 
+label 	: SimpleJob
+init: put x y
+      do sleep 5
+      put near far
+task :
+	echo Hello World
+
+task :
+	echo Hello World
+
+task :
+	echo Hello World
+
+task :
+	echo Hello World
