@@ -10,7 +10,7 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.datastore.JobDataStore;
 import org.fogbowcloud.app.datastore.OAuthTokenDataStore;
-import org.fogbowcloud.app.exception.ArrebolException;
+import org.fogbowcloud.app.exception.IguassuException;
 import org.fogbowcloud.app.external.oauth.ExternalOAuthController;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
@@ -20,7 +20,7 @@ import org.fogbowcloud.app.model.JDFJob;
 import org.fogbowcloud.app.model.JDFJobBuilder;
 import org.fogbowcloud.app.model.OAuthToken;
 import org.fogbowcloud.app.model.User;
-import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
+import org.fogbowcloud.app.utils.IguassuPropertiesConstants;
 import org.fogbowcloud.app.utils.authenticator.IguassuAuthenticator;
 import org.fogbowcloud.app.utils.authenticator.Credential;
 import org.fogbowcloud.app.utils.authenticator.ThirdAppAuthenticator;
@@ -99,11 +99,11 @@ public class IguassuController {
     private static ManagerTimer executionMonitorTimer = new ManagerTimer(Executors.newScheduledThreadPool(1));
 
 	public IguassuController(Properties properties)
-			throws BlowoutException, ArrebolException {
+			throws BlowoutException, IguassuException {
 		if (properties == null) {
 			throw new IllegalArgumentException("Properties cannot be null.");
 		} else if (!checkProperties(properties)) {
-			throw new ArrebolException("Error while initializing Arrebol Controller.");
+			throw new IguassuException("Error while initializing Iguassu Controller.");
 		}
 		this.finishedTasks = new HashMap<>();
 		this.properties = properties;
@@ -124,10 +124,10 @@ public class IguassuController {
 		this.oAuthTokenDataStore = new OAuthTokenDataStore(this.properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL));
 
 		Boolean removePreviousResources = Boolean.valueOf(
-				this.properties.getProperty(ArrebolPropertiesConstants.REMOVE_PREVIOUS_RESOURCES)
+				this.properties.getProperty(IguassuPropertiesConstants.REMOVE_PREVIOUS_RESOURCES)
 		);
 
-		LOGGER.debug("Properties: " + properties.getProperty(ArrebolPropertiesConstants.DEFAULT_SPECS_FILE_PATH));
+		LOGGER.debug("Properties: " + properties.getProperty(IguassuPropertiesConstants.DEFAULT_SPECS_FILE_PATH));
 
 		blowoutController.start(removePreviousResources);
 		this.blowoutController.setStarted(true); // TODO
@@ -139,7 +139,7 @@ public class IguassuController {
 		LOGGER.debug("Restarting jobs");
 		restartAllJobs();
 
-		int schedulerPeriod = Integer.valueOf(properties.getProperty(ArrebolPropertiesConstants.EXECUTION_MONITOR_PERIOD));
+		int schedulerPeriod = Integer.valueOf(properties.getProperty(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD));
 		LOGGER.debug("Starting Execution Monitor, with period: " + schedulerPeriod);
         ExecutionMonitorWithDB executionMonitor = new ExecutionMonitorWithDB(
 				this,
@@ -285,8 +285,8 @@ public class IguassuController {
 
 	public void moveTaskToFinished(Task task) {
 		JDFJob job = this.jobDataStore.getByJobId(
-				task.getMetadata(ArrebolPropertiesConstants.JOB_ID),
-				task.getMetadata(ArrebolPropertiesConstants.OWNER)
+				task.getMetadata(IguassuPropertiesConstants.JOB_ID),
+				task.getMetadata(IguassuPropertiesConstants.OWNER)
 		);
 		LOGGER.debug("Moving task " + task.getId() + " from job " + job.getName() +" to finished");
 		finishedTasks.put(task.getId(), task);
@@ -358,16 +358,16 @@ public class IguassuController {
 
 	private static boolean checkProperties(Properties properties) {
 		// Required properties
-		if (!properties.containsKey(ArrebolPropertiesConstants.EXECUTION_MONITOR_PERIOD)) {
-			LOGGER.error(requiredPropertyMessage(ArrebolPropertiesConstants.EXECUTION_MONITOR_PERIOD));
+		if (!properties.containsKey(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD)) {
+			LOGGER.error(requiredPropertyMessage(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD));
 			return false;
 		}
-		if (!properties.containsKey(ArrebolPropertiesConstants.PUBLIC_KEY_CONSTANT)) {
-			LOGGER.error(requiredPropertyMessage(ArrebolPropertiesConstants.PUBLIC_KEY_CONSTANT));
+		if (!properties.containsKey(IguassuPropertiesConstants.PUBLIC_KEY_CONSTANT)) {
+			LOGGER.error(requiredPropertyMessage(IguassuPropertiesConstants.PUBLIC_KEY_CONSTANT));
 			return false;
 		}
-		if (!properties.containsKey(ArrebolPropertiesConstants.PRIVATE_KEY_FILEPATH)) {
-			LOGGER.error(requiredPropertyMessage(ArrebolPropertiesConstants.PRIVATE_KEY_FILEPATH));
+		if (!properties.containsKey(IguassuPropertiesConstants.PRIVATE_KEY_FILEPATH)) {
+			LOGGER.error(requiredPropertyMessage(IguassuPropertiesConstants.PRIVATE_KEY_FILEPATH));
 			return false;
 		}
 //		if (!properties.containsKey(ArrebolPropertiesConstants.REMOTE_OUTPUT_FOLDER)) {
@@ -378,14 +378,14 @@ public class IguassuController {
 //			LOGGER.error(requiredPropertyMessage(ArrebolPropertiesConstants.LOCAL_OUTPUT_FOLDER));
 //			return false;
 //		} TODO: remove this constant usage along code
-		if (properties.containsKey(ArrebolPropertiesConstants.ENCRYPTION_TYPE)) {
+		if (properties.containsKey(IguassuPropertiesConstants.ENCRYPTION_TYPE)) {
 			try {
-				MessageDigest.getInstance(properties.getProperty(ArrebolPropertiesConstants.ENCRYPTION_TYPE));
+				MessageDigest.getInstance(properties.getProperty(IguassuPropertiesConstants.ENCRYPTION_TYPE));
 			} catch (NoSuchAlgorithmException e) {
 				String builder = "Property " +
-						ArrebolPropertiesConstants.ENCRYPTION_TYPE +
+						IguassuPropertiesConstants.ENCRYPTION_TYPE +
 						"(" +
-						properties.getProperty(ArrebolPropertiesConstants.ENCRYPTION_TYPE) +
+						properties.getProperty(IguassuPropertiesConstants.ENCRYPTION_TYPE) +
 						") does not refer to a valid encryption algorithm." +
 						" Valid options are 'MD5', 'SHA-1' and 'SHA-256'.";
 				LOGGER.error(builder);

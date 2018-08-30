@@ -1,6 +1,6 @@
 package org.fogbowcloud.app.exception;
 
-public class UnauthorizedRequestException extends ArrebolException {
+public class UnauthorizedRequestException extends IguassuException {
 
     private static final String DEFAULT_MESSAGE = "Unauthorized Error";
 

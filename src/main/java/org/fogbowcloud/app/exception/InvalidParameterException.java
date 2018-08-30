@@ -1,6 +1,6 @@
 package org.fogbowcloud.app.exception;
 
-public class InvalidParameterException extends ArrebolException {
+public class InvalidParameterException extends IguassuException {
 
     private static final String DEFAULT_MESSAGE = "Invalid parameter exception";
 

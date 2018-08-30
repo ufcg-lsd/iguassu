@@ -12,7 +12,7 @@ import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
-import org.fogbowcloud.app.utils.ArrebolPropertiesConstants;
+import org.fogbowcloud.app.utils.IguassuPropertiesConstants;
 import org.fogbowcloud.blowout.core.model.Command;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.junit.Test;
@@ -30,9 +30,9 @@ public class TestJDFJobBuilder {
 	@Test
 	public void testJDFCompilation () throws CompilerException, IOException, InterruptedException {
 		Properties properties = new Properties();
-		properties.setProperty(ArrebolPropertiesConstants.INFRA_RESOURCE_USERNAME, "infraname");
-		properties.setProperty(ArrebolPropertiesConstants.PUBLIC_KEY_CONSTANT, "public_key");
-		properties.setProperty(ArrebolPropertiesConstants.PRIVATE_KEY_FILEPATH, "file path");
+		properties.setProperty(IguassuPropertiesConstants.INFRA_RESOURCE_USERNAME, "infraname");
+		properties.setProperty(IguassuPropertiesConstants.PUBLIC_KEY_CONSTANT, "public_key");
+		properties.setProperty(IguassuPropertiesConstants.PRIVATE_KEY_FILEPATH, "file path");
 		User owner = new LDAPUser("arrebolservice", "arrebolservice");
 		JDFJob testJob = new JDFJob(owner.getUser(), new ArrayList<Task>(), owner.getUsername());
 		CommonCompiler commonCompiler = new CommonCompiler();
