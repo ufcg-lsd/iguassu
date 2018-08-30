@@ -1,15 +1,25 @@
-authentication_plugin=org.fogbowcloud.app.utils.authenticator.LDAPAuthenticator
-arrebol.ldap.auth.url=ldap://ldap.lsd.ufcg.edu.br:389
-arrebol.ldap.base=dc=lsd,dc=ufcg,dc=edu,dc=br
+####################################################
+##                                                ##
+##    This is the sample configuration            ##
+##    Make a copy of this file and change         ##
+##    it to use your own configuration values     ##
+##                                                ##
+####################################################
+
+oauth_server_token_url=http://127.0.0.1/index.php/apps/oauth2/api/v1/token
+oauth_server_users_url=http://127.0.0.1/ocs/v1.php/cloud/users
+oauth_client_id=
+oauth_client_secret=
+file_driver_host_ip=127.0.0.1
+file_driver_server_admin_username=admin
+file_driver_server_admin_password=admin
 
 default_specs_file_path=defaulResource.json
 remove_previous_resources=true
 
-execution_monitor_period=60000
-rest_server_port=
+rest_server_port=8080
 resourcer_username=
 
-public_key=
-private_key_filepath=/local/keylocation/.ssh/id_rsa
-local_output=/tmp/arrebol
-remote_output_folder=/tmp
+arrebol.ldap.auth.url=ldap://ldap.lsd.ufcg.edu.br:389
+arrebol.ldap.base=dc=lsd,dc=ufcg,dc=edu,dc=br
+
