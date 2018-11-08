@@ -2,6 +2,8 @@ package org.fogbowcloud.app.external.oauth;
 
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
+import org.fogbowcloud.app.api.http.controllers.JobController;
 import org.fogbowcloud.app.model.OAuthToken;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -19,6 +21,8 @@ import java.util.Properties;
 public class ExternalOAuthController {
 
     private Properties properties;
+
+    private final Logger LOGGER = Logger.getLogger(ExternalOAuthController.class);
 
     public ExternalOAuthController(Properties properties) {
         this.properties = properties;
@@ -91,10 +95,11 @@ public class ExternalOAuthController {
                     .getJSONObject("data")
                     .optString("users")
                     .isEmpty();
+
+
         } catch (IOException e) {
             e.printStackTrace();
         }
-
         return resSatusCode.equals(statusCodeOk) && hasUser;
     }
 
