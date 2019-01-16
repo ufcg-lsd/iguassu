@@ -9,6 +9,7 @@ datastores/
 
 iguassu.conf
 sched.conf
+iguassu.iml
 
 test/test.conf
 test/blowout.conf
