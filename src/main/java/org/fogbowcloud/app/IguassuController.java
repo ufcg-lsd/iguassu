@@ -28,7 +28,7 @@ import org.fogbowcloud.blowout.core.BlowoutController;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskState;
-import org.fogbowcloud.blowout.core.util.AppPropertiesConstants;
+import org.fogbowcloud.blowout.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.core.util.ManagerTimer;
 import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
 import org.json.JSONException;
