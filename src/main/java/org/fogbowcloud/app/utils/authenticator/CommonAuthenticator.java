@@ -18,7 +18,7 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
 public class CommonAuthenticator implements IguassuAuthenticator {
-	public static final Logger LOGGER = Logger.getLogger(CommonAuthenticator.class);
+	private static final Logger LOGGER = Logger.getLogger(CommonAuthenticator.class);
 
 	public static final String AUTH_NAME = "commonauth";
 	private DB usersDB;

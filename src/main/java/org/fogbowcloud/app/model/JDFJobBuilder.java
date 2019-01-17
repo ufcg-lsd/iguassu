@@ -30,7 +30,7 @@ public class JDFJobBuilder {
 
 	// FIXME: what is this?
 	private static final String SANDBOX = "sandbox";
-	private static final String standardImage = "fogbow-ubuntu";
+	private static final String standardImage = "a09e8cd9-3b82-4adf-8ac7-b9cceedcacaa";
 	private static final String SSH_SCP_PRECOMMAND = "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no";
 	private Properties properties;
 

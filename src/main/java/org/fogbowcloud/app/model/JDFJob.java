@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskImpl;
 import org.json.JSONArray;
@@ -23,6 +24,8 @@ public class JDFJob extends Job {
 	private static final String JSON_HEADER_STATE = "state";
 	private static final String JSON_HEADER_OWNER = "owner";
 	private static final String JSON_HEADER_TASKS = "tasks";
+
+	private static final Logger LOGGER = Logger.getLogger(JDFJob.class);
 
 	public enum JDFJobState {
 		SUBMITTED("Submitted"),
