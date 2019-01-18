@@ -1,2 +1,2 @@
-rm datastores/*
-rm /tmp/blowoutdb
+rm -Rf datastores/*
+rm -Rf /tmp/blowoutdb
