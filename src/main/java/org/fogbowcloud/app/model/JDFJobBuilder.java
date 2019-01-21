@@ -30,7 +30,6 @@ public class JDFJobBuilder {
 
 	// FIXME: what is this?
 	private static final String SANDBOX = "sandbox";
-	private static final String standardImage = "fogbow-ubuntu";
 	private static final String SSH_SCP_PRECOMMAND = "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no";
 	private Properties properties;
 
@@ -67,7 +66,9 @@ public class JDFJobBuilder {
 				LOGGER.debug("JobReq: " + jobRequirements);
 
 				jobRequirements = jobRequirements.replace("(", "").replace(")", "");
-				String image = standardImage;
+
+				String image = this.properties.getProperty("standardImage");
+
 				for (String req : jobRequirements.split("and")) {
 					if (req.trim().startsWith("image")) {
 						image = req.split("==")[1].trim();
