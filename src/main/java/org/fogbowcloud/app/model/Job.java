@@ -31,7 +31,7 @@ public abstract class Job implements Serializable {
 		}
 	}
 	
-	public static final Logger LOGGER = Logger.getLogger(Job.class);
+	private static final Logger LOGGER = Logger.getLogger(Job.class);
 	
 	private ReentrantReadWriteLock taskReadyLock = new ReentrantReadWriteLock();
 

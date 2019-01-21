@@ -16,7 +16,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class ThirdAppAuthenticator implements IguassuAuthenticator {
 
-    public static final Logger LOGGER = Logger.getLogger(ThirdAppAuthenticator.class);
+    private static final Logger LOGGER = Logger.getLogger(ThirdAppAuthenticator.class);
 
     public static final String AUTH_NAME = "third_app_auth";
 
