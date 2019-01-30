@@ -21,9 +21,7 @@ public class FileSystemStorageService {
     private final Logger LOGGER = Logger.getLogger(FileSystemStorageService.class);
     private final File FILES_DEFAULT_DIRECTORY = FileSystemView.getFileSystemView().getHomeDirectory();
 
-    public FileSystemStorageService() {
-
-    }
+    public FileSystemStorageService() {}
 
     public void store(MultipartFile file, Map<String, String> formFieldsToLoad) {
         String fileName = file.getOriginalFilename();
@@ -50,7 +48,7 @@ public class FileSystemStorageService {
     }
 
     private File createTmpFile(String content, String fileName) throws IOException {
-        File tempFile = File.createTempFile(fileName, null, FILES_DEFAULT_DIRECTORY);
+        File tempFile = File.createTempFile(fileName, null);
         IOUtils.write(content, new FileOutputStream(tempFile));
 
         LOGGER.info("Writing file of name [" + fileName + "] in " + tempFile.getAbsolutePath());

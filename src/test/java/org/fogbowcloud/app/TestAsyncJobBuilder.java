@@ -2,6 +2,7 @@ package org.fogbowcloud.app;
 
 import org.fogbowcloud.app.datastore.JobDataStore;
 import org.fogbowcloud.app.exception.IguassuException;
+import org.fogbowcloud.app.exception.NameAlreadyInUseException;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.model.JDFJob;
 import org.fogbowcloud.app.model.LDAPUser;

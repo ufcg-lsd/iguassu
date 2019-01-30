@@ -17,11 +17,11 @@ import org.fogbowcloud.app.jdfcompiler.semantic.JDLCommand;
 import org.fogbowcloud.app.jdfcompiler.semantic.JDLCommand.JDLCommandType;
 import org.fogbowcloud.app.jdfcompiler.semantic.RemoteCommand;
 import org.fogbowcloud.app.utils.IguassuPropertiesConstants;
+import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.model.Command;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskImpl;
-import org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowRequirementsHelper;
 import org.fogbowcloud.blowout.pool.AbstractResource;
 import org.springframework.http.HttpStatus;
 
@@ -90,16 +90,16 @@ public class JDFJobBuilder {
 					if (i == 0 && !req.trim().startsWith("image")) {
 						i++;
 						LOGGER.debug("NEW REQUIREMENT: " +req);
-						spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS, req);
+						spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, req);
 					} else if (!req.trim().startsWith("image")) {
 						spec.addRequirement(
-								FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS,
-								spec.getRequirementValue(FogbowRequirementsHelper.METADATA_FOGBOW_REQUIREMENTS) + " && " + req
+								FogbowConstants.METADATA_FOGBOW_REQUIREMENTS,
+								spec.getRequirementValue(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS) + " && " + req
 						);
 					}
 				}
 
-				spec.addRequirement(FogbowRequirementsHelper.METADATA_FOGBOW_REQUEST_TYPE, "one-time");
+				spec.addRequirement(FogbowConstants.METADATA_REQUEST_TYPE, "one-time");
 				int taskID = 0;
 				for (TaskSpecification taskSpec : jobSpec.getTaskSpecs()) {
 					if (Thread.interrupted())
@@ -251,7 +251,6 @@ public class JDFJobBuilder {
 	}
 
 	private Command stageInCommand(String localFile, String remoteFile) {
-		//String scpCommand = "su $UUID ; " + "scp " + SSH_SCP_PRECOMMAND + " -P $" + AbstractResource.ENV_SSH_PORT
 		String scpCommand = "scp " + SSH_SCP_PRECOMMAND + " -P $" + AbstractResource.ENV_SSH_PORT
 				+ " -i $" + AbstractResource.ENV_PRIVATE_KEY_FILE + " " + localFile + " $"
 				+ AbstractResource.ENV_SSH_USER + "@" + "$" + AbstractResource.ENV_HOST + ":" + remoteFile;

@@ -1,7 +1,7 @@
 package org.fogbowcloud.app.api.http.controllers;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.NameAlreadyInUseException;
+import org.fogbowcloud.app.exception.NameAlreadyInUseException;
 import org.fogbowcloud.app.api.http.exceptions.StorageException;
 import org.fogbowcloud.app.api.http.services.FileSystemStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
@@ -140,10 +140,7 @@ public class JobController {
 
     public class JobResponse {
         private String id;
-        public JobResponse() {}
-        public JobResponse(String id) {
-            this.id = id;
-        }
+        public JobResponse(String id) { this.id = id; }
         public String getId() {
             return this.id;
         }

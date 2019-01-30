@@ -138,7 +138,7 @@ public class CommonCompiler implements Compiler {
 	private void run( CommonSyntacticalAnalyzer syntactical ) throws CompilerException {
 
 		try {
-			LOG.debug( "Compilation started for source \"" + sourceFile.getAbsolutePath() + "\"" );
+			LOG.debug( "Compilation started from source \"" + sourceFile.getAbsolutePath() + "\"" );
 			syntactical.startCompilation();
 		} catch ( SyntacticalException sex ) {
 			LOG.error( "Problems at the compilation. ", sex );
