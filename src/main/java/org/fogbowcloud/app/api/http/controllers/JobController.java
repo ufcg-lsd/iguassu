@@ -135,7 +135,7 @@ public class JobController {
         }
 
         JobResponse jobResponse = new JobResponse(stoppedJobId);
-        return new ResponseEntity<JobResponse>(jobResponse, HttpStatus.OK);
+        return new ResponseEntity<>(jobResponse, HttpStatus.OK);
     }
 
     public class JobResponse {

@@ -5,6 +5,7 @@ import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
@@ -38,60 +39,13 @@ import org.json.JSONObject;
 
 public class IguassuController {
 
-    private class AsyncJobBuilder implements Runnable {
-
-        private JDFJob job;
-        private String jdfFilePath;
-        private Properties properties;
-        private BlowoutController blowoutController;
-        private JobDataStore db;
-        private JobSpecification jobSpec;
-        private JDFJobBuilder jdfJobBuilder;
-        private String userName;
-        private String externalOAuthToken;
-
-        AsyncJobBuilder(JDFJob job,
-                        String jdfFilePath,
-                        Properties properties,
-                        BlowoutController blowoutController,
-                        JobDataStore db,
-                        JobSpecification jobSpec,
-                        String userName,
-                        String externalOAuthToken) {
-            this.job = job;
-            this.jdfFilePath = jdfFilePath;
-            this.properties = properties;
-            this.blowoutController = blowoutController;
-            this.db = db;
-            this.jobSpec = jobSpec;
-            this.jdfJobBuilder = new JDFJobBuilder(this.properties);
-            this.userName = userName;
-            this.externalOAuthToken = externalOAuthToken;
-        }
-
-        @Override
-        public void run() {
-            try {
-
-                this.jdfJobBuilder.createJobFromJDFFile(this.job, this.jdfFilePath, this.jobSpec, this.userName, this.externalOAuthToken);
-                this.blowoutController.addTaskList(job.getTasks());
-                LOGGER.debug("Submitted " + job.getId() + " to blowout at time: " + System.currentTimeMillis());
-                this.job.finishCreation();
-            } catch (Exception e) {
-                LOGGER.debug("Failed to Submitt " + job.getId() + " to blowout at time: " + System.currentTimeMillis(), e);
-                this.job.failCreation();
-            }
-            this.db.update(job);
-        }
-    }
-
     private static final Logger LOGGER = Logger.getLogger(IguassuController.class);
 
+    private final Properties properties;
     private BlowoutController blowoutController;
-    private Properties properties;
     private List<Integer> nonces;
-    private HashMap<String, Task> finishedTasks;
-    private HashMap<String, Thread> creatingJobs;
+    private Map<String, Task> finishedTasks;
+    private Map<String, Thread> creatingJobs;
     private JobDataStore jobDataStore;
     private OAuthTokenDataStore oAuthTokenDataStore;
     private IguassuAuthenticator auth;
@@ -101,20 +55,16 @@ public class IguassuController {
 
     public IguassuController(Properties properties)
             throws BlowoutException, IguassuException {
-        if (properties == null) {
-            throw new IllegalArgumentException("Properties cannot be null.");
-        } else if (!checkProperties(properties)) {
-            throw new IguassuException("Error while initializing Iguassu Controller.");
-        }
-        this.finishedTasks = new HashMap<>();
+        validateProperties(properties);
         this.properties = properties;
+        this.finishedTasks = new ConcurrentHashMap<>();
         this.blowoutController = new BlowoutController(properties);
-        this.creatingJobs = new HashMap<>();
+        this.creatingJobs = new ConcurrentHashMap<>();
         this.externalOAuthTokenController = new ExternalOAuthController(properties);
     }
 
     public Properties getProperties() {
-        return properties;
+        return this.properties;
     }
 
     public void init() throws Exception {
@@ -130,11 +80,11 @@ public class IguassuController {
                 this.properties.getProperty(IguassuPropertiesConstants.REMOVE_PREVIOUS_RESOURCES)
         );
 
-        LOGGER.debug("Properties: " + properties.getProperty(IguassuPropertiesConstants.DEFAULT_SPECS_FILE_PATH));
+        LOGGER.info("Properties: " + this.properties.getProperty(IguassuPropertiesConstants.DEFAULT_SPECS_FILE_PATH));
 
-        blowoutController.start(removePreviousResources);
+        this.blowoutController.start(removePreviousResources);
 
-        LOGGER.info("Properties: " + properties.getProperty(AppPropertiesConstants.INFRA_INITIAL_SPECS_FILE_PATH));
+        LOGGER.info("Properties: " + this.properties.getProperty(AppPropertiesConstants.INFRA_INITIAL_SPECS_FILE_PATH));
 
         this.nonces = new ArrayList<>();
 
@@ -142,7 +92,7 @@ public class IguassuController {
         restartAllJobs();
 
         int schedulerPeriod = Integer.valueOf(
-                properties.getProperty(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD)
+                this.properties.getProperty(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD)
         );
         LOGGER.debug("Starting Execution Monitor, with period: " + schedulerPeriod);
         ExecutionMonitorWithDB executionMonitor = new ExecutionMonitorWithDB(this, this.jobDataStore);
@@ -201,7 +151,7 @@ public class IguassuController {
     }
 
     JDFJob createJobFromJDFFile(String jdfFilePath, User owner) throws CompilerException, IOException {
-        JDFJob job = new JDFJob(owner.getUser(), new ArrayList<Task>(), owner.getUsername());
+        JDFJob job = new JDFJob(owner.getUser(), new ArrayList<>(), owner.getUsername());
         CommonCompiler commonCompiler = new CommonCompiler();
         LOGGER.debug("Job " + job.getId() + " compilation started at time: " + System.currentTimeMillis());
         commonCompiler.compile(jdfFilePath, FileType.JDF);
@@ -352,6 +302,14 @@ public class IguassuController {
         this.jobDataStore = dataStore;
     }
 
+    private void validateProperties(Properties properties) throws IguassuException {
+        if (properties == null) {
+            throw new IllegalArgumentException("Properties cannot be null.");
+        } else if (!checkProperties(properties)) {
+            throw new IguassuException("Error while initializing Iguassu Controller.");
+        }
+    }
+
     private static String requiredPropertyMessage(String property) {
         return "Required property " + property + " was not set";
     }
@@ -455,6 +413,53 @@ public class IguassuController {
     private void deleteTokens(List<OAuthToken> tokenList) {
         for (OAuthToken token : tokenList) {
             deleteOAuthTokenByAcessToken(token.getAccessToken());
+        }
+    }
+
+    private class AsyncJobBuilder implements Runnable {
+
+        private JDFJob job;
+        private String jdfFilePath;
+        private Properties properties;
+        private BlowoutController blowoutController;
+        private JobDataStore db;
+        private JobSpecification jobSpec;
+        private JDFJobBuilder jdfJobBuilder;
+        private String userName;
+        private String externalOAuthToken;
+
+        AsyncJobBuilder(JDFJob job,
+                        String jdfFilePath,
+                        Properties properties,
+                        BlowoutController blowoutController,
+                        JobDataStore db,
+                        JobSpecification jobSpec,
+                        String userName,
+                        String externalOAuthToken) {
+            this.job = job;
+            this.jdfFilePath = jdfFilePath;
+            this.properties = properties;
+            this.blowoutController = blowoutController;
+            this.db = db;
+            this.jobSpec = jobSpec;
+            this.jdfJobBuilder = new JDFJobBuilder(this.properties);
+            this.userName = userName;
+            this.externalOAuthToken = externalOAuthToken;
+        }
+
+        @Override
+        public void run() {
+            try {
+
+                this.jdfJobBuilder.createJobFromJDFFile(this.job, this.jdfFilePath, this.jobSpec, this.userName, this.externalOAuthToken);
+                this.blowoutController.addTaskList(job.getTasks());
+                LOGGER.info("Submitted " + job.getId() + " to blowout at time: " + System.currentTimeMillis());
+                this.job.finishCreation();
+            } catch (Exception e) {
+                LOGGER.error("Failed to Submit " + job.getId() + " to blowout at time: " + System.currentTimeMillis(), e);
+                this.job.failCreation();
+            }
+            this.db.update(job);
         }
     }
 

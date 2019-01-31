@@ -17,11 +17,7 @@ import javax.swing.filechooser.FileSystemView;
 
 @Service
 public class FileSystemStorageService {
-
     private final Logger LOGGER = Logger.getLogger(FileSystemStorageService.class);
-    private final File FILES_DEFAULT_DIRECTORY = FileSystemView.getFileSystemView().getHomeDirectory();
-
-    public FileSystemStorageService() {}
 
     public void store(MultipartFile file, Map<String, String> formFieldsToLoad) {
         String fileName = file.getOriginalFilename();
@@ -54,5 +50,4 @@ public class FileSystemStorageService {
         LOGGER.info("Writing file of name [" + fileName + "] in " + tempFile.getAbsolutePath());
         return tempFile;
     }
-
 }

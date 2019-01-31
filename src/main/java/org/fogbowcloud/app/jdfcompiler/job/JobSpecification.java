@@ -214,7 +214,6 @@ public class JobSpecification implements Serializable {
 	 * @return The label of the job.
 	 */
 	public String getLabel() {
-
 		return this.label;
 	}
 
@@ -223,16 +222,12 @@ public class JobSpecification implements Serializable {
 	}
 
 	public void setSourceDirPath( String sourceParentDir ) {
-
 		this.sourceParentDir = sourceParentDir;
 	}
 
-
 	public String getSourceParentDir() {
-
 		return this.sourceParentDir;
 	}
-
 
 	@Override
 	public int hashCode() {

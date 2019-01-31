@@ -27,13 +27,12 @@ import org.springframework.http.HttpStatus;
 
 // TODO: remove unused methods
 public class JDFJobBuilder {
+	private static final Logger LOGGER = Logger.getLogger(JDFJobBuilder.class);
 
 	// FIXME: what is this?
 	private static final String SANDBOX = "sandbox";
 	private static final String SSH_SCP_PRECOMMAND = "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no";
-	private Properties properties;
-
-	private static final Logger LOGGER = Logger.getLogger(JDFJobBuilder.class);
+	private final Properties properties;
 
 	public JDFJobBuilder(Properties properties) {
 		this.properties = properties;
@@ -297,7 +296,7 @@ public class JDFJobBuilder {
 		String scpCommand = "\'server=" + fileDriverHostIp + "; "
 				+ "token=" + token + "; "
 				+ uploadCommand
-				+ " if [ \\$http_code == " + String.valueOf(HttpStatus.UNAUTHORIZED) + " ] ; then " + requestTokenCommand
+				+ " if [ \\$http_code == " + HttpStatus.UNAUTHORIZED + " ] ; then " + requestTokenCommand
 				+ uploadCommand + " fi \'";
 
 		return new Command(scpCommand, Command.Type.REMOTE);

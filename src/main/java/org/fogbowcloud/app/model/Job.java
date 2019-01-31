@@ -13,38 +13,17 @@ import org.fogbowcloud.blowout.core.model.Task;
 public abstract class Job implements Serializable {
 
 	private static final long serialVersionUID = -6111900503095749695L;
-
-	protected Map<String, Task> taskList = new HashMap<>();
-	
-	public enum TaskState{
-		
-		READY("READY"),RUNNING("RUNNING"),COMPLETED("COMPLETED"),FAILED("FAILED"),NOT_CREATED("NOT CREATED");
-		
-		private String value;
-		
-		TaskState(String value){
-			this.value = value;
-		}
-		
-		public String getValue(){
-			return this.value;
-		}
-	}
-	
 	private static final Logger LOGGER = Logger.getLogger(Job.class);
-	
-	private ReentrantReadWriteLock taskReadyLock = new ReentrantReadWriteLock();
 
-	private boolean isCreated = false;
+	private Map<String, Task> taskList;
+	private final ReentrantReadWriteLock taskReadyLock;
+	private boolean isCreated;
 
 	public Job(List<Task> tasks) {
-		for(Task task : tasks){
-			addTask(task);
-		}
-	}
-
-	public Job() {
-
+		this.isCreated = true;
+		this.taskList = new HashMap<>();
+		this.taskReadyLock = new ReentrantReadWriteLock();
+		addTasks(tasks);
 	}
 
 	//TODO: not sure that we need to guarantee thread safety at the job level
@@ -55,6 +34,12 @@ public abstract class Job implements Serializable {
 			getTaskList().put(task.getId(), task);
 		} finally {
 			taskReadyLock.writeLock().unlock();
+		}
+	}
+
+	private void addTasks(List<Task> tasks) {
+		for(Task task : tasks){
+			addTask(task);
 		}
 	}
 	
@@ -74,9 +59,7 @@ public abstract class Job implements Serializable {
 		return this.isCreated;
 	}
 	
-	public void setCreated() {
-		this.isCreated = true;
-	}
+	public void setCreated() { this.isCreated = true; }
 
 	public void restart() {
 		this.isCreated = false;
