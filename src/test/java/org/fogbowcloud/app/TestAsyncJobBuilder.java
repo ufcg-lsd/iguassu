@@ -1,14 +1,12 @@
 package org.fogbowcloud.app;
 
 import org.fogbowcloud.app.datastore.JobDataStore;
-import org.fogbowcloud.app.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.exception.IguassuException;
 import org.fogbowcloud.app.exception.NameAlreadyInUseException;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.model.JDFJob;
 import org.fogbowcloud.app.model.LDAPUser;
 import org.fogbowcloud.blowout.core.BlowoutController;
-import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.junit.Assert;
@@ -32,7 +30,7 @@ public class TestAsyncJobBuilder {
 
     private IguassuController iguassuController;
     private BlowoutController blowout;
-    private OAuthTokenDataStore oAuthTokenDataStore;
+
 
     @Before
     public void setUp() throws Exception {
@@ -50,8 +48,6 @@ public class TestAsyncJobBuilder {
 
         blowout = Mockito.mock(BlowoutController.class);
         iguassuController.setBlowoutController(blowout);
-
-        oAuthTokenDataStore = Mockito.mock(OAuthTokenDataStore.class);
 
         iguassuController.init();
     }
