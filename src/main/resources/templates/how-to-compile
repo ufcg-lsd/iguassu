@@ -1,0 +1,6 @@
+To compile and install Iguassu you must download Blowout and Iguassu repositories
+then open command line, go to Blowout and do "mvn clean install -DskipTests"
+Then go to Iguassu and do "mvn clean install -DskipTests"
+move that Iguassu folder to the desired machine
+fill in the sched.conf and iguassu.conf configuration files.
+run start-iguassu-service.sh on ./bin

@@ -172,16 +172,7 @@ public class JDFJobBuilder {
 	private void parseTaskCommands(String jobId, TaskSpecification taskSpec, Task task, String schedPath, String userName,
 								   String externalOAuthToken) {
 		List<JDLCommand> initBlocks = taskSpec.getTaskBlocks();
-		if (initBlocks == null) {
-			return;
-		}
-		for (JDLCommand jdlCommand : initBlocks) {
-			if (jdlCommand.getBlockType().equals(JDLCommandType.IO)) {
-				addIOCommands(jobId, task, (IOCommand) jdlCommand, schedPath, userName, externalOAuthToken);
-			} else {
-				addRemoteCommand(jobId, task, (RemoteCommand) jdlCommand);
-			}
-		}
+		addCommands(initBlocks, jobId, task, schedPath, userName, externalOAuthToken);
 	}
 
 	/**
@@ -195,6 +186,11 @@ public class JDFJobBuilder {
 	private void parseInitCommands(String jobId, TaskSpecification taskSpec, Task task, String schedPath, String userName,
 								   String externalOAuthToken) {
 		List<JDLCommand> initBlocks = taskSpec.getInitBlocks();
+		addCommands(initBlocks, jobId, task, schedPath, userName, externalOAuthToken);
+	}
+
+	private void addCommands(List<JDLCommand> initBlocks, String jobId, Task task, String schedPath,
+							 String userName, String externalOAuthToken) {
 		if (initBlocks == null) {
 			return;
 		}
@@ -267,16 +263,7 @@ public class JDFJobBuilder {
 	private void parseFinalCommands(String jobId, TaskSpecification taskSpec, Task task, String schedPath, String userName,
 									String externalOAuthToken) {
 		List<JDLCommand> initBlocks = taskSpec.getFinalBlocks();
-		if (initBlocks == null) {
-			return;
-		}
-		for (JDLCommand jdlCommand : initBlocks) {
-			if (jdlCommand.getBlockType().equals(JDLCommandType.IO)) {
-				addIOCommands(jobId, task, (IOCommand) jdlCommand, schedPath, userName, externalOAuthToken);
-			} else {
-				addRemoteCommand(jobId, task, (RemoteCommand) jdlCommand);
-			}
-		}
+		addCommands(initBlocks, jobId, task, schedPath, userName, externalOAuthToken);
 	}
 
 	private Command stageOutCommand(String remoteFile, String localFile) {
