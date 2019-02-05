@@ -23,3 +23,4 @@ resourcer_username=
 arrebol.ldap.auth.url=ldap://ldap.lsd.ufcg.edu.br:389
 arrebol.ldap.base=dc=lsd,dc=ufcg,dc=edu,dc=br
 
+standardImage=
