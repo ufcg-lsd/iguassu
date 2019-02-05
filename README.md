@@ -67,7 +67,7 @@ This two commands are used to copy files from and to the file driver (ex: ownclo
 
 ##How to configure the **Submission Service**?
 
-To configure the **Submission Service** one should edit two configuration files. In the first file, **arrebol.conf**, it is mandatory to assign the port which the **Submission Service** daemon will wait for HTTP requests after it has been started:
+To configure the **Submission Service** one should edit two configuration files. In the first file, **iguassu.conf**, it is mandatory to assign the port which the **Submission Service** daemon will wait for HTTP requests after it has been started:
 
 ```
  rest_server_port=port
