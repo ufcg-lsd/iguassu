@@ -1,16 +1,5 @@
 #!/usr/bin/env bash
 
-##
-# Helper functions.
-##
-
-print_spaces(){
-  echo "-"
-  echo "-"
-  echo "-"
-  echo "-"
-}
-
 echo "This script installs all dependencies needed to the Iguassu."
 echo "This script was tested only in Ubuntu 18.04"
 
