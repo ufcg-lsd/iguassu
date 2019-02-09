@@ -31,15 +31,17 @@ echo "Installing Blowout packages"
 print_spaces
 cd blowout && mvn clean install -DskipTests
 
-echo "Installing Iguassu"
+echo "Cloning Iguassu"
 print_spaces
 cd ../ && git clone git@github.com:ufcg-lsd/iguassu.git && cd iguassu/
 fetch_remote_branchs
+echo "Installing Iguassu packages"
 git checkout adapt-new-fogbow && mvn clean install -DskipTests
 
-echo "Installing Frontend"
+echo "Cloning Iguassu Dashboard"
 print_spaces
 cd ../ && git clone -b support/without-auth https://github.com/fogbow/iguassu-dashboard.git --single-branch && cd iguassu-dashboard/
+echo "Installing Iguassu Dashboard packages"
 npm install
 sudo bower install --allow-root
 
