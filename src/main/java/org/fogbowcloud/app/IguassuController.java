@@ -45,7 +45,7 @@ public class IguassuController {
     private BlowoutController blowoutController;
     private List<Integer> nonces;
     private Map<String, Task> finishedTasks;
-    private Map<String, Thread> creatingJobs;
+    private Map<String, Thread> createdJobs;
     private JobDataStore jobDataStore;
     private OAuthTokenDataStore oAuthTokenDataStore;
     private IguassuAuthenticator auth;
@@ -59,7 +59,7 @@ public class IguassuController {
         this.properties = properties;
         this.finishedTasks = new ConcurrentHashMap<>();
         this.blowoutController = new BlowoutController(properties);
-        this.creatingJobs = new ConcurrentHashMap<>();
+        this.createdJobs = new ConcurrentHashMap<>();
         this.externalOAuthTokenController = new ExternalOAuthController(properties);
     }
 
@@ -100,7 +100,7 @@ public class IguassuController {
     }
 
     public void stop() {
-        for (Thread t : creatingJobs.values()) {
+        for (Thread t : createdJobs.values()) {
             while (t.isAlive())  t.interrupt();
         }
     }
@@ -147,7 +147,7 @@ public class IguassuController {
     }
 
     void waitForJobCreation(String jobId) throws InterruptedException {
-        creatingJobs.get(jobId).join();
+        createdJobs.get(jobId).join();
     }
 
     JDFJob createJobFromJDFFile(String jdfFilePath, User owner) throws CompilerException, IOException {
@@ -161,9 +161,12 @@ public class IguassuController {
         String externalOAuthToken = getAccessTokenByOwnerUsername(userName);
 
         Thread t = new Thread(new AsyncJobBuilder(job, jdfFilePath, this.properties,
-                this.blowoutController, this.jobDataStore, jobSpec, userName, externalOAuthToken));
+                        this.blowoutController, this.jobDataStore, jobSpec, userName, externalOAuthToken), job.getId());
+        LOGGER.debug("Thread " + t.getId() + " is in state: " + t.getState() + " with job: " + t.getName());
         t.start();
-        this.creatingJobs.put(job.getId(), t);
+        LOGGER.debug("Thread " + t.getId() + "with job" + t.getName() + " started");
+
+        this.createdJobs.put(job.getId(), t);
         return job;
     }
 
@@ -182,7 +185,7 @@ public class IguassuController {
         }
         if (jobToRemove != null) {
             LOGGER.debug("Removing job " + jobToRemove.getName() + ".");
-            Thread creatingThread = this.creatingJobs.get(jobToRemove.getId());
+            Thread creatingThread = this.createdJobs.get(jobToRemove.getId());
             if (creatingThread != null) {
                 if (creatingThread.isAlive()) {
                     LOGGER.info("Job was still being created.");
@@ -190,7 +193,7 @@ public class IguassuController {
                         creatingThread.interrupt();
                     }
                 }
-                this.creatingJobs.remove(jobToRemove.getId());
+                this.createdJobs.remove(jobToRemove.getId());
             }
             this.jobDataStore.deleteByJobId(jobToRemove.getId(), owner);
             for (Task task : jobToRemove.getTasks()) {
