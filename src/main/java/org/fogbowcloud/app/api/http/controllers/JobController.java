@@ -1,6 +1,10 @@
 package org.fogbowcloud.app.api.http.controllers;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.api.http.config.ApiDocumentation;
 import org.fogbowcloud.app.exception.NameAlreadyInUseException;
 import org.fogbowcloud.app.api.http.exceptions.StorageException;
 import org.fogbowcloud.app.api.http.services.FileSystemStorageService;
@@ -27,6 +31,7 @@ import java.util.Map;
 @CrossOrigin
 @RestController
 @RequestMapping(value = JobController.JOB_ENDPOINT)
+@Api(description = ApiDocumentation.Job.API)
 public class JobController {
 
     protected static final String JOB_ENDPOINT = "job";
@@ -47,8 +52,10 @@ public class JobController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
+    @ApiOperation(value = ApiDocumentation.Job.GET_OPERATION)
     public ResponseEntity<List<JDFJob>> getAllJobs(
-            @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) {
+            @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
+                @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) {
         LOGGER.info("Retrieving all jobs.");
 
         User owner = this.jobService.authenticateUser(credentials);
@@ -57,8 +64,12 @@ public class JobController {
     }
 
     @RequestMapping(value = JOB_PATH, method = RequestMethod.GET)
-    public ResponseEntity<JDFJob> getJobById(@PathVariable String jobId,
-        @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) throws InvalidParameterException {
+    @ApiOperation(value = ApiDocumentation.Job.GET_BY_ID_OPERATION)
+    public ResponseEntity<JDFJob> getJobById(
+            @ApiParam(value = ApiDocumentation.Job.ID)
+                @PathVariable String jobId,
+            @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
+                @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) throws InvalidParameterException {
         LOGGER.info("Retrieving job with id " + jobId + "].");
 
         User owner = this.jobService.authenticateUser(credentials);
@@ -76,8 +87,12 @@ public class JobController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<JobResponse> addJob(@RequestParam(JobController.JDF_FILE_PATH) MultipartFile file, RedirectAttributes redirectAttributes,
-                                                 @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) {
+    @ApiOperation(value = ApiDocumentation.Job.CREATE_OPERATION)
+    public ResponseEntity<JobResponse> addJob(
+            @ApiParam(value = ApiDocumentation.Job.CREATE_REQUEST_PARAM)
+                    @RequestParam(JobController.JDF_FILE_PATH) MultipartFile file, RedirectAttributes redirectAttributes,
+            @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
+                    @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) {
         LOGGER.info("Saving new Job.");
 
         LOGGER.info(file.toString());
@@ -120,8 +135,12 @@ public class JobController {
     }
 
     @RequestMapping(value = JOB_PATH, method = RequestMethod.DELETE)
-    public ResponseEntity<JobResponse> stopJob(@PathVariable String jobId,
-                                  @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials)
+    @ApiOperation(value = ApiDocumentation.Job.DELETE_OPERATION)
+    public ResponseEntity<JobResponse> stopJob(
+            @ApiParam(value = ApiDocumentation.Job.ID)
+                @PathVariable String jobId,
+            @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
+                @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials)
             throws InvalidParameterException {
         LOGGER.info("Deleting job with Id " + jobId + ".");
 

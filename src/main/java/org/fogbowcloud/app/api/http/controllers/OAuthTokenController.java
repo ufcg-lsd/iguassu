@@ -1,6 +1,10 @@
 package org.fogbowcloud.app.api.http.controllers;
 
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.api.http.config.ApiDocumentation;
 import org.fogbowcloud.app.api.http.services.OAuthService;
 import org.fogbowcloud.app.exception.InvalidParameterException;
 import org.fogbowcloud.app.model.OAuthToken;
@@ -16,6 +20,7 @@ import java.util.List;
 @CrossOrigin
 @RestController
 @RequestMapping(value = OAuthTokenController.OAUTH_TOKEN_ENDPOINT)
+@Api(description = ApiDocumentation.OAuthToken.API)
 public class OAuthTokenController {
 
     public static final String OAUTH_TOKEN_ENDPOINT = "oauthtoken";
@@ -31,7 +36,10 @@ public class OAuthTokenController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    public ResponseEntity<OAuthToken> storeOAuthToken(@RequestBody OAuthToken oAuthToken) {
+    @ApiOperation(value = ApiDocumentation.OAuthToken.STORE_OPERATION)
+    public ResponseEntity<OAuthToken> storeOAuthToken(
+            @ApiParam(value = ApiDocumentation.OAuthToken.CREATE_REQUEST_BODY)
+            @RequestBody OAuthToken oAuthToken) {
         LOGGER.info("Saving new OAuth Token.");
 
         this.oAuthService.storeOAuthToken(oAuthToken);
@@ -39,7 +47,10 @@ public class OAuthTokenController {
     }
 
     @RequestMapping(value = "/{ownerUsername}", method = RequestMethod.GET)
-    public ResponseEntity<OAuthTokenResponse> getAccessTokenBy(@PathVariable String ownerUsername) throws InvalidParameterException {
+    @ApiOperation(value = ApiDocumentation.OAuthToken.GET_BY_USER)
+    public ResponseEntity<OAuthTokenResponse> getAccessTokenBy(
+            @ApiParam(value = ApiDocumentation.OAuthToken.USER_NAME)
+            @PathVariable String ownerUsername) throws InvalidParameterException {
         LOGGER.info("Retrieving OAuth token from user [" + ownerUsername + "]");
 
         String accessToken = this.oAuthService.getAccessTokenByOwnerUsername(ownerUsername);
@@ -48,6 +59,7 @@ public class OAuthTokenController {
     }
 
     @RequestMapping(method = RequestMethod.GET)
+    @ApiOperation(value = ApiDocumentation.OAuthToken.GET_OPERATION)
     public ResponseEntity<List<OAuthToken>> getAllOAuthTokens() {
         LOGGER.info("Retrieving all OAuth tokens.");
 
@@ -57,6 +69,7 @@ public class OAuthTokenController {
 
     // TODO: delete this endpoints after tests
     @RequestMapping(method = RequestMethod.DELETE)
+    @ApiOperation(value = ApiDocumentation.OAuthToken.DELETE_OPERATION)
     public ResponseEntity deleteAllOAuthTokens() {
         LOGGER.info("Deleting all OAuth tokens.");
 
