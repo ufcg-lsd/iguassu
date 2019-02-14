@@ -21,7 +21,7 @@ import java.util.Properties;
 
 public class TestAsyncJobBuilder {
 
-    private static final String EXSIMPLE_JOB = "test" + File.separator + "resources" + File.separator + "SimpleJob2.jdf"; //todo update variable name
+    private static final String SIMPLE_JOB_EXAMPLE = "test" + File.separator + "resources" + File.separator + "SimpleJob2.jdf";
     private static final String IGUASSU_CONF = "iguassu.conf";
     private static final String BLOWOUT_CONF = "sched.conf";
 
@@ -57,7 +57,7 @@ public class TestAsyncJobBuilder {
         try {
             Mockito.doNothing().when(blowout).addTaskList(Mockito.anyListOf(Task.class));
 
-            String id = iguassuController.addJob(EXSIMPLE_JOB, new LDAPUser(user, username));
+            String id = iguassuController.addJob(SIMPLE_JOB_EXAMPLE, new LDAPUser(user, username));
 
             JDFJob job = iguassuController.getJobById(id, user);
             Assert.assertEquals(JDFJob.JDFJobState.SUBMITTED, job.getState());
@@ -79,7 +79,7 @@ public class TestAsyncJobBuilder {
         try {
             Mockito.doNothing().when(blowout).addTaskList(Mockito.anyListOf(Task.class));
 
-            String id = iguassuController.addJob(EXSIMPLE_JOB, new LDAPUser(user, username));
+            String id = iguassuController.addJob(SIMPLE_JOB_EXAMPLE, new LDAPUser(user, username));
 
             JDFJob job = iguassuController.getJobById(id, user);
             Assert.assertEquals(JDFJob.JDFJobState.SUBMITTED, job.getState());
