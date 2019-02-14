@@ -21,7 +21,7 @@ public class TestJDFJobBuilder {
 	
 	public static final String RESOURCE_DIR = "test" + File.separator + "resources";
 
-	public static final String EXSIMPLE_JOB = RESOURCE_DIR + File.separator + "SimpleJob2.jdf";
+	public static final String SIMPLE_JOB_EXAMPLE = RESOURCE_DIR + File.separator + "SimpleJob2.jdf";
 
 	public static final String FAKE_USER_NAME = "fake-username";
 
@@ -30,19 +30,19 @@ public class TestJDFJobBuilder {
 	@Test
 	public void testJDFCompilation () throws CompilerException, IOException, InterruptedException {
 		Properties properties = new Properties();
-		properties.setProperty(IguassuPropertiesConstants.INFRA_RESOURCE_USERNAME, "infraname");
+		properties.setProperty(IguassuPropertiesConstants.INFRA_PROVIDER_USERNAME, "some_infra_name");
 		properties.setProperty(IguassuPropertiesConstants.PUBLIC_KEY_CONSTANT, "public_key");
 		properties.setProperty(IguassuPropertiesConstants.PRIVATE_KEY_FILEPATH, "file path");
-		User owner = new LDAPUser("arrebolservice", "arrebolservice");
-		JDFJob testJob = new JDFJob(owner.getUser(), new ArrayList<Task>(), owner.getUsername());
+		User owner = new LDAPUser("iguassuService", "iguassuService");
+		JDFJob testJob = new JDFJob(owner.getUser(), new ArrayList<>(), owner.getUsername());
 		CommonCompiler commonCompiler = new CommonCompiler();
-		commonCompiler.compile(EXSIMPLE_JOB, FileType.JDF);
+		commonCompiler.compile(SIMPLE_JOB_EXAMPLE, FileType.JDF);
 		JobSpecification jobSpec = (JobSpecification) commonCompiler.getResult().get(0);
 
 		JDFJobBuilder jdfJobBuilder = new JDFJobBuilder(properties);
 		jdfJobBuilder.createJobFromJDFFile(
 				testJob,
-				EXSIMPLE_JOB,
+				SIMPLE_JOB_EXAMPLE,
 				jobSpec,
 				FAKE_USER_NAME,
 				FAKE_EXTERNAL_OAUTH_TOKEN
@@ -53,6 +53,5 @@ public class TestJDFJobBuilder {
 		for (Command command : tasks.get(0).getAllCommands()) {
 			System.out.println(command.getCommand());
 		}
-		assertEquals(tasks.get(0).getUUID(), "1417");
 	}
 }

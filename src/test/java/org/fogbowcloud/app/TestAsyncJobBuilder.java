@@ -21,12 +21,12 @@ import java.util.Properties;
 
 public class TestAsyncJobBuilder {
 
-    private static final String EXSIMPLE_JOB = "test" + File.separator + "resources" + File.separator + "SimpleJob2.jdf";
+    private static final String EXSIMPLE_JOB = "test" + File.separator + "resources" + File.separator + "SimpleJob2.jdf"; //todo update variable name
     private static final String IGUASSU_CONF = "iguassu.conf";
     private static final String BLOWOUT_CONF = "sched.conf";
 
-    private static final String user = "arrebolservice";
-    private static final String username = "arrebolservice";
+    private static final String user = "iguassuService";
+    private static final String username = "iguassuservice";
 
     private IguassuController iguassuController;
     private BlowoutController blowout;

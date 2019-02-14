@@ -22,7 +22,7 @@ public class FakeTokenUpdatePlugin extends AbstractTokenUpdatePlugin {
 		Map<String, String> attributes = new HashMap<String, String>();
 		return new Token("fakeTokenAccess", new User(UUID.randomUUID().toString(),
 				"fakeUsername",
-				"arrebolservice") );
+				"iguassuService") );
 	}
 
 	@Override

@@ -9,7 +9,7 @@ public class IguassuPropertiesConstants {
 	public static final String INFRA_IS_STATIC = "infra_is_elastic";
 	public static final String INFRA_PROVIDER_CLASS_NAME = "infra_provider_class_name";
 	public static final String INFRA_MANAGEMENT_SERVICE_TIME = "infra_management_service_time";
-	public static final String INFRA_RESOURCE_USERNAME = "resourcer_username";
+	public static final String INFRA_PROVIDER_USERNAME = "provider_username";
 	public static final String INFRA_RESOURCE_SERVICE_TIME = "infra_resource_service_time";
 	public static final String INFRA_RESOURCE_CONNECTION_TIMEOUT = "infra_resource_connection_timeout";
 	public static final String INFRA_RESOURCE_IDLE_LIFETIME = "infra_resource_idle_lifetime";
@@ -46,10 +46,10 @@ public class IguassuPropertiesConstants {
 	public static final String X_AUTH_HASH = "X-auth-hash";
 	public static final String X_CREDENTIALS = "X-auth-credentials";
 	public static final String AUTHENTICATION_PLUGIN = "authentication_plugin";
-	public static final String LDAP_AUTHENTICATION_URL = "arrebol.ldap.auth.url";
-	public static final String LDAP_AUTHENTICATION_BASE = "arrebol.ldap.base";
+	public static final String LDAP_AUTHENTICATION_URL = "iguassu.ldap.auth.url";
+	public static final String LDAP_AUTHENTICATION_BASE = "iguassu.ldap.base";
 	
-	//___________ ARREBOL CONSTANTS ____//
+	//___________ IGUASSU CONSTANTS ____//
 	public static final String JOB_ID  = "jobID";
 	public static final String OWNER = "owner";
 
