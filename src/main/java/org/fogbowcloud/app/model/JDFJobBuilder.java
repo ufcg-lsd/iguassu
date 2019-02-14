@@ -76,13 +76,13 @@ public class JDFJobBuilder {
 
 				Specification spec = new Specification(
 						image,
-						this.properties.getProperty(IguassuPropertiesConstants.INFRA_RESOURCE_USERNAME),
+						this.properties.getProperty(IguassuPropertiesConstants.INFRA_PROVIDER_USERNAME),
 						this.properties.getProperty(IguassuPropertiesConstants.PUBLIC_KEY_CONSTANT),
 						this.properties.getProperty(IguassuPropertiesConstants.PRIVATE_KEY_FILEPATH),
 						"",
 						""
 				);
-				LOGGER.debug(this.properties.getProperty(IguassuPropertiesConstants.INFRA_RESOURCE_USERNAME));
+				LOGGER.debug(this.properties.getProperty(IguassuPropertiesConstants.INFRA_PROVIDER_USERNAME));
 
 				int i = 0;
 				for (String req : jobRequirements.split("and")) {
@@ -124,13 +124,14 @@ public class JDFJobBuilder {
 				        resultBuilder.append(inputLine);
 				    }
 					String result = resultBuilder.toString();
+					LOGGER.debug("Result of the Process Builder: " + result);
 
 //					if (result.contains("no such user")) {
 //						throw new SecurityException("User "+job.getUserId()+" is not part of this security group");
 //					}
 //					in.close();
-
-					Task task = new TaskImpl("TaskNumber" + "-" + taskID + "-" + UUID.randomUUID(), spec, result);
+					String uuid = UUID.randomUUID().toString();
+					Task task = new TaskImpl("TaskNumber" + "-" + taskID + "-" + uuid, spec, uuid);
 					task.putMetadata(TaskImpl.METADATA_REMOTE_OUTPUT_FOLDER,
 							this.properties.getProperty(IguassuPropertiesConstants.REMOTE_OUTPUT_FOLDER));
 					task.putMetadata(TaskImpl.METADATA_LOCAL_OUTPUT_FOLDER,
