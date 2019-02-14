@@ -18,7 +18,7 @@ public class OAuthToken {
     private String usernameOwner;
     private Date expirationDate;
 
-    public static final Logger LOGGER = Logger.getLogger(OAuthToken.class);
+    private static final Logger LOGGER = Logger.getLogger(OAuthToken.class);
 
     public OAuthToken() {
 

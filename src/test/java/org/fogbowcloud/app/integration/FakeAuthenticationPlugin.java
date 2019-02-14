@@ -16,23 +16,21 @@ public class FakeAuthenticationPlugin implements IguassuAuthenticator {
 	
 	@Override
 	public User authenticateUser(Credential credential) {
-		return new FakeUser(credential.getUsername(), "arrebolservice");
+		return new FakeUser(credential.getUsername(), "iguassuService");
 	}
 
 	@Override
 	public User addUser(String username, String password) {		
-		return new FakeUser(username, "arrebolservice");
+		return new FakeUser(username, "iguassuService");
 	}
 
 	@Override
 	public User getUserByUsername(String username) {
-		// TODO Auto-generated method stub
-		return new FakeUser(username, "arrebolservice");
+		return new FakeUser(username, "iguassuService");
 	}
 
 	@Override
 	public String getAuthenticatorName() {
-		// TODO Auto-generated method stub
 		return "fake_authenticator";
 	}
 

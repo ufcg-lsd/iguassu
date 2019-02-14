@@ -50,18 +50,10 @@ public class CommonCompiler implements Compiler {
 
 	public static final String JDL_TYPE = "JDL";
 
-//	public static final String GDF_TYPE = "GDF";
-
 	public static final String SDF_TYPE = "SDF";
 	
-	public static enum FileType{ JDF, JDL, SDF };
-	
+	public enum FileType{ JDF, JDL, SDF };
 
-//	private String GDF_FILE_NAME = "/resources/specs/GDFGrammar.gals";
-
-//	private String SDF_FILE_NAME = "/resources/specs/SDFGrammar.gals";
-	
-//	private String JDF_FILE_NAME = "/home/igorvcs/git/arrebol/resources/specs/JDFGrammar.gals";
 	private String JDF_FILE_NAME = "resources/specs/JDFGrammar.gals";
 
 	private static File sourceFile;
@@ -138,7 +130,7 @@ public class CommonCompiler implements Compiler {
 	private void run( CommonSyntacticalAnalyzer syntactical ) throws CompilerException {
 
 		try {
-			LOG.debug( "Compilation started for source \"" + sourceFile.getAbsolutePath() + "\"" );
+			LOG.debug( "Compilation started from source \"" + sourceFile.getAbsolutePath() + "\"" );
 			syntactical.startCompilation();
 		} catch ( SyntacticalException sex ) {
 			LOG.error( "Problems at the compilation. ", sex );

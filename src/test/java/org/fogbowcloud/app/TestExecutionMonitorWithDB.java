@@ -23,7 +23,7 @@ public class TestExecutionMonitorWithDB {
 	private static final String FAKE_UUID = "1234";
 	private Task task;
 	private BlowoutController blowout;
-	private IguassuController arrebol;
+	private IguassuController iguassuController;
 	private JDFJob job;
 	private String FAKE_TASK_ID = "FAKE_TASK_ID";
 	private CurrentThreadExecutorService executorService;
@@ -38,7 +38,7 @@ public class TestExecutionMonitorWithDB {
 		jobDB = mock(HashMap.class);
 		job = mock(JDFJob.class);
 		executorService = new CurrentThreadExecutorService();
-		arrebol = mock(IguassuController.class);
+		iguassuController = mock(IguassuController.class);
 		blowout = mock(BlowoutController.class);
 	}
 
@@ -51,13 +51,13 @@ public class TestExecutionMonitorWithDB {
 		ArrayList<Task> tasks = new ArrayList<>();
 		tasks.add(task);
 		doReturn(tasks).when(job).getTasks();
-		doReturn(TaskState.COMPLETED).when(arrebol).getTaskState(FAKE_TASK_ID);
-		doNothing().when(arrebol).moveTaskToFinished(task);
+		doReturn(TaskState.COMPLETED).when(iguassuController).getTaskState(FAKE_TASK_ID);
+		doNothing().when(iguassuController).moveTaskToFinished(task);
 		jdfJobs.add(job);
 		doReturn(jdfJobs).when(db).getAll();
-		ExecutionMonitorWithDB monitor = new ExecutionMonitorWithDB(arrebol, executorService, db);
+		ExecutionMonitorWithDB monitor = new ExecutionMonitorWithDB(iguassuController, executorService, db);
 		monitor.run();
-		verify(arrebol).moveTaskToFinished(task);
+		verify(iguassuController).moveTaskToFinished(task);
 		TaskProcess tp = mock(TaskProcess.class);
 		List<TaskProcess> processes = new ArrayList<>();
 		processes.add(tp);
@@ -73,12 +73,12 @@ public class TestExecutionMonitorWithDB {
 		ArrayList<Task> tasks = new ArrayList<>();
 		tasks.add(task);
 		doReturn(tasks).when(job).getTasks();
-		doReturn(TaskState.FAILED).when(arrebol).getTaskState(FAKE_TASK_ID);
+		doReturn(TaskState.FAILED).when(iguassuController).getTaskState(FAKE_TASK_ID);
 		jdfJobs.add(job);
 		doReturn(jdfJobs).when(db).getAll();
-		ExecutionMonitorWithDB monitor = new ExecutionMonitorWithDB(arrebol,executorService, db);
+		ExecutionMonitorWithDB monitor = new ExecutionMonitorWithDB(iguassuController,executorService, db);
 		monitor.run();
-		verify(arrebol, never()).moveTaskToFinished(task);
+		verify(iguassuController, never()).moveTaskToFinished(task);
 		
 		TaskProcess tp = mock(TaskProcess.class);
 		List<TaskProcess> processes = new ArrayList<>();
@@ -95,12 +95,12 @@ public class TestExecutionMonitorWithDB {
 		ArrayList<Task> tasks = new ArrayList<>();
 		tasks.add(task);
 		doReturn(tasks).when(job).getTasks();
-		doReturn(TaskState.RUNNING).when(arrebol).getTaskState(FAKE_TASK_ID);
+		doReturn(TaskState.RUNNING).when(iguassuController).getTaskState(FAKE_TASK_ID);
 		jdfJobs.add(job);
 		doReturn(jdfJobs).when(db).getAll();
-		ExecutionMonitorWithDB monitor = new ExecutionMonitorWithDB(arrebol,executorService, db);
+		ExecutionMonitorWithDB monitor = new ExecutionMonitorWithDB(iguassuController,executorService, db);
 		monitor.run();
-		verify(arrebol, never()).moveTaskToFinished(task);
+		verify(iguassuController, never()).moveTaskToFinished(task);
 		TaskProcess tp = mock(TaskProcess.class);
 		doReturn(TaskState.RUNNING).when(tp).getStatus();
 		List<TaskProcess> processes = new ArrayList<>();
@@ -109,7 +109,7 @@ public class TestExecutionMonitorWithDB {
 
 	@Test
 	public void testExecutionMonitorRunningWithUpdatedList() {
-		doReturn(TaskState.READY).when(this.arrebol).getTaskState(anyString());
+		doReturn(TaskState.READY).when(this.iguassuController).getTaskState(anyString());
 
 		String user = "testuser";
 		String username = "'this is a test user'";
@@ -129,7 +129,7 @@ public class TestExecutionMonitorWithDB {
 		ExecutorService service = Mockito.mock(ExecutorService.class);
 		doReturn(null).when(service).submit(any(Runnable.class));
 
-		ExecutionMonitorWithDB em = Mockito.spy(new ExecutionMonitorWithDB(arrebol, service, dataStore));
+		ExecutionMonitorWithDB em = Mockito.spy(new ExecutionMonitorWithDB(iguassuController, service, dataStore));
 
 
 		JDFJob job1 = new JDFJob(user, new ArrayList<Task>(), username);
@@ -178,16 +178,16 @@ public class TestExecutionMonitorWithDB {
 
 		em.run();
 
-		verify(this.arrebol, times(1)).getTaskState(task1.getId());
-		verify(this.arrebol, times(1)).getTaskState(task2.getId());
-		verify(this.arrebol, never()).getTaskState(task3.getId());
-		verify(this.arrebol, never()).getTaskState(task4.getId());
-		verify(this.arrebol, never()).getTaskState(task5.getId());
-		verify(this.arrebol, never()).getTaskState(task6.getId());
-		verify(this.arrebol, never()).getTaskState(task7.getId());
-		verify(this.arrebol, never()).getTaskState(task8.getId());
-		verify(this.arrebol, never()).getTaskState(task9.getId());
-		verify(this.arrebol, never()).getTaskState(task10.getId());
+		verify(this.iguassuController, times(1)).getTaskState(task1.getId());
+		verify(this.iguassuController, times(1)).getTaskState(task2.getId());
+		verify(this.iguassuController, never()).getTaskState(task3.getId());
+		verify(this.iguassuController, never()).getTaskState(task4.getId());
+		verify(this.iguassuController, never()).getTaskState(task5.getId());
+		verify(this.iguassuController, never()).getTaskState(task6.getId());
+		verify(this.iguassuController, never()).getTaskState(task7.getId());
+		verify(this.iguassuController, never()).getTaskState(task8.getId());
+		verify(this.iguassuController, never()).getTaskState(task9.getId());
+		verify(this.iguassuController, never()).getTaskState(task10.getId());
 
 		/* ////////////////////////////////////// */
 		dataStore.insert(job3);
@@ -195,16 +195,16 @@ public class TestExecutionMonitorWithDB {
 
 		em.run();
 
-		verify(this.arrebol, times(2)).getTaskState(task1.getId());
-		verify(this.arrebol, times(2)).getTaskState(task2.getId());
-		verify(this.arrebol, times(1)).getTaskState(task3.getId());
-		verify(this.arrebol, times(1)).getTaskState(task4.getId());
-		verify(this.arrebol, never()).getTaskState(task5.getId());
-		verify(this.arrebol, never()).getTaskState(task6.getId());
-		verify(this.arrebol, never()).getTaskState(task7.getId());
-		verify(this.arrebol, never()).getTaskState(task8.getId());
-		verify(this.arrebol, never()).getTaskState(task9.getId());
-		verify(this.arrebol, never()).getTaskState(task10.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task1.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task2.getId());
+		verify(this.iguassuController, times(1)).getTaskState(task3.getId());
+		verify(this.iguassuController, times(1)).getTaskState(task4.getId());
+		verify(this.iguassuController, never()).getTaskState(task5.getId());
+		verify(this.iguassuController, never()).getTaskState(task6.getId());
+		verify(this.iguassuController, never()).getTaskState(task7.getId());
+		verify(this.iguassuController, never()).getTaskState(task8.getId());
+		verify(this.iguassuController, never()).getTaskState(task9.getId());
+		verify(this.iguassuController, never()).getTaskState(task10.getId());
 
 		/* ////////////////////////////////////// */
 		dataStore.insert(job5);
@@ -213,16 +213,16 @@ public class TestExecutionMonitorWithDB {
 
 		em.run();
 
-		verify(this.arrebol, times(2)).getTaskState(task1.getId());
-		verify(this.arrebol, times(3)).getTaskState(task2.getId());
-		verify(this.arrebol, times(2)).getTaskState(task3.getId());
-		verify(this.arrebol, times(2)).getTaskState(task4.getId());
-		verify(this.arrebol, times(1)).getTaskState(task5.getId());
-		verify(this.arrebol, times(1)).getTaskState(task6.getId());
-		verify(this.arrebol, never()).getTaskState(task7.getId());
-		verify(this.arrebol, never()).getTaskState(task8.getId());
-		verify(this.arrebol, never()).getTaskState(task9.getId());
-		verify(this.arrebol, never()).getTaskState(task10.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task1.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task2.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task3.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task4.getId());
+		verify(this.iguassuController, times(1)).getTaskState(task5.getId());
+		verify(this.iguassuController, times(1)).getTaskState(task6.getId());
+		verify(this.iguassuController, never()).getTaskState(task7.getId());
+		verify(this.iguassuController, never()).getTaskState(task8.getId());
+		verify(this.iguassuController, never()).getTaskState(task9.getId());
+		verify(this.iguassuController, never()).getTaskState(task10.getId());
 
 		/* ////////////////////////////////////// */
 		dataStore.insert(job7);
@@ -232,16 +232,16 @@ public class TestExecutionMonitorWithDB {
 
 		em.run();
 
-		verify(this.arrebol, times(2)).getTaskState(task1.getId());
-		verify(this.arrebol, times(4)).getTaskState(task2.getId());
-		verify(this.arrebol, times(3)).getTaskState(task3.getId());
-		verify(this.arrebol, times(3)).getTaskState(task4.getId());
-		verify(this.arrebol, times(2)).getTaskState(task5.getId());
-		verify(this.arrebol, times(2)).getTaskState(task6.getId());
-		verify(this.arrebol, times(1)).getTaskState(task7.getId());
-		verify(this.arrebol, times(1)).getTaskState(task8.getId());
-		verify(this.arrebol, times(1)).getTaskState(task9.getId());
-		verify(this.arrebol, times(1)).getTaskState(task10.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task1.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task2.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task3.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task4.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task5.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task6.getId());
+		verify(this.iguassuController, times(1)).getTaskState(task7.getId());
+		verify(this.iguassuController, times(1)).getTaskState(task8.getId());
+		verify(this.iguassuController, times(1)).getTaskState(task9.getId());
+		verify(this.iguassuController, times(1)).getTaskState(task10.getId());
 
 		/* ////////////////////////////////////// */
 		dataStore.deleteByJobId(job2.getId(), user);
@@ -250,16 +250,16 @@ public class TestExecutionMonitorWithDB {
 
 		em.run();
 
-		verify(this.arrebol, times(2)).getTaskState(task1.getId());
-		verify(this.arrebol, times(4)).getTaskState(task2.getId());
-		verify(this.arrebol, times(4)).getTaskState(task3.getId());
-		verify(this.arrebol, times(4)).getTaskState(task4.getId());
-		verify(this.arrebol, times(3)).getTaskState(task5.getId());
-		verify(this.arrebol, times(2)).getTaskState(task6.getId());
-		verify(this.arrebol, times(2)).getTaskState(task7.getId());
-		verify(this.arrebol, times(2)).getTaskState(task8.getId());
-		verify(this.arrebol, times(1)).getTaskState(task9.getId());
-		verify(this.arrebol, times(2)).getTaskState(task10.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task1.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task2.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task3.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task4.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task5.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task6.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task7.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task8.getId());
+		verify(this.iguassuController, times(1)).getTaskState(task9.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task10.getId());
 
 		/* ////////////////////////////////////// */
 		dataStore.deleteByJobId(job3.getId(), user);
@@ -268,16 +268,16 @@ public class TestExecutionMonitorWithDB {
 
 		em.run();
 
-		verify(this.arrebol, times(2)).getTaskState(task1.getId());
-		verify(this.arrebol, times(4)).getTaskState(task2.getId());
-		verify(this.arrebol, times(4)).getTaskState(task3.getId());
-		verify(this.arrebol, times(4)).getTaskState(task4.getId());
-		verify(this.arrebol, times(3)).getTaskState(task5.getId());
-		verify(this.arrebol, times(2)).getTaskState(task6.getId());
-		verify(this.arrebol, times(3)).getTaskState(task7.getId());
-		verify(this.arrebol, times(3)).getTaskState(task8.getId());
-		verify(this.arrebol, times(1)).getTaskState(task9.getId());
-		verify(this.arrebol, times(3)).getTaskState(task10.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task1.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task2.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task3.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task4.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task5.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task6.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task7.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task8.getId());
+		verify(this.iguassuController, times(1)).getTaskState(task9.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task10.getId());
 
 		/* ////////////////////////////////////// */
 		dataStore.deleteByJobId(job7.getId(), user);
@@ -286,16 +286,16 @@ public class TestExecutionMonitorWithDB {
 
 		em.run();
 
-		verify(this.arrebol, times(2)).getTaskState(task1.getId());
-		verify(this.arrebol, times(4)).getTaskState(task2.getId());
-		verify(this.arrebol, times(4)).getTaskState(task3.getId());
-		verify(this.arrebol, times(4)).getTaskState(task4.getId());
-		verify(this.arrebol, times(3)).getTaskState(task5.getId());
-		verify(this.arrebol, times(2)).getTaskState(task6.getId());
-		verify(this.arrebol, times(3)).getTaskState(task7.getId());
-		verify(this.arrebol, times(3)).getTaskState(task8.getId());
-		verify(this.arrebol, times(1)).getTaskState(task9.getId());
-		verify(this.arrebol, times(3)).getTaskState(task10.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task1.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task2.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task3.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task4.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task5.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task6.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task7.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task8.getId());
+		verify(this.iguassuController, times(1)).getTaskState(task9.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task10.getId());
 
 		/* ////////////////////////////////////// */
 		dataStore.deleteByJobId(job7.getId(), user);
@@ -304,61 +304,61 @@ public class TestExecutionMonitorWithDB {
 
 		em.run();
 
-		verify(this.arrebol, times(2)).getTaskState(task1.getId());
-		verify(this.arrebol, times(4)).getTaskState(task2.getId());
-		verify(this.arrebol, times(4)).getTaskState(task3.getId());
-		verify(this.arrebol, times(4)).getTaskState(task4.getId());
-		verify(this.arrebol, times(3)).getTaskState(task5.getId());
-		verify(this.arrebol, times(2)).getTaskState(task6.getId());
-		verify(this.arrebol, times(3)).getTaskState(task7.getId());
-		verify(this.arrebol, times(3)).getTaskState(task8.getId());
-		verify(this.arrebol, times(1)).getTaskState(task9.getId());
-		verify(this.arrebol, times(3)).getTaskState(task10.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task1.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task2.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task3.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task4.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task5.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task6.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task7.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task8.getId());
+		verify(this.iguassuController, times(1)).getTaskState(task9.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task10.getId());
 
 		/* ////////////////////////////////////// */
 		em.run();
 
-		verify(this.arrebol, times(2)).getTaskState(task1.getId());
-		verify(this.arrebol, times(4)).getTaskState(task2.getId());
-		verify(this.arrebol, times(4)).getTaskState(task3.getId());
-		verify(this.arrebol, times(4)).getTaskState(task4.getId());
-		verify(this.arrebol, times(3)).getTaskState(task5.getId());
-		verify(this.arrebol, times(2)).getTaskState(task6.getId());
-		verify(this.arrebol, times(3)).getTaskState(task7.getId());
-		verify(this.arrebol, times(3)).getTaskState(task8.getId());
-		verify(this.arrebol, times(1)).getTaskState(task9.getId());
-		verify(this.arrebol, times(3)).getTaskState(task10.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task1.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task2.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task3.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task4.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task5.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task6.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task7.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task8.getId());
+		verify(this.iguassuController, times(1)).getTaskState(task9.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task10.getId());
 
 		/* ////////////////////////////////////// */
 		dataStore.insert(job1);
 
 		em.run();
 
-		verify(this.arrebol, times(3)).getTaskState(task1.getId());
-		verify(this.arrebol, times(4)).getTaskState(task2.getId());
-		verify(this.arrebol, times(4)).getTaskState(task3.getId());
-		verify(this.arrebol, times(4)).getTaskState(task4.getId());
-		verify(this.arrebol, times(3)).getTaskState(task5.getId());
-		verify(this.arrebol, times(2)).getTaskState(task6.getId());
-		verify(this.arrebol, times(3)).getTaskState(task7.getId());
-		verify(this.arrebol, times(3)).getTaskState(task8.getId());
-		verify(this.arrebol, times(1)).getTaskState(task9.getId());
-		verify(this.arrebol, times(3)).getTaskState(task10.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task1.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task2.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task3.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task4.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task5.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task6.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task7.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task8.getId());
+		verify(this.iguassuController, times(1)).getTaskState(task9.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task10.getId());
 
 		/* ////////////////////////////////////// */
 		dataStore.deleteByJobId(job1.getId(), user);
 
 		em.run();
 
-		verify(this.arrebol, times(3)).getTaskState(task1.getId());
-		verify(this.arrebol, times(4)).getTaskState(task2.getId());
-		verify(this.arrebol, times(4)).getTaskState(task3.getId());
-		verify(this.arrebol, times(4)).getTaskState(task4.getId());
-		verify(this.arrebol, times(3)).getTaskState(task5.getId());
-		verify(this.arrebol, times(2)).getTaskState(task6.getId());
-		verify(this.arrebol, times(3)).getTaskState(task7.getId());
-		verify(this.arrebol, times(3)).getTaskState(task8.getId());
-		verify(this.arrebol, times(1)).getTaskState(task9.getId());
-		verify(this.arrebol, times(3)).getTaskState(task10.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task1.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task2.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task3.getId());
+		verify(this.iguassuController, times(4)).getTaskState(task4.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task5.getId());
+		verify(this.iguassuController, times(2)).getTaskState(task6.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task7.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task8.getId());
+		verify(this.iguassuController, times(1)).getTaskState(task9.getId());
+		verify(this.iguassuController, times(3)).getTaskState(task10.getId());
 	}
 }

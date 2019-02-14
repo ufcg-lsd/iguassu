@@ -1,6 +1,0 @@
-To compile and install arrebol you must download Blowout and Iguassu repositories
-then open command line, go to Blowout and do "mvn clean install -DskipTests"
-Then go to Arrebol and do "mvn clean install -DskipTests"
-move that arrebol folder to the desired machine
-fill in the sched.conf and iguassu.conf configuration files.
-run start-iguassu-service.sh on ./bin

@@ -18,8 +18,9 @@ default_specs_file_path=defaulResource.json
 remove_previous_resources=true
 
 rest_server_port=8080
-resourcer_username=
+provider_username=fogbow
 
-arrebol.ldap.auth.url=ldap://ldap.lsd.ufcg.edu.br:389
-arrebol.ldap.base=dc=lsd,dc=ufcg,dc=edu,dc=br
+iguassu.ldap.auth.url=ldap://ldap.lsd.ufcg.edu.br:389
+iguassu.ldap.base=dc=lsd,dc=ufcg,dc=edu,dc=br
 
+standardImage=

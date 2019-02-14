@@ -1,4 +1,4 @@
-package org.fogbowcloud.app;
+package org.fogbowcloud.app.exception;
 
 public class NameAlreadyInUseException extends Exception {
 	

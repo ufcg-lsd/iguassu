@@ -18,14 +18,11 @@ public class ExecutionMonitorWithDB implements Runnable {
 	private ExecutorService service;
     private JobDataStore db;
 
-	ExecutionMonitorWithDB(IguassuController iguassuController,
-                           JobDataStore dataStore) {
+	ExecutionMonitorWithDB(IguassuController iguassuController, JobDataStore dataStore) {
 		this(iguassuController, Executors.newFixedThreadPool(3), dataStore);
 	}
 
-	ExecutionMonitorWithDB(IguassuController iguassuController,
-                           ExecutorService service,
-                           JobDataStore db) {
+	ExecutionMonitorWithDB(IguassuController iguassuController, ExecutorService service, JobDataStore db) {
 		this.iguassuController = iguassuController;
 		if (service == null) {
 			this.service = Executors.newFixedThreadPool(3);
@@ -37,22 +34,22 @@ public class ExecutionMonitorWithDB implements Runnable {
 
 	@Override
 	public void run() {
-		LOGGER.debug("Submitting monitoring tasks");
+		LOGGER.info("Submitting monitoring tasks.");
 		ArrayList<JDFJob> jobMap = (ArrayList<JDFJob>) db.getAll();
 		for (JDFJob aJob : jobMap) {
-			LOGGER.debug("Starting monitoring of job " + aJob.getName() + "[" + aJob.getId() + "].");
+			LOGGER.info("Starting monitoring of job " + aJob.getName() + "[" + aJob.getId() + "].");
 			int count = 0;
 			for (Task task : aJob.getTasks()) {
 				if (!task.isFinished()) {
 					count++;
-					LOGGER.debug("Task: " + task +" is being treated");
+					LOGGER.info("Task: " + task +" is being treated");
 					TaskState taskState = iguassuController.getTaskState(task.getId());
-					LOGGER.debug("Process " + task.getId() + " has state " + taskState.getDesc());
+					LOGGER.info("Process " + task.getId() + " has state " + taskState.getDesc());
 					service.submit(new TaskExecutionChecker(task));
 				}
 			}
 			if (count == 0) {
-				LOGGER.debug("Job has no active tasks.");
+				LOGGER.info("Job has no active tasks.");
 			}
 		}
 	}
@@ -71,6 +68,7 @@ public class ExecutionMonitorWithDB implements Runnable {
 
 			if (TaskState.COMPLETED.equals(state)) {
 				iguassuController.moveTaskToFinished(task);
+				LOGGER.info("The task " + this.task.getId() + " has been completed!");
 			}
 		}
 	}

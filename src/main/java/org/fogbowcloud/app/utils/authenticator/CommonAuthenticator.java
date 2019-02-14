@@ -18,7 +18,7 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
 public class CommonAuthenticator implements IguassuAuthenticator {
-	public static final Logger LOGGER = Logger.getLogger(CommonAuthenticator.class);
+	private static final Logger LOGGER = Logger.getLogger(CommonAuthenticator.class);
 
 	public static final String AUTH_NAME = "commonauth";
 	private DB usersDB;
@@ -36,11 +36,6 @@ public class CommonAuthenticator implements IguassuAuthenticator {
 		if (user == null) {
 			return false;
 		}
-		// When using the arrebol CLI the generated base64 hash has some line
-		// breaks
-		// to be able to send it in the request we replace the new line char
-		// with "*"
-		// and here we need to replace it back with the new line char
 		hash = hash.replace("*", "\n");
 		RSAPublicKey publicKey = RSAUtils.getPublicKeyFromString(((UserImpl)user).getPublicKey());
 		return RSAUtils.verify(publicKey, user.getUser() + nonce, hash);

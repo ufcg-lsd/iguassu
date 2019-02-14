@@ -4,14 +4,13 @@
 ## What is Iguassu?
   Iguassu is a tool for monitoring and executing jobs in a multi-cloud environment federated by the [fogbow middleware](http://www.fogbowcloud.org). Iguassu allows the user to harness cloud resources without bothering about the details of the cloud infrastructure.
 
-  Iguassu has three main components:
-  - **Submission service**: The submission service is the deamon responsible for receiving job submission and monitoring requests and interacting with the **fogbow middleware** to execute the jobs in the federated cloud resources. The submission services runs a **REST** interface acessed by two clients: **Iguassu CLI** and **Iguassu Dashboard**.
-  - **Iguassu Dashboard**: Dashboard is a web application that shows status information about the jobs controlled by a **submission service**.
-  - **Iguassu CLI**: CLI is a bash script to easy interaction with the **submission service** in UNIX enviroments. It allows to submit jobs, retrieve status information about running jobs, and cancel them.  
+  Iguassu has two main components:
+  - **Submission service**: The submission service is the daemon responsible for receiving job submission and monitoring requests and interacting with the **fogbow middleware** to execute the jobs in the federated cloud resources. The submission services runs a **REST** interface accessed by one client: **Iguassu Dashboard**.
+  - **Iguassu Dashboard**: Its a web application that shows status information about the jobs controlled by a **submission service**.    
 
   This document describes how to install and configure the **Submission Service**. To install and configure **Iguassu Dashboard**, go to [its repository](https://github.com/ufcg-lsd/iguassu-dashboard).
 
-##How to use it?
+## How to use it?
 
 ### Writing a job
 
@@ -65,15 +64,15 @@ This two commands are used to copy files from and to the file driver (ex: ownclo
  GET remotefile localfile - where the localfile is writable to the scheduler that will run the job 
 ```
 
-##How to configure the **Submission Service**?
+## How to configure the **Submission Service**?
 
-To configure the **Submission Service** one should edit two configuration files. In the first file, **arrebol.conf**, it is mandatory to assign the port which the **Submission Service** daemon will wait for HTTP requests after it has been started:
+To configure the **Submission Service** one should edit two configuration files. In the first file, **iguassu.conf**, it is mandatory to assign the port which the **Submission Service** daemon will wait for HTTP requests after it has been started:
 
 ```
  rest_server_port=port
 ```
 
-In the second file, **sched.conf**, it is possible to tune the behaviour of the **Submission Service**. We cover this  configuration in the [full tutorial]().
+In the second file, **sched.conf**, it is possible to tune the behaviour of the **Submission Service**.
 
 To start the **Submission Service**, run the script:
 
