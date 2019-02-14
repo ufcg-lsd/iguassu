@@ -22,7 +22,7 @@ import org.fogbowcloud.app.model.JDFJob;
 import org.fogbowcloud.app.model.JDFJobBuilder;
 import org.fogbowcloud.app.model.OAuthToken;
 import org.fogbowcloud.app.model.User;
-import org.fogbowcloud.app.utils.IguassuPropertiesConstants;
+import org.fogbowcloud.app.utils.constants.IguassuPropertiesConstants;
 import org.fogbowcloud.app.utils.authenticator.IguassuAuthenticator;
 import org.fogbowcloud.app.utils.authenticator.Credential;
 import org.fogbowcloud.app.utils.authenticator.ThirdAppAuthenticator;

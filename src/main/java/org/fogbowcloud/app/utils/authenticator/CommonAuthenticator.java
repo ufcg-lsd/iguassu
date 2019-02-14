@@ -10,7 +10,7 @@ import java.util.concurrent.ConcurrentMap;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.model.User;
 import org.fogbowcloud.app.model.UserImpl;
-import org.fogbowcloud.app.utils.IguassuPropertiesConstants;
+import org.fogbowcloud.app.utils.constants.IguassuPropertiesConstants;
 import org.fogbowcloud.app.utils.RSAUtils;
 import org.json.JSONException;
 import org.json.JSONObject;

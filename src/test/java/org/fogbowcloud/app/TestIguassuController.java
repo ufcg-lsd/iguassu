@@ -9,7 +9,7 @@ import org.fogbowcloud.app.datastore.JobDataStore;
 import org.fogbowcloud.app.model.JDFJob;
 import org.fogbowcloud.app.model.LDAPUser;
 import org.fogbowcloud.app.model.User;
-import org.fogbowcloud.app.utils.IguassuPropertiesConstants;
+import org.fogbowcloud.app.utils.constants.IguassuPropertiesConstants;
 import org.fogbowcloud.blowout.core.BlowoutController;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.model.Specification;

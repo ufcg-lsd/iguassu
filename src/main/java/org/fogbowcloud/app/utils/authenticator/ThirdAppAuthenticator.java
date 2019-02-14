@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.external.oauth.ExternalOAuthController;
 import org.fogbowcloud.app.model.User;
 import org.fogbowcloud.app.model.UserImpl;
-import org.fogbowcloud.app.utils.IguassuPropertiesConstants;
+import org.fogbowcloud.app.utils.constants.IguassuPropertiesConstants;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mapdb.DB;

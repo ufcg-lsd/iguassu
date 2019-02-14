@@ -15,19 +15,19 @@ public class ExecutionMonitorWithDB implements Runnable {
     private static final Logger LOGGER = Logger.getLogger(ExecutionMonitorWithDB.class);
 
 	private IguassuController iguassuController;
-	private ExecutorService service;
+	private ExecutorService executorService;
     private JobDataStore db;
 
 	ExecutionMonitorWithDB(IguassuController iguassuController, JobDataStore dataStore) {
 		this(iguassuController, Executors.newFixedThreadPool(3), dataStore);
 	}
 
-	ExecutionMonitorWithDB(IguassuController iguassuController, ExecutorService service, JobDataStore db) {
+	ExecutionMonitorWithDB(IguassuController iguassuController, ExecutorService executorService, JobDataStore db) {
 		this.iguassuController = iguassuController;
-		if (service == null) {
-			this.service = Executors.newFixedThreadPool(3);
+		if (executorService == null) {
+			this.executorService = Executors.newFixedThreadPool(3);
 		} else {
-			this.service = service;
+			this.executorService = executorService;
 		}
         this.db = db;
 	}
@@ -45,7 +45,7 @@ public class ExecutionMonitorWithDB implements Runnable {
 					LOGGER.info("Task: " + task +" is being treated");
 					TaskState taskState = iguassuController.getTaskState(task.getId());
 					LOGGER.info("Process " + task.getId() + " has state " + taskState.getDesc());
-					service.submit(new TaskExecutionChecker(task));
+					executorService.submit(new TaskExecutionChecker(task));
 				}
 			}
 			if (count == 0) {
