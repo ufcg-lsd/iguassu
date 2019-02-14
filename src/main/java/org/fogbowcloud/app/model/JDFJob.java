@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 
+import org.apache.log4j.Logger;
 import org.fogbowcloud.blowout.core.model.Task;
 import org.fogbowcloud.blowout.core.model.TaskImpl;
 import org.json.JSONArray;
@@ -16,6 +17,8 @@ import org.json.JSONObject;
  * It add the job name, job name and sched path to the {@link Job} abstraction.
  */
 public class JDFJob extends Job {
+	private static final Logger LOGGER = Logger.getLogger(JDFJob.class);
+	private static final long serialVersionUID = 7780896231796955706L;
 
 	private static final String JSON_HEADER_JOB_ID = "jobId";
 	private static final String JSON_HEADER_NAME = "name";
@@ -24,46 +27,11 @@ public class JDFJob extends Job {
 	private static final String JSON_HEADER_OWNER = "owner";
 	private static final String JSON_HEADER_TASKS = "tasks";
 
-	public enum JDFJobState {
-		SUBMITTED("Submitted"),
-		FAILED("Failed"),
-		CREATED("Created");
-
-		private String desc;
-
-		JDFJobState(String desc) {
-			this.desc = desc;
-		}
-
-		public String value() {
-			return this.desc;
-		}
-
-		public static JDFJobState create(String desc) throws Exception{
-			for (JDFJobState ts : values()) {
-				if(ts.value().equals(desc)){
-					return ts;
-				}
-			}
-			throw new Exception("Invalid task state");
-		}
-	}
-
-	private static final long serialVersionUID = 7780896231796955706L;
 	private final String jobId;
-	private String name;
 	private final String owner;
 	private final String userId;
+	private String name;
 	private JDFJobState state;
-
-	public JDFJob(String owner, List<Task> taskList, String userID) {
-		super(taskList);
-		this.name = "";
-		this.jobId = UUID.randomUUID().toString();
-		this.owner = owner;
-		this.userId = userID;
-		this.state = JDFJobState.SUBMITTED;
-	}
 	
 	public JDFJob(String jobId, String owner, List<Task> taskList, String userID) {
 		super(taskList);
@@ -72,6 +40,10 @@ public class JDFJob extends Job {
 		this.owner = owner;
 		this.userId = userID;
 		this.state = JDFJobState.SUBMITTED;
+	}
+
+	public JDFJob(String owner, List<Task> taskList, String userID) {
+		this(UUID.randomUUID().toString(), owner, taskList, userID);
 	}
 
 	public String getId() {
@@ -124,7 +96,6 @@ public class JDFJob extends Job {
 	@Override
 	public void fail(Task task) {
 		// TODO Auto-generated method stub
-		
 	}
 	
 	public String getUserId() {
@@ -187,5 +158,30 @@ public class JDFJob extends Job {
 			}
 		}
 		return false;
+	}
+
+	public enum JDFJobState {
+		SUBMITTED("Submitted"),
+		FAILED("Failed"),
+		CREATED("Created");
+
+		private String desc;
+
+		JDFJobState(String desc) {
+			this.desc = desc;
+		}
+
+		public String value() {
+			return this.desc;
+		}
+
+		public static JDFJobState create(String desc) throws Exception{
+			for (JDFJobState ts : values()) {
+				if(ts.value().equals(desc)){
+					return ts;
+				}
+			}
+			throw new Exception("Invalid task state");
+		}
 	}
 }

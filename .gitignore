@@ -16,3 +16,5 @@ test/blowout.conf
 test/blowout2.conf
 
 *.log
+
+iguassu.iml

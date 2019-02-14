@@ -19,9 +19,6 @@ import java.util.Properties;
 
 @SpringBootApplication
 public class IguassuApplication {
-
-    private final Logger LOGGER = Logger.getLogger(IguassuApplication.class);
-
     @Bean
     CommandLineRunner cmdRunner() {
         return new IguassuMainRunner();
