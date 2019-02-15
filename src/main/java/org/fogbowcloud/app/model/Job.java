@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.core.model.Task;
+import org.fogbowcloud.blowout.core.model.task.Task;
 
 public abstract class Job implements Serializable {
 

@@ -8,7 +8,7 @@ import org.fogbowcloud.app.model.JDFJob;
 import org.fogbowcloud.app.model.LDAPUser;
 import org.fogbowcloud.blowout.core.BlowoutController;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
-import org.fogbowcloud.blowout.core.model.Task;
+import org.fogbowcloud.blowout.core.model.task.Task;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
