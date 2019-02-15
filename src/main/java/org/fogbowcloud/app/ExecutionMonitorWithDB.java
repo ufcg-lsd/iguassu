@@ -7,27 +7,27 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.datastore.JobDataStore;
 import org.fogbowcloud.app.model.JDFJob;
-import org.fogbowcloud.blowout.core.model.Task;
-import org.fogbowcloud.blowout.core.model.TaskState;
+import org.fogbowcloud.blowout.core.model.task.Task;
+import org.fogbowcloud.blowout.core.model.task.TaskState;
 
 public class ExecutionMonitorWithDB implements Runnable {
 
     private static final Logger LOGGER = Logger.getLogger(ExecutionMonitorWithDB.class);
 
 	private IguassuController iguassuController;
-	private ExecutorService service;
+	private ExecutorService executorService;
     private JobDataStore db;
 
 	ExecutionMonitorWithDB(IguassuController iguassuController, JobDataStore dataStore) {
 		this(iguassuController, Executors.newFixedThreadPool(3), dataStore);
 	}
 
-	ExecutionMonitorWithDB(IguassuController iguassuController, ExecutorService service, JobDataStore db) {
+	ExecutionMonitorWithDB(IguassuController iguassuController, ExecutorService executorService, JobDataStore db) {
 		this.iguassuController = iguassuController;
-		if (service == null) {
-			this.service = Executors.newFixedThreadPool(3);
+		if (executorService == null) {
+			this.executorService = Executors.newFixedThreadPool(3);
 		} else {
-			this.service = service;
+			this.executorService = executorService;
 		}
         this.db = db;
 	}
@@ -45,7 +45,7 @@ public class ExecutionMonitorWithDB implements Runnable {
 					LOGGER.info("Task: " + task +" is being treated");
 					TaskState taskState = iguassuController.getTaskState(task.getId());
 					LOGGER.info("Process " + task.getId() + " has state " + taskState.getDesc());
-					service.submit(new TaskExecutionChecker(task));
+					executorService.submit(new TaskExecutionChecker(task));
 				}
 			}
 			if (count == 0) {

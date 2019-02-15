@@ -1,6 +1,6 @@
 package org.fogbowcloud.app.datastore;
 
-import org.fogbowcloud.app.utils.DataStoreHelper;
+import org.fogbowcloud.app.utils.DataStoreUtils;
 import org.apache.log4j.Logger;
 import java.sql.*;
 import java.util.ArrayList;
@@ -17,7 +17,7 @@ public abstract class DataStore<T> {
     private static final Logger LOGGER = Logger.getLogger(DataStore.class);
 
     public DataStore(String dataStoreURL) {
-        this.dataStoreURL = DataStoreHelper.getDataStoreUrl(dataStoreURL, DEFAULT_DATASTORE_NAME);
+        this.dataStoreURL = DataStoreUtils.getDataStoreUrl(dataStoreURL, DEFAULT_DATASTORE_NAME);
     }
 
     /**

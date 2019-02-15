@@ -1,14 +1,11 @@
 package org.fogbowcloud.app.datastore;
 
-import org.fogbowcloud.app.model.JDFJob;
 import org.fogbowcloud.app.model.OAuthToken;
-import org.fogbowcloud.blowout.core.model.Task;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.sql.Date;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.*;
