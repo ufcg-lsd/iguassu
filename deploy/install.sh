@@ -43,7 +43,7 @@ scp -r $DIR_PATH/conf-files/backend-confs    $REMOTE_USER@$IGUASSU_HOST_IP:$PATH
 scp -r $DIR_PATH/conf-files/frontend-confs   $REMOTE_USER@$IGUASSU_HOST_IP:$PATH_VM/conf-files
 
 # sends the deploy script
-scp $DIR_PATH/deploy-iguassu.sh $REMOTE_USER@$IGUASSU_HOST_IP:$PATH_VM
+scp $DIR_PATH/deploy-docker.sh $REMOTE_USER@$IGUASSU_HOST_IP:$PATH_VM
 
 # run ansible
 DEPLOY_IGUASSU_FILE_PATH="deploy-iguassu.yml"

@@ -6,7 +6,7 @@
       become: yes
 - hosts: iguassu-machine
   vars:
-    deploy_script_runner: bash deploy-iguassu.sh
+    deploy_script_runner: bash deploy-docker.sh
   tasks:
     - name: Deploying iguassu in Iguassu Machine
       shell: "{{ deploy_script_runner }}"
