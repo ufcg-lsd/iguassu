@@ -79,7 +79,6 @@ public class OAuthTokenController {
 
     public class OAuthTokenResponse {
         private String token;
-        public OAuthTokenResponse() {}
         public OAuthTokenResponse(String token) {
             this.token = token;
         }
@@ -90,5 +89,4 @@ public class OAuthTokenController {
             this.token = data;
         }
     }
-
 }

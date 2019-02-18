@@ -42,7 +42,7 @@ public class ExecutionMonitorWithDB implements Runnable {
 			for (Task task : aJob.getTasks()) {
 				if (!task.isFinished()) {
 					count++;
-					LOGGER.info("Task: " + task +" is being treated");
+					LOGGER.info("Task: " + task.getId() +" is being treated");
 					TaskState taskState = iguassuController.getTaskState(task.getId());
 					LOGGER.info("Process " + task.getId() + " has state " + taskState.getDesc());
 					executorService.submit(new TaskExecutionChecker(task));

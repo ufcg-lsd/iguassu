@@ -23,4 +23,4 @@ provider_username=fogbow
 iguassu.ldap.auth.url=ldap://ldap.lsd.ufcg.edu.br:389
 iguassu.ldap.base=dc=lsd,dc=ufcg,dc=edu,dc=br
 
-standardImage=
+standard-image=

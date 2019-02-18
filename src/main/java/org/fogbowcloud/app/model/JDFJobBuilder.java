@@ -66,7 +66,7 @@ public class JDFJobBuilder {
 
 				jobRequirements = jobRequirements.replace("(", "").replace(")", "");
 
-				String image = this.properties.getProperty("standardImage");
+				String image = this.properties.getProperty("standard-image");
 
 				for (String req : jobRequirements.split("and")) {
 					if (req.trim().startsWith("image")) {

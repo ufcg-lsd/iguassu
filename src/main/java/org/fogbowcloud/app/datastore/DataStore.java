@@ -8,13 +8,13 @@ import java.util.List;
 
 public abstract class DataStore<T> {
 
+    private static final Logger LOGGER = Logger.getLogger(DataStore.class);
+
     protected static final String DATASTORE_DRIVER = "org.sqlite.JDBC";
     protected static final String ERROR_WHILE_INITIALIZING_THE_DATA_STORE = "Error while initializing the Job DataStore.";
-    protected static final String DEFAULT_DATASTORE_NAME = "datastore.slite";
+    protected static final String DEFAULT_DATASTORE_NAME = "datastore.sqlite";
 
-    String dataStoreURL;
-
-    private static final Logger LOGGER = Logger.getLogger(DataStore.class);
+    protected String dataStoreURL;
 
     public DataStore(String dataStoreURL) {
         this.dataStoreURL = DataStoreUtils.getDataStoreUrl(dataStoreURL, DEFAULT_DATASTORE_NAME);
