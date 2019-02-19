@@ -3,7 +3,6 @@ package org.fogbowcloud.app.external.oauth;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.api.http.controllers.JobController;
 import org.fogbowcloud.app.model.OAuthToken;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -29,10 +28,10 @@ public class ExternalOAuthController {
     }
 
     public OAuthToken refreshToken(String refreshToken) {
-        String server_url = this.properties.getProperty(ExternalOAuthConstants.SERVER_TOKEN_URL);
+        String server_url = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_TOKEN_URL);
         String request_query = server_url + "?grant_type=refresh_token" + "&refresh_token=" + refreshToken;
-        String clientId = this.properties.getProperty(ExternalOAuthConstants.MY_CLIENT_ID);
-        String clientSecret = this.properties.getProperty(ExternalOAuthConstants.MY_SECRET_ID);
+        String clientId = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID);
+        String clientSecret = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
 
         OAuthToken refreshedToken = null;
         try {
@@ -69,10 +68,10 @@ public class ExternalOAuthController {
     }
 
     public boolean userExists(String username) {
-        String user_provisioning_url = this.properties.getProperty(ExternalOAuthConstants.USER_PROVISIONING_BASE_ENDPOINT);
+        String user_provisioning_url = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_USERS_URL);
         String request_query = user_provisioning_url + "?search=" + username;
-        String fileDriverAdminUsername = this.properties.getProperty(ExternalOAuthConstants.FILE_DRIVER_ADMIN_USERNAME);
-        String fileDriverAdminPassword = this.properties.getProperty(ExternalOAuthConstants.FILE_DRIVER_ADMIN_PASSWORD);
+        String fileDriverAdminUsername = this.properties.getProperty(ExternalOAuthConstants.STORAGE_SERVICE_ADMIN_USERNAME);
+        String fileDriverAdminPassword = this.properties.getProperty(ExternalOAuthConstants.STORAGE_SERVICE_ADMIN_PASSWORD);
 
         String statusCodeOk = "100";
         boolean hasUser = false;

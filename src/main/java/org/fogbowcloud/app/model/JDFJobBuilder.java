@@ -32,7 +32,7 @@ public class JDFJobBuilder {
 	// FIXME: what is this?
 	private static final String SANDBOX = "sandbox";
 	private static final String SSH_SCP_PRECOMMAND = "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no";
-	private static final String DEFAULT_IMAGE = "default-image";
+	private static final String DEFAULT_IMAGE = "compute-default-image";
 	private final Properties properties;
 
 	public JDFJobBuilder(Properties properties) {
@@ -78,8 +78,8 @@ public class JDFJobBuilder {
 				Specification spec = new Specification(
 						image,
 						this.properties.getProperty(IguassuPropertiesConstants.INFRA_PROVIDER_USERNAME),
-						this.properties.getProperty(IguassuPropertiesConstants.PUBLIC_KEY_CONSTANT),
-						this.properties.getProperty(IguassuPropertiesConstants.PRIVATE_KEY_FILEPATH),
+						this.properties.getProperty(IguassuPropertiesConstants.IGUASSU_PUBLIC_KEY),
+						this.properties.getProperty(IguassuPropertiesConstants.IGUASSU_PRIVATE_KEY_FILEPATH),
 						"",
 						""
 				);
@@ -276,7 +276,7 @@ public class JDFJobBuilder {
 	}
 
 	private Command uploadFileCommands(String localFilePath, String filePathToUpload, String userName, String token) {
-		String fileDriverHostIp = this.properties.getProperty(IguassuPropertiesConstants.FILE_DRIVER_HOST_IP);
+		String fileDriverHostIp = this.properties.getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_HOST);
 		String requestTokenCommand = getUserExternalOAuthTokenRequestCommand(userName);
 		String uploadCommand = " http_code=$(curl --write-out %{http_code} -X PUT --header \"Authorization:Bearer $token\" "
 				+ " --data-binary @" + localFilePath + " --silent --output /dev/null "
@@ -292,7 +292,7 @@ public class JDFJobBuilder {
 	}
 
 	private Command downloadFileCommands(String localFilePath, String filePathToDownload, String userName, String token) {
-		String fileDriverHostIp = this.properties.getProperty(IguassuPropertiesConstants.FILE_DRIVER_HOST_IP);
+		String fileDriverHostIp = this.properties.getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_HOST);
 		String requestTokenCommand = getUserExternalOAuthTokenRequestCommand(userName);
 		String downloadCommand = " full_response=$(curl --write-out %{http_code} --header \"Authorization:Bearer $token\" "
 				+ " http://$server/remote.php/webdav/" + filePathToDownload
@@ -323,7 +323,7 @@ public class JDFJobBuilder {
 	}
 
 	private String getAppServiceIp() {
-		return "http://" + this.properties.getProperty(IguassuPropertiesConstants.M_IP)
+		return "http://" + this.properties.getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_VM_PUBLIC_IP)
 				+ ":" + this.properties.getProperty(IguassuPropertiesConstants.REST_SERVER_PORT);
 	}
 }
