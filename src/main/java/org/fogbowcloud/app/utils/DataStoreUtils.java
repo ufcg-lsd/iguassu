@@ -2,7 +2,7 @@ package org.fogbowcloud.app.utils;
 
 import java.io.File;
 
-public class DataStoreHelper {
+public class DataStoreUtils {
 
 	private static final String DATASTORES_FOLDER = "datastores";
 	private static final String PREFIX_DATASTORE_URL = "jdbc:sqlite:";
@@ -20,7 +20,6 @@ public class DataStoreHelper {
 				datastoreDir.mkdirs();
 			}
 		}
-		
 		return dataStoreUrl;
 	}
 

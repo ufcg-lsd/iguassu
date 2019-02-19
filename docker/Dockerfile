@@ -1,7 +1,7 @@
 FROM openjdk:8
 
 ARG BLOWOUT_BRANCH=adapt-new-fogbow
-ARG IGUASSU_BRANCH=adapt-new-fogbow
+ARG IGUASSU_BRANCH=master
 ARG IGUASSU_DASHBOARD_BRANCH=support/without-auth
 
 #install

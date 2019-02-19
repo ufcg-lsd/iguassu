@@ -1,0 +1,3 @@
+#!/bin/bash
+
+./push fogbow/resource-allocation-service:develop

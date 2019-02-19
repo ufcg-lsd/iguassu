@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.utils;
+package org.fogbowcloud.app.utils.constants;
 
 public class IguassuPropertiesConstants {
 

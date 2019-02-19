@@ -1,8 +1,7 @@
 package org.fogbowcloud.app;
 
-import org.fogbowcloud.app.utils.IguassuPropertiesConstants;
-import org.fogbowcloud.app.utils.IguassuGeneralConstants;
-import org.apache.log4j.Logger;
+import org.fogbowcloud.app.utils.constants.IguassuPropertiesConstants;
+import org.fogbowcloud.app.utils.constants.IguassuGeneralConstants;
 import org.fogbowcloud.app.exception.IguassuException;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.springframework.beans.factory.annotation.Autowired;

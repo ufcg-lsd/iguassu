@@ -5,8 +5,8 @@
   Iguassu is a tool for monitoring and executing jobs in a multi-cloud environment federated by the [fogbow middleware](http://www.fogbowcloud.org). Iguassu allows the user to harness cloud resources without bothering about the details of the cloud infrastructure.
 
   Iguassu has two main components:
-  - **Submission service**: The submission service is the daemon responsible for receiving job submission and monitoring requests and interacting with the **fogbow middleware** to execute the jobs in the federated cloud resources. The submission services runs a **REST** interface accessed by one client: **Iguassu Dashboard**.
-  - **Iguassu Dashboard**: Its a web application that shows status information about the jobs controlled by a **submission service**.    
+  - **Submission Service**: The submission Service is the daemon responsible for receiving job submission and monitoring requests and interacting with the **fogbow middleware** to execute the jobs in the federated cloud resources. The submission services runs a **REST** interface accessed by one client: **Iguassu Dashboard**.
+  - **Iguassu Dashboard**: Its a web application that shows status information about the jobs controlled by a **Submission Service**.    
 
   This document describes how to install and configure the **Submission Service**. To install and configure **Iguassu Dashboard**, go to [its repository](https://github.com/ufcg-lsd/iguassu-dashboard).
 

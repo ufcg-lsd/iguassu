@@ -16,13 +16,13 @@ import org.fogbowcloud.app.jdfcompiler.semantic.IOCommand;
 import org.fogbowcloud.app.jdfcompiler.semantic.JDLCommand;
 import org.fogbowcloud.app.jdfcompiler.semantic.JDLCommand.JDLCommandType;
 import org.fogbowcloud.app.jdfcompiler.semantic.RemoteCommand;
-import org.fogbowcloud.app.utils.IguassuPropertiesConstants;
+import org.fogbowcloud.app.utils.constants.IguassuPropertiesConstants;
 import org.fogbowcloud.blowout.core.constants.FogbowConstants;
 import org.fogbowcloud.blowout.core.model.Command;
 import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.blowout.core.model.Task;
-import org.fogbowcloud.blowout.core.model.TaskImpl;
-import org.fogbowcloud.blowout.pool.AbstractResource;
+import org.fogbowcloud.blowout.core.model.task.Task;
+import org.fogbowcloud.blowout.core.model.task.TaskImpl;
+import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 import org.springframework.http.HttpStatus;
 
 // TODO: remove unused methods
@@ -32,6 +32,7 @@ public class JDFJobBuilder {
 	// FIXME: what is this?
 	private static final String SANDBOX = "sandbox";
 	private static final String SSH_SCP_PRECOMMAND = "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no";
+	private static final String DEFAULT_IMAGE = "default-image";
 	private final Properties properties;
 
 	public JDFJobBuilder(Properties properties) {
@@ -66,7 +67,7 @@ public class JDFJobBuilder {
 
 				jobRequirements = jobRequirements.replace("(", "").replace(")", "");
 
-				String image = this.properties.getProperty("standardImage");
+				String image = this.properties.getProperty(DEFAULT_IMAGE);
 
 				for (String req : jobRequirements.split("and")) {
 					if (req.trim().startsWith("image")) {

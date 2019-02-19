@@ -9,6 +9,7 @@ import java.util.concurrent.ExecutorService;
 import org.fogbowcloud.app.datastore.JobDataStore;
 import org.fogbowcloud.app.model.JDFJob;
 import org.fogbowcloud.blowout.core.BlowoutController;
+import org.fogbowcloud.blowout.core.model.task.*;
 import org.fogbowcloud.blowout.core.model.*;
 import org.fogbowcloud.blowout.infrastructure.exception.InfrastructureException;
 import org.junit.Before;
@@ -22,7 +23,7 @@ public class TestExecutionMonitorWithDB {
 
 	private static final String FAKE_UUID = "1234";
 	private Task task;
-	private BlowoutController blowout;
+	private BlowoutController blowoutController;
 	private IguassuController iguassuController;
 	private JDFJob job;
 	private String FAKE_TASK_ID = "FAKE_TASK_ID";
@@ -39,7 +40,7 @@ public class TestExecutionMonitorWithDB {
 		job = mock(JDFJob.class);
 		executorService = new CurrentThreadExecutorService();
 		iguassuController = mock(IguassuController.class);
-		blowout = mock(BlowoutController.class);
+		blowoutController = mock(BlowoutController.class);
 	}
 
 	@Test
@@ -58,10 +59,10 @@ public class TestExecutionMonitorWithDB {
 		ExecutionMonitorWithDB monitor = new ExecutionMonitorWithDB(iguassuController, executorService, db);
 		monitor.run();
 		verify(iguassuController).moveTaskToFinished(task);
-		TaskProcess tp = mock(TaskProcess.class);
+		TaskProcess taskProcess = mock(TaskProcess.class);
 		List<TaskProcess> processes = new ArrayList<>();
-		processes.add(tp);
-		doReturn(TaskState.FINISHED).when(tp).getStatus();
+		processes.add(taskProcess);
+		doReturn(TaskState.FINISHED).when(taskProcess).getTaskState();
 	}
 
 	@Test
@@ -101,10 +102,10 @@ public class TestExecutionMonitorWithDB {
 		ExecutionMonitorWithDB monitor = new ExecutionMonitorWithDB(iguassuController,executorService, db);
 		monitor.run();
 		verify(iguassuController, never()).moveTaskToFinished(task);
-		TaskProcess tp = mock(TaskProcess.class);
-		doReturn(TaskState.RUNNING).when(tp).getStatus();
+		TaskProcess taskProcess = mock(TaskProcess.class);
+		doReturn(TaskState.RUNNING).when(taskProcess).getTaskState();
 		List<TaskProcess> processes = new ArrayList<>();
-		processes.add(tp);
+		processes.add(taskProcess);
 	}
 
 	@Test
