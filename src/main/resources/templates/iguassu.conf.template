@@ -6,21 +6,24 @@
 ##                                                ##
 ####################################################
 
-oauth_server_token_url=http://127.0.0.1/index.php/apps/oauth2/api/v1/token
-oauth_server_users_url=http://127.0.0.1/ocs/v1.php/cloud/users
-oauth_client_id=
-oauth_client_secret=
-file_driver_host_ip=127.0.0.1
-file_driver_server_admin_username=admin
-file_driver_server_admin_password=admin
-
-default_specs_file_path=defaulResource.json
-remove_previous_resources=true
-
+#### Server configuration properties ####
 rest_server_port=8080
-provider_username=fogbow
 
-iguassu.ldap.auth.url=ldap://ldap.lsd.ufcg.edu.br:389
-iguassu.ldap.base=dc=lsd,dc=ufcg,dc=edu,dc=br
+#### Datastore configuration properties ####
+oauth_storage_service_token_url=
+oauth_storage_service_users_url=
+oauth_storage_service_client_id=
+oauth_storage_service_client_secret=
 
-standard-image=
+#### Storage Service ####
+storage_service_host=
+storage_service_vm_public_ip=
+storage_service_admin_username=
+storage_service_admin_password=
+
+#### Default
+default_compute_flavor_spec=defaulResource.json
+
+#### Properties to SSH communication ####
+iguassu_public_key=
+iguassu_private_key_filepath=/home/user/.ssh/id_rsa
