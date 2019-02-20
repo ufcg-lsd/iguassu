@@ -14,10 +14,10 @@ public abstract class DataStore<T> {
     protected static final String ERROR_WHILE_INITIALIZING_THE_DATA_STORE = "Error while initializing the Job DataStore.";
     protected static final String DEFAULT_DATASTORE_NAME = "datastore.sqlite";
 
-    protected String dataStoreURL;
+    protected String tokenDataStoreURL;
 
-    public DataStore(String dataStoreURL) {
-        this.dataStoreURL = DataStoreUtils.getDataStoreUrl(dataStoreURL, DEFAULT_DATASTORE_NAME);
+    public DataStore(String tokenDataStoreURL) {
+        this.tokenDataStoreURL = DataStoreUtils.getDataStoreUrl(tokenDataStoreURL, DEFAULT_DATASTORE_NAME);
     }
 
     /**
@@ -26,7 +26,7 @@ public abstract class DataStore<T> {
      */
     public Connection getConnection() throws SQLException {
         try {
-            return DriverManager.getConnection(this.dataStoreURL);
+            return DriverManager.getConnection(this.tokenDataStoreURL);
         } catch (SQLException e) {
             LOGGER.error("Error while getting a new connection from the connection pool.", e);
             throw e;
@@ -94,5 +94,4 @@ public abstract class DataStore<T> {
         LOGGER.debug("There are " + dataList.size() + " rows at DB to this query (" + preparedStatement.toString() + ").");
         return dataList;
     }
-
 }

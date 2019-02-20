@@ -61,6 +61,7 @@ public class IguassuController {
         this.blowoutController = new BlowoutController(properties);
         this.createdJobs = new ConcurrentHashMap<>();
         this.externalOAuthTokenController = new ExternalOAuthController(properties);
+        this.auth = new ThirdAppAuthenticator(this.properties);
     }
 
     public Properties getProperties() {
@@ -68,9 +69,6 @@ public class IguassuController {
     }
 
     public void init() throws Exception {
-        // FIXME: add as constructor param?
-        this.auth = new ThirdAppAuthenticator(this.properties);
-        // FIXME: replace by a proper
         this.jobDataStore = new JobDataStore(this.properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL));
         this.oAuthTokenDataStore = new OAuthTokenDataStore(
                 this.properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL)
