@@ -25,10 +25,10 @@ public class ThirdAppAuthenticator implements IguassuAuthenticator {
     private ExternalOAuthController externalOAuthTokenController;
 
     public ThirdAppAuthenticator(Properties properties) {
-        final File usersFile = new File(IguassuPropertiesConstants.DB_FILE_USERS);
+        final File usersFile = new File(IguassuPropertiesConstants.DATASTORES_USERS_DB);
         this.usersDB = DBMaker.newFileDB(usersFile).make();
-        this.usersDB.checkShouldCreate(IguassuPropertiesConstants.DB_MAP_USERS);
-        this.userList = this.usersDB.getHashMap(IguassuPropertiesConstants.DB_MAP_USERS);
+        this.usersDB.checkShouldCreate(IguassuPropertiesConstants.DATASTORES_USERS);
+        this.userList = this.usersDB.getHashMap(IguassuPropertiesConstants.DATASTORES_USERS);
         this.externalOAuthTokenController = new ExternalOAuthController(properties);
     }
 
