@@ -36,7 +36,7 @@ print_spaces
 cd ../ && git clone git@github.com:ufcg-lsd/iguassu.git && cd iguassu/
 fetch_remote_branchs
 echo "Installing Iguassu packages"
-git checkout adapt-new-fogbow && mvn clean install -DskipTests
+git checkout master && mvn clean install -DskipTests
 
 echo "Cloning Iguassu Dashboard"
 print_spaces
