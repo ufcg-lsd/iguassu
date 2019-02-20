@@ -7,4 +7,4 @@ fi
 
 branch=$1
 tag=$2
-sudo docker build --build-arg BRANCH=$branch --no-cache -t wesleymonte/iguassu:$tag .
+sudo docker build --build-arg IGUASSU_BRANCH=$branch --no-cache -t ufcglsd/iguassu:$tag .

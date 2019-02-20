@@ -3,7 +3,7 @@
 DIR_PATH=$(pwd)
 CONF_FILES_DIR="conf-files"
 
-IMAGE_NAME="wesleymonte/iguassu"
+IMAGE_NAME="ufcglsd/iguassu"
 CONTAINER_NAME="iguassu"
 
 MANAGER_PORT="8080"
