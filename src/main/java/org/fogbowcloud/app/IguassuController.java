@@ -80,11 +80,10 @@ public class IguassuController {
                 this.properties.getProperty(IguassuPropertiesConstants.REMOVE_PREVIOUS_RESOURCES)
         );
 
-        LOGGER.info("Properties: " + this.properties.getProperty(IguassuPropertiesConstants.DEFAULT_COMPUTE_FLAVOR_SPEC));
-
         this.blowoutController.start(removePreviousResources);
 
-        LOGGER.info("Properties: " + this.properties.getProperty(AppPropertiesConstants.DEFAULT_COMPUTE_FLAVOR_SPEC));
+        LOGGER.info("Default Compute flavor specification: "
+                + this.properties.getProperty(IguassuPropertiesConstants.DEFAULT_COMPUTE_FLAVOR_SPEC));
 
         this.nonces = new ArrayList<>();
 

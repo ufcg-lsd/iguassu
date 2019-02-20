@@ -32,7 +32,7 @@ public class JDFJobBuilder {
 	// FIXME: what is this?
 	private static final String SANDBOX = "sandbox";
 	private static final String SSH_SCP_PRECOMMAND = "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no";
-	private static final String DEFAULT_IMAGE = "compute-default-image";
+	private static final String DEFAULT_IMAGE = "default-compute-image";
 	private final Properties properties;
 
 	public JDFJobBuilder(Properties properties) {

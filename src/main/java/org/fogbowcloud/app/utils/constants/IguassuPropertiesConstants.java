@@ -2,7 +2,7 @@ package org.fogbowcloud.app.utils.constants;
 
 public class IguassuPropertiesConstants {
 
-	public static final String DEFAULT_COMPUTE_FLAVOR_SPEC = "DEFAULT_COMPUTE_FLAVOR_SPEC";
+	public static final String DEFAULT_COMPUTE_FLAVOR_SPEC = "default_compute_flavor_spec";
 	public static final String REMOVE_PREVIOUS_RESOURCES = "remove_previous_resources";
 
 	// __________ INFRASTRUCTURE CONSTANTS __________ //
