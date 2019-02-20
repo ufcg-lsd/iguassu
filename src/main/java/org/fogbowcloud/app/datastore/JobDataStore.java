@@ -48,7 +48,7 @@ public class JobDataStore extends DataStore<JDFJob> {
 		Connection connection = null;
 
 		try {
-			LOGGER.debug("jobDataStoreURL: " + super.dataStoreURL);
+			LOGGER.debug("jobDataStoreURL: " + super.tokenDataStoreURL);
 
 			Class.forName(DATASTORE_DRIVER);
 

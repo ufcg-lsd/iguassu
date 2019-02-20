@@ -61,6 +61,7 @@ public class IguassuController {
         this.blowoutController = new BlowoutController(properties);
         this.createdJobs = new ConcurrentHashMap<>();
         this.externalOAuthTokenController = new ExternalOAuthController(properties);
+        this.auth = new ThirdAppAuthenticator(this.properties);
     }
 
     public Properties getProperties() {
@@ -68,9 +69,6 @@ public class IguassuController {
     }
 
     public void init() throws Exception {
-        // FIXME: add as constructor param?
-        this.auth = new ThirdAppAuthenticator(this.properties);
-        // FIXME: replace by a proper
         this.jobDataStore = new JobDataStore(this.properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL));
         this.oAuthTokenDataStore = new OAuthTokenDataStore(
                 this.properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL)
@@ -80,23 +78,22 @@ public class IguassuController {
                 this.properties.getProperty(IguassuPropertiesConstants.REMOVE_PREVIOUS_RESOURCES)
         );
 
-        LOGGER.info("Properties: " + this.properties.getProperty(IguassuPropertiesConstants.DEFAULT_SPECS_FILE_PATH));
-
         this.blowoutController.start(removePreviousResources);
 
-        LOGGER.info("Properties: " + this.properties.getProperty(AppPropertiesConstants.INFRA_INITIAL_SPECS_FILE_PATH));
+        LOGGER.info("Default Compute flavor specification: "
+                + this.properties.getProperty(IguassuPropertiesConstants.DEFAULT_COMPUTE_FLAVOR_SPEC));
 
         this.nonces = new ArrayList<>();
 
         LOGGER.debug("Restarting jobs");
         restartAllJobs();
 
-        int schedulerPeriod = Integer.valueOf(
+        int schedulerMonitorPeriod = Integer.valueOf(
                 this.properties.getProperty(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD)
         );
-        LOGGER.debug("Starting Execution Monitor, with period: " + schedulerPeriod);
+        LOGGER.debug("Starting Execution Monitor, with period: " + schedulerMonitorPeriod);
         ExecutionMonitorWithDB executionMonitor = new ExecutionMonitorWithDB(this, this.jobDataStore);
-        executionMonitorTimer.scheduleAtFixedRate(executionMonitor, 0, schedulerPeriod);
+        executionMonitorTimer.scheduleAtFixedRate(executionMonitor, 0, schedulerMonitorPeriod);
     }
 
     public void stop() {
@@ -323,12 +320,12 @@ public class IguassuController {
             LOGGER.error(requiredPropertyMessage(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD));
             return false;
         }
-        if (!properties.containsKey(IguassuPropertiesConstants.PUBLIC_KEY_CONSTANT)) {
-            LOGGER.error(requiredPropertyMessage(IguassuPropertiesConstants.PUBLIC_KEY_CONSTANT));
+        if (!properties.containsKey(IguassuPropertiesConstants.IGUASSU_PUBLIC_KEY)) {
+            LOGGER.error(requiredPropertyMessage(IguassuPropertiesConstants.IGUASSU_PUBLIC_KEY));
             return false;
         }
-        if (!properties.containsKey(IguassuPropertiesConstants.PRIVATE_KEY_FILEPATH)) {
-            LOGGER.error(requiredPropertyMessage(IguassuPropertiesConstants.PRIVATE_KEY_FILEPATH));
+        if (!properties.containsKey(IguassuPropertiesConstants.IGUASSU_PRIVATE_KEY_FILEPATH)) {
+            LOGGER.error(requiredPropertyMessage(IguassuPropertiesConstants.IGUASSU_PRIVATE_KEY_FILEPATH));
             return false;
         }
         if (properties.containsKey(IguassuPropertiesConstants.ENCRYPTION_TYPE)) {

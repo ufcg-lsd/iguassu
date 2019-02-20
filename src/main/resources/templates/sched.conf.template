@@ -6,53 +6,34 @@
 ##                                                ##
 ####################################################
 
-impl_blowout_pool_class_name=org.fogbowcloud.blowout.pool.DefaultBlowoutPool
-impl_scheduler_class_name=org.fogbowcloud.blowout.core.StandardScheduler
-impl_infra_manager_class_name=org.fogbowcloud.blowout.infrastructure.manager.DefaultInfrastructureManager
-infra_provider_class_name=org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowInfrastructureProvider
+#### Blowout Plugins ####
+blowout_pool_plugin=
+blowout_scheduler_plugin=
+blowout_infra_manager_plugin=
+blowout_infra_provider_plugin=
+blowout_token_update_plugin=
 
+#### Change in the future ####
+default-compute-image=
+
+#### Resource Allocation Service ####
+ras_base_url=
+ras_token_username=
+ras_token_password=
+ras_token_projectname=
+ras_token_domain=
+ras_token_update_time=
+ras_token_update_time_unit=
+
+##### Datastore constants #####
+blowout_datastore_url=jdbc:sqlite:/tmp/blowoutdb
+
+#### Infrastructure Properties ####
+remove_previous_resources=true
 infra_is_elastic=true
 infra_monitor_period=30000
 infra_resource_connection_timeout=20000
-infra_resource_idle_lifetime=120000
+infra_resource_idle_lifetime=60000
 max_resource_reuse=4
 max_resource_connection_retry=4
-
-accounting_datastore_url=jdbc:h2:/tmp/sebalsched.orders
 execution_monitor_period=60000
-
-rest_server_port=44444
-
-##### FOGBOW INFRASTRUCTURE CONSTANTS #####
-infra_fogbow_manager_base_url=
-infra_fogbow_token_public_key_filepath=/tmp/x509up_u1350
-infra_fogbow_token_update_plugin=org.fogbowcloud.blowout.infrastructure.plugin.NAFTokenUpdatePlugin
-
-
-##### AUTH TOKEN PROPERTIES - LDAP #####
-infra_auth_token_update_plugin=org.fogbowcloud.blowout.infrastructure.token.LDAPTokenUpdatePlugin
-auth_token_prop_ldap_username=
-auth_token_prop_ldap_password=
-auth_token_prop_ldap_auth_url=
-auth_token_prop_ldap_base=dc=lsd,dc=ufcg,dc=edu,dc=br
-auth_token_prop_ldap_encrypt_type=
-auth_token_prop_ldap_private_key=/path/
-auth_token_prop_ldap_public_key=/path/
-
-fogbow.ldap.username=
-fogbow.ldap.password=
-fogbow.ldap.auth.url=ldap://ldap.lsd.ufcg.edu.br:389
-fogbow.ldap.base=dc=lsd,dc=ufcg,dc=edu,dc=br
-fogbow.ldap.private.key=/path/
-fogbow.ldap.public.key=/path/
-
-public_key=
-fogbow_username=
-private_key_filepath=/path/
-
-##### TOKEN PROPERTIES #####
-token_update_time=2
-token_update_time_unit=h
-
-##### DB CONSTANTS #####
-blowout_datastore_url=jdbc:sqlite:/tmp/blowoutdb

@@ -31,8 +31,8 @@ public class TestJDFJobBuilder {
 	public void testJDFCompilation () throws CompilerException, IOException, InterruptedException {
 		Properties properties = new Properties();
 		properties.setProperty(IguassuPropertiesConstants.INFRA_PROVIDER_USERNAME, "some_infra_name");
-		properties.setProperty(IguassuPropertiesConstants.PUBLIC_KEY_CONSTANT, "public_key");
-		properties.setProperty(IguassuPropertiesConstants.PRIVATE_KEY_FILEPATH, "file path");
+		properties.setProperty(IguassuPropertiesConstants.IGUASSU_PUBLIC_KEY, "public_key");
+		properties.setProperty(IguassuPropertiesConstants.IGUASSU_PRIVATE_KEY_FILEPATH, "file path");
 		User owner = new LDAPUser("iguassuService", "iguassuService");
 		JDFJob testJob = new JDFJob(owner.getUser(), new ArrayList<>(), owner.getUsername());
 		CommonCompiler commonCompiler = new CommonCompiler();

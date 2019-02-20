@@ -45,7 +45,7 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
         Statement statement = null;
         Connection connection = null;
         try {
-            LOGGER.debug("tokenDataStoreURL: " + super.dataStoreURL);
+            LOGGER.debug("tokenDataStoreURL: " + super.tokenDataStoreURL);
 
             Class.forName(DATASTORE_DRIVER);
 

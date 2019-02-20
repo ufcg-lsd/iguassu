@@ -47,20 +47,20 @@ public class TestIguassuController {
                 IguassuPropertiesConstants.AUTHENTICATION_PLUGIN,
                 "org.fogbowcloud.app.utils.authenticator.CommonAuthenticator"
         );
-        properties.put(IguassuPropertiesConstants.PUBLIC_KEY_CONSTANT, testPublicKey);
-        properties.put(IguassuPropertiesConstants.PRIVATE_KEY_FILEPATH, testPrivateKeyPath);
+        properties.put(IguassuPropertiesConstants.IGUASSU_PUBLIC_KEY, testPublicKey);
+        properties.put(IguassuPropertiesConstants.IGUASSU_PRIVATE_KEY_FILEPATH, testPrivateKeyPath);
         properties.put(IguassuPropertiesConstants.REMOTE_OUTPUT_FOLDER, "/tmp");
         properties.put(IguassuPropertiesConstants.LOCAL_OUTPUT_FOLDER, "/tmp");
 
         properties.put(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT, "300000000");
         properties.put(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, "30000");
-        properties.put(AppPropertiesConstants.INFRA_IS_STATIC, "true");
+        properties.put(AppPropertiesConstants.INFRA_IS_ELASTIC, "true");
         properties.put(
-                AppPropertiesConstants.INFRA_AUTH_TOKEN_UPDATE_PLUGIN,
+                AppPropertiesConstants.TOKEN_UPDATE_PLUGIN,
                 "org.fogbowcloud.blowout.infrastructure.token.LDAPTokenUpdatePlugin"
         );
         properties.put(
-                AppPropertiesConstants.INFRA_PROVIDER_CLASS_NAME,
+                AppPropertiesConstants.INFRA_PROVIDER_PLUGIN,
                 "org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowInfrastructureProvider"
         );
         properties.put(AppPropertiesConstants.DB_DATASTORE_URL, "jdbc:h2:/tmp/datastores/testfogbowresourcesdatastore");
