@@ -1,8 +1,9 @@
 package org.fogbowcloud.app;
 
-import org.fogbowcloud.app.utils.constants.IguassuPropertiesConstants;
-import org.fogbowcloud.app.utils.constants.IguassuGeneralConstants;
-import org.fogbowcloud.app.exception.IguassuException;
+import org.fogbowcloud.app.core.IguassuController;
+import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
+import org.fogbowcloud.app.core.constants.IguassuGeneralConstants;
+import org.fogbowcloud.app.core.exceptions.IguassuException;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

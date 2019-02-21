@@ -1,11 +1,12 @@
 package org.fogbowcloud.app;
 
-import org.fogbowcloud.app.datastore.JobDataStore;
-import org.fogbowcloud.app.exception.IguassuException;
-import org.fogbowcloud.app.exception.NameAlreadyInUseException;
+import org.fogbowcloud.app.core.IguassuController;
+import org.fogbowcloud.app.core.datastore.JobDataStore;
+import org.fogbowcloud.app.core.exceptions.IguassuException;
+import org.fogbowcloud.app.core.exceptions.NameAlreadyInUseException;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
-import org.fogbowcloud.app.model.JDFJob;
-import org.fogbowcloud.app.model.LDAPUser;
+import org.fogbowcloud.app.core.models.JDFJob;
+import org.fogbowcloud.app.core.models.LDAPUser;
 import org.fogbowcloud.blowout.core.BlowoutController;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.fogbowcloud.blowout.core.model.task.Task;

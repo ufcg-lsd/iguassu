@@ -1,10 +1,10 @@
 package org.fogbowcloud.app.api.http.services;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.IguassuController;
-import org.fogbowcloud.app.exception.InvalidParameterException;
-import org.fogbowcloud.app.model.OAuthToken;
-import org.fogbowcloud.app.model.User;
+import org.fogbowcloud.app.core.IguassuController;
+import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
+import org.fogbowcloud.app.core.models.OAuthToken;
+import org.fogbowcloud.app.core.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;

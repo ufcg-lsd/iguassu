@@ -4,16 +4,15 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.api.http.config.ApiDocumentation;
+import org.fogbowcloud.app.api.config.ApiDocumentation;
 import org.fogbowcloud.app.api.http.services.OAuthService;
-import org.fogbowcloud.app.exception.InvalidParameterException;
-import org.fogbowcloud.app.model.OAuthToken;
+import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
+import org.fogbowcloud.app.core.models.OAuthToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.util.List;
 

@@ -1,10 +1,10 @@
 package org.fogbowcloud.app.api.http.exceptions;
 
 
-import org.fogbowcloud.app.exception.ExceptionResponse;
-import org.fogbowcloud.app.exception.IguassuException;
-import org.fogbowcloud.app.exception.InvalidParameterException;
-import org.fogbowcloud.app.exception.UnauthorizedRequestException;
+import org.fogbowcloud.app.core.exceptions.ExceptionResponse;
+import org.fogbowcloud.app.core.exceptions.IguassuException;
+import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
+import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
