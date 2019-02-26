@@ -6,9 +6,9 @@ import static org.mockito.Mockito.*;
 import java.util.*;
 
 import org.fogbowcloud.app.core.datastore.JobDataStore;
-import org.fogbowcloud.app.core.models.JDFJob;
-import org.fogbowcloud.app.core.models.LDAPUser;
-import org.fogbowcloud.app.core.models.User;
+import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
+import org.fogbowcloud.app.core.authenticator.models.LDAPUser;
+import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.fogbowcloud.blowout.core.BlowoutController;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;

@@ -1,7 +1,6 @@
 package org.fogbowcloud.app.core.datastore;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.models.OAuthToken;
 import org.json.JSONObject;
 
 import java.sql.*;

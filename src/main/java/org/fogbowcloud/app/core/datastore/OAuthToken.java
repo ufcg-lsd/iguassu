@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.models;
+package org.fogbowcloud.app.core.datastore;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;

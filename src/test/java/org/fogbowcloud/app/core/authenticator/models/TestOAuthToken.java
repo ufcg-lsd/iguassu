@@ -1,5 +1,6 @@
-package org.fogbowcloud.app.core.models;
+package org.fogbowcloud.app.core.authenticator.models;
 
+import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.junit.Test;
 
 import java.sql.Date;

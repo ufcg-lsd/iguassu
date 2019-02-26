@@ -8,7 +8,7 @@ import java.util.concurrent.ExecutorService;
 
 import org.fogbowcloud.app.CurrentThreadExecutorService;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
-import org.fogbowcloud.app.core.models.JDFJob;
+import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.blowout.core.BlowoutController;
 import org.fogbowcloud.blowout.core.model.task.*;
 import org.fogbowcloud.blowout.core.model.*;

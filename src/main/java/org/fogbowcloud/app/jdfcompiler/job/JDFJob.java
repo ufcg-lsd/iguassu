@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.models;
+package org.fogbowcloud.app.jdfcompiler.job;
 
 import java.util.ArrayList;
 import java.util.List;

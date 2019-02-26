@@ -1,6 +1,7 @@
 package org.fogbowcloud.app.core.authenticator;
 
-import org.fogbowcloud.app.core.models.User;
+import org.fogbowcloud.app.core.authenticator.models.Credential;
+import org.fogbowcloud.app.core.authenticator.models.User;
 
 public interface IguassuAuthenticator {
 	User authenticateUser(Credential credential);

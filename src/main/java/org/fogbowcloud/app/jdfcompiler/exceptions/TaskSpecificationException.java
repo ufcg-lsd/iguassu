@@ -17,14 +17,12 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  * 
  */
-package org.fogbowcloud.app.jdfcompiler.exception;
+package org.fogbowcloud.app.jdfcompiler.exceptions;
 
 /**
- * This class represents a problem when creating a new JobSpec. In general, the
- * problems are related to the list of Tasks Specs passed by parameter when
- * creating a JobSpec or when setting the list of Tasks Specs of a JobSpec.
+ * This exceptions is used to signalize if a TaskSpec object is not valid.
  */
-public class JobSpecificationException extends Exception {
+public class TaskSpecificationException extends Exception {
 
 	private static final long serialVersionUID = 33L;
 
@@ -32,7 +30,7 @@ public class JobSpecificationException extends Exception {
 	/**
 	 * @see java.lang.Exception#Exception(java.lang.String)
 	 */
-	public JobSpecificationException( String argumentsInConflict ) {
+	public TaskSpecificationException( String argumentsInConflict ) {
 
 		super( argumentsInConflict );
 	}

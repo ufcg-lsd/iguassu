@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.api.http.exceptions;
+package org.fogbowcloud.app.api.exceptions;
 
 
 import org.fogbowcloud.app.core.exceptions.ExceptionResponse;

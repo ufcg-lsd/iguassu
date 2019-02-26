@@ -8,8 +8,9 @@ import java.util.Properties;
 import java.util.concurrent.ConcurrentMap;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.models.User;
-import org.fogbowcloud.app.core.models.UserImpl;
+import org.fogbowcloud.app.core.authenticator.models.Credential;
+import org.fogbowcloud.app.core.authenticator.models.User;
+import org.fogbowcloud.app.core.authenticator.models.UserImpl;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.fogbowcloud.app.utils.RSAUtils;
 import org.json.JSONException;

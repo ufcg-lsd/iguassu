@@ -21,7 +21,7 @@ package org.fogbowcloud.app.jdfcompiler.grammar.exception;
 
 /**
  * Project: Caymman(DSC/UFCG) Description: This class represents an invalid rule
- * exception.
+ * exceptions.
  * 
  * @version 1.0 Created on Sep 25, 2003 Last update: Sep 25, 2003
  */

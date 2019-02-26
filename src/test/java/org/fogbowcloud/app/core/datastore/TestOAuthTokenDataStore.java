@@ -1,6 +1,5 @@
 package org.fogbowcloud.app.core.datastore;
 
-import org.fogbowcloud.app.core.models.OAuthToken;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

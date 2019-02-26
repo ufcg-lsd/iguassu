@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.models;
+package org.fogbowcloud.app.core.authenticator.models;
 
 public interface User {
 	

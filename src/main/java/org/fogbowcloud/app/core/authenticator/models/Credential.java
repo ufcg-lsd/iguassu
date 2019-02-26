@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.authenticator;
+package org.fogbowcloud.app.core.authenticator.models;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -54,7 +54,7 @@ public class Credential {
 		JSONObject credential = new JSONObject();
 		try {
 			credential.put(USER_NAME_KEY, this.username);
-			credential.put(	USER_TOKEN_KEY, this.token);
+			credential.put(USER_TOKEN_KEY, this.token);
 			credential.put(NONCE_KEY, this.nonce);
 		} catch (JSONException e) {
 			return null;

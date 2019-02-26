@@ -8,7 +8,7 @@ import java.sql.Statement;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.models.JDFJob;
+import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.json.JSONObject;
 
 public class JobDataStore extends DataStore<JDFJob> {

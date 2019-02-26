@@ -2,9 +2,9 @@ package org.fogbowcloud.app.integration;
 
 import java.util.Properties;
 
-import org.fogbowcloud.app.core.models.User;
+import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.authenticator.IguassuAuthenticator;
-import org.fogbowcloud.app.core.authenticator.Credential;
+import org.fogbowcloud.app.core.authenticator.models.Credential;
 
 public class FakeAuthenticationPlugin implements IguassuAuthenticator {
 

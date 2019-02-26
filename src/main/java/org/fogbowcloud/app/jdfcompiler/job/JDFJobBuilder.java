@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.models;
+package org.fogbowcloud.app.jdfcompiler.job;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -9,8 +9,6 @@ import java.util.Properties;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
-import org.fogbowcloud.app.jdfcompiler.job.TaskSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.semantic.IOCommand;
 import org.fogbowcloud.app.jdfcompiler.semantic.JDLCommand;

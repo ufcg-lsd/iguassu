@@ -15,8 +15,9 @@ import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.models.LDAPUser;
-import org.fogbowcloud.app.core.models.User;
+import org.fogbowcloud.app.core.authenticator.models.Credential;
+import org.fogbowcloud.app.core.authenticator.models.LDAPUser;
+import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 
 public class LDAPAuthenticator implements IguassuAuthenticator {

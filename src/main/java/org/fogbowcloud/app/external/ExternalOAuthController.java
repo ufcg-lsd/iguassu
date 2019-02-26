@@ -3,7 +3,7 @@ package org.fogbowcloud.app.external;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.models.OAuthToken;
+import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;

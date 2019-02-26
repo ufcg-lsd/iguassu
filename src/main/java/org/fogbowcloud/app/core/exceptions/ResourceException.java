@@ -1,6 +1,6 @@
 package org.fogbowcloud.app.core.exceptions;
 
-import org.fogbowcloud.app.core.models.Status;
+import org.fogbowcloud.app.core.authenticator.models.Status;
 
 public class ResourceException extends RuntimeException {
     private Status status;

@@ -1,9 +1,10 @@
 package org.fogbowcloud.app.core.authenticator;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.core.authenticator.models.Credential;
 import org.fogbowcloud.app.external.ExternalOAuthController;
-import org.fogbowcloud.app.core.models.User;
-import org.fogbowcloud.app.core.models.UserImpl;
+import org.fogbowcloud.app.core.authenticator.models.User;
+import org.fogbowcloud.app.core.authenticator.models.UserImpl;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.json.JSONException;
 import org.json.JSONObject;

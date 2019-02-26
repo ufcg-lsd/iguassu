@@ -21,7 +21,7 @@ package org.fogbowcloud.app.jdfcompiler.grammar.exception;
 
 /**
  * Project: Caymman(DSC/UFCG) Description: This class represents a grammar
- * exception. All the grammars exception should inherits of this class.
+ * exceptions. All the grammars exceptions should inherits of this class.
  * 
  * @version 1.0 Created on Sep 25, 2003 Last update: May 22, 2004
  */

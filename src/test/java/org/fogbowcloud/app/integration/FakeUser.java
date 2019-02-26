@@ -1,6 +1,6 @@
 package org.fogbowcloud.app.integration;
 
-import org.fogbowcloud.app.core.models.User;
+import org.fogbowcloud.app.core.authenticator.models.User;
 
 public class FakeUser implements User {
 

@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.api.config;
+package org.fogbowcloud.app.api.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -10,7 +10,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import static org.fogbowcloud.app.api.config.ApiDocumentation.*;
+import static org.fogbowcloud.app.api.constants.ApiDocumentation.*;
 
 @EnableSwagger2
 @Configuration

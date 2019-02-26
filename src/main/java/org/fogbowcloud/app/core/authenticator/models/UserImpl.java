@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.models;
+package org.fogbowcloud.app.core.authenticator.models;
 
 import org.json.JSONException;
 import org.json.JSONObject;

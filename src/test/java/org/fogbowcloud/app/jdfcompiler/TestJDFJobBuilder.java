@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.models;
+package org.fogbowcloud.app.jdfcompiler;
 
 import static org.junit.Assert.assertEquals;
 
@@ -8,6 +8,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
+import org.fogbowcloud.app.core.authenticator.models.LDAPUser;
+import org.fogbowcloud.app.core.authenticator.models.User;
+import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
+import org.fogbowcloud.app.jdfcompiler.job.JDFJobBuilder;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
