@@ -1,7 +1,6 @@
 language: java
 jdk:
   - oraclejdk8
-  - openjdk8
 
 before_install:
   - git clone -b adapt-new-fogbow https://github.com/ufcg-lsd/blowout.git --single-branch
