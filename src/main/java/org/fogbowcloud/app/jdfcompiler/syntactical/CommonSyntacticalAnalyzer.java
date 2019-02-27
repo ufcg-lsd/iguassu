@@ -136,7 +136,7 @@ public class CommonSyntacticalAnalyzer implements SyntacticalAnalyzer {
 	/*
 	 * It will call the functions of the lexical module checking before wich one
 	 * is more adequated on the actual situation. @throws SyntacticalException
-	 * Wraps a lexical exception occured when getting a token from the lexical
+	 * Wraps a lexical exceptions occured when getting a token from the lexical
 	 * analyzer.
 	 */
 	private void getNewToken() throws SyntacticalException, SemanticException {

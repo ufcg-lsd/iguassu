@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.fogbowcloud.app.jdfcompiler.CommonUtils;
-import org.fogbowcloud.app.jdfcompiler.exception.JobSpecificationException;
+import org.fogbowcloud.app.jdfcompiler.exceptions.JobSpecificationException;
 
 /**
  * Entity that encapsulates all the information given by the user about each

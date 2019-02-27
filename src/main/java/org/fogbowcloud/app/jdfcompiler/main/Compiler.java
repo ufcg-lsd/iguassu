@@ -38,7 +38,7 @@ public interface Compiler {
 	 * @param sourceFileName The file that contains the source to be compiled.
 	 * @param languageType A member of {@link FileType} enum.
 	 * @throws CompilerException Thrown when happens any problem. It generally
-	 *         packs a more specific exception.
+	 *         packs a more specific exceptions.
 	 */
 	public void compile( String sourceFileName, FileType languageType ) throws CompilerException;
 

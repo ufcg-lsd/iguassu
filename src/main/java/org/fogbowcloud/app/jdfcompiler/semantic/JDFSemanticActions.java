@@ -19,7 +19,6 @@
  */
 package org.fogbowcloud.app.jdfcompiler.semantic;
 
-import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -28,11 +27,10 @@ import java.util.List;
 import java.util.Stack;
 
 import org.fogbowcloud.app.jdfcompiler.CompilerMessages;
-import org.fogbowcloud.app.jdfcompiler.exception.JobSpecificationException;
+import org.fogbowcloud.app.jdfcompiler.exceptions.JobSpecificationException;
 import org.fogbowcloud.app.jdfcompiler.job.IOEntry;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.job.TaskSpecification;
-import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.semantic.exception.SemanticException;
 import org.fogbowcloud.app.jdfcompiler.syntactical.CommonSyntacticalAnalyzer;
 import org.fogbowcloud.app.jdfcompiler.token.Token;

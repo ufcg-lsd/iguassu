@@ -1,14 +1,14 @@
 package org.fogbowcloud.app.api.http.services;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.IguassuController;
-import org.fogbowcloud.app.exception.NameAlreadyInUseException;
-import org.fogbowcloud.app.exception.InvalidParameterException;
-import org.fogbowcloud.app.exception.ResourceException;
+import org.fogbowcloud.app.core.IguassuController;
+import org.fogbowcloud.app.core.exceptions.NameAlreadyInUseException;
+import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
+import org.fogbowcloud.app.core.exceptions.ResourceException;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
-import org.fogbowcloud.app.model.JDFJob;
-import org.fogbowcloud.app.model.Status;
-import org.fogbowcloud.app.model.User;
+import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
+import org.fogbowcloud.app.core.authenticator.models.Status;
+import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;

@@ -52,7 +52,7 @@ public class CompilerMessages {
 
 	public static final String BAD_GRAMMAR_FILE_NOT_FOUND = "The grammar could not be loaded because the file specified could not be found.";
 
-	public static final String ERROR_GRAMMAR_IO = "The grammar could not be loaded because of some I/O exception.";
+	public static final String ERROR_GRAMMAR_IO = "The grammar could not be loaded because of some I/O exceptions.";
 
 
 	public static String ERROR_GRAMMAR_MALFORMED_RULE( String rulesHeadSymbol ) {
