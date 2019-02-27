@@ -23,5 +23,6 @@ test/blowout2.conf
 
 *.log
 *.log.*
+logs/
 
 iguassu.iml
