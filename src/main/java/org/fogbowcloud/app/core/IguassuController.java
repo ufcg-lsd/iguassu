@@ -395,7 +395,7 @@ public class IguassuController {
         this.oAuthTokenDataStore.deleteAll();
     }
 
-    public String refreshExternalOAuthToken(String ownerUsername) {
+    private String refreshExternalOAuthToken(String ownerUsername) {
         List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(ownerUsername);
 
         String accessToken = null;

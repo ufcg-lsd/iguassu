@@ -68,18 +68,22 @@ public class IguassuApplication {
                 schedConfPath = IguassuGeneralConstants.DEFAULT_SCHED_CONF_FILE_PATH;
             }
 
-            try {
-                properties.load(new FileInputStream(iguassuConfPath));
-                properties.load(new FileInputStream(schedConfPath));
-            } catch (Exception e) {
-                System.exit(1);
-            }
+            loadProperties(iguassuConfPath, schedConfPath);
         }
 
         @Override
         public void onApplicationEvent(final EmbeddedServletContainerInitializedEvent event) {
             int port = event.getEmbeddedServletContainer().getPort();
             properties.setProperty(IguassuPropertiesConstants.REST_SERVER_PORT, String.valueOf(port));
+        }
+
+        private void loadProperties(String iguassuConfPath, String schedConfPath){
+            try {
+                properties.load(new FileInputStream(iguassuConfPath));
+                properties.load(new FileInputStream(schedConfPath));
+            } catch (Exception e){
+                System.exit(1);
+            }
         }
     }
 }
