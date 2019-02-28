@@ -1,7 +1,7 @@
 package org.fogbowcloud.app.api.http.services;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.IguassuController;
+import org.fogbowcloud.app.core.IguassuFacade;
 import org.fogbowcloud.app.core.exceptions.NameAlreadyInUseException;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
 import org.fogbowcloud.app.core.exceptions.ResourceException;
@@ -24,18 +24,18 @@ public class JobService {
 
     @Lazy
     @Autowired
-    IguassuController iguassuController;
+    IguassuFacade iguassuFacade;
 
     private final Logger LOGGER = Logger.getLogger(JobService.class);
 
     public List<JDFJob> getAllJobs(User owner) {
-        return this.iguassuController.getAllJobs(owner.getUser());
+        return this.iguassuFacade.getAllJobs(owner.getUser());
     }
 
     public JDFJob getJobById(String jobId, User owner) throws InvalidParameterException {
-        JDFJob job = this.iguassuController.getJobById(jobId, owner.getUser());
+        JDFJob job = this.iguassuFacade.getJobById(jobId, owner.getUser());
         if (job == null) {
-            job = this.iguassuController.getJobByName(jobId, owner.getUser());
+            job = this.iguassuFacade.getJobByName(jobId, owner.getUser());
             if (job == null) {
                 LOGGER.info("Could not find job with id " + jobId + " for user " + owner.getUsername());
                 throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
@@ -48,22 +48,22 @@ public class JobService {
     }
 
     public JDFJob getJobByName(String jobName, String owner) {
-        return this.iguassuController.getJobByName(jobName, owner);
+        return this.iguassuFacade.getJobByName(jobName, owner);
     }
 
     public String stopJob(String jobId, String owner) {
-        return this.iguassuController.stopJob(jobId, owner);
+        return this.iguassuFacade.stopJob(jobId, owner);
     }
 
     public String addJob(String jdfFilePath, User owner)
             throws CompilerException, NameAlreadyInUseException, BlowoutException, IOException {
-        return this.iguassuController.addJob(jdfFilePath, owner);
+        return this.iguassuFacade.addJob(jdfFilePath, owner);
     }
 
     public User authenticateUser(String credentials) {
         User owner;
         try {
-            owner = this.iguassuController.authUser(credentials);
+            owner = this.iguassuFacade.authUser(credentials);
         } catch (GeneralSecurityException e) {
             LOGGER.error("Error trying to authenticate", e);
             throw new ResourceException(

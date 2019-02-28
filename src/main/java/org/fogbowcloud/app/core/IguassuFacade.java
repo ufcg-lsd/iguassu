@@ -19,8 +19,11 @@ public class IguassuFacade {
 
     private IguassuController iguassuController;
 
-    public void init(Properties properties) throws Exception {
-        iguassuController = new IguassuController(properties);
+    public IguassuFacade(IguassuController iguassuController){
+        this.iguassuController = iguassuController;
+    }
+
+    public void init() throws Exception {
         iguassuController.init();
     }
 

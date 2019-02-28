@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
 import org.fogbowcloud.app.core.IguassuController;
 import org.fogbowcloud.app.api.constants.ApiDocumentation;
+import org.fogbowcloud.app.core.IguassuFacade;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -22,12 +23,12 @@ public class NonceController {
 
     @Lazy
     @Autowired
-    IguassuController iguassuController;
+    IguassuFacade iguassuFacade;
 
     @RequestMapping(method = RequestMethod.GET)
     @ApiParam(value = ApiDocumentation.Nonce.GET_OPERATION)
     public ResponseEntity<String> getNonce() {
-        int nonce = this.iguassuController.getNonce();
+        int nonce = this.iguassuFacade.getNonce();
         String nonceStr = String.valueOf(nonce);
         return new ResponseEntity<String>(nonceStr, HttpStatus.OK);
     }
