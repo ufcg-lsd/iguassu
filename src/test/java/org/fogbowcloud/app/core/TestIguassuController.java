@@ -138,7 +138,7 @@ public class TestIguassuController {
         User user = new LDAPUser("testuser", "'this is a test user'");
 
         JDFJob job = new JDFJob(user.getUser(), new ArrayList<Task>(), user.getUsername());
-        Mockito.doReturn(job).when(this.iguassuController).createJobFromJDFFile(
+        Mockito.doReturn(job).when(this.iguassuController).runJobFromJDFFile(
                 Mockito.anyString(),
                 Mockito.any(User.class)
         );

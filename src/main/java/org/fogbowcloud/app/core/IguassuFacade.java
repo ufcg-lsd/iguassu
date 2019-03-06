@@ -1,6 +1,5 @@
 package org.fogbowcloud.app.core;
 
-import org.fogbowcloud.app.core.IguassuController;
 import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.exceptions.NameAlreadyInUseException;
@@ -13,7 +12,6 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 public class IguassuFacade {
 

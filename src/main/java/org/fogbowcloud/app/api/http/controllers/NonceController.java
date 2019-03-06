@@ -2,7 +2,6 @@ package org.fogbowcloud.app.api.http.controllers;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiParam;
-import org.fogbowcloud.app.core.IguassuController;
 import org.fogbowcloud.app.api.constants.ApiDocumentation;
 import org.fogbowcloud.app.core.IguassuFacade;
 import org.springframework.beans.factory.annotation.Autowired;
