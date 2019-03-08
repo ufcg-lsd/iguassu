@@ -12,7 +12,6 @@ import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.blowout.core.BlowoutController;
 import org.fogbowcloud.blowout.core.model.task.*;
 import org.fogbowcloud.blowout.core.model.*;
-import org.fogbowcloud.blowout.infrastructure.exception.InfrastructureException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,7 +31,6 @@ public class TestExecutionMonitorWithDB {
 	private JobDataStore db;
 	private HashMap<String, JDFJob> jobDB;
 
-	@SuppressWarnings("unchecked")
 	@Before
 	public void setUp() {
 		task = spy(new TaskImpl(FAKE_TASK_ID, null, FAKE_UUID));
@@ -45,7 +43,7 @@ public class TestExecutionMonitorWithDB {
 	}
 
 	@Test
-	public void testExecutionMonitor() throws InfrastructureException, InterruptedException {
+	public void testExecutionMonitor() {
 		List<JDFJob> jdfJobs = new ArrayList<>();
 		doReturn("jobId").when(job).getId();
 		doReturn(job).when(jobDB).put("jobId", job);
@@ -67,7 +65,7 @@ public class TestExecutionMonitorWithDB {
 	}
 
 	@Test
-	public void testExecutionMonitorTaskFails() throws InterruptedException {
+	public void testExecutionMonitorTaskFails() {
 		List<JDFJob> jdfJobs = new ArrayList<>();
 		doReturn("jobId").when(job).getId();
 		doReturn(job).when(jobDB).put("jobId", job);
@@ -89,7 +87,7 @@ public class TestExecutionMonitorWithDB {
 	}
 
 	@Test
-	public void testExecutionIsNotOver() throws InfrastructureException, InterruptedException {
+	public void testExecutionIsNotOver() {
 		List<JDFJob> jdfJobs = new ArrayList<>();
 		doReturn("jobId").when(job).getId();
 		doReturn(job).when(jobDB).put("jobId", job);

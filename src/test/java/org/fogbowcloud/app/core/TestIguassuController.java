@@ -28,11 +28,11 @@ import org.mockito.Mockito;
 public class TestIguassuController {
 
     private static final String FAKE_UUID = "1234";
-    private static final String testowner = "testowner";
-    private static final String testtaskid = "testtaskId";
-    private static final String testimage = "testimage";
-    private static final String testPublicKey = "testPublicKey";
-    private static final String testPrivateKeyPath = "testPrivateKeyPath";
+    private static final String TEST_OWNER = "testowner";
+    private static final String TEST_TASK_ID = "testtaskId";
+    private static final String TEST_IMAGE = "testimage";
+    private static final String TEST_PUBLIC_KEY = "testPublicKey";
+    private static final String TEST_PRIVATE_KEY_PATH = "testPrivateKeyPath";
 
     private IguassuController iguassuController;
     private BlowoutController blowoutController;
@@ -47,8 +47,8 @@ public class TestIguassuController {
                 IguassuPropertiesConstants.AUTHENTICATION_PLUGIN,
                 "org.fogbowcloud.app.utils.authenticator.CommonAuthenticator"
         );
-        properties.put(IguassuPropertiesConstants.IGUASSU_PUBLIC_KEY, testPublicKey);
-        properties.put(IguassuPropertiesConstants.IGUASSU_PRIVATE_KEY_FILEPATH, testPrivateKeyPath);
+        properties.put(IguassuPropertiesConstants.IGUASSU_PUBLIC_KEY, TEST_PUBLIC_KEY);
+        properties.put(IguassuPropertiesConstants.IGUASSU_PRIVATE_KEY_FILEPATH, TEST_PRIVATE_KEY_PATH);
         properties.put(IguassuPropertiesConstants.REMOTE_OUTPUT_FOLDER, "/tmp");
         properties.put(IguassuPropertiesConstants.LOCAL_OUTPUT_FOLDER, "/tmp");
 
@@ -74,7 +74,6 @@ public class TestIguassuController {
 
     @After
     public void tearDown() {
-        // FIXME fix test to use the new DB
         this.dataStore.deleteAll();
     }
 
@@ -82,17 +81,17 @@ public class TestIguassuController {
     public void testRestart() throws BlowoutException, JSONException {
         ArrayList<Task> taskList = new ArrayList<>();
         Specification spec = new Specification(
-                testimage,
-                testowner,
-                testPublicKey,
-                testPrivateKeyPath,
+                TEST_IMAGE,
+                TEST_OWNER,
+                TEST_PUBLIC_KEY,
+                TEST_PRIVATE_KEY_PATH,
                 "",
                 ""
         );
-        Task task = new TaskImpl(testtaskid, spec, FAKE_UUID);
+        Task task = new TaskImpl(TEST_TASK_ID, spec, FAKE_UUID);
         taskList.add(task);
 
-        JDFJob job = new JDFJob(testowner, taskList, "");
+        JDFJob job = new JDFJob(TEST_OWNER, taskList, "");
         job.finishCreation();
         this.iguassuController.getJobDataStore().insert(job);
 
@@ -101,35 +100,35 @@ public class TestIguassuController {
         } catch (BlowoutException e) {
             Assert.fail();
         }
-        Assert.assertEquals(1, this.iguassuController.getAllJobs(testowner).size());
-        JDFJob job1 = this.iguassuController.getAllJobs(testowner).get(0);
+        Assert.assertEquals(1, this.iguassuController.getAllJobs(TEST_OWNER).size());
+        JDFJob job1 = this.iguassuController.getAllJobs(TEST_OWNER).get(0);
         assert (job1.equals(job));
-        System.out.println(this.iguassuController.getAllJobs(testowner).get(0).getTaskById(testtaskid).getSpecification().toJSON().toString());
+        System.out.println(this.iguassuController.getAllJobs(TEST_OWNER).get(0).getTaskById(TEST_TASK_ID).getSpecification().toJSON().toString());
 
         Specification spec2 = Specification.fromJSON(
                 new JSONObject(
                         this.iguassuController
-                                .getAllJobs(testowner)
+                                .getAllJobs(TEST_OWNER)
                                 .get(0)
-                                .getTaskById(testtaskid)
+                                .getTaskById(TEST_TASK_ID)
                                 .getSpecification()
                                 .toJSON()
                                 .toString()
                 )
         );
-        Assert.assertEquals(1, this.iguassuController.getAllJobs(testowner).get(0).getTaskList().size());
+        Assert.assertEquals(1, this.iguassuController.getAllJobs(TEST_OWNER).get(0).getTaskList().size());
         assert (spec.equals(spec2));
-        assert (task.equals(this.iguassuController.getAllJobs(testowner).get(0).getTaskList().get(testtaskid)));
-        assert (spec.equals(this.iguassuController.getAllJobs(testowner).get(0).getTaskList().get(testtaskid).getSpecification()));
+        assert (task.equals(this.iguassuController.getAllJobs(TEST_OWNER).get(0).getTaskList().get(TEST_TASK_ID)));
+        assert (spec.equals(this.iguassuController.getAllJobs(TEST_OWNER).get(0).getTaskList().get(TEST_TASK_ID).getSpecification()));
         Mockito.verify(this.blowoutController).addTaskList(taskList);
     }
 
     @Test
     public void testGetJobById() {
         String jobId = "jobId00";
-        JDFJob job = new JDFJob(jobId, testowner, new ArrayList<Task>(), null);
-        doReturn(job).when(dataStore).getByJobId(jobId, testowner);
-        assert (job.equals(this.iguassuController.getJobById(jobId, testowner)));
+        JDFJob job = new JDFJob(jobId, TEST_OWNER, new ArrayList<Task>(), null);
+        doReturn(job).when(dataStore).getByJobId(jobId, TEST_OWNER);
+        assert (job.equals(this.iguassuController.getJobById(jobId, TEST_OWNER)));
     }
 
     @Test
@@ -153,35 +152,35 @@ public class TestIguassuController {
     public void testGetAllJobs() {
         ArrayList<JDFJob> jobs = new ArrayList<>();
         ArrayList<Task> task = new ArrayList<>();
-        jobs.add(new JDFJob("job1", testowner, task, null));
-        jobs.add(new JDFJob("job2", testowner, task, null));
-        jobs.add(new JDFJob("job3", testowner, task, null));
-        jobs.add(new JDFJob("job4", testowner, task, null));
+        jobs.add(new JDFJob("job1", TEST_OWNER, task, null));
+        jobs.add(new JDFJob("job2", TEST_OWNER, task, null));
+        jobs.add(new JDFJob("job3", TEST_OWNER, task, null));
+        jobs.add(new JDFJob("job4", TEST_OWNER, task, null));
 
-        doReturn(jobs).when(this.dataStore).getAllByOwner(testowner);
+        doReturn(jobs).when(this.dataStore).getAllByOwner(TEST_OWNER);
         doNothing().when(this.iguassuController).updateJob(any(JDFJob.class));
 
-        this.iguassuController.getAllJobs(testowner);
+        this.iguassuController.getAllJobs(TEST_OWNER);
 
-        Assert.assertEquals(jobs.size(), this.iguassuController.getAllJobs(testowner).size());
+        Assert.assertEquals(jobs.size(), this.iguassuController.getAllJobs(TEST_OWNER).size());
     }
 
     @Test
     public void testGetAllJobsWithoutAnotherUser() {
         ArrayList<JDFJob> jobs = new ArrayList<>();
         ArrayList<Task> task = new ArrayList<>();
-        jobs.add(new JDFJob(testowner, task, null));
-        jobs.add(new JDFJob(testowner, task, null));
-        jobs.add(new JDFJob(testowner, task, null));
-        jobs.add(new JDFJob(testowner, task, null));
-        doReturn(jobs).when(this.dataStore).getAllByOwner(testowner);
+        jobs.add(new JDFJob(TEST_OWNER, task, null));
+        jobs.add(new JDFJob(TEST_OWNER, task, null));
+        jobs.add(new JDFJob(TEST_OWNER, task, null));
+        jobs.add(new JDFJob(TEST_OWNER, task, null));
+        doReturn(jobs).when(this.dataStore).getAllByOwner(TEST_OWNER);
 
         Assert.assertEquals(0, this.iguassuController.getAllJobs("wrong user owner").size());
 
-        jobs.add(new JDFJob(testowner, task, null));
-        jobs.add(new JDFJob(testowner, task, null));
-        jobs.add(new JDFJob(testowner, task, null));
-        jobs.add(new JDFJob(testowner, task, null));
+        jobs.add(new JDFJob(TEST_OWNER, task, null));
+        jobs.add(new JDFJob(TEST_OWNER, task, null));
+        jobs.add(new JDFJob(TEST_OWNER, task, null));
+        jobs.add(new JDFJob(TEST_OWNER, task, null));
 
         Assert.assertEquals(0, this.iguassuController.getAllJobs("wrong user owner").size());
 
@@ -194,63 +193,63 @@ public class TestIguassuController {
         String jobName = "jobName00";
         ArrayList<JDFJob> jobs = new ArrayList<>();
         ArrayList<Task> task = new ArrayList<>();
-        JDFJob jdfJob = new JDFJob(testowner, task, null);
+        JDFJob jdfJob = new JDFJob(TEST_OWNER, task, null);
         jdfJob.setFriendlyName(jobName);
         jobs.add(jdfJob);
-        jobs.add(new JDFJob(testowner, task, null));
-        jobs.add(new JDFJob(testowner, task, null));
+        jobs.add(new JDFJob(TEST_OWNER, task, null));
+        jobs.add(new JDFJob(TEST_OWNER, task, null));
 
-        jobs.add(new JDFJob(testowner, task, null));
-        jobs.add(new JDFJob(testowner, task, null));
+        jobs.add(new JDFJob(TEST_OWNER, task, null));
+        jobs.add(new JDFJob(TEST_OWNER, task, null));
 
-        doReturn(jobs).when(this.dataStore).getAllByOwner(testowner);
+        doReturn(jobs).when(this.dataStore).getAllByOwner(TEST_OWNER);
 
-        this.iguassuController.getJobByName(jobName, testowner);
-        assert (jdfJob.equals(this.iguassuController.getJobByName(jobName, testowner)));
+        this.iguassuController.getJobByName(jobName, TEST_OWNER);
+        assert (jdfJob.equals(this.iguassuController.getJobByName(jobName, TEST_OWNER)));
     }
 
     @Test
     public void testStopJob() {
         String jobName = "jobName00";
-        JDFJob jdfJob = new JDFJob(testowner, new ArrayList<Task>(), null);
+        JDFJob jdfJob = new JDFJob(TEST_OWNER, new ArrayList<Task>(), null);
         jdfJob.setFriendlyName(jobName);
-        doReturn(true).when(this.dataStore).deleteByJobId(jdfJob.getId(), testowner);
+        doReturn(true).when(this.dataStore).deleteByJobId(jdfJob.getId(), TEST_OWNER);
         doNothing().when(iguassuController).updateJob(any(JDFJob.class));
         doNothing().when(blowoutController).cleanTask(any(Task.class));
-        doReturn(jdfJob).when(iguassuController).getJobByName(jobName, testowner);
+        doReturn(jdfJob).when(iguassuController).getJobByName(jobName, TEST_OWNER);
         // update DB Map
-        this.iguassuController.stopJob(jobName, testowner);
+        this.iguassuController.stopJob(jobName, TEST_OWNER);
 
-        Mockito.verify(this.dataStore).deleteByJobId(jdfJob.getId(), testowner);
+        Mockito.verify(this.dataStore).deleteByJobId(jdfJob.getId(), TEST_OWNER);
     }
 
     @Test
     public void testStopJobWithId() {
         ArrayList<JDFJob> jobs = new ArrayList<>();
         ArrayList<Task> task = new ArrayList<>();
-        JDFJob jdfJob = new JDFJob(testowner, task, null);
+        JDFJob jdfJob = new JDFJob(TEST_OWNER, task, null);
         jobs.add(jdfJob);
-        jobs.add(new JDFJob("job1", testowner, task, null));
-        jobs.add(new JDFJob("job2", testowner, task, null));
+        jobs.add(new JDFJob("job1", TEST_OWNER, task, null));
+        jobs.add(new JDFJob("job2", TEST_OWNER, task, null));
 
-        doReturn(jobs).when(this.dataStore).getAllByOwner(testowner);
-        doReturn(true).when(this.dataStore).deleteByJobId(jdfJob.getId(), testowner);
+        doReturn(jobs).when(this.dataStore).getAllByOwner(TEST_OWNER);
+        doReturn(true).when(this.dataStore).deleteByJobId(jdfJob.getId(), TEST_OWNER);
         doNothing().when(iguassuController).updateJob(any(JDFJob.class));
         doNothing().when(blowoutController).cleanTask(any(Task.class));
-        doReturn(jdfJob).when(this.dataStore).getByJobId(jdfJob.getId(), testowner);
+        doReturn(jdfJob).when(this.dataStore).getByJobId(jdfJob.getId(), TEST_OWNER);
         // update DB Map
-        this.iguassuController.stopJob(jdfJob.getId(), testowner);
+        this.iguassuController.stopJob(jdfJob.getId(), TEST_OWNER);
 
-        Mockito.verify(this.dataStore).deleteByJobId(jdfJob.getId(), testowner);
+        Mockito.verify(this.dataStore).deleteByJobId(jdfJob.getId(), TEST_OWNER);
     }
 
     @Test
     public void testGetTaskById() {
-        Task task = new TaskImpl(testtaskid, new Specification(
-                testimage,
-                testowner,
-                testPublicKey,
-                testPrivateKeyPath,
+        Task task = new TaskImpl(TEST_TASK_ID, new Specification(
+                TEST_IMAGE,
+                TEST_OWNER,
+                TEST_PUBLIC_KEY,
+                TEST_PRIVATE_KEY_PATH,
                 "",
                 ""
         ), FAKE_UUID);
@@ -258,12 +257,12 @@ public class TestIguassuController {
         tasks.add(task);
 
         ArrayList<JDFJob> jobs = new ArrayList<>();
-        JDFJob jdfJob = new JDFJob(testowner, tasks, null);
+        JDFJob jdfJob = new JDFJob(TEST_OWNER, tasks, null);
         jobs.add(jdfJob);
 
-        doReturn(jobs).when(this.dataStore).getAllByOwner(testowner);
-        assert (jobs.get(0).equals(this.iguassuController.getAllJobs(testowner).get(0)));
-        Assert.assertEquals(task, this.iguassuController.getTaskById(testtaskid, testowner));
+        doReturn(jobs).when(this.dataStore).getAllByOwner(TEST_OWNER);
+        assert (jobs.get(0).equals(this.iguassuController.getAllJobs(TEST_OWNER).get(0)));
+        Assert.assertEquals(task, this.iguassuController.getTaskById(TEST_TASK_ID, TEST_OWNER));
 
         jdfJob.addTask(task);
         // jdfJob.run(task);
@@ -272,18 +271,18 @@ public class TestIguassuController {
         doNothing().when(iguassuController).updateJob(any(JDFJob.class));
         // update DB Map
 
-        Assert.assertEquals(jobs, this.iguassuController.getAllJobs(testowner));
-        Assert.assertEquals(task, this.iguassuController.getTaskById(testtaskid, testowner));
+        Assert.assertEquals(jobs, this.iguassuController.getAllJobs(TEST_OWNER));
+        Assert.assertEquals(task, this.iguassuController.getTaskById(TEST_TASK_ID, TEST_OWNER));
     }
 
     @Test
     public void testTaskStateAfterControllerRestart() {
         doReturn(TaskState.READY).when(this.blowoutController).getTaskState(anyString());
         Specification spec = new Specification(
-                testimage,
-                testowner,
-                testPublicKey,
-                testPrivateKeyPath,
+                TEST_IMAGE,
+                TEST_OWNER,
+                TEST_PUBLIC_KEY,
+                TEST_PRIVATE_KEY_PATH,
                 "",
                 ""
         );
