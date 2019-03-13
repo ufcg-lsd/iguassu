@@ -14,12 +14,9 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @CrossOrigin
 @EnableWebMvc
 @RestController
-@RequestMapping(value = NonceController.NONCE_ENDPOINT)
+@RequestMapping(value = ApiDocumentation.ApiEndpoints.NONCE_ENDPOINT)
 @Api(description = ApiDocumentation.Nonce.API)
 public class NonceController {
-
-    public static final String NONCE_ENDPOINT = "nonce";
-
     @Lazy
     @Autowired
     IguassuFacade iguassuFacade;

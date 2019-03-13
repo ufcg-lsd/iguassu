@@ -18,12 +18,9 @@ import java.util.List;
 
 @CrossOrigin
 @RestController
-@RequestMapping(value = OAuthTokenController.OAUTH_TOKEN_ENDPOINT)
+@RequestMapping(value = ApiDocumentation.ApiEndpoints.OAUTH_TOKEN_ENDPOINT)
 @Api(description = ApiDocumentation.OAuthToken.API)
 public class OAuthTokenController {
-
-    public static final String OAUTH_TOKEN_ENDPOINT = "oauthtoken";
-
     private final Logger LOGGER = Logger.getLogger(OAuthTokenController.class);
 
     @Lazy
@@ -42,7 +39,7 @@ public class OAuthTokenController {
         LOGGER.info("Saving new OAuth Token.");
 
         this.oAuthService.storeOAuthToken(oAuthToken);
-        return new ResponseEntity<OAuthToken>(oAuthToken, HttpStatus.CREATED);
+        return new ResponseEntity<>(oAuthToken, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/{ownerUsername}", method = RequestMethod.GET)
@@ -63,10 +60,9 @@ public class OAuthTokenController {
         LOGGER.info("Retrieving all OAuth tokens.");
 
         List<OAuthToken> list = this.oAuthService.getAll();
-        return new ResponseEntity<List<OAuthToken>>(list, HttpStatus.CREATED);
+        return new ResponseEntity<>(list, HttpStatus.CREATED);
     }
 
-    // TODO: delete this endpoints after tests
     @RequestMapping(method = RequestMethod.DELETE)
     @ApiOperation(value = ApiDocumentation.OAuthToken.DELETE_OPERATION)
     public ResponseEntity deleteAllOAuthTokens() {

@@ -16,9 +16,9 @@ import static org.fogbowcloud.app.api.constants.ApiDocumentation.*;
 @Configuration
 public class SwaggerConfiguration {
 
-	public static final String BASE_PACKAGE = "org.fogbowcloud.app.api.http";
+	private static final String BASE_PACKAGE = "org.fogbowcloud.app.api.http";
 
-	public static final Contact CONTACT = new Contact(
+	private static final Contact CONTACT = new Contact(
 			ApiInfo.CONTACT_NAME,
 			ApiInfo.CONTACT_URL,
 			ApiInfo.CONTACT_EMAIL);

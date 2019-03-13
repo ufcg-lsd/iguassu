@@ -197,10 +197,15 @@ public class IguassuController {
                 this.createdJobs.remove(jobToRemove.getId());
             }
             this.jobDataStore.deleteByJobId(jobToRemove.getId(), owner);
+
+            LOGGER.info("Removing Job " + jobToRemove.getId());
+            this.blowoutController.cleanTasks(jobToRemove.getTasks());
+            /*
             for (Task task : jobToRemove.getTasks()) {
                 LOGGER.info("Removing task " + task.getId() + " from job.");
                 this.blowoutController.cleanTask(task);
             }
+            */
             return jobToRemove.getId();
         }
         return null;
