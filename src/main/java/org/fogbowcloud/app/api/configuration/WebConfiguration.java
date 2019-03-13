@@ -8,10 +8,13 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 @Configuration
 @EnableWebMvc
 public class WebConfiguration extends WebMvcConfigurerAdapter {
+    private static final String[] HTTP_METHODS_SUPPORTED = { "GET", "POST", "PUT", "DELETE" };
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedMethods("HEAD", "GET", "PUT", "POST", "DELETE", "PATCH");
+                .allowedOrigins("*").
+                allowedHeaders("*")
+                .allowedMethods(HTTP_METHODS_SUPPORTED);
     }
 }
