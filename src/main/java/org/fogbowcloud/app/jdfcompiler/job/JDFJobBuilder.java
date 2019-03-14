@@ -30,7 +30,7 @@ public class JDFJobBuilder {
 	// FIXME: what is this?
 	private static final String SANDBOX = "sandbox";
 	private static final String SSH_SCP_PRECOMMAND = "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no";
-	private static final String DEFAULT_IMAGE = "default-compute-image";
+	private static final String DEFAULT_FLAVOR_NAME = "default-compute-flavor";
 	private final Properties properties;
 
 	public JDFJobBuilder(Properties properties) {
@@ -65,17 +65,17 @@ public class JDFJobBuilder {
 
 				jobRequirements = jobRequirements.replace("(", "").replace(")", "");
 
-				String image = this.properties.getProperty(DEFAULT_IMAGE);
+				String imageName = this.properties.getProperty(DEFAULT_FLAVOR_NAME);
+				String cloudName = this.properties.getProperty(IguassuPropertiesConstants.DEFAULT_CLOUD_NAME);
 
 				for (String req : jobRequirements.split("and")) {
 					if (req.trim().startsWith("image")) {
-						image = req.split("==")[1].trim();
+						imageName = req.split("==")[1].trim();
 					}
 				}
 
 				Specification spec = new Specification(
-						this.properties.getProperty(IguassuPropertiesConstants.DEFAULT_CLOUD_NAME),
-						image,
+						imageName,
 						this.properties.getProperty(IguassuPropertiesConstants.INFRA_PROVIDER_USERNAME),
 						this.properties.getProperty(IguassuPropertiesConstants.IGUASSU_PUBLIC_KEY),
 						this.properties.getProperty(IguassuPropertiesConstants.IGUASSU_PRIVATE_KEY_FILEPATH),
