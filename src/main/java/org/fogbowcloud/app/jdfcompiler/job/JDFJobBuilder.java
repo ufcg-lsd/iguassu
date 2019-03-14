@@ -74,6 +74,7 @@ public class JDFJobBuilder {
 				}
 
 				Specification spec = new Specification(
+						this.properties.getProperty(IguassuPropertiesConstants.DEFAULT_CLOUD_NAME),
 						image,
 						this.properties.getProperty(IguassuPropertiesConstants.INFRA_PROVIDER_USERNAME),
 						this.properties.getProperty(IguassuPropertiesConstants.IGUASSU_PUBLIC_KEY),
@@ -81,6 +82,7 @@ public class JDFJobBuilder {
 						"",
 						""
 				);
+				LOGGER.debug(this.properties.getProperty(IguassuPropertiesConstants.DEFAULT_CLOUD_NAME));
 				LOGGER.debug(this.properties.getProperty(IguassuPropertiesConstants.INFRA_PROVIDER_USERNAME));
 
 				int i = 0;
