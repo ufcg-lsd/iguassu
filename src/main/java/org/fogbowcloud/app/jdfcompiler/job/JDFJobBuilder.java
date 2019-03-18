@@ -31,6 +31,11 @@ public class JDFJobBuilder {
 	private static final String SANDBOX = "sandbox";
 	private static final String SSH_SCP_PRECOMMAND = "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no";
 	private static final String DEFAULT_FLAVOR_NAME = "default-compute-flavor";
+	private static final String ENV_PRIVATE_KEY_FILE = "PRIVATE_KEY_FILE";
+	private static final String ENV_HOST = "HOST";
+	private static final String ENV_SSH_PORT = "SSH_PORT";
+	private static final String ENV_SSH_USER = "SSH_USER";
+
 	private final Properties properties;
 
 	public JDFJobBuilder(Properties properties) {
@@ -75,6 +80,7 @@ public class JDFJobBuilder {
 				}
 
 				Specification spec = new Specification(
+						cloudName,
 						imageName,
 						this.properties.getProperty(IguassuPropertiesConstants.INFRA_PROVIDER_USERNAME),
 						this.properties.getProperty(IguassuPropertiesConstants.IGUASSU_PUBLIC_KEY),
@@ -248,9 +254,9 @@ public class JDFJobBuilder {
 	}
 
 	private Command stageInCommand(String localFile, String remoteFile) {
-		String scpCommand = "scp " + SSH_SCP_PRECOMMAND + " -P $" + AbstractResource.ENV_SSH_PORT
-				+ " -i $" + AbstractResource.ENV_PRIVATE_KEY_FILE + " " + localFile + " $"
-				+ AbstractResource.ENV_SSH_USER + "@" + "$" + AbstractResource.ENV_HOST + ":" + remoteFile;
+		String scpCommand = "scp " + SSH_SCP_PRECOMMAND + " -P $" + ENV_SSH_PORT
+				+ " -i $" + ENV_PRIVATE_KEY_FILE + " " + localFile + " $"
+				+ ENV_SSH_USER + "@" + "$" + ENV_HOST + ":" + remoteFile;
 		return new Command(scpCommand, Command.Type.LOCAL);
 	}
 
@@ -269,9 +275,9 @@ public class JDFJobBuilder {
 	}
 
 	private Command stageOutCommand(String remoteFile, String localFile) {
-		String scpCommand = "scp " + SSH_SCP_PRECOMMAND + " -P $" + AbstractResource.ENV_SSH_PORT
-				+ " -i $" + AbstractResource.ENV_PRIVATE_KEY_FILE + " $" + AbstractResource.ENV_SSH_USER + "@" + "$"
-				+ AbstractResource.ENV_HOST + ": " + remoteFile + " " + localFile;
+		String scpCommand = "scp " + SSH_SCP_PRECOMMAND + " -P $" + ENV_SSH_PORT
+				+ " -i $" + AbstractResource.ENV_PRIVATE_KEY_FILE + " $" + ENV_SSH_USER + "@" + "$"
+				+ ENV_HOST + ": " + remoteFile + " " + localFile;
 		return new Command(scpCommand, Command.Type.LOCAL);
 	}
 

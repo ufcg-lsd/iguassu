@@ -112,13 +112,14 @@ public class TestExecutionMonitorWithDB {
 	@Test
 	public void testExecutionMonitorRunningWithUpdatedList() {
 		doReturn(TaskState.READY).when(this.iguassuController).getTaskState(anyString());
-
-		String user = "testuser";
-		String username = "'this is a test user'";
-		String testImage = "testimage";
-		String testPublicKey = "testPublicKey";
-		String testPrivateKeyPath = "testPrivateKeyPath";
+		final String cloudName = "fake-cloud-name";
+		final String user = "testuser";
+		final String username = "'this is a test user'";
+		final String testImage = "testimage";
+		final String testPublicKey = "testPublicKey";
+		final String testPrivateKeyPath = "testPrivateKeyPath";
 		Specification spec = new Specification(
+				cloudName,
 				testImage,
 				user,
 				testPublicKey,
