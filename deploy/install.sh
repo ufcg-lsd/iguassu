@@ -1,10 +1,16 @@
 #!/bin/bash
 
-DIR_PATH="${PWD}"
+MY_PATH="`dirname \"$0\"`"              # relative
+MY_PATH="`( cd \"$MY_PATH\" && pwd )`"  # absolutized and normalized
+if [ -z "$MY_PATH" ] ; then
+  # error; for some reason, the path is not accessible
+  # to the script (e.g. permissions re-evaled after suid)
+  exit 1  # fail
+fi
 
-echo "Dir path: "$DIR_PATH
+echo "Dir path: "$MY_PATH
 
-HOSTS_CONF_FILE=$DIR_PATH"/hosts.conf"
+HOSTS_CONF_FILE=$MY_PATH"/hosts.conf"
 echo "hosts.conf file path:" $HOST_CONF_FILE
 
 IGUASSU_HOST_IP_PATTERN="iguassu_host_ip"
