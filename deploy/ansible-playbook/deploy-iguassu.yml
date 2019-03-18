@@ -11,4 +11,4 @@
       shell: "{{ deploy_script }}"
       become: yes
     - name: Cleaning up
-      shell: rm -rf deploy-docker.sh install-docker.sh conf-files/ 
+      shell: rm -rf deploy-docker.sh install-docker.sh conf-files/ .ansible/

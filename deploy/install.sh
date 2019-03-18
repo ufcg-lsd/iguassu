@@ -32,8 +32,17 @@ IGUASSU_CONF_FILES_PATH=$(grep $IGUASSU_CONF_FILES_PATH_PATTERN $HOSTS_CONF_FILE
 DASHBOARD_CONF_FILES_PATH_PATTERN="dashboard_conf_files_path"
 DASHBOARD_CONF_FILES_PATH=$(grep $DASHBOARD_CONF_FILES_PATH_PATTERN $HOSTS_CONF_FILE | awk -F "=" '{print $2}')
 
+#ansible-playbook path
 ANSIBLE_FILES_PATH_PATTERN="ansible_files_path"
 ANSIBLE_FILES_PATH=$(grep $ANSIBLE_FILES_PATH_PATTERN $HOSTS_CONF_FILE | awk -F "=" '{print $2}')
+
+#scripts_files_path
+SCRIPTS_FILES_PATH_PATTERN="scripts_files_path"
+SCRIPTS_FILES_PATH=$(grep $SCRIPTS_FILES_PATH_PATTERN $HOSTS_CONF_FILE | awk -F "=" '{print $2}')
+
+#private key to send to the container
+PRIVATE_KEY_TO_CONTAINER_PATTERN="private_key_to_container"
+PRIVATE_KEY_TO_CONTAINER=$(grep $PRIVATE_KEY_TO_CONTAINER_PATTERN $HOSTS_CONF_FILE | awk -F "=" '{print $2}')
 
 ANSIBLE_PLAYBOOK_FILE=$ANSIBLE_FILES_PATH/"ansible-playbook"
 ANSIBLE_HOSTS_FILE=$ANSIBLE_FILES_PATH/"hosts"
@@ -41,9 +50,9 @@ ANSIBLE_CFG_FILE=$ANSIBLE_FILES_PATH/"ansible.cfg"
 
 echo "Ansible ssh private key file path: $PRIVATE_KEY_FILE_PATH"
 echo "Remote user in host: $REMOTE_USER"
-
 echo "Iguassu host ip: " $IGUASSU_HOST_IP
 echo "Remote User: " $REMOTE_USER
+echo "Private key to container: " $PRIVATE_KEY_TO_CONTAINER
 
 #Testing ssh-port
 SSH_PORT_STATUS=$(nmap $IGUASSU_HOST_IP -PN -p ssh | egrep 'open|closed|filtered')
@@ -76,11 +85,13 @@ PATH_VM="/home/$REMOTE_USER"
 echo "Path to add configuration files: $PATH_VM"
 
 # sends the configuration files (backend-confs/frontend-confs)
-ssh -i $PRIVATE_KEY_FILE_PATH $REMOTE_USER@$IGUASSU_HOST_IP 'mkdir conf-files && cd conf-files'
-scp -i $PRIVATE_KEY_FILE_PATH -r $IGUASSU_CONF_FILES_PATH    $REMOTE_USER@$IGUASSU_HOST_IP:$PATH_VM/conf-files
+ssh -i $PRIVATE_KEY_FILE_PATH $REMOTE_USER@$IGUASSU_HOST_IP 'mkdir conf-files && cd conf-files && mkdir secret'
+scp -i $PRIVATE_KEY_FILE_PATH -r $IGUASSU_CONF_FILES_PATH     $REMOTE_USER@$IGUASSU_HOST_IP:$PATH_VM/conf-files
 scp -i $PRIVATE_KEY_FILE_PATH -r $DASHBOARD_CONF_FILES_PATH   $REMOTE_USER@$IGUASSU_HOST_IP:$PATH_VM/conf-files
+scp -i $PRIVATE_KEY_FILE_PATH -r $PRIVATE_KEY_TO_CONTAINER    $REMOTE_USER@$IGUASSU_HOST_IP:$PATH_VM/conf-files/secret
+
 # sends the deploy script
-scp -i $PRIVATE_KEY_FILE_PATH -r $DIR_PATH/scripts/* $REMOTE_USER@$IGUASSU_HOST_IP:$PATH_VM
+scp -i $PRIVATE_KEY_FILE_PATH -r $SCRIPTS_FILES_PATH/* $REMOTE_USER@$IGUASSU_HOST_IP:$PATH_VM
 
 # run ansible
 DEPLOY_IGUASSU_YML_FILE="deploy-iguassu.yml"
