@@ -1,51 +1,82 @@
 #!/bin/bash
 
-DIR_PATH=$(pwd)
+DIR_PATH="${PWD}"
 
-HOSTS_CONF_FILE=$DIR_PATH/"conf-files"/"hosts.conf"
+echo "Dir path: "$DIR_PATH
 
-ANSIBLE_FILES_DIR=$DIR_PATH/"ansible-playbook"
-ANSIBLE_HOSTS_FILE=$ANSIBLE_FILES_DIR/"hosts"
-ANSIBLE_CFG_FILE=$ANSIBLE_FILES_DIR/"ansible.cfg"
+HOSTS_CONF_FILE=$DIR_PATH"/hosts.conf"
+echo "hosts.conf file path:" $HOST_CONF_FILE
 
 IGUASSU_HOST_IP_PATTERN="iguassu_host_ip"
 IGUASSU_HOST_IP=$(grep $IGUASSU_HOST_IP_PATTERN $HOSTS_CONF_FILE | awk -F "=" '{print $2}')
-
-echo "Iguassu host ip:" $IGUASSU_HOST_IP
-
-# WRITES THE IP ADDRESS IN HOST FILE
-# DELETE EVERYTHING BETWEEN [iguassu-machine] AND [iguassu-machine:vars] AND THEN WRITE IP
-sed -i 's/\[iguassu-machine\].*\[iguassu-machine:vars\]/[iguassu-machine]\n\n[iguassu-machine:vars]/' $ANSIBLE_HOSTS_FILE
-sed -i "2s/.*/$IGUASSU_HOST_IP/" $ANSIBLE_HOSTS_FILE
-
-
-# Ansible ssh private key file path
-PRIVATE_KEY_FILE_PATH_PATTERN="ansible_ssh_private_key_file"
-PRIVATE_KEY_FILE_PATH=$(grep $PRIVATE_KEY_FILE_PATH_PATTERN $HOSTS_CONF_FILE | awk -F "=" '{print $2}')
-
-echo "Ansible ssh private key file path: $PRIVATE_KEY_FILE_PATH"
-sed -i "s#.*$PRIVATE_KEY_FILE_PATH_PATTERN=.*#$PRIVATE_KEY_FILE_PATH_PATTERN=$PRIVATE_KEY_FILE_PATH#g" $ANSIBLE_HOSTS_FILE
-
 
 # Remove user of VM
 REMOTE_USER_PATTERN="remote_user"
 REMOTE_USER=$(grep $REMOTE_USER_PATTERN $HOSTS_CONF_FILE | awk -F "=" '{print $2}')
 
+# Ansible ssh private key file path
+PRIVATE_KEY_FILE_PATH_PATTERN="ansible_ssh_private_key_file"
+PRIVATE_KEY_FILE_PATH=$(grep $PRIVATE_KEY_FILE_PATH_PATTERN $HOSTS_CONF_FILE | awk -F "=" '{print $2}')
+
+# Iguassu conf-files path
+IGUASSU_CONF_FILES_PATH_PATTERN="iguassu_conf_files_path"
+IGUASSU_CONF_FILES_PATH=$(grep $IGUASSU_CONF_FILES_PATH_PATTERN $HOSTS_CONF_FILE | awk -F "=" '{print $2}')
+
+# Iguassu-dashboard conf-files path
+DASHBOARD_CONF_FILES_PATH_PATTERN="dashboard_conf_files_path"
+DASHBOARD_CONF_FILES_PATH=$(grep $DASHBOARD_CONF_FILES_PATH_PATTERN $HOSTS_CONF_FILE | awk -F "=" '{print $2}')
+
+ANSIBLE_FILES_PATH_PATTERN="ansible_files_path"
+ANSIBLE_FILES_PATH=$(grep $ANSIBLE_FILES_PATH_PATTERN $HOSTS_CONF_FILE | awk -F "=" '{print $2}')
+
+ANSIBLE_PLAYBOOK_FILE=$ANSIBLE_FILES_PATH/"ansible-playbook"
+ANSIBLE_HOSTS_FILE=$ANSIBLE_FILES_PATH/"hosts"
+ANSIBLE_CFG_FILE=$ANSIBLE_FILES_PATH/"ansible.cfg"
+
+echo "Ansible ssh private key file path: $PRIVATE_KEY_FILE_PATH"
 echo "Remote user in host: $REMOTE_USER"
+
+echo "Iguassu host ip: " $IGUASSU_HOST_IP
+echo "Remote User: " $REMOTE_USER
+
+#Testing ssh-port
+SSH_PORT_STATUS=$(nmap $IGUASSU_HOST_IP -PN -p ssh | egrep 'open|closed|filtered')
+echo "SSH port status: " $SSH_PORT_STATUS
+
+#Testing Connection
+ssh -i $PRIVATE_KEY_FILE_PATH -q $REMOTE_USER@$IGUASSU_HOST_IP exit
+RETURN_TEST=$?
+echo "Status Connection: " $RETURN_TEST
+
+if [ $RETURN_TEST -eq 0 ]; then
+    echo "successful connection test"
+else
+    echo "the ssh connection failed"
+    exit
+fi
+
+# DELETE EVERYTHING BETWEEN [iguassu-machine] AND [iguassu-machine:vars]
+sed -i 's/\[iguassu-machine\].*\[iguassu-machine:vars\]/[iguassu-machine]\n\n[iguassu-machine:vars]/' $ANSIBLE_HOSTS_FILE
+# WRITES THE IP ADDRESS IN HOST FILE
+sed -i "2s/.*/$IGUASSU_HOST_IP/" $ANSIBLE_HOSTS_FILE
+
+#WRITES THE SSH PRIVATE KEY FILE PATH IN HOST FILE
+sed -i "s#.*$PRIVATE_KEY_FILE_PATH_PATTERN=.*#$PRIVATE_KEY_FILE_PATH_PATTERN=$PRIVATE_KEY_FILE_PATH#g" $ANSIBLE_HOSTS_FILE
+
+#WRITES THE SSH PRIVATE KEY FILE PATH IN HOST FILE
 sed -i "s/.*$REMOTE_USER_PATTERN = .*/$REMOTE_USER_PATTERN = $REMOTE_USER/" $ANSIBLE_CFG_FILE
 
 PATH_VM="/home/$REMOTE_USER"
 echo "Path to add configuration files: $PATH_VM"
 
-# creates the folder and sends the configuration files (backend-confs/frontend-confs)
-ssh $REMOTE_USER@$IGUASSU_HOST_IP 'mkdir conf-files'
-scp -r $DIR_PATH/conf-files/backend-confs    $REMOTE_USER@$IGUASSU_HOST_IP:$PATH_VM/conf-files
-scp -r $DIR_PATH/conf-files/frontend-confs   $REMOTE_USER@$IGUASSU_HOST_IP:$PATH_VM/conf-files
-
+# sends the configuration files (backend-confs/frontend-confs)
+ssh -i $PRIVATE_KEY_FILE_PATH $REMOTE_USER@$IGUASSU_HOST_IP 'mkdir conf-files && cd conf-files'
+scp -i $PRIVATE_KEY_FILE_PATH -r $IGUASSU_CONF_FILES_PATH    $REMOTE_USER@$IGUASSU_HOST_IP:$PATH_VM/conf-files
+scp -i $PRIVATE_KEY_FILE_PATH -r $DASHBOARD_CONF_FILES_PATH   $REMOTE_USER@$IGUASSU_HOST_IP:$PATH_VM/conf-files
 # sends the deploy script
-scp $DIR_PATH/deploy-docker.sh $REMOTE_USER@$IGUASSU_HOST_IP:$PATH_VM
+scp -i $PRIVATE_KEY_FILE_PATH -r $DIR_PATH/scripts/* $REMOTE_USER@$IGUASSU_HOST_IP:$PATH_VM
 
 # run ansible
-DEPLOY_IGUASSU_FILE_PATH="deploy-iguassu.yml"
+DEPLOY_IGUASSU_YML_FILE="deploy-iguassu.yml"
 
-(cd ansible-playbook && ansible-playbook $DEPLOY_IGUASSU_FILE_PATH)
+(cd $ANSIBLE_FILES_PATH && ansible-playbook $DEPLOY_IGUASSU_YML_FILE)
