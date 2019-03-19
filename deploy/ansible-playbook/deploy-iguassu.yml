@@ -7,7 +7,7 @@
     - name: Installing Docker
       shell: "{{ install_script }}"
       become: yes
-    - name: Deploying Iguassu in Iguassu Machine
+    - name: Deploying Iguassu to the Iguassu Machine
       shell: "{{ deploy_script }}"
       become: yes
     - name: Cleaning up
