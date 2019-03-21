@@ -1,13 +1,14 @@
 ---
 - hosts: iguassu-machine
+  vars:
+    install_script: bash install-docker.sh
+    deploy_script: bash deploy-docker.sh
   tasks:
     - name: Installing Docker
-      apt: pkg=docker.io state=latest update_cache=yes cache_valid_time=3600
+      shell: "{{ install_script }}"
       become: yes
-- hosts: iguassu-machine
-  vars:
-    deploy_script_runner: bash deploy-docker.sh
-  tasks:
-    - name: Deploying iguassu in Iguassu Machine
-      shell: "{{ deploy_script_runner }}"
+    - name: Deploying Iguassu to the Iguassu Machine
+      shell: "{{ deploy_script }}"
       become: yes
+    - name: Cleaning up
+      shell: rm -rf deploy-docker.sh install-docker.sh conf-files/ .ansible/
