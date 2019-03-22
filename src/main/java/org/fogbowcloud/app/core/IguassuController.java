@@ -12,7 +12,6 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.core.exceptions.IguassuException;
-import org.fogbowcloud.app.core.exceptions.NameAlreadyInUseException;
 import org.fogbowcloud.app.external.ExternalOAuthController;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
@@ -128,16 +127,9 @@ public class IguassuController {
     }
 
     public String addJob(String jdfFilePath, User owner)
-            throws CompilerException, NameAlreadyInUseException, BlowoutException, IOException {
+            throws CompilerException, IOException {
         LOGGER.debug("Adding job  of owner " + owner.getUsername() + " to scheduler");
         JDFJob job = createJobFromJDFFile(jdfFilePath, owner);
-        if (job.getName() != null &&
-                !job.getName().trim().isEmpty() &&
-                getJobByName(job.getName(), owner.getUser()) != null) {
-            throw new NameAlreadyInUseException(
-                    "The job name '" + job.getName() + "' is already in use for the user '" + owner.getUser() + "'."
-            );
-        }
 
         jobDataStore.insert(job);
         return job.getId();

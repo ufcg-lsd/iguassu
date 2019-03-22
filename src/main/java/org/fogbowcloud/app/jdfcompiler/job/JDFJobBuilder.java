@@ -276,7 +276,7 @@ public class JDFJobBuilder {
 
 	private Command stageOutCommand(String remoteFile, String localFile) {
 		String scpCommand = "scp " + SSH_SCP_PRECOMMAND + " -P $" + ENV_SSH_PORT
-				+ " -i $" + AbstractResource.ENV_PRIVATE_KEY_FILE + " $" + ENV_SSH_USER + "@" + "$"
+				+ " -i $" + ENV_PRIVATE_KEY_FILE + " $" + ENV_SSH_USER + "@" + "$"
 				+ ENV_HOST + ": " + remoteFile + " " + localFile;
 		return new Command(scpCommand, Command.Type.LOCAL);
 	}

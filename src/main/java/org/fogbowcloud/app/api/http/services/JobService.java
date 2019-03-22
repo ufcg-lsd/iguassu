@@ -2,7 +2,6 @@ package org.fogbowcloud.app.api.http.services;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.IguassuController;
-import org.fogbowcloud.app.core.exceptions.NameAlreadyInUseException;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
 import org.fogbowcloud.app.core.exceptions.ResourceException;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
@@ -56,7 +55,7 @@ public class JobService {
     }
 
     public String addJob(String jdfFilePath, User owner)
-            throws CompilerException, NameAlreadyInUseException, BlowoutException, IOException {
+            throws CompilerException, BlowoutException, IOException {
         return this.iguassuController.addJob(jdfFilePath, owner);
     }
 

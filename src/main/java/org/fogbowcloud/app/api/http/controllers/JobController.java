@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.ApiDocumentation;
-import org.fogbowcloud.app.core.exceptions.NameAlreadyInUseException;
 import org.fogbowcloud.app.api.exceptions.StorageException;
 import org.fogbowcloud.app.api.http.services.FileSystemStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
@@ -122,7 +121,7 @@ public class JobController {
         } catch (CompilerException ce) {
             LOGGER.error(ce.getMessage(), ce);
             throw new StorageException("Could not compile JDF file.", ce);
-        } catch (NameAlreadyInUseException | BlowoutException iae) {
+        } catch (BlowoutException iae) {
             LOGGER.error(iae.getMessage(), iae);
             throw new StorageException(iae.getMessage());
         } catch (IOException e) {
