@@ -10,7 +10,6 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.core.exceptions.IguassuException;
-import org.fogbowcloud.app.core.exceptions.NameAlreadyInUseException;
 import org.fogbowcloud.app.external.ExternalOAuthController;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
@@ -130,7 +129,6 @@ public class IguassuController {
                     "The job name '" + job.getName() + "' is already in use for the user '" + owner.getUser() + "'."
             );
         }
-
         jobDataStore.insert(job);
         return job.getId();
     }

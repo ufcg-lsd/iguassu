@@ -3,6 +3,7 @@ package org.fogbowcloud.app.core.constants;
 public class IguassuPropertiesConstants {
 
 	public static final String DEFAULT_COMPUTE_FLAVOR_SPEC = "default_compute_flavor_spec";
+	public static final String DEFAULT_CLOUD_NAME = "default-cloud-name";
 	public static final String REMOVE_PREVIOUS_RESOURCES = "remove_previous_resources";
 	public static final String INFRA_PROVIDER_USERNAME = "provider_username";
 	public static final String EXECUTION_MONITOR_PERIOD = "execution_monitor_period";
