@@ -28,12 +28,12 @@ import org.mockito.Mockito;
 public class TestIguassuController {
 
     private static final String FAKE_UUID = "1234";
-    private static final String FAKE_CLOUD_NAME = "fake-cloud-name";
-    private static final String FAKE_OWNER = "fake-owner";
-    private static final String FAKE_TASK_ID = "fake-task-id";
-    private static final String FAKE_IMAGE_FLAVOR_NAME = "fake-image-flavor-name";
-    private static final String FAKE_PUBLIC_KEY = "fake-public-key";
-    private static final String FAKE_PRIVATE_KEY_FILE_PATH = "fake-private-key-file-path";
+    private static final String FAKE_CLOUD_NAME = "cloudfake";
+    private static final String FAKE_OWNER = "testowner";
+    private static final String FAKE_TASK_ID = "testtaskId";
+    private static final String FAKE_IMAGE_FLAVOR_NAME = "testimage";
+    private static final String FAKE_PUBLIC_KEY = "testPublicKey";
+    private static final String FAKE_PRIVATE_KEY_FILE_PATH = "testPrivateKeyPath";
 
     private IguassuController iguassuController;
     private BlowoutController blowoutController;
@@ -50,6 +50,7 @@ public class TestIguassuController {
         );
         properties.put(IguassuPropertiesConstants.IGUASSU_PUBLIC_KEY, FAKE_PUBLIC_KEY);
         properties.put(IguassuPropertiesConstants.IGUASSU_PRIVATE_KEY_FILEPATH, FAKE_PRIVATE_KEY_FILE_PATH);
+
         properties.put(IguassuPropertiesConstants.REMOTE_OUTPUT_FOLDER, "/tmp");
         properties.put(IguassuPropertiesConstants.LOCAL_OUTPUT_FOLDER, "/tmp");
 
@@ -75,7 +76,6 @@ public class TestIguassuController {
 
     @After
     public void tearDown() {
-        // FIXME fix test to use the new DB
         this.dataStore.deleteAll();
     }
 
@@ -103,6 +103,7 @@ public class TestIguassuController {
         } catch (BlowoutException e) {
             Assert.fail();
         }
+
         Assert.assertEquals(1, this.iguassuController.getAllJobs(FAKE_OWNER).size());
         JDFJob job1 = this.iguassuController.getAllJobs(FAKE_OWNER).get(0);
         assert (job1.equals(job));
@@ -123,6 +124,7 @@ public class TestIguassuController {
         assert (spec.equals(spec2));
         assert (task.equals(this.iguassuController.getAllJobs(FAKE_OWNER).get(0).getTaskList().get(FAKE_TASK_ID)));
         assert (spec.equals(this.iguassuController.getAllJobs(FAKE_OWNER).get(0).getTaskList().get(FAKE_TASK_ID).getSpecification()));
+
         Mockito.verify(this.blowoutController).addTaskList(taskList);
     }
 
@@ -132,6 +134,7 @@ public class TestIguassuController {
         JDFJob job = new JDFJob(jobId, FAKE_OWNER, new ArrayList<Task>(), null);
         doReturn(job).when(dataStore).getByJobId(jobId, FAKE_OWNER);
         assert (job.equals(this.iguassuController.getJobById(jobId, FAKE_OWNER)));
+
     }
 
     @Test
@@ -140,7 +143,7 @@ public class TestIguassuController {
         User user = new LDAPUser("testuser", "'this is a test user'");
 
         JDFJob job = new JDFJob(user.getUser(), new ArrayList<Task>(), user.getUsername());
-        Mockito.doReturn(job).when(this.iguassuController).createJobFromJDFFile(
+        Mockito.doReturn(job).when(this.iguassuController).runJobFromJDFFile(
                 Mockito.anyString(),
                 Mockito.any(User.class)
         );
@@ -172,6 +175,7 @@ public class TestIguassuController {
     public void testGetAllJobsWithoutAnotherUser() {
         ArrayList<JDFJob> jobs = new ArrayList<>();
         ArrayList<Task> task = new ArrayList<>();
+
         jobs.add(new JDFJob(FAKE_OWNER, task, null));
         jobs.add(new JDFJob(FAKE_OWNER, task, null));
         jobs.add(new JDFJob(FAKE_OWNER, task, null));
@@ -214,6 +218,7 @@ public class TestIguassuController {
     @Test
     public void testStopJob() {
         String jobName = "jobName00";
+
         JDFJob jdfJob = new JDFJob(FAKE_OWNER, new ArrayList<Task>(), null);
         jdfJob.setFriendlyName(jobName);
         doReturn(true).when(this.dataStore).deleteByJobId(jdfJob.getId(), FAKE_OWNER);
@@ -230,6 +235,7 @@ public class TestIguassuController {
     public void testStopJobWithId() {
         ArrayList<JDFJob> jobs = new ArrayList<>();
         ArrayList<Task> task = new ArrayList<>();
+
         JDFJob jdfJob = new JDFJob(FAKE_OWNER, task, null);
         jobs.add(jdfJob);
         jobs.add(new JDFJob("job1", FAKE_OWNER, task, null));
@@ -248,6 +254,7 @@ public class TestIguassuController {
 
     @Test
     public void testGetTaskById() {
+
         Task task = new TaskImpl(FAKE_TASK_ID, new Specification(
                 FAKE_CLOUD_NAME,
                 FAKE_IMAGE_FLAVOR_NAME,

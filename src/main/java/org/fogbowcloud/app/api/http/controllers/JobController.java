@@ -29,14 +29,10 @@ import java.util.Map;
 
 @CrossOrigin
 @RestController
-@RequestMapping(value = JobController.JOB_ENDPOINT)
+@RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_ENDPOINT)
 @Api(description = ApiDocumentation.Job.API)
 public class JobController {
-
-    protected static final String JOB_ENDPOINT = "job";
-    private final String JOB_PATH = "/{jobId}";
     public static final String JDF_FILE_PATH = "jdffilepath";
-
     private final Logger LOGGER = Logger.getLogger(JobController.class);
 
     @Lazy
@@ -62,7 +58,7 @@ public class JobController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @RequestMapping(value = JOB_PATH, method = RequestMethod.GET)
+    @RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH, method = RequestMethod.GET)
     @ApiOperation(value = ApiDocumentation.Job.GET_BY_ID_OPERATION)
     public ResponseEntity<JDFJob> getJobById(
             @ApiParam(value = ApiDocumentation.Job.ID)
@@ -133,7 +129,7 @@ public class JobController {
         return new ResponseEntity<>(mJobId, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = JOB_PATH, method = RequestMethod.DELETE)
+    @RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH, method = RequestMethod.DELETE)
     @ApiOperation(value = ApiDocumentation.Job.DELETE_OPERATION)
     public ResponseEntity<JobResponse> stopJob(
             @ApiParam(value = ApiDocumentation.Job.ID)
