@@ -68,7 +68,7 @@ public class TestAsyncJobBuilder {
             job = iguassuController.getJobById(id, user);
             Assert.assertEquals(JDFJob.JDFJobState.CREATED, job.getState());
             Assert.assertEquals(3, job.getTasks().size());
-        } catch (CompilerException | NameAlreadyInUseException | BlowoutException | InterruptedException e) {
+        } catch (CompilerException | BlowoutException | InterruptedException e) {
             e.printStackTrace();
             Assert.fail();
         }
@@ -89,7 +89,7 @@ public class TestAsyncJobBuilder {
 
             job = iguassuController.getJobById(id, user);
             Assert.assertNull(job);
-        } catch (CompilerException | NameAlreadyInUseException | BlowoutException e) {
+        } catch (CompilerException | BlowoutException e) {
 
             e.printStackTrace();
             Assert.fail();

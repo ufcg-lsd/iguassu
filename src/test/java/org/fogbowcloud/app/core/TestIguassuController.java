@@ -28,11 +28,12 @@ import org.mockito.Mockito;
 public class TestIguassuController {
 
     private static final String FAKE_UUID = "1234";
-    private static final String TEST_OWNER = "testowner";
-    private static final String TEST_TASK_ID = "testtaskId";
-    private static final String TEST_IMAGE = "testimage";
-    private static final String TEST_PUBLIC_KEY = "testPublicKey";
-    private static final String TEST_PRIVATE_KEY_PATH = "testPrivateKeyPath";
+    private static final String FAKE_CLOUD_NAME = "cloudfake";
+    private static final String FAKE_OWNER = "testowner";
+    private static final String FAKE_TASK_ID = "testtaskId";
+    private static final String FAKE_IMAGE_FLAVOR_NAME = "testimage";
+    private static final String FAKE_PUBLIC_KEY = "testPublicKey";
+    private static final String FAKE_PRIVATE_KEY_FILE_PATH = "testPrivateKeyPath";
 
     private IguassuController iguassuController;
     private BlowoutController blowoutController;

@@ -119,16 +119,9 @@ public class IguassuController {
     }
 
     public String addJob(String jdfFilePath, User owner)
-            throws CompilerException, NameAlreadyInUseException {
+            throws CompilerException {
         LOGGER.debug("Adding job  of owner " + owner.getUsername() + " to scheduler");
         JDFJob job = runJobFromJDFFile(jdfFilePath, owner);
-        if (job.getName() != null &&
-                !job.getName().trim().isEmpty() &&
-                getJobByName(job.getName(), owner.getUser()) != null) {
-            throw new NameAlreadyInUseException(
-                    "The job name '" + job.getName() + "' is already in use for the user '" + owner.getUser() + "'."
-            );
-        }
         jobDataStore.insert(job);
         return job.getId();
     }

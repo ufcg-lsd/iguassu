@@ -2,7 +2,6 @@ package org.fogbowcloud.app.core;
 
 import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
-import org.fogbowcloud.app.core.exceptions.NameAlreadyInUseException;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.blowout.core.exception.BlowoutException;
@@ -29,7 +28,7 @@ public class IguassuFacade {
         return iguassuController.getJobById(id, owner);
     }
 
-    public String addJob(String jdfFilePath, User owner) throws CompilerException, NameAlreadyInUseException, IOException, BlowoutException {
+    public String addJob(String jdfFilePath, User owner) throws CompilerException, IOException, BlowoutException {
         return iguassuController.addJob(jdfFilePath, owner);
     }
 
