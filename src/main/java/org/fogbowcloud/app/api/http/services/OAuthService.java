@@ -25,6 +25,7 @@ public class OAuthService {
         User user = this.iguassuFacade.getUser(oAuthToken.getUsernameOwner());
         if (user == null) {
             this.iguassuFacade.addUser(oAuthToken.getUsernameOwner(), oAuthToken.getAccessToken());
+            LOGGER.info("User " + oAuthToken.getUsernameOwner() + " was added.");
         }
         this.iguassuFacade.storeOAuthToken(oAuthToken);
     }

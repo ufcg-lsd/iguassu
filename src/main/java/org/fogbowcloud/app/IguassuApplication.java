@@ -9,6 +9,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
 import java.util.Properties;
 
@@ -39,6 +42,20 @@ public class IguassuApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(IguassuApplication.class, args);
+    }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        final String[] HTTP_METHODS_SUPPORTED = { "GET", "POST", "PUT", "DELETE", "OPTIONS" };
+        return new WebMvcConfigurerAdapter() {
+            @Override
+            public void addCorsMappings(CorsRegistry registry) {
+                registry.addMapping("/**")
+                        .allowedOrigins("*").
+                        allowedHeaders("*")
+                        .allowedMethods(HTTP_METHODS_SUPPORTED);
+            }
+        };
     }
 
 }
