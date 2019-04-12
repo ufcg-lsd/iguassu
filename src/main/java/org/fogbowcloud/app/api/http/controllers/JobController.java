@@ -96,10 +96,8 @@ public class JobController {
         Map<String, String> fieldMap = new HashMap<>();
         fieldMap.put(JDF_FILE_PATH, null);
         fieldMap.put(IguassuPropertiesConstants.X_CREDENTIALS, null);
-
-        // handle file upload
+        
         this.storageService.store(file, fieldMap);
-        System.out.println(credentials);
         User owner = this.jobService.authenticateUser(credentials);
 
         // Creating job
