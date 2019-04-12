@@ -2,6 +2,8 @@ package org.fogbowcloud.app.api.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
@@ -14,7 +16,7 @@ import static org.fogbowcloud.app.api.constants.ApiDocumentation.*;
 
 @EnableSwagger2
 @Configuration
-public class SwaggerConfiguration {
+public class SwaggerConfiguration extends WebMvcConfigurationSupport {
 
 	private static final String BASE_PACKAGE = "org.fogbowcloud.app.api.http";
 
@@ -43,4 +45,12 @@ public class SwaggerConfiguration {
 		return apiInfoBuilder;
 	}
 
+	@Override
+	protected void addResourceHandlers(ResourceHandlerRegistry registry) {
+		registry.addResourceHandler("swagger-ui.html")
+				.addResourceLocations("classpath:/META-INF/resources/");
+
+		registry.addResourceHandler("/webjars/**")
+				.addResourceLocations("classpath:/META-INF/resources/webjars/");
+	}
 }

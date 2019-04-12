@@ -99,6 +99,7 @@ public class JobController {
 
         // handle file upload
         this.storageService.store(file, fieldMap);
+        System.out.println(credentials);
         User owner = this.jobService.authenticateUser(credentials);
 
         // Creating job

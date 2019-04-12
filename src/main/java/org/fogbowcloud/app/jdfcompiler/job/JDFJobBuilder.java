@@ -95,7 +95,6 @@ public class JDFJobBuilder {
 				for (String req : jobRequirements.split("and")) {
 					if (i == 0 && !req.trim().startsWith("image")) {
 						i++;
-						LOGGER.debug("NEW REQUIREMENT: " +req);
 						spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, req);
 					} else if (!req.trim().startsWith("image")) {
 						spec.addRequirement(
@@ -332,4 +331,5 @@ public class JDFJobBuilder {
 		return "http://" + this.properties.getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_VM_PUBLIC_IP)
 				+ ":" + this.properties.getProperty(IguassuPropertiesConstants.REST_SERVER_PORT);
 	}
+
 }
