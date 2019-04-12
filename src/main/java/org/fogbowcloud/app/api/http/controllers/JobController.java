@@ -92,15 +92,13 @@ public class JobController {
 
         LOGGER.info(file.toString());
 
-        // Credentials
         Map<String, String> fieldMap = new HashMap<>();
         fieldMap.put(JDF_FILE_PATH, null);
         fieldMap.put(IguassuPropertiesConstants.X_CREDENTIALS, null);
-        
+
         this.storageService.store(file, fieldMap);
         User owner = this.jobService.authenticateUser(credentials);
 
-        // Creating job
         String jdf = fieldMap.get(JDF_FILE_PATH);
         if (jdf == null) {
             LOGGER.info("Could not store  new job from user " + owner.getUsername());
