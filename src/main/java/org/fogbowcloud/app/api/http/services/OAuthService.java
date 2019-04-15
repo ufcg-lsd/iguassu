@@ -1,7 +1,7 @@
 package org.fogbowcloud.app.api.http.services;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.IguassuController;
+import org.fogbowcloud.app.core.IguassuFacade;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.authenticator.models.User;
@@ -17,24 +17,25 @@ public class OAuthService {
 
     @Lazy
     @Autowired
-    IguassuController iguassuController;
+    IguassuFacade iguassuFacade;
 
     private static final Logger LOGGER = Logger.getLogger(OAuthService.class);
 
     public void storeOAuthToken(OAuthToken oAuthToken) {
-        User user = this.iguassuController.getUser(oAuthToken.getUsernameOwner());
+        User user = this.iguassuFacade.getUser(oAuthToken.getUsernameOwner());
         if (user == null) {
-            this.iguassuController.addUser(oAuthToken.getUsernameOwner(), oAuthToken.getAccessToken());
+            this.iguassuFacade.addUser(oAuthToken.getUsernameOwner(), oAuthToken.getAccessToken());
+            LOGGER.info("User " + oAuthToken.getUsernameOwner() + " was added.");
         }
-        this.iguassuController.storeOAuthToken(oAuthToken);
+        this.iguassuFacade.storeOAuthToken(oAuthToken);
     }
 
     public List<OAuthToken> getAll() {
-        return this.iguassuController.getAllOAuthTokens();
+        return this.iguassuFacade.getAllOAuthTokens();
     }
 
     public String getAccessTokenByOwnerUsername(String ownerUsername) throws InvalidParameterException {
-        String accessToken = this.iguassuController.getAccessTokenByOwnerUsername(ownerUsername);
+        String accessToken = this.iguassuFacade.getAccessTokenByOwnerUsername(ownerUsername);
 
         if (accessToken != null) {
             return accessToken;
@@ -47,6 +48,6 @@ public class OAuthService {
     }
 
     public void deleteAllTokens() {
-        this.iguassuController.deleteAllExternalOAuthTokens();
+        this.iguassuFacade.deleteAllExternalOAuthTokens();
     }
 }

@@ -1,6 +1,13 @@
 package org.fogbowcloud.app.api.constants;
 
 public class ApiDocumentation {
+	public static class ApiEndpoints {
+		public static final String OAUTH_TOKEN_ENDPOINT = "oauthtoken";
+		public static final String NONCE_ENDPOINT = "nonce";
+		public static final String JOB_ENDPOINT = "job";
+		public static final String JOB_PATH = "/{jobId}";
+	}
+
 	public static class ApiInfo {
 		public static final String API_TITLE = "Iguassu";
 		public static final String API_DESCRIPTION = "Iguassu is a tool for monitoring and executing jobs in " +
@@ -16,7 +23,7 @@ public class ApiDocumentation {
 		public static final String API = "Manages jobs.";
 		public static final String CREATE_OPERATION = "Creates an job.";
 		public static final String GET_OPERATION = "Lists all jobs.";
-		public static final String GET_BY_ID_OPERATION = "Lists a specific job.";
+		public static final String GET_BY_ID_OPERATION = "Get a specific job.";
 		public static final String DELETE_OPERATION = "Deletes a specific job.";
 
 		public static final String ID = "The ID of the specific job.";
@@ -31,7 +38,7 @@ public class ApiDocumentation {
 	public static class OAuthToken {
 		public static final String API = "Manages tokens";
 		public static final String STORE_OPERATION = "Store an token.";
-		public static final String GET_OPERATION = "Lists all jobs.";
+		public static final String GET_OPERATION = "Lists all tokens.";
 		public static final String DELETE_OPERATION = "Deletes all tokens.";
 		public static final String CREATE_REQUEST_BODY = "The body of the request must specify the OAuthToken";
 		public static final String GET_BY_USER = "Gets the token of user";

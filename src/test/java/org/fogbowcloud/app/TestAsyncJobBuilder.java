@@ -3,7 +3,6 @@ package org.fogbowcloud.app;
 import org.fogbowcloud.app.core.IguassuController;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.exceptions.IguassuException;
-import org.fogbowcloud.app.core.exceptions.NameAlreadyInUseException;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.core.authenticator.models.LDAPUser;
@@ -69,7 +68,7 @@ public class TestAsyncJobBuilder {
             job = iguassuController.getJobById(id, user);
             Assert.assertEquals(JDFJob.JDFJobState.CREATED, job.getState());
             Assert.assertEquals(3, job.getTasks().size());
-        } catch (CompilerException | NameAlreadyInUseException | BlowoutException | IOException | InterruptedException e) {
+        } catch (CompilerException | BlowoutException | InterruptedException e) {
             e.printStackTrace();
             Assert.fail();
         }
@@ -90,7 +89,8 @@ public class TestAsyncJobBuilder {
 
             job = iguassuController.getJobById(id, user);
             Assert.assertNull(job);
-        } catch (CompilerException | NameAlreadyInUseException | BlowoutException | IOException e) {
+        } catch (CompilerException | BlowoutException e) {
+
             e.printStackTrace();
             Assert.fail();
         }
