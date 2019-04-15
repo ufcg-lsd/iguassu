@@ -1,24 +1,4 @@
-/*
- * Copyright (C) 2008 Universidade Federal de Campina Grande
- *  
- * This file is part of OurGrid. 
- *
- * OurGrid is free software: you can redistribute it and/or modify it under the
- * terms of the GNU Lesser General Public License as published by the Free 
- * Software Foundation, either version 3 of the License, or (at your option) 
- * any later version. 
- * 
- * This program is distributed in the hope that it will be useful, but WITHOUT 
- * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or 
- * FITNESS FOR A PARTICULAR PURPOSE. See the GNU Lesser General Public License
- * for more details. 
- * 
- * You should have received a copy of the GNU Lesser General Public License 
- * along with this program. If not, see <http://www.gnu.org/licenses/>.
- * 
- */
 package org.fogbowcloud.app.jdfcompiler;
-
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -39,22 +19,9 @@ import java.util.Set;
 public abstract class Configuration implements Serializable {
 
 	private static final long serialVersionUID = 1L;
-
-	public static final String VERSION_FILE = "/resources/VERSION";
-	
-
 	private static Configuration singleInstance = null;
 
-	public static final String PROP_LOGFILE = "logfile";
-
-	public static final String PROP_LOG_PROPERTIES_FILE = "logProperties";
-
-	public static final String MGROOT = "MGROOT";
-
-	public static final String OGROOT = "OGROOT";
-
 	private Properties currentProperties = new Properties( System.getProperties() );
-
 	private boolean usingDefaultProperties = false;
 		
 	protected Configuration() {

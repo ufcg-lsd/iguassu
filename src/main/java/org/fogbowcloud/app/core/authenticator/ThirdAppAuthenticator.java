@@ -67,6 +67,7 @@ public class ThirdAppAuthenticator implements IguassuAuthenticator {
     public User getUserByUsername(String username) {
         User user = null;
         String userJSONString = this.userList.get(username);
+
         if (userJSONString == null || userJSONString.isEmpty()) {
             LOGGER.info("There is no user with username " + username);
             return null;

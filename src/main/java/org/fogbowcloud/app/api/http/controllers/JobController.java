@@ -5,7 +5,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.ApiDocumentation;
-import org.fogbowcloud.app.core.exceptions.NameAlreadyInUseException;
 import org.fogbowcloud.app.api.exceptions.StorageException;
 import org.fogbowcloud.app.api.http.services.FileSystemStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
@@ -30,14 +29,10 @@ import java.util.Map;
 
 @CrossOrigin
 @RestController
-@RequestMapping(value = JobController.JOB_ENDPOINT)
+@RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_ENDPOINT)
 @Api(description = ApiDocumentation.Job.API)
 public class JobController {
-
-    protected static final String JOB_ENDPOINT = "job";
-    private final String JOB_PATH = "/{jobId}";
     public static final String JDF_FILE_PATH = "jdffilepath";
-
     private final Logger LOGGER = Logger.getLogger(JobController.class);
 
     @Lazy
@@ -63,7 +58,7 @@ public class JobController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    @RequestMapping(value = JOB_PATH, method = RequestMethod.GET)
+    @RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH, method = RequestMethod.GET)
     @ApiOperation(value = ApiDocumentation.Job.GET_BY_ID_OPERATION)
     public ResponseEntity<JDFJob> getJobById(
             @ApiParam(value = ApiDocumentation.Job.ID)
@@ -97,16 +92,13 @@ public class JobController {
 
         LOGGER.info(file.toString());
 
-        // Credentials
         Map<String, String> fieldMap = new HashMap<>();
         fieldMap.put(JDF_FILE_PATH, null);
         fieldMap.put(IguassuPropertiesConstants.X_CREDENTIALS, null);
 
-        // handle file upload
         this.storageService.store(file, fieldMap);
         User owner = this.jobService.authenticateUser(credentials);
 
-        // Creating job
         String jdf = fieldMap.get(JDF_FILE_PATH);
         if (jdf == null) {
             LOGGER.info("Could not store  new job from user " + owner.getUsername());
@@ -122,7 +114,7 @@ public class JobController {
         } catch (CompilerException ce) {
             LOGGER.error(ce.getMessage(), ce);
             throw new StorageException("Could not compile JDF file.", ce);
-        } catch (NameAlreadyInUseException | BlowoutException iae) {
+        } catch (BlowoutException iae) {
             LOGGER.error(iae.getMessage(), iae);
             throw new StorageException(iae.getMessage());
         } catch (IOException e) {
@@ -134,7 +126,7 @@ public class JobController {
         return new ResponseEntity<>(mJobId, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = JOB_PATH, method = RequestMethod.DELETE)
+    @RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH, method = RequestMethod.DELETE)
     @ApiOperation(value = ApiDocumentation.Job.DELETE_OPERATION)
     public ResponseEntity<JobResponse> stopJob(
             @ApiParam(value = ApiDocumentation.Job.ID)

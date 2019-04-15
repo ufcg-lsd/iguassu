@@ -1,7 +1,5 @@
 package org.fogbowcloud.app.core;
 
-import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
@@ -12,7 +10,6 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.core.exceptions.IguassuException;
-import org.fogbowcloud.app.core.exceptions.NameAlreadyInUseException;
 import org.fogbowcloud.app.external.ExternalOAuthController;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
@@ -70,27 +67,21 @@ public class IguassuController {
 
     public void init() throws Exception {
         this.jobDataStore = new JobDataStore(this.properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL));
-        this.oAuthTokenDataStore = new OAuthTokenDataStore(
-                this.properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL)
-        );
+        this.oAuthTokenDataStore = new OAuthTokenDataStore(this.properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL));
 
-        boolean removePreviousResources = Boolean.parseBoolean(
-                this.properties.getProperty(IguassuPropertiesConstants.REMOVE_PREVIOUS_RESOURCES)
-        );
+        boolean removePreviousResources = Boolean.parseBoolean(this.properties.getProperty(IguassuPropertiesConstants.REMOVE_PREVIOUS_RESOURCES));
 
         this.blowoutController.start(removePreviousResources);
 
-        LOGGER.info("Default Compute flavor specification: "
-                + this.properties.getProperty(IguassuPropertiesConstants.DEFAULT_COMPUTE_FLAVOR_SPEC));
+        LOGGER.info("Default Compute flavor specification: " + this.properties.getProperty(IguassuPropertiesConstants.DEFAULT_COMPUTE_FLAVOR_SPEC));
 
         this.nonces = new ArrayList<>();
 
         LOGGER.debug("Restarting jobs");
         restartAllJobs();
 
-        int schedulerMonitorPeriod = Integer.valueOf(
-                this.properties.getProperty(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD)
-        );
+        int schedulerMonitorPeriod = Integer.valueOf(this.properties.getProperty(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD));
+
         LOGGER.debug("Starting Execution Monitor, with period: " + schedulerMonitorPeriod);
         ExecutionMonitorWithDB executionMonitor = new ExecutionMonitorWithDB(this, this.jobDataStore);
         executionMonitorTimer.scheduleAtFixedRate(executionMonitor, 0, schedulerMonitorPeriod);
@@ -128,44 +119,48 @@ public class IguassuController {
     }
 
     public String addJob(String jdfFilePath, User owner)
-            throws CompilerException, NameAlreadyInUseException, BlowoutException, IOException {
+            throws CompilerException {
         LOGGER.debug("Adding job  of owner " + owner.getUsername() + " to scheduler");
-        JDFJob job = createJobFromJDFFile(jdfFilePath, owner);
-        if (job.getName() != null &&
-                !job.getName().trim().isEmpty() &&
-                getJobByName(job.getName(), owner.getUser()) != null) {
-            throw new NameAlreadyInUseException(
-                    "The job name '" + job.getName() + "' is already in use for the user '" + owner.getUser() + "'."
-            );
-        }
-
+        JDFJob job = runJobFromJDFFile(jdfFilePath, owner);
         jobDataStore.insert(job);
         return job.getId();
+    }
+
+    public JDFJob runJobFromJDFFile(String jdfFilePath, User owner) throws CompilerException {
+        String userName = owner.getUsername();
+        JDFJob job = new JDFJob(owner.getUser(), new ArrayList<>(), userName);
+        JobSpecification jobSpec = compile(job.getId(), jdfFilePath);
+
+        String externalOAuthToken = getAccessTokenByOwnerUsername(userName);
+
+        Thread t = runNewJobThread(job, jdfFilePath,jobSpec, userName, externalOAuthToken);
+
+        this.createdJobs.put(job.getId(), t);
+        return job;
+    }
+
+    private JobSpecification compile(String jobId, String jdfFilePath) throws CompilerException {
+        CommonCompiler commonCompiler = new CommonCompiler();
+        LOGGER.debug("Job " + jobId + " compilation started at time: " + System.currentTimeMillis());
+        commonCompiler.compile(jdfFilePath, FileType.JDF);
+        LOGGER.debug("Job " + jobId + " compilation ended at time: " + System.currentTimeMillis());
+        JobSpecification jobSpec = (JobSpecification) commonCompiler.getResult().get(0);
+        return jobSpec;
+    }
+
+    private Thread runNewJobThread(JDFJob job, String jdfFilePath, JobSpecification jobSpec, String userName, String externalOAuthToken) {
+        Thread t = new Thread(new AsyncJobBuilder(job, jdfFilePath, this.properties,
+                this.blowoutController, this.jobDataStore, jobSpec, userName, externalOAuthToken),"Thread with Job " + job.getId());
+        LOGGER.debug("Thread " + t.getId() + " is in state: " + t.getState() + " with job: " + t.getName());
+        t.start();
+        LOGGER.debug("Thread " + t.getId() + "with job" + t.getName() + " started");
+        return t;
     }
 
     public void waitForJobCreation(String jobId) throws InterruptedException {
         createdJobs.get(jobId).join();
     }
 
-    public JDFJob createJobFromJDFFile(String jdfFilePath, User owner) throws CompilerException, IOException {
-        JDFJob job = new JDFJob(owner.getUser(), new ArrayList<>(), owner.getUsername());
-        CommonCompiler commonCompiler = new CommonCompiler();
-        LOGGER.debug("Job " + job.getId() + " compilation started at time: " + System.currentTimeMillis());
-        commonCompiler.compile(jdfFilePath, FileType.JDF);
-        LOGGER.debug("Job " + job.getId() + " compilation ended at time: " + System.currentTimeMillis());
-        JobSpecification jobSpec = (JobSpecification) commonCompiler.getResult().get(0);
-        String userName = owner.getUsername();
-        String externalOAuthToken = getAccessTokenByOwnerUsername(userName);
-
-        Thread t = new Thread(new AsyncJobBuilder(job, jdfFilePath, this.properties,
-                        this.blowoutController, this.jobDataStore, jobSpec, userName, externalOAuthToken), job.getId());
-        LOGGER.debug("Thread " + t.getId() + " is in state: " + t.getState() + " with job: " + t.getName());
-        t.start();
-        LOGGER.debug("Thread " + t.getId() + "with job" + t.getName() + " started");
-
-        this.createdJobs.put(job.getId(), t);
-        return job;
-    }
 
     public ArrayList<JDFJob> getAllJobs(String owner) {
         return (ArrayList<JDFJob>) this.jobDataStore.getAllByOwner(owner);
@@ -193,10 +188,15 @@ public class IguassuController {
                 this.createdJobs.remove(jobToRemove.getId());
             }
             this.jobDataStore.deleteByJobId(jobToRemove.getId(), owner);
+
+            LOGGER.info("Removing Job " + jobToRemove.getId());
+            this.blowoutController.cleanTasks(jobToRemove.getTasks());
+            /*
             for (Task task : jobToRemove.getTasks()) {
                 LOGGER.info("Removing task " + task.getId() + " from job.");
                 this.blowoutController.cleanTask(task);
             }
+            */
             return jobToRemove.getId();
         }
         return null;
@@ -245,7 +245,7 @@ public class IguassuController {
         this.blowoutController.cleanTask(task);
     }
 
-    public User authUser(String credentials) throws IOException, GeneralSecurityException {
+    public User authUser(String credentials) {
         if (credentials == null) {
             return null;
         }
@@ -395,7 +395,7 @@ public class IguassuController {
         this.oAuthTokenDataStore.deleteAll();
     }
 
-    public String refreshExternalOAuthToken(String ownerUsername) {
+    private String refreshExternalOAuthToken(String ownerUsername) {
         List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(ownerUsername);
 
         String accessToken = null;

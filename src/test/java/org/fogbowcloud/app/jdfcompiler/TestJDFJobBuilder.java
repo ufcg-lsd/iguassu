@@ -22,14 +22,11 @@ import org.fogbowcloud.blowout.core.model.task.Task;
 import org.junit.Test;
 
 public class TestJDFJobBuilder {
-	
-	public static final String RESOURCE_DIR = "test" + File.separator + "resources";
 
-	public static final String SIMPLE_JOB_EXAMPLE = RESOURCE_DIR + File.separator + "SimpleJob2.jdf";
-
-	public static final String FAKE_USER_NAME = "fake-username";
-
-	public static final String FAKE_EXTERNAL_OAUTH_TOKEN = "fake-external-oauth-token";
+	private static final String RESOURCE_DIR = "test" + File.separator + "resources";
+	private static final String SIMPLE_JOB_EXAMPLE = RESOURCE_DIR + File.separator + "SimpleJob2.jdf";
+	private static final String FAKE_USER_NAME = "fake-username";
+	private static final String FAKE_EXTERNAL_OAUTH_TOKEN = "fake-external-oauth-token";
 
 	@Test
 	public void testJDFCompilation () throws CompilerException, IOException, InterruptedException {

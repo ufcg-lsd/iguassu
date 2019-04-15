@@ -17,7 +17,6 @@ public class CurrentThreadExecutorService implements ExecutorService {
 	@Override
 	public void shutdown() {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
