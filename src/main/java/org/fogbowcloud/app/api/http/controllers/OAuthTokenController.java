@@ -24,7 +24,7 @@ public class OAuthTokenController {
     private final Logger LOGGER = Logger.getLogger(OAuthTokenController.class);
 
     @Lazy
-    OAuthService oAuthService;
+    private OAuthService oAuthService;
 
     @Autowired
     public OAuthTokenController(OAuthService oAuthService) {
@@ -52,15 +52,6 @@ public class OAuthTokenController {
         String accessToken = this.oAuthService.getAccessTokenByOwnerUsername(ownerUsername);
         OAuthTokenResponse dataResponse = new OAuthTokenResponse(accessToken);
         return new ResponseEntity<>(dataResponse, HttpStatus.OK);
-    }
-
-    @RequestMapping(method = RequestMethod.GET)
-    @ApiOperation(value = ApiDocumentation.OAuthToken.GET_OPERATION)
-    public ResponseEntity<List<OAuthToken>> getAllOAuthTokens() {
-        LOGGER.info("Retrieving all OAuth tokens.");
-
-        List<OAuthToken> list = this.oAuthService.getAll();
-        return new ResponseEntity<>(list, HttpStatus.CREATED);
     }
 
     @RequestMapping(method = RequestMethod.DELETE)
