@@ -69,7 +69,7 @@ public class OAuthTokenController {
         LOGGER.info("Deleting all OAuth tokens.");
 
         this.oAuthService.deleteAllTokens();
-        return new ResponseEntity<List<OAuthToken>>(HttpStatus.CREATED);
+        return new ResponseEntity<List<OAuthToken>>(HttpStatus.ACCEPTED);
     }
 
     public class OAuthTokenResponse {

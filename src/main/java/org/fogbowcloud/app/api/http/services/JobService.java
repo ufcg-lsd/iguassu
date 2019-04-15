@@ -63,6 +63,7 @@ public class JobService {
         User owner;
         try {
             owner = this.iguassuFacade.authUser(credentials);
+            LOGGER.info("Retrieving user " + owner.getUsername());
         } catch (GeneralSecurityException e) {
             LOGGER.error("Error trying to authenticate", e);
             throw new ResourceException(
