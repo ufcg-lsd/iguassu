@@ -20,4 +20,4 @@ if [ -f "/tmp/blowoutdb" ]; then
     rm /tmp/blowoutdb
 fi
 
-java -Xdebug -Xrunjdwp:server=y,transport=dt_socket,address=4001,suspend=n $CONF_LOG -cp target/iguassu-0.0.1.jar:target/lib/* org.fogbowcloud.app.IguassuApplication > /dev/null &
+mvn spring-boot:run
