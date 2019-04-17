@@ -73,6 +73,10 @@ public class ExternalOAuthController {
         String fileDriverAdminUsername = this.properties.getProperty(ExternalOAuthConstants.STORAGE_SERVICE_ADMIN_USERNAME);
         String fileDriverAdminPassword = this.properties.getProperty(ExternalOAuthConstants.STORAGE_SERVICE_ADMIN_PASSWORD);
 
+        // TODO may be required remove this verification.
+
+        LOGGER.info("Verifying if the user " + username + " already exists on the data storage service.");
+
         String statusCodeOk = "100";
         boolean hasUser = false;
         String resSatusCode = "";
@@ -84,6 +88,8 @@ public class ExternalOAuthController {
             request.setHeader("Authorization", "Basic " + encoding);
 
             HttpResponse response = client.execute(request);
+
+            LOGGER.info("Query response is: " + response.toString());
             String responseXMLString = EntityUtils.toString(response.getEntity());
 
             JSONObject responseJsonObj = XML.toJSONObject(responseXMLString);

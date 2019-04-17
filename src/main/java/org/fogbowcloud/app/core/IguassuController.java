@@ -45,7 +45,7 @@ public class IguassuController {
     private Map<String, Thread> createdJobs;
     private JobDataStore jobDataStore;
     private OAuthTokenDataStore oAuthTokenDataStore;
-    private IguassuAuthenticator auth;
+    private IguassuAuthenticator authenticator;
     private ExternalOAuthController externalOAuthTokenController;
 
     private static ManagerTimer executionMonitorTimer = new ManagerTimer(Executors.newScheduledThreadPool(1));
@@ -58,7 +58,7 @@ public class IguassuController {
         this.blowoutController = new BlowoutController(properties);
         this.createdJobs = new ConcurrentHashMap<>();
         this.externalOAuthTokenController = new ExternalOAuthController(properties);
-        this.auth = new ThirdAppAuthenticator(this.properties);
+        this.authenticator = new ThirdAppAuthenticator(this.properties);
     }
 
     public Properties getProperties() {
@@ -247,6 +247,7 @@ public class IguassuController {
 
     public User authUser(String credentials) {
         if (credentials == null) {
+            LOGGER.error("Invalid credentials. Some of the fields are null.");
             return null;
         }
 
@@ -263,7 +264,7 @@ public class IguassuController {
         LOGGER.debug("Checking nonce");
         if (this.nonces.contains(credential.getNonce())) {
             this.nonces.remove(credential.getNonce());
-            user = this.auth.authenticateUser(credential);
+            user = this.authenticator.authenticateUser(credential);
         }
         return user;
     }
@@ -275,19 +276,19 @@ public class IguassuController {
     }
 
     public User getUser(String username) {
-        return this.auth.getUserByUsername(username);
+        return this.authenticator.getUserByUsername(username);
     }
 
     public User addUser(String username, String publicKey) {
         try {
-            return this.auth.addUser(username, publicKey);
+            return this.authenticator.addUser(username, publicKey);
         } catch (Exception e) {
             throw new RuntimeException("Could not add user", e);
         }
     }
 
     public String getAuthenticatorName() {
-        return this.auth.getAuthenticatorName();
+        return this.authenticator.getAuthenticatorName();
     }
 
     public void setBlowoutController(BlowoutController blowout) {
