@@ -20,7 +20,6 @@ import org.fogbowcloud.blowout.core.model.Command;
 import org.fogbowcloud.blowout.core.model.Specification;
 import org.fogbowcloud.blowout.core.model.task.Task;
 import org.fogbowcloud.blowout.core.model.task.TaskImpl;
-import org.fogbowcloud.blowout.core.model.resource.AbstractResource;
 import org.springframework.http.HttpStatus;
 
 // TODO: remove unused methods
@@ -328,7 +327,7 @@ public class JDFJobBuilder {
 	}
 
 	private String getAppServiceIp() {
-		return "http://" + this.properties.getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_VM_PUBLIC_IP)
+		return "http://" + this.properties.getProperty(IguassuPropertiesConstants.IGUASSU_SERVICE_HOST)
 				+ ":" + this.properties.getProperty(IguassuPropertiesConstants.REST_SERVER_PORT);
 	}
 
