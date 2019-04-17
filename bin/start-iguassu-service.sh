@@ -20,6 +20,4 @@ if [ -f "/tmp/blowoutdb" ]; then
     rm /tmp/blowoutdb
 fi
 
-mvn clean package && \
-
-java -jar target/iguassu-0.0.1-exec.jar
+mvn spring-boot:run &
