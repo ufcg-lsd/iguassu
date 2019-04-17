@@ -322,13 +322,12 @@ public class JDFJobBuilder {
 	}
 
 	private String getUserExternalOAuthTokenRequestCommand(String userName) {
-		String myIguassuHttpServiceIp = getAppServiceIp();
+		String myIguassuHttpServiceIp = getIguassuHost();
 		return "token=$(curl --request GET --url " + myIguassuHttpServiceIp + "/oauthtoken/" + userName + "); ";
 	}
 
-	private String getAppServiceIp() {
-		return "http://" + this.properties.getProperty(IguassuPropertiesConstants.IGUASSU_SERVICE_HOST)
-				+ ":" + this.properties.getProperty(IguassuPropertiesConstants.REST_SERVER_PORT);
+	private String getIguassuHost() {
+		return "https://" + this.properties.getProperty(IguassuPropertiesConstants.IGUASSU_SERVICE_HOST) + "/api/v1";
 	}
 
 }
