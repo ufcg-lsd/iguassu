@@ -52,10 +52,6 @@ public class IguassuFacade {
         return iguassuController.authUser(credentials);
     }
 
-    public User authenticateUser(String credentials) throws IOException, GeneralSecurityException {
-        return iguassuController.authUser(credentials);
-    }
-
     public int getNonce() {
         return iguassuController.getNonce();
     }
