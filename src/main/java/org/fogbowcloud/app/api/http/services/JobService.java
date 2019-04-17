@@ -76,8 +76,7 @@ public class JobService {
                     Status.CLIENT_ERROR_BAD_REQUEST,
                     "Failed to read request header."
             );
-        }
-        if (owner == null) {
+        } catch (NullPointerException e) {
             LOGGER.error("Authentication failed. Wrong username/password.");
             throw new ResourceException(
                     Status.CLIENT_ERROR_UNAUTHORIZED,

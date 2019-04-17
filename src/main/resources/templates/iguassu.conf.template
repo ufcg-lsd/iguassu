@@ -11,15 +11,12 @@ rest_server_port=8080
 
 #### Datastore configuration properties ####
 oauth_storage_service_token_url=
-oauth_storage_service_users_url=
 oauth_storage_service_client_id=
 oauth_storage_service_client_secret=
 
 #### Storage Service ####
 storage_service_host=
-storage_service_vm_public_ip=
-storage_service_admin_username=
-storage_service_admin_password=
+iguassu_service_host=
 
 #### Default
 default_compute_flavor_spec=defaulResource.json

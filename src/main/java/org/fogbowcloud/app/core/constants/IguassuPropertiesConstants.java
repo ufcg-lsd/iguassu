@@ -26,6 +26,6 @@ public class IguassuPropertiesConstants {
 	public static final String OWNER = "owner";
 
 	//____ Storage Service ____//
-	public static final String STORAGE_SERVICE_VM_PUBLIC_IP = "storage_service_vm_public_ip";
+	public static final String IGUASSU_SERVICE_HOST = "iguassu_service_host";
 	public static final String STORAGE_SERVICE_HOST = "storage_service_host";
 }

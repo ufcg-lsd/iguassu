@@ -40,6 +40,7 @@ public class ExternalOAuthController {
             String encoding = Base64.getEncoder().encodeToString((clientId +":" + clientSecret).getBytes("UTF-8"));
             request.setHeader("Authorization", "Basic " + encoding);
             request.setHeader("Content-Type", "application/json");
+            LOGGER.info("Requesting a new access token using refresh token.");
             HttpResponse response = client.execute(request);
             String responseJsonString = EntityUtils.toString(response.getEntity());
             JSONObject responseJson = new JSONObject(responseJsonString);
@@ -59,47 +60,11 @@ public class ExternalOAuthController {
                     responseJson.optString(jsonHeaderRefreshToken),
                     responseJson.optString(jsonHeaderUserId),
                     expirationDate);
-
+            LOGGER.info("New access token requested successful.");
         } catch (IOException e) {
             e.printStackTrace();
         }
 
         return refreshedToken;
     }
-
-    public boolean userExists(String username) {
-        String user_provisioning_url = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_USERS_URL);
-        String request_query = user_provisioning_url + "?search=" + username;
-        String fileDriverAdminUsername = this.properties.getProperty(ExternalOAuthConstants.STORAGE_SERVICE_ADMIN_USERNAME);
-        String fileDriverAdminPassword = this.properties.getProperty(ExternalOAuthConstants.STORAGE_SERVICE_ADMIN_PASSWORD);
-
-        String statusCodeOk = "100";
-        boolean hasUser = false;
-        String resSatusCode = "";
-        try {
-            HttpClient client = HttpClientBuilder.create().build();
-            HttpGet request = new HttpGet(request_query);
-
-            String encoding = Base64.getEncoder().encodeToString((fileDriverAdminUsername + ":" + fileDriverAdminPassword).getBytes("UTF-8"));
-            request.setHeader("Authorization", "Basic " + encoding);
-
-            HttpResponse response = client.execute(request);
-            String responseXMLString = EntityUtils.toString(response.getEntity());
-
-            JSONObject responseJsonObj = XML.toJSONObject(responseXMLString);
-            resSatusCode = responseJsonObj.getJSONObject("ocs")
-                    .getJSONObject("meta")
-                    .optString("statuscode");
-            hasUser = !responseJsonObj.getJSONObject("ocs")
-                    .getJSONObject("data")
-                    .optString("users")
-                    .isEmpty();
-
-
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return resSatusCode.equals(statusCodeOk) && hasUser;
-    }
-
 }
