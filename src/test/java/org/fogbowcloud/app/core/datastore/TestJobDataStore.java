@@ -6,7 +6,6 @@ import static org.junit.Assert.assertNull;
 import java.util.ArrayList;
 
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.blowout.core.model.task.Task;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

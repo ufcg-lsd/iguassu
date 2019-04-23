@@ -10,6 +10,8 @@ import java.util.Properties;
 
 import org.fogbowcloud.app.core.authenticator.models.LDAPUser;
 import org.fogbowcloud.app.core.authenticator.models.User;
+import org.fogbowcloud.app.core.command.Command;
+import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJobBuilder;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
@@ -17,8 +19,6 @@ import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
-import org.fogbowcloud.blowout.core.model.Command;
-import org.fogbowcloud.blowout.core.model.task.Task;
 import org.junit.Test;
 
 public class TestJDFJobBuilder {

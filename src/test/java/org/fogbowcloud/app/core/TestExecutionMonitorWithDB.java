@@ -8,10 +8,11 @@ import java.util.concurrent.ExecutorService;
 
 import org.fogbowcloud.app.CurrentThreadExecutorService;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
+import org.fogbowcloud.app.core.task.Specification;
+import org.fogbowcloud.app.core.task.Task;
+import org.fogbowcloud.app.core.task.TaskImpl;
+import org.fogbowcloud.app.core.task.TaskState;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.blowout.core.BlowoutController;
-import org.fogbowcloud.blowout.core.model.task.*;
-import org.fogbowcloud.blowout.core.model.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -23,7 +24,6 @@ public class TestExecutionMonitorWithDB {
 
 	private static final String FAKE_UUID = "1234";
 	private Task task;
-	private BlowoutController blowoutController;
 	private IguassuController iguassuController;
 	private JDFJob job;
 	private String FAKE_TASK_ID = "FAKE_TASK_ID";
@@ -39,7 +39,6 @@ public class TestExecutionMonitorWithDB {
 		job = mock(JDFJob.class);
 		executorService = new CurrentThreadExecutorService();
 		iguassuController = mock(IguassuController.class);
-		blowoutController = mock(BlowoutController.class);
 	}
 
 	@Test
@@ -58,10 +57,6 @@ public class TestExecutionMonitorWithDB {
 		ExecutionMonitorWithDB monitor = new ExecutionMonitorWithDB(iguassuController, executorService, db);
 		monitor.run();
 		verify(iguassuController).moveTaskToFinished(task);
-		TaskProcess taskProcess = mock(TaskProcess.class);
-		List<TaskProcess> processes = new ArrayList<>();
-		processes.add(taskProcess);
-		doReturn(TaskState.FINISHED).when(taskProcess).getTaskState();
 	}
 
 	@Test
@@ -79,10 +74,7 @@ public class TestExecutionMonitorWithDB {
 		ExecutionMonitorWithDB monitor = new ExecutionMonitorWithDB(iguassuController,executorService, db);
 		monitor.run();
 		verify(iguassuController, never()).moveTaskToFinished(task);
-		
-		TaskProcess tp = mock(TaskProcess.class);
-		List<TaskProcess> processes = new ArrayList<>();
-		processes.add(tp);
+
 		doNothing().when(job).finish(task);
 	}
 
@@ -101,10 +93,7 @@ public class TestExecutionMonitorWithDB {
 		ExecutionMonitorWithDB monitor = new ExecutionMonitorWithDB(iguassuController,executorService, db);
 		monitor.run();
 		verify(iguassuController, never()).moveTaskToFinished(task);
-		TaskProcess taskProcess = mock(TaskProcess.class);
-		doReturn(TaskState.RUNNING).when(taskProcess).getTaskState();
-		List<TaskProcess> processes = new ArrayList<>();
-		processes.add(taskProcess);
+
 	}
 
 	@Test

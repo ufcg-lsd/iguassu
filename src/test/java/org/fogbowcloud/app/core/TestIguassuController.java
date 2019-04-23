@@ -5,18 +5,16 @@ import static org.mockito.Mockito.*;
 
 import java.util.*;
 
+import org.fogbowcloud.app.core.constants.IguassuGeneralConstants;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
+import org.fogbowcloud.app.core.task.Specification;
+import org.fogbowcloud.app.core.task.Task;
+import org.fogbowcloud.app.core.task.TaskImpl;
+import org.fogbowcloud.app.core.task.TaskState;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.core.authenticator.models.LDAPUser;
 import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
-import org.fogbowcloud.blowout.core.BlowoutController;
-import org.fogbowcloud.blowout.core.exception.BlowoutException;
-import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.blowout.core.model.task.Task;
-import org.fogbowcloud.blowout.core.model.task.TaskImpl;
-import org.fogbowcloud.blowout.core.model.task.TaskState;
-import org.fogbowcloud.blowout.core.constants.AppPropertiesConstants;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
@@ -36,7 +34,6 @@ public class TestIguassuController {
     private static final String FAKE_PRIVATE_KEY_FILE_PATH = "testPrivateKeyPath";
 
     private IguassuController iguassuController;
-    private BlowoutController blowoutController;
     private JobDataStore dataStore;
 
     @Before
@@ -54,23 +51,21 @@ public class TestIguassuController {
         properties.put(IguassuPropertiesConstants.REMOTE_OUTPUT_FOLDER, "/tmp");
         properties.put(IguassuPropertiesConstants.LOCAL_OUTPUT_FOLDER, "/tmp");
 
-        properties.put(AppPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT, "300000000");
-        properties.put(AppPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, "30000");
-        properties.put(AppPropertiesConstants.INFRA_IS_ELASTIC, "true");
+        properties.put(IguassuPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT, "300000000");
+        properties.put(IguassuPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, "30000");
+        properties.put(IguassuPropertiesConstants.INFRA_IS_ELASTIC, "true");
         properties.put(
-                AppPropertiesConstants.TOKEN_UPDATE_PLUGIN,
+                IguassuPropertiesConstants.TOKEN_UPDATE_PLUGIN,
                 "org.fogbowcloud.blowout.infrastructure.token.LDAPTokenUpdatePlugin"
         );
         properties.put(
-                AppPropertiesConstants.INFRA_PROVIDER_PLUGIN,
+                IguassuPropertiesConstants.INFRA_PROVIDER_PLUGIN,
                 "org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowInfrastructureProvider"
         );
-        properties.put(AppPropertiesConstants.DB_DATASTORE_URL, "jdbc:h2:/tmp/datastores/testfogbowresourcesdatastore");
+        properties.put(IguassuGeneralConstants.DB_DATASTORE_URL, "jdbc:h2:/tmp/datastores/testfogbowresourcesdatastore");
         this.iguassuController = Mockito.spy(new IguassuController(properties));
-        this.blowoutController = mock(BlowoutController.class);
-        this.dataStore = Mockito.spy(new JobDataStore(properties.getProperty(AppPropertiesConstants.DB_DATASTORE_URL)));
+        this.dataStore = Mockito.spy(new JobDataStore(properties.getProperty(IguassuGeneralConstants.DB_DATASTORE_URL)));
 
-        this.iguassuController.setBlowoutController(blowoutController);
         this.iguassuController.setDataStore(dataStore);
     }
 
@@ -80,7 +75,7 @@ public class TestIguassuController {
     }
 
     @Test
-    public void testRestart() throws BlowoutException, JSONException {
+    public void testRestart() throws JSONException {
         ArrayList<Task> taskList = new ArrayList<>();
         Specification spec = new Specification(
                 FAKE_CLOUD_NAME,
@@ -98,11 +93,7 @@ public class TestIguassuController {
         job.finishCreation();
         this.iguassuController.getJobDataStore().insert(job);
 
-        try {
-            this.iguassuController.restartAllJobs();
-        } catch (BlowoutException e) {
-            Assert.fail();
-        }
+        this.iguassuController.restartAllJobs();
 
         Assert.assertEquals(1, this.iguassuController.getAllJobs(FAKE_OWNER).size());
         JDFJob job1 = this.iguassuController.getAllJobs(FAKE_OWNER).get(0);
@@ -125,7 +116,6 @@ public class TestIguassuController {
         assert (task.equals(this.iguassuController.getAllJobs(FAKE_OWNER).get(0).getTaskList().get(FAKE_TASK_ID)));
         assert (spec.equals(this.iguassuController.getAllJobs(FAKE_OWNER).get(0).getTaskList().get(FAKE_TASK_ID).getSpecification()));
 
-        Mockito.verify(this.blowoutController).addTaskList(taskList);
     }
 
     @Test
@@ -223,7 +213,6 @@ public class TestIguassuController {
         jdfJob.setFriendlyName(jobName);
         doReturn(true).when(this.dataStore).deleteByJobId(jdfJob.getId(), FAKE_OWNER);
         doNothing().when(iguassuController).updateJob(any(JDFJob.class));
-        doNothing().when(blowoutController).cleanTask(any(Task.class));
         doReturn(jdfJob).when(iguassuController).getJobByName(jobName, FAKE_OWNER);
         // update DB Map
         this.iguassuController.stopJob(jobName, FAKE_OWNER);
@@ -244,7 +233,6 @@ public class TestIguassuController {
         doReturn(jobs).when(this.dataStore).getAllByOwner(FAKE_OWNER);
         doReturn(true).when(this.dataStore).deleteByJobId(jdfJob.getId(), FAKE_OWNER);
         doNothing().when(iguassuController).updateJob(any(JDFJob.class));
-        doNothing().when(blowoutController).cleanTask(any(Task.class));
         doReturn(jdfJob).when(this.dataStore).getByJobId(jdfJob.getId(), FAKE_OWNER);
         // update DB Map
         this.iguassuController.stopJob(jdfJob.getId(), FAKE_OWNER);
@@ -288,7 +276,6 @@ public class TestIguassuController {
 
     @Test
     public void testTaskStateAfterControllerRestart() {
-        doReturn(TaskState.READY).when(this.blowoutController).getTaskState(anyString());
         Specification spec = new Specification(
                 FAKE_CLOUD_NAME,
                 FAKE_IMAGE_FLAVOR_NAME,
@@ -338,12 +325,7 @@ public class TestIguassuController {
         job.addTask(task);
 
         this.dataStore.insert(job);
-        try {
-            this.iguassuController.restartAllJobs();
-        } catch (BlowoutException e) {
-            e.printStackTrace();
-            Assert.fail();
-        }
+        this.iguassuController.restartAllJobs();
 
         System.out.println(taskIds.get(0));
         Assert.assertEquals(TaskState.READY, this.iguassuController.getTaskState(taskIds.get(0)));
