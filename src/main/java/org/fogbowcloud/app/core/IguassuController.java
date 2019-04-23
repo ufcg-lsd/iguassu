@@ -31,7 +31,6 @@ import org.fogbowcloud.app.utils.ManagerTimer;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 public class IguassuController {
 
     private static final Logger LOGGER = Logger.getLogger(IguassuController.class);
@@ -68,9 +67,6 @@ public class IguassuController {
         LOGGER.info("Default Compute flavor specification: " + this.properties.getProperty(IguassuPropertiesConstants.DEFAULT_COMPUTE_FLAVOR_SPEC));
 
         this.nonces = new ArrayList<>();
-
-        LOGGER.debug("Restarting jobs");
-        restartAllJobs();
 
         int schedulerMonitorPeriod = Integer.valueOf(this.properties.getProperty(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD));
 
