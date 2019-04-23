@@ -8,7 +8,6 @@ import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.core.authenticator.models.Status;
 import org.fogbowcloud.app.core.authenticator.models.User;
-import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -55,7 +54,7 @@ public class JobService {
     }
 
     public String addJob(String jdfFilePath, User owner)
-            throws CompilerException, BlowoutException, IOException {
+            throws CompilerException, IOException {
         return this.iguassuFacade.addJob(jdfFilePath, owner);
     }
 

@@ -3,7 +3,6 @@ package org.fogbowcloud.app;
 import org.fogbowcloud.app.core.IguassuController;
 import org.fogbowcloud.app.core.IguassuFacade;
 import org.fogbowcloud.app.core.exceptions.IguassuException;
-import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -29,7 +28,7 @@ public class IguassuApplication {
 
     @Bean
     @Lazy
-    public IguassuFacade iguassuFacade(Properties properties) throws BlowoutException, IguassuException {
+    public IguassuFacade iguassuFacade(Properties properties) throws IguassuException {
         IguassuController iguassuController = new IguassuController(properties);
         IguassuFacade iguassuFacade = new IguassuFacade(iguassuController);
         try {
@@ -57,5 +56,4 @@ public class IguassuApplication {
             }
         };
     }
-
 }

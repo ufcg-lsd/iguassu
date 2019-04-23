@@ -9,24 +9,22 @@ import java.util.Properties;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.core.command.Command;
+import org.fogbowcloud.app.core.constants.FogbowConstants;
+import org.fogbowcloud.app.core.task.Specification;
+import org.fogbowcloud.app.core.task.Task;
+import org.fogbowcloud.app.core.task.TaskImpl;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.semantic.IOCommand;
 import org.fogbowcloud.app.jdfcompiler.semantic.JDLCommand;
 import org.fogbowcloud.app.jdfcompiler.semantic.JDLCommand.JDLCommandType;
 import org.fogbowcloud.app.jdfcompiler.semantic.RemoteCommand;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
-import org.fogbowcloud.blowout.core.constants.FogbowConstants;
-import org.fogbowcloud.blowout.core.model.Command;
-import org.fogbowcloud.blowout.core.model.Specification;
-import org.fogbowcloud.blowout.core.model.task.Task;
-import org.fogbowcloud.blowout.core.model.task.TaskImpl;
 import org.springframework.http.HttpStatus;
 
-// TODO: remove unused methods
 public class JDFJobBuilder {
 	private static final Logger LOGGER = Logger.getLogger(JDFJobBuilder.class);
 
-	// FIXME: what is this?
 	private static final String SANDBOX = "sandbox";
 	private static final String SSH_SCP_PRECOMMAND = "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no";
 	private static final String DEFAULT_FLAVOR_NAME = "default-compute-flavor";
@@ -230,7 +228,7 @@ public class JDFJobBuilder {
 	}
 
 	private void addRemoteCommand(String jobId, Task task, RemoteCommand remCommand) {
-		Command command = new Command("\"" + remCommand.getContent() + "\"", Command.Type.REMOTE);
+		Command command = new Command("\"" + remCommand.getContent() + "\"");
 		LOGGER.debug("JobId: " + jobId + " task: " + task.getId() + " remote command: " + remCommand.getContent());
 		task.addCommand(command);
 	}
@@ -248,14 +246,14 @@ public class JDFJobBuilder {
 			return null;
 		}
 		String mkdirCommand = "mkdir -p " + folder;
-		return new Command(mkdirCommand, Command.Type.REMOTE);
+		return new Command(mkdirCommand);
 	}
 
 	private Command stageInCommand(String localFile, String remoteFile) {
 		String scpCommand = "scp " + SSH_SCP_PRECOMMAND + " -P $" + ENV_SSH_PORT
 				+ " -i $" + ENV_PRIVATE_KEY_FILE + " " + localFile + " $"
 				+ ENV_SSH_USER + "@" + "$" + ENV_HOST + ":" + remoteFile;
-		return new Command(scpCommand, Command.Type.LOCAL);
+		return new Command(scpCommand);
 	}
 
 	/**
@@ -276,7 +274,7 @@ public class JDFJobBuilder {
 		String scpCommand = "scp " + SSH_SCP_PRECOMMAND + " -P $" + ENV_SSH_PORT
 				+ " -i $" + ENV_PRIVATE_KEY_FILE + " $" + ENV_SSH_USER + "@" + "$"
 				+ ENV_HOST + ": " + remoteFile + " " + localFile;
-		return new Command(scpCommand, Command.Type.LOCAL);
+		return new Command(scpCommand);
 	}
 
 	private Command uploadFileCommands(String localFilePath, String filePathToUpload, String userName, String token) {
@@ -292,7 +290,7 @@ public class JDFJobBuilder {
 				+ " if [ \\$http_code == " + HttpStatus.UNAUTHORIZED + " ] ; then " + requestTokenCommand
 				+ uploadCommand + " fi \'";
 
-		return new Command(scpCommand, Command.Type.REMOTE);
+		return new Command(scpCommand);
 	}
 
 	private Command downloadFileCommands(String localFilePath, String filePathToDownload, String userName, String token) {
@@ -310,7 +308,7 @@ public class JDFJobBuilder {
 				+ " if [ \\$http_code == " + String.valueOf(HttpStatus.UNAUTHORIZED) + " ] ; then " + requestTokenCommand
 				+ " " + downloadCommand + " fi \'";
 
-		return new Command(scpCommand, Command.Type.REMOTE);
+		return new Command(scpCommand);
 	}
 
 	private Command mkdirLocalFolder(String folder) {
@@ -318,7 +316,7 @@ public class JDFJobBuilder {
 			return null;
 		}
 		String mkdirCommand = "su $UserID ; " + "mkdir -p " + folder;
-		return new Command(mkdirCommand, Command.Type.LOCAL);
+		return new Command(mkdirCommand);
 	}
 
 	private String getUserExternalOAuthTokenRequestCommand(String userName) {

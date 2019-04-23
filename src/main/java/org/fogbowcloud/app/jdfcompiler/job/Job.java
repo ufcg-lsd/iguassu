@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.core.model.task.Task;
+import org.fogbowcloud.app.core.task.Task;
 
 public abstract class Job implements Serializable {
 
@@ -26,7 +26,6 @@ public abstract class Job implements Serializable {
 		addTasks(tasks);
 	}
 
-	//TODO: not sure that we need to guarantee thread safety at the job level
 	public void addTask(Task task) {
 		LOGGER.debug("Adding task " + task.getId());
 		taskReadyLock.writeLock().lock();
@@ -53,8 +52,6 @@ public abstract class Job implements Serializable {
 
 	public abstract String getId();
 
-	//TODO: it seems this *created* and restart methods help the Scheduler class to its job. I'm not sure
-	//if we should keep them.
 	public boolean isCreated() {
 		return this.isCreated;
 	}
@@ -69,7 +66,6 @@ public abstract class Job implements Serializable {
 		return taskList;
 	}
 
-	//FIXME: why do we need this method? (serialization?)
 	public void setTaskList(Map<String, Task> taskList) {
 		this.taskList = taskList;
 	}

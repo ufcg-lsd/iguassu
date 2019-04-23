@@ -6,9 +6,9 @@ import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
+import org.fogbowcloud.app.core.task.Task;
+import org.fogbowcloud.app.core.task.TaskState;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.blowout.core.model.task.Task;
-import org.fogbowcloud.blowout.core.model.task.TaskState;
 
 public class ExecutionMonitorWithDB implements Runnable {
 

@@ -13,7 +13,6 @@ import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
-import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -114,9 +113,6 @@ public class JobController {
         } catch (CompilerException ce) {
             LOGGER.error(ce.getMessage(), ce);
             throw new StorageException("Could not compile JDF file.", ce);
-        } catch (BlowoutException iae) {
-            LOGGER.error(iae.getMessage(), iae);
-            throw new StorageException(iae.getMessage());
         } catch (IOException e) {
             LOGGER.error("Could not read JDF file.", e);
             throw new StorageException("Could not read JDF file.");

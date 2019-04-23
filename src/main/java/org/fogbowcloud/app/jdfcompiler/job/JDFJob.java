@@ -7,8 +7,8 @@ import java.util.Map.Entry;
 import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.core.model.task.Task;
-import org.fogbowcloud.blowout.core.model.task.TaskImpl;
+import org.fogbowcloud.app.core.task.Task;
+import org.fogbowcloud.app.core.task.TaskImpl;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

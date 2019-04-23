@@ -4,8 +4,6 @@ import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
-import org.fogbowcloud.blowout.core.exception.BlowoutException;
-import org.fogbowcloud.blowout.core.model.task.TaskState;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
@@ -28,7 +26,7 @@ public class IguassuFacade {
         return iguassuController.getJobById(id, owner);
     }
 
-    public String addJob(String jdfFilePath, User owner) throws CompilerException, IOException, BlowoutException {
+    public String addJob(String jdfFilePath, User owner) throws CompilerException, IOException {
         return iguassuController.addJob(jdfFilePath, owner);
     }
 
@@ -42,10 +40,6 @@ public class IguassuFacade {
 
     public String stopJob(String jobReference, String owner) {
         return iguassuController.stopJob(jobReference, owner);
-    }
-
-    public TaskState getTaskState(String taskId){
-        return iguassuController.getTaskState(taskId);
     }
 
     public User authUser(String credentials) throws IOException, GeneralSecurityException {
