@@ -50,8 +50,8 @@ public class IguassuApplication {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("*").
-                        allowedHeaders("*")
+                        .allowedOrigins("*")
+                        .allowedHeaders("*")
                         .allowedMethods(HTTP_METHODS_SUPPORTED);
             }
         };
