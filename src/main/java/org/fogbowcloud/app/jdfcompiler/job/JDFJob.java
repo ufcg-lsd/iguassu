@@ -46,6 +46,11 @@ public class JDFJob extends Job {
 		this(UUID.randomUUID().toString(), owner, taskList, userID);
 	}
 
+	@Override
+	public void setState(JDFJobState state) {
+		this.state = state;
+	}
+
 	public String getId() {
 		return jobId;
 	}
@@ -88,15 +93,6 @@ public class JDFJob extends Job {
 		this.state = JDFJobState.FAILED;
 	}
 
-	@Override
-	public void finish(Task task) {
-		getTaskById(task.getId()).finish();
-	}
-
-	@Override
-	public void fail(Task task) {
-		// TODO Auto-generated method stub
-	}
 	
 	public String getUserId() {
 		return this.userId;
@@ -158,30 +154,5 @@ public class JDFJob extends Job {
 			}
 		}
 		return false;
-	}
-
-	public enum JDFJobState {
-		SUBMITTED("Submitted"),
-		FAILED("Failed"),
-		CREATED("Created");
-
-		private String desc;
-
-		JDFJobState(String desc) {
-			this.desc = desc;
-		}
-
-		public String value() {
-			return this.desc;
-		}
-
-		public static JDFJobState create(String desc) throws Exception{
-			for (JDFJobState ts : values()) {
-				if(ts.value().equals(desc)){
-					return ts;
-				}
-			}
-			throw new Exception("Invalid task state");
-		}
 	}
 }

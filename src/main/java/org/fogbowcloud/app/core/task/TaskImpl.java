@@ -18,7 +18,6 @@ public class TaskImpl implements Task {
 
     public static final String METADATA_REMOTE_OUTPUT_FOLDER = "remote_output_folder";
     public static final String METADATA_LOCAL_OUTPUT_FOLDER = "local_output_folder";
-    public static final String METADATA_SANDBOX = "sandbox";
     public static final String METADATA_REMOTE_COMMAND_EXIT_PATH = "remote_command_exit_path";
     public static final String METADATA_RESOURCE_ID = "resource_id";
     public static final String METADATA_TASK_TIMEOUT = "task_timeout";

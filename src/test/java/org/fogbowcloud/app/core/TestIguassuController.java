@@ -39,7 +39,6 @@ public class TestIguassuController {
     @Before
     public void setUp() throws Exception {
         Properties properties = new Properties();
-        properties.put(IguassuPropertiesConstants.REST_SERVER_PORT, "4444");
         properties.put(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD, "60000");
         properties.put(
                 IguassuPropertiesConstants.AUTHENTICATION_PLUGIN,
@@ -54,14 +53,7 @@ public class TestIguassuController {
         properties.put(IguassuPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT, "300000000");
         properties.put(IguassuPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, "30000");
         properties.put(IguassuPropertiesConstants.INFRA_IS_ELASTIC, "true");
-        properties.put(
-                IguassuPropertiesConstants.TOKEN_UPDATE_PLUGIN,
-                "org.fogbowcloud.blowout.infrastructure.token.LDAPTokenUpdatePlugin"
-        );
-        properties.put(
-                IguassuPropertiesConstants.INFRA_PROVIDER_PLUGIN,
-                "org.fogbowcloud.blowout.infrastructure.provider.fogbow.FogbowInfrastructureProvider"
-        );
+
         properties.put(IguassuGeneralConstants.DB_DATASTORE_URL, "jdbc:h2:/tmp/datastores/testfogbowresourcesdatastore");
         this.iguassuController = Mockito.spy(new IguassuController(properties));
         this.dataStore = Mockito.spy(new JobDataStore(properties.getProperty(IguassuGeneralConstants.DB_DATASTORE_URL)));
@@ -78,13 +70,8 @@ public class TestIguassuController {
     public void testRestart() throws JSONException {
         ArrayList<Task> taskList = new ArrayList<>();
         Specification spec = new Specification(
-                FAKE_CLOUD_NAME,
                 FAKE_IMAGE_FLAVOR_NAME,
-                FAKE_OWNER,
-                FAKE_PUBLIC_KEY,
-                FAKE_PRIVATE_KEY_FILE_PATH,
-                "",
-                ""
+                FAKE_OWNER
         );
         Task task = new TaskImpl(FAKE_TASK_ID, spec, FAKE_UUID);
         taskList.add(task);
@@ -244,13 +231,8 @@ public class TestIguassuController {
     public void testGetTaskById() {
 
         Task task = new TaskImpl(FAKE_TASK_ID, new Specification(
-                FAKE_CLOUD_NAME,
                 FAKE_IMAGE_FLAVOR_NAME,
-                FAKE_OWNER,
-                FAKE_PUBLIC_KEY,
-                FAKE_PRIVATE_KEY_FILE_PATH,
-                "",
-                ""
+                FAKE_OWNER
         ), FAKE_UUID);
         List<Task> tasks = new ArrayList<>();
         tasks.add(task);
@@ -277,13 +259,8 @@ public class TestIguassuController {
     @Test
     public void testTaskStateAfterControllerRestart() {
         Specification spec = new Specification(
-                FAKE_CLOUD_NAME,
                 FAKE_IMAGE_FLAVOR_NAME,
-                FAKE_OWNER,
-                FAKE_PUBLIC_KEY,
-                FAKE_PRIVATE_KEY_FILE_PATH,
-                "",
-                ""
+                FAKE_OWNER
         );
         List<String> taskIds = new ArrayList<>();
         JDFJob job = new JDFJob("testuser", new ArrayList<Task>(), "'this is a test user");

@@ -43,6 +43,7 @@ public class HttpWrapper {
         }
 
         final HttpResponse response = HttpClients.createMinimal().execute(request);
+
         return extractHttpEntity(response, request);
     }
 

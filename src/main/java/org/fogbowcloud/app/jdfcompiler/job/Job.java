@@ -46,16 +46,14 @@ public abstract class Job implements Serializable {
 		return new ArrayList<>(taskList.values());
 	}
 	
-	public abstract void finish(Task task);
-
-	public abstract void fail(Task task);
+	public abstract void setState(JDFJobState state);
 
 	public abstract String getId();
 
 	public boolean isCreated() {
 		return this.isCreated;
 	}
-	
+
 	public void setCreated() { this.isCreated = true; }
 
 	public void restart() {

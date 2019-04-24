@@ -75,7 +75,6 @@ public class TestExecutionMonitorWithDB {
 		monitor.run();
 		verify(iguassuController, never()).moveTaskToFinished(task);
 
-		doNothing().when(job).finish(task);
 	}
 
 	@Test
@@ -99,20 +98,12 @@ public class TestExecutionMonitorWithDB {
 	@Test
 	public void testExecutionMonitorRunningWithUpdatedList() {
 		doReturn(TaskState.READY).when(this.iguassuController).getTaskState(anyString());
-		final String cloudName = "fake-cloud-name";
 		final String user = "testuser";
 		final String username = "'this is a test user'";
 		final String testImage = "testimage";
-		final String testPublicKey = "testPublicKey";
-		final String testPrivateKeyPath = "testPrivateKeyPath";
 		Specification spec = new Specification(
-				cloudName,
 				testImage,
-				user,
-				testPublicKey,
-				testPrivateKeyPath,
-				"",
-				""
+				user
 		);
 		JobDataStore dataStore = Mockito.spy(new JobDataStore("jdbc:h2:/tmp/datastores/testfogbowresourcesdatastore"));
 

@@ -7,6 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.arrebol.ArrebolFacade;
 import org.fogbowcloud.app.core.constants.FogbowConstants;
 import org.fogbowcloud.app.core.constants.IguassuGeneralConstants;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
@@ -15,12 +16,13 @@ import org.fogbowcloud.app.core.exceptions.IguassuException;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.core.task.TaskState;
 import org.fogbowcloud.app.external.ExternalOAuthController;
+import org.fogbowcloud.app.jdfcompiler.job.AsyncJobBuilder;
+import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJobBuilder;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
@@ -43,6 +45,7 @@ public class IguassuController {
     private OAuthTokenDataStore oAuthTokenDataStore;
     private IguassuAuthenticator authenticator;
     private ExternalOAuthController externalOAuthTokenController;
+    private ArrebolFacade arrebolFacade;
 
     private static ManagerTimer executionMonitorTimer = new ManagerTimer(Executors.newScheduledThreadPool(1));
 
@@ -54,36 +57,30 @@ public class IguassuController {
         this.createdJobs = new ConcurrentHashMap<>();
         this.externalOAuthTokenController = new ExternalOAuthController(properties);
         this.authenticator = new ThirdAppAuthenticator(this.properties);
+        this.arrebolFacade = new ArrebolFacade();
     }
 
     public Properties getProperties() {
         return this.properties;
     }
 
-    public void init() throws Exception {
+    public void init() {
         this.jobDataStore = new JobDataStore(this.properties.getProperty(IguassuGeneralConstants.DB_DATASTORE_URL));
         this.oAuthTokenDataStore = new OAuthTokenDataStore(this.properties.getProperty(IguassuGeneralConstants.DB_DATASTORE_URL));
 
-        LOGGER.info("Default Compute flavor specification: " + this.properties.getProperty(IguassuPropertiesConstants.DEFAULT_COMPUTE_FLAVOR_SPEC));
-
         this.nonces = new ArrayList<>();
 
-        int schedulerMonitorPeriod = Integer.valueOf(this.properties.getProperty(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD));
+        final int localJobsMonitorPeriod = Integer.valueOf(this.properties.getProperty(
+                IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD));
 
-        LOGGER.debug("Starting Execution Monitor, with period: " + schedulerMonitorPeriod);
+        LOGGER.debug("Starting Execution Monitor, with period: " + localJobsMonitorPeriod);
         ExecutionMonitorWithDB executionMonitor = new ExecutionMonitorWithDB(this, this.jobDataStore);
-        executionMonitorTimer.scheduleAtFixedRate(executionMonitor, 0, schedulerMonitorPeriod);
-    }
-
-    public void stop() {
-        for (Thread t : createdJobs.values()) {
-            while (t.isAlive())  t.interrupt();
-        }
+        executionMonitorTimer.scheduleAtFixedRate(executionMonitor, 0, localJobsMonitorPeriod);
     }
 
     public void restartAllJobs()  {
         for (JDFJob job : this.jobDataStore.getAll()) {
-            if (job.getState().equals(JDFJob.JDFJobState.SUBMITTED)) {
+            if (job.getState().equals(JDFJobState.SUBMITTED)) {
                 job.failCreation();
                 this.jobDataStore.update(job);
             }
@@ -98,8 +95,6 @@ public class IguassuController {
                     finishedTasks.put(task.getId(), task);
                 }
             }
-            // TODO verify if this method is really required.
-            // blowoutController.addTaskList(taskList);
         }
     }
 
@@ -139,7 +134,7 @@ public class IguassuController {
 
     private Thread runNewJobThread(JDFJob job, String jdfFilePath, JobSpecification jobSpec, String userName, String externalOAuthToken) {
         Thread t = new Thread(new AsyncJobBuilder(job, jdfFilePath, this.properties, this.jobDataStore, jobSpec,
-                userName, externalOAuthToken),"Thread with Job " + job.getId());
+                userName, externalOAuthToken, this.arrebolFacade),"Thread with Job " + job.getId());
         LOGGER.debug("Thread " + t.getId() + " is in state: " + t.getState() + " with job: " + t.getName());
         t.start();
         LOGGER.debug("Thread " + t.getId() + "with job" + t.getName() + " started");
@@ -218,7 +213,6 @@ public class IguassuController {
         );
         LOGGER.info("Moving task " + task.getId() + " from job " + job.getName() + " to finished");
         this.finishedTasks.put(task.getId(), task);
-        job.finish(task);
         updateJob(job);
     }
 
@@ -292,10 +286,6 @@ public class IguassuController {
         // Required properties
         if (!properties.containsKey(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD)) {
             LOGGER.error(requiredPropertyMessage(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD));
-            return false;
-        }
-        if (!properties.containsKey(IguassuPropertiesConstants.IGUASSU_PUBLIC_KEY)) {
-            LOGGER.error(requiredPropertyMessage(IguassuPropertiesConstants.IGUASSU_PUBLIC_KEY));
             return false;
         }
         if (!properties.containsKey(IguassuPropertiesConstants.IGUASSU_PRIVATE_KEY_FILEPATH)) {
@@ -375,52 +365,4 @@ public class IguassuController {
             deleteOAuthTokenByAcessToken(token.getAccessToken());
         }
     }
-
-    private class AsyncJobBuilder implements Runnable {
-
-        private JDFJob job;
-        private String jdfFilePath;
-        private Properties properties;
-        private JobDataStore db;
-        private JobSpecification jobSpec;
-        private JDFJobBuilder jdfJobBuilder;
-        private String userName;
-        private String externalOAuthToken;
-
-        AsyncJobBuilder(JDFJob job,
-                        String jdfFilePath,
-                        Properties properties,
-                        JobDataStore db,
-                        JobSpecification jobSpec,
-                        String userName,
-                        String externalOAuthToken) {
-            this.job = job;
-            this.jdfFilePath = jdfFilePath;
-            this.properties = properties;
-            this.db = db;
-            this.jobSpec = jobSpec;
-            this.jdfJobBuilder = new JDFJobBuilder(this.properties);
-            this.userName = userName;
-            this.externalOAuthToken = externalOAuthToken;
-        }
-
-        @Override
-        public void run() {
-            try {
-
-                this.jdfJobBuilder.createJobFromJDFFile(this.job, this.jdfFilePath, this.jobSpec, this.userName, this.externalOAuthToken);
-
-                // Todo call api to add a job
-
-                // this.blowoutController.addTaskList(job.getTasks());
-                LOGGER.info("Submitted " + job.getId() + " to blowout at time: " + System.currentTimeMillis());
-                this.job.finishCreation();
-            } catch (Exception e) {
-                LOGGER.error("Failed to Submit " + job.getId() + " to blowout at time: " + System.currentTimeMillis(), e);
-                this.job.failCreation();
-            }
-            this.db.update(job);
-        }
-    }
-
 }

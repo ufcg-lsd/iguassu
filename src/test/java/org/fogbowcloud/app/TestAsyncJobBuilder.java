@@ -3,6 +3,7 @@ package org.fogbowcloud.app;
 import org.fogbowcloud.app.core.IguassuController;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.exceptions.IguassuException;
+import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.core.authenticator.models.LDAPUser;
@@ -51,13 +52,13 @@ public class TestAsyncJobBuilder {
             String id = iguassuController.addJob(SIMPLE_JOB_EXAMPLE, new LDAPUser(user, username));
 
             JDFJob job = iguassuController.getJobById(id, user);
-            Assert.assertEquals(JDFJob.JDFJobState.SUBMITTED, job.getState());
+            Assert.assertEquals(JDFJobState.SUBMITTED, job.getState());
             Assert.assertEquals(0, job.getTasks().size());
 
             iguassuController.waitForJobCreation(job.getId());
 
             job = iguassuController.getJobById(id, user);
-            Assert.assertEquals(JDFJob.JDFJobState.CREATED, job.getState());
+            Assert.assertEquals(JDFJobState.CREATED, job.getState());
             Assert.assertEquals(3, job.getTasks().size());
         } catch (CompilerException | InterruptedException e) {
             e.printStackTrace();
@@ -72,7 +73,7 @@ public class TestAsyncJobBuilder {
             String id = iguassuController.addJob(SIMPLE_JOB_EXAMPLE, new LDAPUser(user, username));
 
             JDFJob job = iguassuController.getJobById(id, user);
-            Assert.assertEquals(JDFJob.JDFJobState.SUBMITTED, job.getState());
+            Assert.assertEquals(JDFJobState.SUBMITTED, job.getState());
             Assert.assertEquals(0, job.getTasks().size());
 
             iguassuController.stopJob(id, user);
