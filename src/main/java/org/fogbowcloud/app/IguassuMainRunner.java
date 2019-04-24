@@ -13,6 +13,7 @@ import java.util.Properties;
 public class IguassuMainRunner implements CommandLineRunner {
 
     private static final Logger LOGGER = Logger.getLogger(IguassuMainRunner.class);
+    private static String CONF_FILE_PATH = IguassuGeneralConstants.DEFAULT_IGUASSU_CONF_FILE_PATH;
 
     @Autowired
     private Properties properties;
@@ -21,26 +22,25 @@ public class IguassuMainRunner implements CommandLineRunner {
     @Autowired
     IguassuController iguassuController;
 
-    private String iguassuConfPath = IguassuGeneralConstants.DEFAULT_IGUASSU_CONF_FILE_PATH;
-
     @Override
     public void run(String... args) throws Exception {
-        LOGGER.info("Running IguassuMainRunner.");
+        LOGGER.info("Running " + IguassuMainRunner.class.getName());
         if (args.length > 0) {
-            iguassuConfPath = args[0];
-            LOGGER.info("Configurations imported of path " + iguassuConfPath);
+            CONF_FILE_PATH = args[0];
+            LOGGER.info("Configurations imported of path " + CONF_FILE_PATH + ".");
 
         } else {
-            LOGGER.info("Configurations of default path " + iguassuConfPath);
+            LOGGER.info("Configurations of default path " + CONF_FILE_PATH + ".");
         }
-        loadProperties(iguassuConfPath);
+        loadProperties(CONF_FILE_PATH);
     }
 
     private void loadProperties(String iguassuConfPath) {
         try {
             properties.load(new FileInputStream(iguassuConfPath));
-            LOGGER.info("Configurations of path " + iguassuConfPath + " loaded with success");
+            LOGGER.info("Configurations of path " + iguassuConfPath + " loaded with success.");
         } catch (Exception e) {
+            LOGGER.info("Configuration file was not founded or not loaded with success.");
             System.exit(1);
         }
     }

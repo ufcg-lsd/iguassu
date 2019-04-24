@@ -27,13 +27,13 @@ public class JobService {
     private final Logger LOGGER = Logger.getLogger(JobService.class);
 
     public List<JDFJob> getAllJobs(User owner) {
-        return this.iguassuFacade.getAllJobs(owner.getUser());
+        return this.iguassuFacade.getAllJobs(owner.getUsername());
     }
 
     public JDFJob getJobById(String jobId, User owner) throws InvalidParameterException {
-        JDFJob job = this.iguassuFacade.getJobById(jobId, owner.getUser());
+        JDFJob job = this.iguassuFacade.getJobById(jobId, owner.getUsername());
         if (job == null) {
-            job = this.iguassuFacade.getJobByName(jobId, owner.getUser());
+            job = this.iguassuFacade.getJobByName(jobId, owner.getUsername());
             if (job == null) {
                 LOGGER.info("Could not find job with id " + jobId + " for user " + owner.getUsername());
                 throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
@@ -53,8 +53,7 @@ public class JobService {
         return this.iguassuFacade.stopJob(jobId, owner);
     }
 
-    public String addJob(String jdfFilePath, User owner)
-            throws CompilerException, IOException {
+    public String addJob(String jdfFilePath, User owner) throws CompilerException, IOException {
         return this.iguassuFacade.addJob(jdfFilePath, owner);
     }
 
@@ -84,5 +83,4 @@ public class JobService {
         }
         return owner;
     }
-
 }

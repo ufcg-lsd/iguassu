@@ -5,7 +5,6 @@ import org.json.JSONObject;
 
 public class UserImpl implements User {
 
-	private static final String DEFAULT_USER = "1111";
 	private String username;
 	private String publicKey;
 	private boolean active;
@@ -45,6 +44,7 @@ public class UserImpl implements User {
 		JSONObject user = new JSONObject();
 		user.put("username", this.username);
 		user.put("publicKey", this.publicKey);
+		user.put("active", this.active);
 		return user;
 	}
 
@@ -55,6 +55,6 @@ public class UserImpl implements User {
 
 	@Override
 	public String getUsername() {
-		return  (this.username != null) ? this.username : DEFAULT_USER;
+		return this.username;
 	}
 }
