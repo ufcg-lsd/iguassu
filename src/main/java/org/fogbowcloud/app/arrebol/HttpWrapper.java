@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.executor;
+package org.fogbowcloud.app.arrebol;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -12,15 +12,20 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
+import java.io.IOException;
 import java.util.List;
+import org.apache.log4j.Logger;
 
 public class HttpWrapper {
 
+    private static final Logger LOGGER = Logger.getLogger(HttpWrapper.class);
+
     private static final int VERSION_NOT_SUPPORTED = 505;
     private static final int BAD_REQUEST = 400;
-
     private static final String APPLICATION_JSON = "application/json";
     private static final String CONTENT_TYPE = "Content-Type";
+
+    public HttpWrapper() {}
 
     public String doRequest(String method, String endpoint, List<Header> additionalHeaders) throws Exception {
         return doRequest(method, endpoint, additionalHeaders, null);
@@ -39,6 +44,10 @@ public class HttpWrapper {
         }
 
         final HttpResponse response = HttpClients.createMinimal().execute(request);
+        return extractHttpEntity(response, request);
+    }
+
+    private String extractHttpEntity(HttpResponse response, HttpUriRequest request) {
         HttpEntity entity = null;
 
         try {
@@ -51,20 +60,25 @@ public class HttpWrapper {
                 return EntityUtils.toString(response.getEntity());
 
             } else if(statusCode >= BAD_REQUEST && statusCode <= VERSION_NOT_SUPPORTED) {
-                throw new Exception("Erro on request - Method ["+method+"] " +
-                        "Endpoint: ["+endpoint+"] - Status: "+statusCode+" -  " +
-                        "Msg: "+response.getStatusLine().toString());
+                final String errMsg = "Request to " + request.getURI() + " failed with status code " + statusCode;
+                LOGGER.error(errMsg);
+                throw new Exception(errMsg);
             } else {
                 return response.getStatusLine().toString();
             }
 
+        } catch (Exception e) {
+            e.printStackTrace();
         } finally {
             try {
                 if (entity != null) {
                     EntityUtils.toString(entity);
                 }
-            } catch (Exception e) {}
+            } catch (Exception e) {
+                LOGGER.info("Error while trying extract HTTP Entity with error message: " + e.getMessage());
+            }
         }
+        return null;
     }
 
     private HttpUriRequest instantiateRequest(String method, String endpoint, StringEntity body) {
