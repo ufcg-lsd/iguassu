@@ -51,7 +51,6 @@ public class HttpWrapper {
         HttpEntity entity = null;
 
         try {
-
             entity = response.getEntity();
 
             int statusCode = response.getStatusLine().getStatusCode();
