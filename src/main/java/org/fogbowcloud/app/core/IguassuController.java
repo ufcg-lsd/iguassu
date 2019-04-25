@@ -7,7 +7,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.arrebol.ArrebolFacade;
+import org.fogbowcloud.app.jes.JobExecutionSystem;
 import org.fogbowcloud.app.core.constants.FogbowConstants;
 import org.fogbowcloud.app.core.constants.IguassuGeneralConstants;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
@@ -15,6 +15,7 @@ import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.core.exceptions.IguassuException;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.core.task.TaskState;
+import org.fogbowcloud.app.jes.ArrebolJobExecutionSystem;
 import org.fogbowcloud.app.external.ExternalOAuthController;
 import org.fogbowcloud.app.jdfcompiler.job.AsyncJobBuilder;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
@@ -45,7 +46,7 @@ public class IguassuController {
     private OAuthTokenDataStore oAuthTokenDataStore;
     private IguassuAuthenticator authenticator;
     private ExternalOAuthController externalOAuthTokenController;
-    private ArrebolFacade arrebolFacade;
+    private JobExecutionSystem jobExecutionSystem;
 
     private static ManagerTimer executionMonitorTimer = new ManagerTimer(Executors.newScheduledThreadPool(1));
 
@@ -57,7 +58,7 @@ public class IguassuController {
         this.createdJobs = new ConcurrentHashMap<>();
         this.externalOAuthTokenController = new ExternalOAuthController(properties);
         this.authenticator = new ThirdAppAuthenticator(this.properties);
-        this.arrebolFacade = new ArrebolFacade();
+        this.jobExecutionSystem = new ArrebolJobExecutionSystem();
     }
 
     public Properties getProperties() {
@@ -134,7 +135,7 @@ public class IguassuController {
 
     private Thread runNewJobThread(JDFJob job, String jdfFilePath, JobSpecification jobSpec, String userName, String externalOAuthToken) {
         Thread t = new Thread(new AsyncJobBuilder(job, jdfFilePath, this.properties, this.jobDataStore, jobSpec,
-                userName, externalOAuthToken, this.arrebolFacade),"Thread with Job " + job.getId());
+                userName, externalOAuthToken, this.jobExecutionSystem),"Thread with Job " + job.getId());
         LOGGER.debug("Thread " + t.getId() + " is in state: " + t.getState() + " with job: " + t.getName());
         t.start();
         LOGGER.debug("Thread " + t.getId() + "with job" + t.getName() + " started");

@@ -1,7 +1,7 @@
 package org.fogbowcloud.app.jdfcompiler.job;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.arrebol.ArrebolFacade;
+import org.fogbowcloud.app.jes.JobExecutionSystem;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 
 import java.util.Properties;
@@ -17,10 +17,10 @@ public class AsyncJobBuilder implements Runnable {
     private JDFJobBuilder jdfJobBuilder;
     private String userName;
     private String externalOAuthToken;
-    private ArrebolFacade arrebolFacade;
+    private JobExecutionSystem jobExecutionSystem;
 
     public AsyncJobBuilder(JDFJob job, String jdfFilePath, Properties properties, JobDataStore db,
-             JobSpecification jobSpec, String userName, String externalOAuthToken, ArrebolFacade arrebolFacade) {
+             JobSpecification jobSpec, String userName, String externalOAuthToken, JobExecutionSystem jobExecutionSystem) {
         this.job = job;
         this.jdfFilePath = jdfFilePath;
         this.properties = properties;
@@ -29,7 +29,7 @@ public class AsyncJobBuilder implements Runnable {
         this.jdfJobBuilder = new JDFJobBuilder(this.properties);
         this.userName = userName;
         this.externalOAuthToken = externalOAuthToken;
-        this.arrebolFacade = arrebolFacade;
+        this.jobExecutionSystem = jobExecutionSystem;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class AsyncJobBuilder implements Runnable {
             this.jdfJobBuilder.createJobFromJDFFile(this.job, this.jdfFilePath, this.jobSpec,
                     this.userName, this.externalOAuthToken);
 
-            this.arrebolFacade.executeJob(this.job);
+            this.jobExecutionSystem.execute(this.job);
 
             LOGGER.info("Submitted " + job.getId() + " to blowout at time: " + System.currentTimeMillis());
 
