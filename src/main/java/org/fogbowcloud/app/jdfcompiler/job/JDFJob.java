@@ -1,10 +1,8 @@
 package org.fogbowcloud.app.jdfcompiler.job;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.io.Serializable;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.task.Task;
@@ -16,7 +14,7 @@ import org.json.JSONObject;
 /**
  * It add the job name, job name and sched path to the {@link Job} abstraction.
  */
-public class JDFJob extends Job {
+public class JDFJob extends Job implements Serializable {
 	private static final Logger LOGGER = Logger.getLogger(JDFJob.class);
 	private static final long serialVersionUID = 7780896231796955706L;
 
@@ -145,14 +143,18 @@ public class JDFJob extends Job {
         LOGGER.debug("Job read from JSON is from owner: " + job.optString(JSON_HEADER_OWNER));
         return jdfJob;
 	}
-	
+
 	@Override
-	public boolean equals(Object job2) {
-		if (job2 instanceof JDFJob) {
-			if (this.toJSON().similar(((JDFJob) job2).toJSON())) {
-				return true;
-			}
-		}
-		return false;
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+		JDFJob jdfJob = (JDFJob) o;
+		return jobId.equals(jdfJob.jobId) &&
+				owner.equals(jdfJob.owner);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(jobId, owner);
 	}
 }

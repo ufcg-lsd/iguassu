@@ -17,10 +17,9 @@ public class AsyncJobBuilder implements Runnable {
     private JDFJobBuilder jdfJobBuilder;
     private String userName;
     private String externalOAuthToken;
-    private JobExecutionSystem jobExecutionSystem;
 
     public AsyncJobBuilder(JDFJob job, String jdfFilePath, Properties properties, JobDataStore db,
-             JobSpecification jobSpec, String userName, String externalOAuthToken, JobExecutionSystem jobExecutionSystem) {
+             JobSpecification jobSpec, String userName, String externalOAuthToken) {
         this.job = job;
         this.jdfFilePath = jdfFilePath;
         this.properties = properties;
@@ -29,23 +28,19 @@ public class AsyncJobBuilder implements Runnable {
         this.jdfJobBuilder = new JDFJobBuilder(this.properties);
         this.userName = userName;
         this.externalOAuthToken = externalOAuthToken;
-        this.jobExecutionSystem = jobExecutionSystem;
     }
 
     @Override
     public void run() {
         try {
-
             this.jdfJobBuilder.createJobFromJDFFile(this.job, this.jdfFilePath, this.jobSpec,
                     this.userName, this.externalOAuthToken);
 
-            this.jobExecutionSystem.execute(this.job);
-
-            LOGGER.info("Submitted " + job.getId() + " to blowout at time: " + System.currentTimeMillis());
+            LOGGER.info("Job [" + job.getId() + "] was built with success at time: " + System.currentTimeMillis());
 
             this.job.finishCreation();
         } catch (Exception e) {
-            LOGGER.error("Failed to Submit " + job.getId() + " to blowout at time: " + System.currentTimeMillis(), e);
+            LOGGER.error("Failed to build [" + job.getId() + "] : at time: " + System.currentTimeMillis(), e);
             this.job.failCreation();
         }
         this.db.update(job);

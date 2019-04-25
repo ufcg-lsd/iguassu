@@ -7,23 +7,19 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.jdfcompiler.job.*;
 import org.fogbowcloud.app.jes.JobExecutionSystem;
-import org.fogbowcloud.app.core.constants.FogbowConstants;
 import org.fogbowcloud.app.core.constants.IguassuGeneralConstants;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.core.exceptions.IguassuException;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.core.task.TaskState;
-import org.fogbowcloud.app.jes.ArrebolJobExecutionSystem;
+import org.fogbowcloud.app.jes.arrebol.ArrebolJobExecutionSystem;
 import org.fogbowcloud.app.external.ExternalOAuthController;
-import org.fogbowcloud.app.jdfcompiler.job.AsyncJobBuilder;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
-import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
@@ -50,15 +46,14 @@ public class IguassuController {
 
     private static ManagerTimer executionMonitorTimer = new ManagerTimer(Executors.newScheduledThreadPool(1));
 
-    public IguassuController(Properties properties)
-            throws IguassuException {
+    public IguassuController(Properties properties) throws IguassuException {
         validateProperties(properties);
         this.properties = properties;
         this.finishedTasks = new ConcurrentHashMap<>();
         this.createdJobs = new ConcurrentHashMap<>();
         this.externalOAuthTokenController = new ExternalOAuthController(properties);
         this.authenticator = new ThirdAppAuthenticator(this.properties);
-        this.jobExecutionSystem = new ArrebolJobExecutionSystem();
+        this.jobExecutionSystem = new ArrebolJobExecutionSystem(this.properties);
     }
 
     public Properties getProperties() {
@@ -79,36 +74,21 @@ public class IguassuController {
         executionMonitorTimer.scheduleAtFixedRate(executionMonitor, 0, localJobsMonitorPeriod);
     }
 
-    public void restartAllJobs()  {
-        for (JDFJob job : this.jobDataStore.getAll()) {
-            if (job.getState().equals(JDFJobState.SUBMITTED)) {
-                job.failCreation();
-                this.jobDataStore.update(job);
-            }
-            ArrayList<Task> taskList = new ArrayList<>();
-            for (Task task : job.getTasks()) {
-                if (!task.isFinished()) {
-                    taskList.add(task);
-                    LOGGER.debug("Specification of Recovered task: " + task.getSpecification().toJSON().toString());
-                    LOGGER.debug("Task Requirements: " + task.getSpecification()
-                            .getRequirementValue(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS));
-                } else {
-                    finishedTasks.put(task.getId(), task);
-                }
-            }
-        }
-    }
-
     public JDFJob getJobById(String jobId, String owner) {
         return this.jobDataStore.getByJobId(jobId, owner);
     }
 
     public String addJob(String jdfFilePath, User owner)
             throws CompilerException {
-        LOGGER.debug("Adding job  of owner " + owner.getUsername() + " to scheduler");
-        JDFJob job = runJobFromJDFFile(jdfFilePath, owner);
-        jobDataStore.insert(job);
-        return job.getId();
+      LOGGER.debug("Adding job  of owner " + owner.getUsername() + " to scheduler");
+
+      JDFJob job = runJobFromJDFFile(jdfFilePath, owner);
+
+      this.jobDataStore.insert(job);
+
+      String executionId = this.jobExecutionSystem.execute(job);
+
+      return executionId;
     }
 
     public JDFJob runJobFromJDFFile(String jdfFilePath, User owner) throws CompilerException {
@@ -121,6 +101,7 @@ public class IguassuController {
         Thread t = runNewJobThread(job, jdfFilePath,jobSpec, userName, externalOAuthToken);
 
         this.createdJobs.put(job.getId(), t);
+
         return job;
     }
 
@@ -133,19 +114,19 @@ public class IguassuController {
         return jobSpec;
     }
 
-    private Thread runNewJobThread(JDFJob job, String jdfFilePath, JobSpecification jobSpec, String userName, String externalOAuthToken) {
+    private Thread runNewJobThread(JDFJob job, String jdfFilePath, JobSpecification jobSpec, String userName,
+                                   String externalOAuthToken) {
         Thread t = new Thread(new AsyncJobBuilder(job, jdfFilePath, this.properties, this.jobDataStore, jobSpec,
-                userName, externalOAuthToken, this.jobExecutionSystem),"Thread with Job " + job.getId());
-        LOGGER.debug("Thread " + t.getId() + " is in state: " + t.getState() + " with job: " + t.getName());
+                userName, externalOAuthToken),"job_creation: " + job.getId());
+        LOGGER.debug("Thread " + t.getName() + " is in state: " + t.getState() + " with job: " + t.getName());
         t.start();
-        LOGGER.debug("Thread " + t.getId() + "with job" + t.getName() + " started");
+        LOGGER.debug("Thread " + t.getName() + "with job" + t.getName() + " started");
         return t;
     }
 
     public void waitForJobCreation(String jobId) throws InterruptedException {
         createdJobs.get(jobId).join();
     }
-
 
     public ArrayList<JDFJob> getAllJobs(String owner) {
         return (ArrayList<JDFJob>) this.jobDataStore.getAllByOwner(owner);
@@ -259,10 +240,6 @@ public class IguassuController {
         }
     }
 
-    public String getAuthenticatorName() {
-        return this.authenticator.getAuthenticatorName();
-    }
-
     public JobDataStore getJobDataStore() {
         return this.jobDataStore;
     }
@@ -284,7 +261,6 @@ public class IguassuController {
     }
 
     private static boolean checkProperties(Properties properties) {
-        // Required properties
         if (!properties.containsKey(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD)) {
             LOGGER.error(requiredPropertyMessage(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD));
             return false;

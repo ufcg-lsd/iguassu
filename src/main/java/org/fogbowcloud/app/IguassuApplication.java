@@ -1,5 +1,6 @@
 package org.fogbowcloud.app;
 
+import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.IguassuController;
 import org.fogbowcloud.app.core.IguassuFacade;
 import org.fogbowcloud.app.core.exceptions.IguassuException;
@@ -16,6 +17,8 @@ import java.util.Properties;
 
 @SpringBootApplication
 public class IguassuApplication {
+    private final Logger LOGGER = Logger.getLogger(IguassuApplication.class);
+
     @Bean
     CommandLineRunner cmdRunner() {
         return new IguassuMainRunner();
@@ -31,6 +34,7 @@ public class IguassuApplication {
     public IguassuFacade iguassuFacade(Properties properties) throws IguassuException {
         IguassuController iguassuController = new IguassuController(properties);
         IguassuFacade iguassuFacade = new IguassuFacade(iguassuController);
+
         try {
             iguassuFacade.init();
         } catch (Exception e) {

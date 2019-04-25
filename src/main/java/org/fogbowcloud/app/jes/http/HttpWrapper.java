@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.jes;
+package org.fogbowcloud.app.jes.http;
 
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
@@ -24,13 +24,11 @@ public class HttpWrapper {
     private static final String APPLICATION_JSON = "application/json";
     private static final String CONTENT_TYPE = "Content-Type";
 
-    public HttpWrapper() {}
-
-    public String doRequest(String method, String endpoint, List<Header> additionalHeaders) throws Exception {
+    public static String doRequest(String method, String endpoint, List<Header> additionalHeaders) throws Exception {
         return doRequest(method, endpoint, additionalHeaders, null);
     }
 
-    public String doRequest(String method, String endpoint, List<Header> additionalHeaders, StringEntity body) throws Exception {
+    public static String doRequest(String method, String endpoint, List<Header> additionalHeaders, StringEntity body) throws Exception {
 
         HttpUriRequest request = instantiateRequest(method, endpoint, body);
 
@@ -47,7 +45,7 @@ public class HttpWrapper {
         return extractHttpEntity(response, request);
     }
 
-    private String extractHttpEntity(HttpResponse response, HttpUriRequest request) {
+    private static String extractHttpEntity(HttpResponse response, HttpUriRequest request) {
         HttpEntity entity = null;
 
         try {
@@ -80,7 +78,7 @@ public class HttpWrapper {
         return null;
     }
 
-    private HttpUriRequest instantiateRequest(String method, String endpoint, StringEntity body) {
+    private static HttpUriRequest instantiateRequest(String method, String endpoint, StringEntity body) {
         HttpUriRequest request = null;
         if (method.equalsIgnoreCase(HttpGet.METHOD_NAME)) {
             request = new HttpGet(endpoint);

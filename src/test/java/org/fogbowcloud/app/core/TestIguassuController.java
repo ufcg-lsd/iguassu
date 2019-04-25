@@ -80,7 +80,7 @@ public class TestIguassuController {
         job.finishCreation();
         this.iguassuController.getJobDataStore().insert(job);
 
-        this.iguassuController.restartAllJobs();
+//        this.iguassuController.restartAllJobs();
 
         Assert.assertEquals(1, this.iguassuController.getAllJobs(FAKE_OWNER).size());
         JDFJob job1 = this.iguassuController.getAllJobs(FAKE_OWNER).get(0);
@@ -302,7 +302,7 @@ public class TestIguassuController {
         job.addTask(task);
 
         this.dataStore.insert(job);
-        this.iguassuController.restartAllJobs();
+//        this.iguassuController.restartAllJobs();
 
         System.out.println(taskIds.get(0));
         Assert.assertEquals(TaskState.READY, this.iguassuController.getTaskState(taskIds.get(0)));

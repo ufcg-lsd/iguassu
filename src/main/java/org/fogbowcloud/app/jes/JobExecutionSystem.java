@@ -1,12 +1,16 @@
 package org.fogbowcloud.app.jes;
 
-import org.fogbowcloud.app.jdfcompiler.job.Job;
+import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
+
+import javax.print.attribute.standard.JobState;
 
 public interface JobExecutionSystem {
 
-    void execute(Job job);
+    String execute(JDFJob job);
 
-    Job getCurrentState();
+    JDFJob getJob(String jobId);
+
+    JobState jobState(String executionId);
 
     void stop(String jobId);
 }

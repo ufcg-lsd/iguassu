@@ -38,7 +38,7 @@ public class IguassuMainRunner implements CommandLineRunner {
     private void loadProperties(String iguassuConfPath) {
         try {
             properties.load(new FileInputStream(iguassuConfPath));
-            LOGGER.info("Configurations of path " + iguassuConfPath + " loaded with success.");
+            LOGGER.info("Configurations of file " + iguassuConfPath + " was loaded with success.");
         } catch (Exception e) {
             LOGGER.info("Configuration file was not founded or not loaded with success.");
             System.exit(1);

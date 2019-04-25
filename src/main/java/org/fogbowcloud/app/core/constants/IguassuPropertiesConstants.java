@@ -27,4 +27,9 @@ public class IguassuPropertiesConstants {
 	public static final String INFRA_IS_ELASTIC = "infra_is_elastic";
 	public static final String INFRA_RESOURCE_CONNECTION_TIMEOUT = "infra_resource_connection_timeout";
 	public static final String INFRA_RESOURCE_IDLE_LIFETIME = "infra_resource_idle_lifetime";
+
+	/*
+	 *  Arrebol batch jobs execution system configs
+	 */
+	public static final String ARREBOL_BASE_URL = "arrebol_base_url";
 }
