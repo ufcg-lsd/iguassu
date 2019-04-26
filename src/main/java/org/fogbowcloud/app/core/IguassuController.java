@@ -160,33 +160,10 @@ public class IguassuController {
         this.jobDataStore.update(job);
     }
 
-    public String stopJob(String jobReference, String owner) {
-        LOGGER.info("Stop not implemented yet.");
-
-//        JDFJob jobToRemove = getJobByName(jobReference, owner);
-//        if (jobToRemove == null) {
-//            jobToRemove = getJobById(jobReference, owner);
-//        }
-//        if (jobToRemove != null) {
-//            LOGGER.debug("Removing job " + jobToRemove.getName() + ".");
-//            Thread creatingThread = this.createdJobs.get(jobToRemove.getId());
-//            if (creatingThread != null) {
-//                if (creatingThread.isAlive()) {
-//                    LOGGER.info("Job was still being created.");
-//                    while (creatingThread.isAlive()) {
-//                        creatingThread.interrupt();
-//                    }
-//                }
-//                this.createdJobs.remove(jobToRemove.getId());
-//            }
-//            this.jobDataStore.deleteByJobId(jobToRemove.getId(), owner);
-//
-//            LOGGER.info("Removing Job " + jobToRemove.getId());
-//            // Call API to delete a job
-//            return jobToRemove.getId();
-//        }
-//        return null;
-        return null;
+    public String stopJob(String jobId, String owner) {
+        // TODO: Stop job at Arrebol
+        this.jobDataStore.deleteByJobId(jobId, owner);
+        return jobId;
     }
 
     public JDFJob getJobByName(String jobName, String owner) {

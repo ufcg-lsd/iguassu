@@ -38,8 +38,8 @@ public class IguassuFacade {
         return iguassuController.getJobByName(jobName, owner);
     }
 
-    public String stopJob(String jobReference, String owner) {
-        return iguassuController.stopJob(jobReference, owner);
+    public String stopJob(String jobId, String owner) {
+        return iguassuController.stopJob(jobId, owner);
     }
 
     public User authUser(String credentials) throws IOException, GeneralSecurityException {
