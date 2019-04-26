@@ -1,15 +1,13 @@
 package org.fogbowcloud.app.jes.arrebol;
 
-import org.apache.http.entity.StringEntity;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.app.jdfcompiler.job.Job;
+import java.util.Properties;
 
 import javax.print.attribute.standard.JobState;
+
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jes.JobExecutionSystem;
 import org.fogbowcloud.app.jes.exceptions.SubmitJobException;
-
-import java.util.Properties;
 
 public class ArrebolJobExecutionSystem implements JobExecutionSystem {
 
@@ -24,6 +22,7 @@ public class ArrebolJobExecutionSystem implements JobExecutionSystem {
     @Override
     public String execute(JDFJob job) {
         LOGGER.info("Execution for the Job with id :[" + job.getId() + "] was started");
+<<<<<<< HEAD
 
         String jobIdArrebol = null;
         try {
@@ -34,11 +33,16 @@ public class ArrebolJobExecutionSystem implements JobExecutionSystem {
         }
 
         return jobIdArrebol;
+=======
+        return this.requestsHelper.submitJobToExecution(job);
+>>>>>>> origin/arrebol-integration-demo
     }
 
+    // TODO this return JDF
     @Override
     public JDFJob getJob(String jobId) {
-        return requestsHelper.getJob(jobId);
+//        return requestsHelper.getJob(jobId);
+    	return null;
     }
 
     @Override
