@@ -7,6 +7,7 @@ import org.fogbowcloud.app.jdfcompiler.job.Job;
 import javax.print.attribute.standard.JobState;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.jes.JobExecutionSystem;
+import org.fogbowcloud.app.jes.exceptions.SubmitJobException;
 
 import java.util.Properties;
 
@@ -24,7 +25,15 @@ public class ArrebolJobExecutionSystem implements JobExecutionSystem {
     public String execute(JDFJob job) {
         LOGGER.info("Execution for the Job with id :[" + job.getId() + "] was started");
 
-        return this.requestsHelper.submitJobToExecution(job);
+        String jobIdArrebol = null;
+        try {
+             jobIdArrebol = this.requestsHelper.submitJobToExecution(job);
+        } catch (Exception | SubmitJobException sje) {
+            LOGGER.error("Error while submitting job with id: [" + job.getId() + "]",
+                    sje);
+        }
+
+        return jobIdArrebol;
     }
 
     @Override

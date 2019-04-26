@@ -24,6 +24,9 @@ public class JSONUtils {
         return newMap;
     }
 
-
-
+    public static String getValueFromJsonStr(String key, String jsonStr) {
+        JSONObject json = new JSONObject(jsonStr);
+        String value = json.getString(key);
+        return value;
+    }
 }

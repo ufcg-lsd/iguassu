@@ -21,13 +21,13 @@ public class Specification implements Serializable {
     private static final String USERNAME_STR = "username";
     private static final String IMAGE_STR = "image";
 
-    private String imageName;
+    private String image;
     private String username;
 
     private Map<String, String> requirements;
 
-    public Specification(String imageName, String username) {
-        this.imageName = imageName;
+    public Specification(String image, String username) {
+        this.image = image;
         this.username = username;
         this.requirements = new HashMap<>();
     }
@@ -50,8 +50,8 @@ public class Specification implements Serializable {
         return this.requirements;
     }
 
-    public String getImageName() {
-        return this.imageName;
+    public String getImage() {
+        return this.image;
     }
 
     public String getUsername() {
@@ -61,7 +61,7 @@ public class Specification implements Serializable {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(" Image: " + this.imageName);
+        sb.append(" Image: " + this.image);
 
         if ((this.requirements != null) && !this.requirements.isEmpty()) {
             sb.append(LN + "Requirements:{");
@@ -74,7 +74,7 @@ public class Specification implements Serializable {
     }
 
     public Specification clone() {
-        Specification cloneSpec = new Specification(this.imageName, this.username);
+        Specification cloneSpec = new Specification(this.image, this.username);
         cloneSpec.putAllRequirements(this.getAllRequirements());
         return cloneSpec;
     }
@@ -82,7 +82,7 @@ public class Specification implements Serializable {
     public JSONObject toJSON() {
         try {
             JSONObject specification = new JSONObject();
-            specification.put(IMAGE_STR, this.getImageName());
+            specification.put(IMAGE_STR, this.getImage());
             specification.put(USERNAME_STR, this.getUsername());
             specification.put(REQUIREMENTS_MAP_STR, getAllRequirements().toString());
             return specification;
@@ -160,7 +160,7 @@ public class Specification implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + ((imageName == null) ? 0 : imageName.hashCode());
+        result = prime * result + ((image == null) ? 0 : image.hashCode());
         result = prime * result + ((requirements == null) ? 0 : requirements.hashCode());
         result = prime * result + ((username == null) ? 0 : username.hashCode());
         return result;
@@ -175,10 +175,10 @@ public class Specification implements Serializable {
         if (getClass() != obj.getClass())
             return false;
         Specification other = (Specification) obj;
-        if (imageName == null) {
-            if (other.imageName != null)
+        if (image == null) {
+            if (other.image != null)
                 return false;
-        } else if (!imageName.equals(other.imageName))
+        } else if (!image.equals(other.image))
             return false;
         if (requirements == null) {
             if (other.requirements != null)

@@ -64,15 +64,15 @@ public class JDFJobBuilder {
 
 				jobRequirements = jobRequirements.replace("(", "").replace(")", "");
 
-				String imageName = this.properties.getProperty(DEFAULT_FLAVOR_NAME);
+				String image = this.properties.getProperty(DEFAULT_FLAVOR_NAME);
 
 				for (String req : jobRequirements.split("and")) {
 					if (req.trim().startsWith("image")) {
-						imageName = req.split("==")[1].trim();
+						image = req.split("==")[1].trim();
 					}
 				}
 
-				Specification spec = new Specification(imageName, userName);
+				Specification spec = new Specification(image, userName);
 
 				int i = 0;
 				for (String req : jobRequirements.split("and")) {

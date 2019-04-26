@@ -21,8 +21,13 @@ public class HttpWrapper {
 
     private static final int VERSION_NOT_SUPPORTED = 505;
     private static final int BAD_REQUEST = 400;
+
     private static final String APPLICATION_JSON = "application/json";
     private static final String CONTENT_TYPE = "Content-Type";
+
+    public static final String HTTP_METHOD_POST = HttpPost.METHOD_NAME;
+    public static final String HTTP_METHOD_GET = HttpGet.METHOD_NAME;
+    public static final String HTTP_METHOD_DELETE = HttpDelete.METHOD_NAME;
 
     public static String doRequest(String method, String endpoint, List<Header> additionalHeaders) throws Exception {
         return doRequest(method, endpoint, additionalHeaders, null);
