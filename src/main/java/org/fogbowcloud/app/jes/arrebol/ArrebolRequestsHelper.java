@@ -68,17 +68,16 @@ public class ArrebolRequestsHelper {
     }
 
     public JobDTO getJob(String jobArrebolId) throws GetJobException {
-    	String endpoint = this.arrebolBaseUrl + "/" + jobArrebolId;
+    	final String endpoint = this.arrebolBaseUrl + "/job/" + jobArrebolId;
     	
-    	String jsonResponse = null;
+    	String jsonResponse;
     	try {
     		jsonResponse = HttpWrapper.doRequest(HttpGet.METHOD_NAME, endpoint, null);
 		} catch (Exception e) {
         	throw new GetJobException("Get Job from Arrebol has FAILED: " + e.getMessage(), e);
 		}
-    	JobDTO jobDTO = this.gson.fromJson(jsonResponse, JobDTO.class);
-    	
-        return jobDTO;
+
+        return this.gson.fromJson(jsonResponse, JobDTO.class);
     }
 
     private StringEntity makeJSONBody(JDFJob job) throws UnsupportedEncodingException {

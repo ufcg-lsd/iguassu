@@ -39,9 +39,10 @@ public class HttpWrapper {
 
         if (request != null) {
             request.setHeader(CONTENT_TYPE, APPLICATION_JSON);
-
-            for (Header header : additionalHeaders) {
-                request.addHeader(header);
+            if (additionalHeaders != null) {
+                for (Header header : additionalHeaders) {
+                    request.addHeader(header);
+                }
             }
         }
 
