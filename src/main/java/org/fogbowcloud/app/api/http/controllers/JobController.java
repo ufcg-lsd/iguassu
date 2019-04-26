@@ -85,6 +85,8 @@ public class JobController {
                 throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
             }
         }
+        
+        job = this.jobSynchronizer.synchronizeJob(job);
 
         return new ResponseEntity<>(job, HttpStatus.OK);
     }
