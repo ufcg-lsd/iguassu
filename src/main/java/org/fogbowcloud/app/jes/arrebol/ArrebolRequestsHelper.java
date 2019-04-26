@@ -3,6 +3,7 @@ package org.fogbowcloud.app.jes.arrebol;
 import java.io.UnsupportedEncodingException;
 import java.util.Properties;
 
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
@@ -51,9 +52,18 @@ public class ArrebolRequestsHelper {
         return jobResponse.get("id").getAsString();
     }
 
-    public JDFJob getJob(String jobId) {
+    public JobDTO getJob(String jobArrebolId) {
+    	String endpoint = this.arrebolBaseUrl + "/" + jobArrebolId;
     	
-        return null;
+    	String jsonResponse = null;
+    	try {
+    		jsonResponse = HttpWrapper.doRequest(HttpGet.METHOD_NAME, endpoint, null);
+		} catch (Exception e) {
+        	// TODO throw exception
+		}
+    	JobDTO jobDTO = this.gson.fromJson(jsonResponse, JobDTO.class);
+    	
+        return jobDTO;
     }
 
     public StringEntity makeJSONBody(JDFJob job) throws UnsupportedEncodingException {

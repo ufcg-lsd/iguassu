@@ -21,13 +21,14 @@ public class ArrebolJobExecutionSystem implements JobExecutionSystem {
     @Override
     public String execute(JDFJob job) {
         LOGGER.info("Execution for the Job with id :[" + job.getId() + "] was started");
-
         return this.requestsHelper.submitJobToExecution(job);
     }
 
+    // TODO this return JDF
     @Override
     public JDFJob getJob(String jobId) {
-        return requestsHelper.getJob(jobId);
+//        return requestsHelper.getJob(jobId);
+    	return null;
     }
 
     @Override
