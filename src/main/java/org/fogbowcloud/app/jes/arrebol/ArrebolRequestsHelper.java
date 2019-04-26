@@ -87,8 +87,6 @@ public class ArrebolRequestsHelper {
         JobDTO jobDTO = new JobDTO((job));
         String json = gson.toJson(jobDTO);
 
-        LOGGER.info("Job json looks like " + json);
-
         return new StringEntity(json);
     }
 }

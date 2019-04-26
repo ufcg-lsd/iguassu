@@ -88,26 +88,28 @@ public class IguassuController {
     public String addJob(String jdfFilePath, User owner)
             throws CompilerException {
       LOGGER.debug("Adding job  of owner " + owner.getUsername() + " to scheduler");
-
-      JDFJob job = runJobFromJDFFile(jdfFilePath, owner);
-            
       // TODO change this method name
+
+      JDFJob job = buildJob(jdfFilePath, owner);
+
       String joIdArrebol = this.jobExecutionSystem.execute(job);
       job.setJobIdArrebol(joIdArrebol);
+
+      LOGGER.info("Arrebol Id: " + job.getJobIdArrebol());
 
       this.jobDataStore.insert(job);
 
       return job.getId();
     }
 
-    public JDFJob runJobFromJDFFile(String jdfFilePath, User owner) throws CompilerException {
+    public JDFJob buildJob(String jdfFilePath, User owner) throws CompilerException {
         String userName = owner.getUsername();
         JDFJob job = new JDFJob(owner.getUser(), new ArrayList<>(), userName);
         JobSpecification jobSpec = compile(job.getId(), jdfFilePath);
 
         String externalOAuthToken = getAccessTokenByOwnerUsername(userName);
 
-        JDFJob jobBuilt = buildJob(job, jdfFilePath,jobSpec, userName, externalOAuthToken);
+        JDFJob jobBuilt = buildJobFromJDFFile(job, jdfFilePath,jobSpec, userName, externalOAuthToken);
 
         this.createdJobs.put(jobBuilt.getId(), jobBuilt);
 
@@ -123,7 +125,7 @@ public class IguassuController {
         return jobSpec;
     }
 
-    private JDFJob buildJob(JDFJob job, String jdfFilePath, JobSpecification jobSpec, String userName,
+    private JDFJob buildJobFromJDFFile(JDFJob job, String jdfFilePath, JobSpecification jobSpec, String userName,
                                    String externalOAuthToken) {
         try {
             this.jobBuilder.createJobFromJDFFile(job, jdfFilePath, jobSpec,

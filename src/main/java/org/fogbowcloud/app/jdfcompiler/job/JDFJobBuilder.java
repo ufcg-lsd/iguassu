@@ -1,9 +1,6 @@
 package org.fogbowcloud.app.jdfcompiler.job;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.util.List;
 import java.util.Properties;
 import java.util.UUID;
@@ -206,7 +203,9 @@ public class JDFJobBuilder {
 	}
 
 	private void addRemoteCommand(String jobId, Task task, RemoteCommand remCommand) {
-		Command command = new Command("\"" + remCommand.getContent() + "\"");
+		String commandStr = remCommand.getContent();;
+
+		Command command = new Command(commandStr);
 		LOGGER.debug("JobId: " + jobId + " task: " + task.getId() + " remote command: " + remCommand.getContent());
 		task.addCommand(command);
 	}

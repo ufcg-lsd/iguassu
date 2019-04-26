@@ -48,14 +48,13 @@ public class TaskImpl implements Task {
         this.state = TaskState.READY;
         this.uuid = uuid;
         this.startedRunningAt = Long.MAX_VALUE;
-        populateCommandStrList();
+        this.commandsStr = new ArrayList<>();
     }
 
     private void populateCommandStrList() {
         for (int i = 0; i < this.commands.size(); i++) {
             this.commandsStr.add(this.commands.get(i).getCommand());
         }
-
     }
 
     @Override
@@ -95,6 +94,7 @@ public class TaskImpl implements Task {
     }
 
     public List<String> getAllCommandsInStr() {
+        populateCommandStrList();
         return this.commandsStr;
     }
 

@@ -20,6 +20,7 @@ public class JobDTO implements Serializable {
     private void populateTaskSpec(JDFJob job) {
         List<Task> taskList = job.getTasks();
         for (int i = 0; i < job.getTasks().size(); i++ ) {
+            List<String> commands = taskList.get(i).getAllCommandsInStr();
             this.tasksSpecs.add(
                     new TaskSpecDTO(
                             taskList.get(i).getSpecification(),
