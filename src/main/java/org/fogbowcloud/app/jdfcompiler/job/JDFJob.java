@@ -42,6 +42,16 @@ public class JDFJob extends Job implements Serializable {
 		this.state = JDFJobState.SUBMITTED;
 	}
 
+	public JDFJob(String jobId, String owner, List<Task> taskList, String userID, String jobIdArrebol) {
+		super(taskList);
+		this.name = "";
+		this.jobId = jobId;
+		this.owner = owner;
+		this.userId = userID;
+		this.state = JDFJobState.SUBMITTED;
+		this.jobIdArrebol = jobIdArrebol;
+	}
+
 	public JDFJob(String owner, List<Task> taskList, String userID) {
 		this(UUID.randomUUID().toString(), owner, taskList, userID);
 	}
@@ -148,7 +158,8 @@ public class JDFJob extends Job implements Serializable {
 				job.optString(JSON_HEADER_JOB_ID),
 				job.optString(JSON_HEADER_OWNER),
 				tasks,
-				job.optString(JSON_HEADER_UUID)
+				job.optString(JSON_HEADER_UUID,
+						job.optString(JSON_HEADER_JOB_ID_ARREBOL))
 		);
 		jdfJob.setFriendlyName(job.optString(JSON_HEADER_NAME));
 		try {

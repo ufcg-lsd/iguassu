@@ -55,12 +55,12 @@ public class TestAsyncJobBuilder {
             Assert.assertEquals(JDFJobState.SUBMITTED, job.getState());
             Assert.assertEquals(0, job.getTasks().size());
 
-            iguassuController.waitForJobCreation(job.getId());
+//            iguassuController.waitForJobCreation(job.getId());
 
             job = iguassuController.getJobById(id, user);
             Assert.assertEquals(JDFJobState.CREATED, job.getState());
             Assert.assertEquals(3, job.getTasks().size());
-        } catch (CompilerException | InterruptedException e) {
+        } catch (CompilerException e) {
             e.printStackTrace();
             Assert.fail();
         }

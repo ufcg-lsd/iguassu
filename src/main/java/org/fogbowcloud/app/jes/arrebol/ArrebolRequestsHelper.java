@@ -11,9 +11,9 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.fogbowcloud.app.core.dto.JobDTO;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
+import org.fogbowcloud.app.jes.exceptions.GetJobException;
 import org.fogbowcloud.app.jes.exceptions.SubmitJobException;
 import org.fogbowcloud.app.jes.http.HttpWrapper;
-import org.fogbowcloud.app.utils.JSONUtils;
 
 import java.util.LinkedList;
 
@@ -67,14 +67,14 @@ public class ArrebolRequestsHelper {
         return jobIdArrebol;
     }
 
-    public JobDTO getJob(String jobArrebolId) {
+    public JobDTO getJob(String jobArrebolId) throws GetJobException {
     	String endpoint = this.arrebolBaseUrl + "/" + jobArrebolId;
     	
     	String jsonResponse = null;
     	try {
     		jsonResponse = HttpWrapper.doRequest(HttpGet.METHOD_NAME, endpoint, null);
 		} catch (Exception e) {
-        	// TODO throw exception
+        	throw new GetJobException("Get Job from Arrebol has FAILED: " + e.getMessage(), e);
 		}
     	JobDTO jobDTO = this.gson.fromJson(jsonResponse, JobDTO.class);
     	

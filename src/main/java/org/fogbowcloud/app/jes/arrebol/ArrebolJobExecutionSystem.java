@@ -5,8 +5,10 @@ import java.util.Properties;
 import javax.print.attribute.standard.JobState;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.core.dto.JobDTO;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jes.JobExecutionSystem;
+import org.fogbowcloud.app.jes.exceptions.GetJobException;
 import org.fogbowcloud.app.jes.exceptions.SubmitJobException;
 
 public class ArrebolJobExecutionSystem implements JobExecutionSystem {
@@ -22,7 +24,6 @@ public class ArrebolJobExecutionSystem implements JobExecutionSystem {
     @Override
     public String execute(JDFJob job) {
         LOGGER.info("Execution for the Job with id :[" + job.getId() + "] was started");
-<<<<<<< HEAD
 
         String jobIdArrebol = null;
         try {
@@ -32,17 +33,19 @@ public class ArrebolJobExecutionSystem implements JobExecutionSystem {
                     sje);
         }
 
-        return jobIdArrebol;
-=======
-        return this.requestsHelper.submitJobToExecution(job);
->>>>>>> origin/arrebol-integration-demo
+       return jobIdArrebol;
+
     }
 
     // TODO this return JDF
     @Override
-    public JDFJob getJob(String jobId) {
-//        return requestsHelper.getJob(jobId);
-    	return null;
+    public JobDTO getJob(String jobId) {
+        try {
+            return requestsHelper.getJob(jobId);
+        } catch (GetJobException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
     @Override
