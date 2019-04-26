@@ -13,6 +13,8 @@ import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
+import org.fogbowcloud.app.jes.arrebol.ArrebolJobSynchronizer;
+import org.fogbowcloud.app.jes.arrebol.JobSynchronizer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -22,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +39,8 @@ public class JobController {
 
     @Lazy
     JobService jobService;
+
+    private JobSynchronizer jobSynchronizer;
 
     private final FileSystemStorageService storageService;
 
@@ -54,7 +59,12 @@ public class JobController {
 
         User owner = this.jobService.authenticateUser(credentials);
         List<JDFJob> list = this.jobService.getAllJobs(owner);
-        return new ResponseEntity<>(list, HttpStatus.OK);
+        List<JDFJob> syncList = new ArrayList<>();
+        for(JDFJob job : list) {
+            JDFJob syncJob = this.jobSynchronizer.synchronizeJob(job);
+            syncList.add(job);
+        }
+        return new ResponseEntity<>(syncList, HttpStatus.OK);
     }
 
     @RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH, method = RequestMethod.GET)
@@ -143,6 +153,10 @@ public class JobController {
 
         JobResponse jobResponse = new JobResponse(stoppedJobId);
         return new ResponseEntity<>(jobResponse, HttpStatus.OK);
+    }
+
+    public void setJobSynchronizer(JobSynchronizer jobSynchronizer) {
+        this.jobSynchronizer = jobSynchronizer;
     }
 
     public class JobResponse {
