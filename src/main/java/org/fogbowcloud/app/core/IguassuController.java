@@ -162,8 +162,13 @@ public class IguassuController {
 
     public String stopJob(String jobId, String owner) {
         // TODO: Stop job at Arrebol
-        this.jobDataStore.deleteByJobId(jobId, owner);
-        return jobId;
+        try {
+            this.jobDataStore.deleteByJobId(jobId, owner);
+            return jobId;
+		} catch (Exception e) {
+			LOGGER.error("Couldn't stop job with id [" + jobId + "]", e);
+			return null;
+        }
     }
 
     public JDFJob getJobByName(String jobName, String owner) {
