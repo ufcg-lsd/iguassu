@@ -28,6 +28,7 @@ public class TaskImpl implements Task {
     private Specification specification;
     private TaskState state;
     private List<Command> commands;
+    private List<String> commandsStr;
     private List<String> processes;
     private Map<String, String> metadata;
     private boolean isFailed;
@@ -47,6 +48,14 @@ public class TaskImpl implements Task {
         this.state = TaskState.READY;
         this.uuid = uuid;
         this.startedRunningAt = Long.MAX_VALUE;
+        populateCommandStrList();
+    }
+
+    private void populateCommandStrList() {
+        for (int i = 0; i < this.commands.size(); i++) {
+            this.commandsStr.add(this.commands.get(i).getCommand());
+        }
+
     }
 
     @Override
@@ -83,6 +92,10 @@ public class TaskImpl implements Task {
     @Override
     public List<Command> getAllCommands() {
         return commands;
+    }
+
+    public List<String> getAllCommandsInStr() {
+        return this.commandsStr;
     }
 
     @Override

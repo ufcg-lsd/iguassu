@@ -9,10 +9,10 @@ import java.util.Map;
 
 public class TaskSpecDTO implements Serializable {
     private Specification spec;
-    private List<Command> commands;
+    private List<String> commands;
     private Map<String, String> metadata;
 
-    public TaskSpecDTO(Specification spec, List<Command> commands, Map<String, String> metadata){
+    public TaskSpecDTO(Specification spec, List<String> commands, Map<String, String> metadata){
         this.spec = spec;
         this.commands = commands;
         this.metadata = metadata;
@@ -20,7 +20,7 @@ public class TaskSpecDTO implements Serializable {
 
     public TaskSpecDTO() { }
 
-    public List<Command> getCommands(){
+    public List<String> getCommands(){
         return this.commands;
     }
 
