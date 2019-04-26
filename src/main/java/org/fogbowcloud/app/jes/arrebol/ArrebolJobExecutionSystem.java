@@ -1,14 +1,12 @@
 package org.fogbowcloud.app.jes.arrebol;
 
-import org.apache.http.entity.StringEntity;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.app.jdfcompiler.job.Job;
+import java.util.Properties;
 
 import javax.print.attribute.standard.JobState;
-import org.apache.log4j.Logger;
-import org.fogbowcloud.app.jes.JobExecutionSystem;
 
-import java.util.Properties;
+import org.apache.log4j.Logger;
+import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
+import org.fogbowcloud.app.jes.JobExecutionSystem;
 
 public class ArrebolJobExecutionSystem implements JobExecutionSystem {
 

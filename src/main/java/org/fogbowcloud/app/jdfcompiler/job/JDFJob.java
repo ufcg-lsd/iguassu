@@ -19,6 +19,7 @@ public class JDFJob extends Job implements Serializable {
 	private static final long serialVersionUID = 7780896231796955706L;
 
 	private static final String JSON_HEADER_JOB_ID = "jobId";
+	private static final String JSON_HEADER_JOB_ID_ARREBOL = "jobIdArrebol";
 	private static final String JSON_HEADER_NAME = "name";
 	private static final String JSON_HEADER_UUID = "uuid";
 	private static final String JSON_HEADER_STATE = "state";
@@ -30,6 +31,7 @@ public class JDFJob extends Job implements Serializable {
 	private final String userId;
 	private String name;
 	private JDFJobState state;
+	private String jobIdArrebol;
 	
 	public JDFJob(String jobId, String owner, List<Task> taskList, String userID) {
 		super(taskList);
@@ -49,6 +51,18 @@ public class JDFJob extends Job implements Serializable {
 		this.state = state;
 	}
 
+	public String getJobId() {
+		return jobId;
+	}
+	
+	public String getJobIdArrebol() {
+		return jobIdArrebol;
+	}
+	
+	public void setJobIdArrebol(String jobIdArrebol) {
+		this.jobIdArrebol = jobIdArrebol;
+	}
+	
 	public String getId() {
 		return jobId;
 	}
@@ -104,6 +118,7 @@ public class JDFJob extends Job implements Serializable {
 			job.put(JSON_HEADER_OWNER, this.getOwner());
 			job.put(JSON_HEADER_UUID, this.getUserId());
 			job.put(JSON_HEADER_STATE, this.getState().value());
+			job.put(JSON_HEADER_JOB_ID_ARREBOL, this.jobIdArrebol);
 			JSONArray tasks = new JSONArray();
 			Map<String, Task> taskList = this.getTaskList();
 			for (Entry<String, Task> entry : taskList.entrySet()) {
@@ -117,6 +132,7 @@ public class JDFJob extends Job implements Serializable {
 		}
 	}
 
+	// TODO implement JSON_HEADER_JOB_ID_ARREBOL
 	public static JDFJob fromJSON(JSONObject job) {
         LOGGER.info("Reading Job from JSON");
         List<Task> tasks = new ArrayList<>();

@@ -1,36 +1,33 @@
 package org.fogbowcloud.app.jes.arrebol;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import java.io.UnsupportedEncodingException;
+import java.util.Properties;
+
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.command.Command;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.fogbowcloud.app.core.dto.JobDTO;
-import org.fogbowcloud.app.core.task.Specification;
-import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jes.http.HttpWrapper;
 
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonObject;
 
-
-
+// TODO implement tests
 public class ArrebolRequestsHelper {
 
-    private static final Logger LOGGER = Logger.getLogger(ArrebolRequestsHelper.class);
+	// TODO review this names
     private final Properties properties;
-    private final String ARREBOL_BASE_URL;
-    private final HttpWrapper http;
+    private final String arrebolBaseUrl;
+    private final Gson gson = new Gson();
+    
+    private static final Logger LOGGER = Logger.getLogger(ArrebolRequestsHelper.class);
 
     public ArrebolRequestsHelper(Properties properties) {
         this.properties = properties;
-        this.http = new HttpWrapper();
-        ARREBOL_BASE_URL = this.properties.getProperty(IguassuPropertiesConstants.ARREBOL_BASE_URL);
+        this.arrebolBaseUrl = this.properties.getProperty(IguassuPropertiesConstants.ARREBOL_BASE_URL);
     }
 
     public String submitJobToExecution(JDFJob job) {
@@ -39,12 +36,23 @@ public class ArrebolRequestsHelper {
         try {
             requestBody = makeJSONBody(job);
         } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        	// TODO throw exception
         }
-        return "";
+        
+        String jsonResponse = null;
+        try {
+			jsonResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, this.arrebolBaseUrl, null, requestBody);
+		} catch (Exception e) {
+        	// TODO throw exception
+		}
+        JsonObject jobResponse = this.gson.fromJson(jsonResponse, JsonObject.class);
+                
+        // Use constants
+        return jobResponse.get("id").getAsString();
     }
 
     public JDFJob getJob(String jobId) {
+    	
         return null;
     }
 

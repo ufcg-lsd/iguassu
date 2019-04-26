@@ -83,12 +83,14 @@ public class IguassuController {
       LOGGER.debug("Adding job  of owner " + owner.getUsername() + " to scheduler");
 
       JDFJob job = runJobFromJDFFile(jdfFilePath, owner);
+            
+      // TODO change this method name
+      String joIdArrebol = this.jobExecutionSystem.execute(job);
+      job.setJobIdArrebol(joIdArrebol);
 
       this.jobDataStore.insert(job);
 
-      String executionId = this.jobExecutionSystem.execute(job);
-
-      return executionId;
+      return job.getId();
     }
 
     public JDFJob runJobFromJDFFile(String jdfFilePath, User owner) throws CompilerException {
