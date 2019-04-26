@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.IguassuApplication;
 import org.fogbowcloud.app.api.constants.ApiDocumentation;
 import org.fogbowcloud.app.api.exceptions.StorageException;
 import org.fogbowcloud.app.api.http.services.FileSystemStorageService;
@@ -39,8 +40,6 @@ public class JobController {
     @Lazy
     JobService jobService;
 
-    private JobSynchronizer jobSynchronizer;
-
     private final FileSystemStorageService storageService;
 
     @Autowired
@@ -60,7 +59,7 @@ public class JobController {
         List<JDFJob> list = this.jobService.getAllJobs(owner);
         List<JDFJob> syncList = new ArrayList<>();
         for(JDFJob job : list) {
-            JDFJob syncJob = this.jobSynchronizer.synchronizeJob(job);
+            JDFJob syncJob = IguassuApplication.jobSynchronizer.synchronizeJob(job);
             syncList.add(syncJob);
         }
         return new ResponseEntity<>(syncList, HttpStatus.OK);
@@ -86,7 +85,7 @@ public class JobController {
             }
         }
         
-        job = this.jobSynchronizer.synchronizeJob(job);
+        job = IguassuApplication.jobSynchronizer.synchronizeJob(job);
 
         return new ResponseEntity<>(job, HttpStatus.OK);
     }
@@ -154,10 +153,6 @@ public class JobController {
 
         JobResponse jobResponse = new JobResponse(stoppedJobId);
         return new ResponseEntity<>(jobResponse, HttpStatus.OK);
-    }
-
-    public void setJobSynchronizer(JobSynchronizer jobSynchronizer) {
-        this.jobSynchronizer = jobSynchronizer;
     }
 
     public class JobResponse {

@@ -13,7 +13,7 @@ import java.util.Set;
 
 public class ArrebolJobSynchronizer implements JobSynchronizer {
 
-	private final Logger LOGGER = Logger.getLogger(ArrebolJobSynchronizer.class);
+	private static final Logger LOGGER = Logger.getLogger(ArrebolJobSynchronizer.class);
 
 	private final ArrebolRequestsHelper requestsHelper;
 
@@ -25,6 +25,7 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
 	public JDFJob synchronizeJob(JDFJob job) {
 		try {
 			String arrebolJobJson = this.requestsHelper.getJobJSON(job.getJobIdArrebol());
+			LOGGER.debug("JSON Response [" + arrebolJobJson + "]");
 			Set<ArrebolTaskState> taskStates = this.getJobTaskStates(arrebolJobJson);
 			JDFJobState jobState = getJobState(taskStates);
 			LOGGER.debug("Tasks states set [" + taskStates.toString() + "] resuming to State [" + jobState.value() + "]");

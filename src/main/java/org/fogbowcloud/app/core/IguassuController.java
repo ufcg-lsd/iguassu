@@ -35,6 +35,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.annotation.PostConstruct;
+
 public class IguassuController {
 
     private static final Logger LOGGER = Logger.getLogger(IguassuController.class);
@@ -51,6 +53,7 @@ public class IguassuController {
     private JDFJobBuilder jobBuilder;
     
     private JobSynchronizer jobSynchronizer;
+
     @Autowired
     private JobController jobController;
 
@@ -65,11 +68,10 @@ public class IguassuController {
         this.externalOAuthTokenController = new ExternalOAuthController(properties);
         this.authenticator = new ThirdAppAuthenticator(this.properties);
         this.jobExecutionSystem = new ArrebolJobExecutionSystem(this.properties);
-        this.jobSynchronizer = new ArrebolJobSynchronizer(this.properties);
         this.jobBuilder = new JDFJobBuilder(this.properties);
-        
-        this.jobController.setJobSynchronizer(this.jobSynchronizer);
     }
+
+
 
     public Properties getProperties() {
         return this.properties;

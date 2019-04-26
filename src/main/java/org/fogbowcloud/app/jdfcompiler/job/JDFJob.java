@@ -158,8 +158,8 @@ public class JDFJob extends Job implements Serializable {
 				job.optString(JSON_HEADER_JOB_ID),
 				job.optString(JSON_HEADER_OWNER),
 				tasks,
-				job.optString(JSON_HEADER_UUID,
-						job.optString(JSON_HEADER_JOB_ID_ARREBOL))
+				job.optString(JSON_HEADER_UUID),
+						job.optString(JSON_HEADER_JOB_ID_ARREBOL)
 		);
 		jdfJob.setFriendlyName(job.optString(JSON_HEADER_NAME));
 		try {

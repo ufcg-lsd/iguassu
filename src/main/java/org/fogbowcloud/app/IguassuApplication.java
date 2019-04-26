@@ -4,6 +4,8 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.IguassuController;
 import org.fogbowcloud.app.core.IguassuFacade;
 import org.fogbowcloud.app.core.exceptions.IguassuException;
+import org.fogbowcloud.app.jes.arrebol.ArrebolJobSynchronizer;
+import org.fogbowcloud.app.jes.arrebol.JobSynchronizer;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -19,6 +21,8 @@ import java.util.Properties;
 public class IguassuApplication {
     private final Logger LOGGER = Logger.getLogger(IguassuApplication.class);
 
+    public static JobSynchronizer jobSynchronizer;
+
     @Bean
     CommandLineRunner cmdRunner() {
         return new IguassuMainRunner();
@@ -32,6 +36,7 @@ public class IguassuApplication {
     @Bean
     @Lazy
     public IguassuFacade iguassuFacade(Properties properties) throws IguassuException {
+        jobSynchronizer = new ArrebolJobSynchronizer(properties);
         IguassuController iguassuController = new IguassuController(properties);
         IguassuFacade iguassuFacade = new IguassuFacade(iguassuController);
 
