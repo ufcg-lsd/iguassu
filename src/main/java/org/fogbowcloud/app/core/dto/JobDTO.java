@@ -23,7 +23,7 @@ public class JobDTO implements Serializable {
             this.tasksSpecs.add(
                     new TaskSpecDTO(
                             taskList.get(i).getSpecification(),
-                            taskList.get(i).getAllCommands(),
+                            taskList.get(i).getAllCommandsInStr(),
                             taskList.get(i).getAllMetadata()
                     )
             );

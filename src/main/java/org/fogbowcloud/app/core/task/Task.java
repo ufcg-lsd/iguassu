@@ -28,6 +28,8 @@ public interface Task {
 
     List<Command> getAllCommands();
 
+    List<String> getAllCommandsInStr();
+
     void startedRunning();
 
     void putMetadata(String attributeName, String value);
