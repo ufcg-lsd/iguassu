@@ -38,38 +38,38 @@ public class ExecutionMonitorWithDB implements Runnable {
 		ArrayList<JDFJob> jobMap = (ArrayList<JDFJob>) db.getAll();
 		for (JDFJob aJob : jobMap) {
 			LOGGER.info("Starting monitoring of job " + aJob.getName() + "[" + aJob.getId() + "].");
-			int count = 0;
+//			int count = 0;
 			for (Task task : aJob.getTasks()) {
 				if (!task.isFinished()) {
-					count++;
-					LOGGER.info("Task: " + task.getId() +" is being treated");
-					TaskState taskState = iguassuController.getTaskState(task.getId());
-					LOGGER.info("Process " + task.getId() + " has state " + taskState.getDesc());
-					executorService.submit(new TaskExecutionChecker(task));
+//					count++;
+//					LOGGER.info("Task: " + task.getId() +" is being treated");
+//					TaskState taskState = iguassuController.getTaskState(task.getId());
+//					LOGGER.info("Process " + task.getId() + " has state " + taskState.getDesc());
+//					executorService.submit(new TaskExecutionChecker(task));
 				}
 			}
-			if (count == 0) {
-				LOGGER.info("Job has no active tasks.");
-			}
+//			if (count == 0) {
+//				LOGGER.info("Job has no active tasks.");
+//			}
 		}
 	}
 
-	class TaskExecutionChecker implements Runnable {
-
-		private Task task;
-
-		TaskExecutionChecker(Task task) {
-			this.task = task;
-		}
-
-		@Override
-		public void run() {
-			TaskState state = iguassuController.getTaskState(task.getId());
-
-			if (TaskState.COMPLETED.equals(state)) {
-				iguassuController.moveTaskToFinished(task);
-				LOGGER.info("The task " + this.task.getId() + " has been completed!");
-			}
-		}
-	}
+//	class TaskExecutionChecker implements Runnable {
+//
+//		private Task task;
+//
+//		TaskExecutionChecker(Task task) {
+//			this.task = task;
+//		}
+//
+//		@Override
+//		public void run() {
+//			TaskState state = iguassuController.getTaskState(task.getId());
+//
+//			if (TaskState.COMPLETED.equals(state)) {
+//				iguassuController.moveTaskToFinished(task);
+//				LOGGER.info("The task " + this.task.getId() + " has been completed!");
+//			}
+//		}
+//	}
 }

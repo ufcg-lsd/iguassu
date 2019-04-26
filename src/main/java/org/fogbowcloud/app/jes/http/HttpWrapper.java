@@ -34,7 +34,6 @@ public class HttpWrapper {
     }
 
     public static String doRequest(String method, String endpoint, List<Header> additionalHeaders, StringEntity body) throws Exception {
-
         HttpUriRequest request = instantiateRequest(method, endpoint, body);
 
         if (request != null) {
