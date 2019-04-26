@@ -3,7 +3,8 @@ package org.fogbowcloud.app.jdfcompiler.job;
 public enum JDFJobState {
     SUBMITTED("Submitted"),
     FAILED("Failed"),
-    CREATED("Created");
+    CREATED("Created"),
+	FINISHED("Finished");
 
     private String desc;
 
