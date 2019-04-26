@@ -27,6 +27,8 @@ import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.fogbowcloud.app.core.authenticator.IguassuAuthenticator;
 import org.fogbowcloud.app.core.authenticator.models.Credential;
 import org.fogbowcloud.app.core.authenticator.ThirdAppAuthenticator;
+import org.fogbowcloud.app.jes.arrebol.ArrebolJobSynchronizer;
+import org.fogbowcloud.app.jes.arrebol.JobSynchronizer;
 import org.fogbowcloud.app.utils.ManagerTimer;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,6 +47,7 @@ public class IguassuController {
     private ExternalOAuthController externalOAuthTokenController;
     private JobExecutionSystem jobExecutionSystem;
     private JDFJobBuilder jobBuilder;
+    private JobSynchronizer jobSynchronizer;
 
     private static ManagerTimer executionMonitorTimer = new ManagerTimer(Executors.newScheduledThreadPool(1));
 
@@ -57,6 +60,7 @@ public class IguassuController {
         this.externalOAuthTokenController = new ExternalOAuthController(properties);
         this.authenticator = new ThirdAppAuthenticator(this.properties);
         this.jobExecutionSystem = new ArrebolJobExecutionSystem(this.properties);
+        this.jobSynchronizer = new ArrebolJobSynchronizer(this.properties);
         this.jobBuilder = new JDFJobBuilder(this.properties);
     }
 
