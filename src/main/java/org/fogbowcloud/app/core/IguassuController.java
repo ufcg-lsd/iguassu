@@ -164,12 +164,12 @@ public class IguassuController {
 
     public String stopJob(String jobId, String owner) {
         // TODO: Stop job at Arrebol
-        try {
-            this.jobDataStore.deleteByJobId(jobId, owner);
+        boolean isStopped = this.jobDataStore.deleteByJobId(jobId, owner);
+        if (isStopped) {
             return jobId;
-		} catch (Exception e) {
-			LOGGER.error("Couldn't stop job with id [" + jobId + "]", e);
-			return null;
+        } else {
+            LOGGER.error("jobDataStore returns false for deleteByJobId to the job with id [" + jobId + "]");
+            return null;
         }
     }
 
