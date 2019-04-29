@@ -92,10 +92,7 @@ public class IguassuController {
     }
 
     public JDFJob getJobById(String jobId, String owner) {
-        JDFJob jdfJob = this.jobDataStore.getByJobId(jobId, owner);
-        JobDTO job = this.jobExecutionSystem.getJob(jdfJob.getJobIdArrebol());
-
-        return null;
+        return this.jobDataStore.getByJobId(jobId, owner);
     }
 
     public String addJob(String jdfFilePath, User owner)
