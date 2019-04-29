@@ -60,6 +60,7 @@ public class JobController {
         List<JDFJob> syncList = new ArrayList<>();
         for(JDFJob job : list) {
             JDFJob syncJob = IguassuApplication.jobSynchronizer.synchronizeJob(job);
+            this.jobService.updateJob(job);
             syncList.add(syncJob);
         }
         return new ResponseEntity<>(syncList, HttpStatus.OK);
@@ -86,6 +87,7 @@ public class JobController {
         }
         
         job = IguassuApplication.jobSynchronizer.synchronizeJob(job);
+        this.jobService.updateJob(job);
 
         return new ResponseEntity<>(job, HttpStatus.OK);
     }

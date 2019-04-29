@@ -1,15 +1,16 @@
 package org.fogbowcloud.app.jes.arrebol;
 
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
+import org.fogbowcloud.app.jes.arrebol.models.ArrebolJob;
+import org.fogbowcloud.app.jes.arrebol.models.ArrebolTask;
 import org.fogbowcloud.app.jes.exceptions.GetJobException;
 import org.json.JSONObject;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 public class ArrebolJobSynchronizer implements JobSynchronizer {
 
@@ -24,16 +25,32 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
 	@Override
 	public JDFJob synchronizeJob(JDFJob job) {
 		try {
-			String arrebolJobJson = this.requestsHelper.getJobJSON(job.getJobIdArrebol());
-			LOGGER.debug("JSON Response [" + arrebolJobJson + "]");
-			Set<ArrebolTaskState> taskStates = this.getJobTaskStates(arrebolJobJson);
-			JDFJobState jobState = getJobState(taskStates);
-			LOGGER.debug("Tasks states set [" + taskStates.toString() + "] resuming to State [" + jobState.value() + "]");
-			job.setState(jobState);
+			String arrebolJobId = job.getJobIdArrebol();
+			if(arrebolJobId != null){
+				String arrebolJobJson = this.requestsHelper.getJobJSON(arrebolJobId);
+				LOGGER.debug("JSON Response [" + arrebolJobJson + "]");
+
+				Gson gson = new Gson();
+				ArrebolJob arrebolJob = gson.fromJson(arrebolJobJson, ArrebolJob.class);
+
+				Set<ArrebolTaskState> taskStates = this.getJobTaskStates(arrebolJobJson);
+				JDFJobState jobState = getJobState(taskStates);
+				LOGGER.debug("Tasks states set [" + taskStates.toString() + "] resuming to State [" + jobState.value() + "]");
+				job.setState(jobState);
+			} else {
+				LOGGER.error("ArrebolJobId from Job [" + job.getId() + "] is null.");
+			}
 		} catch (GetJobException e) {
 			LOGGER.error(e.getMessage());
 		}
 		return job;
+	}
+
+	public void updateTaskState(JDFJob iguassuJob, ArrebolJob arrebolJob){
+		Map<String, ArrebolTask> arrebolTasks = arrebolJob.getTasks();
+		for(Task task : iguassuJob.getTaskList().values()){
+			ArrebolTask arrebolTask = arrebolTasks.get(task.getId());
+		}
 	}
 
 	public Set<ArrebolTaskState> getJobTaskStates(String arrebolJson) {
