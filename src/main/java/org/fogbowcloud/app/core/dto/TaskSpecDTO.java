@@ -1,30 +1,36 @@
 package org.fogbowcloud.app.core.dto;
 
-import org.fogbowcloud.app.core.command.Command;
 import org.fogbowcloud.app.core.task.Specification;
-
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
 public class TaskSpecDTO implements Serializable {
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
+    
+    private String id;
     private Specification spec;
     private List<String> commands;
     private Map<String, String> metadata;
 
-    public TaskSpecDTO(Specification spec, List<String> commands, Map<String, String> metadata){
+    public TaskSpecDTO(String id, Specification spec, List<String> commands,
+            Map<String, String> metadata) {
+        this.id = id;
         this.spec = spec;
         this.commands = commands;
         this.metadata = metadata;
     }
 
-    public TaskSpecDTO() { }
+    public TaskSpecDTO() {}
 
-    public List<String> getCommands(){
+    public List<String> getCommands() {
         return this.commands;
     }
 
-    public Specification getSpec(){
+    public Specification getSpec() {
         return this.spec;
     }
 
@@ -32,13 +38,14 @@ public class TaskSpecDTO implements Serializable {
         return this.metadata;
     }
 
+    public String getId() {
+        return id;
+    }
+
     @Override
     public String toString() {
-        return "TaskSpec{" +
-                "spec=" + spec +
-                ", commands=" + commands +
-                ", metadata=" + metadata +
-                '}';
+        return "TaskSpecDTO [id=" + id + ", spec=" + spec + ", commands=" + commands + ", metadata="
+                + metadata + "]";
     }
 
 }
