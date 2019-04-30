@@ -32,7 +32,7 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
 				ArrebolJob arrebolJob = gson.fromJson(arrebolJobJson, ArrebolJob.class);
 				this.updateJob(job, arrebolJob);
 			} else {
-				LOGGER.error("ArrebolJobId from Job [" + job.getId() + "] is null.", new NullPointerException());
+				LOGGER.info("ArrebolJobId from Job [" + job.getId() + "] is null.");
 			}
 		} catch (GetJobException e) {
 			LOGGER.error(e.getMessage(), e);
