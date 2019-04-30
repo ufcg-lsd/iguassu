@@ -97,7 +97,7 @@ public class ArrebolRequestsHelper {
         LOGGER.info("Building JSON body of Job : [" + job.getId() + "]");
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        JobDTO jobDTO = new JobDTO((job));
+        JobDTO jobDTO = new JobDTO(job);
         String json = gson.toJson(jobDTO);
 
         return new StringEntity(json);
