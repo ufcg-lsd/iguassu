@@ -3,13 +3,11 @@ package org.fogbowcloud.app.jes.arrebol;
 import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.task.Task;
+import org.fogbowcloud.app.core.task.TaskState;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
-import org.fogbowcloud.app.jes.arrebol.models.ArrebolJob;
-import org.fogbowcloud.app.jes.arrebol.models.ArrebolTask;
+import org.fogbowcloud.app.jes.arrebol.models.*;
 import org.fogbowcloud.app.jes.exceptions.GetJobException;
-import org.json.JSONObject;
-
 import java.util.*;
 
 public class ArrebolJobSynchronizer implements JobSynchronizer {
@@ -32,11 +30,7 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
 
 				Gson gson = new Gson();
 				ArrebolJob arrebolJob = gson.fromJson(arrebolJobJson, ArrebolJob.class);
-
-				Set<ArrebolTaskState> taskStates = this.getJobTaskStates(arrebolJobJson);
-				JDFJobState jobState = getJobState(taskStates);
-				LOGGER.debug("Tasks states set [" + taskStates.toString() + "] resuming to State [" + jobState.value() + "]");
-				job.setState(jobState);
+				this.updateJob(job, arrebolJob);
 			} else {
 				LOGGER.error("ArrebolJobId from Job [" + job.getId() + "] is null.");
 			}
@@ -46,65 +40,56 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
 		return job;
 	}
 
-	public void updateTaskState(JDFJob iguassuJob, ArrebolJob arrebolJob){
+	private void updateJob(JDFJob job, ArrebolJob arrebolJob){
+		updateTasksState(job, arrebolJob);
+		updateJobState(job, arrebolJob.getJobState());
+	}
+
+	private void updateTasksState(JDFJob job, ArrebolJob arrebolJob){
 		Map<String, ArrebolTask> arrebolTasks = arrebolJob.getTasks();
-		for(Task task : iguassuJob.getTaskList().values()){
+		LOGGER.info("Updating tasks state from job [" + job.getId() + "].");
+		for(Task task : job.getTaskList().values()){
 			ArrebolTask arrebolTask = arrebolTasks.get(task.getId());
+			ArrebolTaskState arrebolTaskState = arrebolTask.getState();
+			TaskState taskState = getTaskState(arrebolTaskState);
+			task.setState(taskState);
+			LOGGER.debug("Updated task [" + task.getId() + "] to state " + taskState.toString());
 		}
 	}
 
-	public Set<ArrebolTaskState> getJobTaskStates(String arrebolJson) {
-		JSONObject jsonObject = new JSONObject(arrebolJson);
-		jsonObject = jsonObject.getJSONObject("tasks");
-		@SuppressWarnings("unchecked")
-		Iterator<String> keys = jsonObject.keys();
-		Set<ArrebolTaskState> taskStateList = new HashSet<ArrebolTaskState>();
-		while (keys.hasNext()) {
-			String key = keys.next();
-			JSONObject taskObject = jsonObject.getJSONObject(key);
-			String taskState = taskObject.getString("state");
-			LOGGER.debug("State [" + taskState + "] of [" + key + "] Task");
-			taskStateList.add(ArrebolTaskState.getTaskStateFromDesc(taskState));
-		}
-		return taskStateList;
+	private void updateJobState(JDFJob job, ArrebolJobState arrebolJobState){
+		JDFJobState jdfJobState = this.getJobState(arrebolJobState);
+		job.setState(jdfJobState);
+		LOGGER.info("Updated job [" + job.getId() + "] to state " + jdfJobState.toString());
 	}
-	
-	public JDFJobState getJobState(Set<ArrebolTaskState> taskStates) {
-		if (taskStates.contains(ArrebolTaskState.FAILED)) {
+
+	private TaskState getTaskState(ArrebolTaskState arrebolTaskState){
+		if(arrebolTaskState.equals(ArrebolTaskState.FAILED)){
+			return TaskState.FAILED;
+		} else if(arrebolTaskState.equals(ArrebolTaskState.RUNNING)){
+			return TaskState.RUNNING;
+		} else if(arrebolTaskState.equals(ArrebolTaskState.FINISHED)){
+			return TaskState.FINISHED;
+		} else if(arrebolTaskState.equals(ArrebolTaskState.PENDING)){
+			return TaskState.READY;
+		} else if(arrebolTaskState.equals(ArrebolTaskState.CLOSED)){
+			return TaskState.COMPLETED;
+		}
+		return null;
+	}
+
+	private JDFJobState getJobState(ArrebolJobState arrebolJobState){
+		if(arrebolJobState.equals(ArrebolJobState.FAILED)){
 			return JDFJobState.FAILED;
-		} else if (taskStates.contains(ArrebolTaskState.RUNNING)) {
+		} else if(arrebolJobState.equals(ArrebolJobState.FINISHED)){
+			return JDFJobState.FINISHED;
+		} else if(arrebolJobState.equals(ArrebolJobState.SUBMITTED)){
 			return JDFJobState.SUBMITTED;
-		} else if (taskStates.contains(ArrebolTaskState.FINISHED)) {
-			if(taskStates.contains(ArrebolTaskState.PENDING)) {
-				return JDFJobState.SUBMITTED;
-			} else {
-				return JDFJobState.FINISHED;
-			}
-		} else {
+		} else if(arrebolJobState.equals(ArrebolJobState.RUNNING)){
+			return JDFJobState.SUBMITTED;
+		} else if(arrebolJobState.equals(ArrebolJobState.READY)){
 			return JDFJobState.CREATED;
 		}
-	}
-
-	public enum ArrebolTaskState {
-		PENDING("PENDING"), FAILED("FAILED"), FINISHED("FINISHED"), RUNNING("RUNNING"), CLOSED("CLOSED");
-
-		private String desc;
-
-		ArrebolTaskState(String desc) {
-			this.desc = desc;
-		}
-
-		public String getDesc() {
-			return this.desc;
-		}
-
-		public static ArrebolTaskState getTaskStateFromDesc(String desc) {
-			for (ArrebolTaskState ts : values()) {
-				if (ts.getDesc().equals(desc)) {
-					return ts;
-				}
-			}
-			return null;
-		}
+		return null;
 	}
 }
