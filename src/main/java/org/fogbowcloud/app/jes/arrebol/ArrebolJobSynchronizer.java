@@ -1,93 +1,95 @@
 package org.fogbowcloud.app.jes.arrebol;
 
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.core.task.Task;
+import org.fogbowcloud.app.core.task.TaskState;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
+import org.fogbowcloud.app.jes.arrebol.models.*;
 import org.fogbowcloud.app.jes.exceptions.GetJobException;
-import org.json.JSONObject;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 public class ArrebolJobSynchronizer implements JobSynchronizer {
 
-	private static final Logger LOGGER = Logger.getLogger(ArrebolJobSynchronizer.class);
+    private static final Logger LOGGER = Logger.getLogger(ArrebolJobSynchronizer.class);
 
-	private final ArrebolRequestsHelper requestsHelper;
+    private final ArrebolRequestsHelper requestsHelper;
 
-	public ArrebolJobSynchronizer(Properties properties) {
-		this.requestsHelper = new ArrebolRequestsHelper(properties);
-	}
+    public ArrebolJobSynchronizer(Properties properties) {
+        this.requestsHelper = new ArrebolRequestsHelper(properties);
+    }
 
-	@Override
-	public JDFJob synchronizeJob(JDFJob job) {
-		try {
-			String arrebolJobJson = this.requestsHelper.getJobJSON(job.getJobIdArrebol());
-			LOGGER.debug("JSON Response [" + arrebolJobJson + "]");
-			Set<ArrebolTaskState> taskStates = this.getJobTaskStates(arrebolJobJson);
-			JDFJobState jobState = getJobState(taskStates);
-			LOGGER.debug("Tasks states set [" + taskStates.toString() + "] resuming to State [" + jobState.value() + "]");
-			job.setState(jobState);
-		} catch (GetJobException e) {
-			LOGGER.error(e.getMessage());
-		}
-		return job;
-	}
+    //TODO Review method name
+    @Override
+    public JDFJob synchronizeJob(JDFJob job) {
+        try {
+            String arrebolJobId = job.getJobIdArrebol();
+            if (arrebolJobId != null) {
+                String arrebolJobJson = this.requestsHelper.getJobJSON(arrebolJobId);
+                LOGGER.debug("JSON Response [" + arrebolJobJson + "]");
 
-	public Set<ArrebolTaskState> getJobTaskStates(String arrebolJson) {
-		JSONObject jsonObject = new JSONObject(arrebolJson);
-		jsonObject = jsonObject.getJSONObject("tasks");
-		@SuppressWarnings("unchecked")
-		Iterator<String> keys = jsonObject.keys();
-		Set<ArrebolTaskState> taskStateList = new HashSet<ArrebolTaskState>();
-		while (keys.hasNext()) {
-			String key = keys.next();
-			JSONObject taskObject = jsonObject.getJSONObject(key);
-			String taskState = taskObject.getString("state");
-			LOGGER.debug("State [" + taskState + "] of [" + key + "] Task");
-			taskStateList.add(ArrebolTaskState.getTaskStateFromDesc(taskState));
-		}
-		return taskStateList;
-	}
-	
-	public JDFJobState getJobState(Set<ArrebolTaskState> taskStates) {
-		if (taskStates.contains(ArrebolTaskState.FAILED)) {
-			return JDFJobState.FAILED;
-		} else if (taskStates.contains(ArrebolTaskState.RUNNING)) {
-			return JDFJobState.SUBMITTED;
-		} else if (taskStates.contains(ArrebolTaskState.FINISHED)) {
-			if(taskStates.contains(ArrebolTaskState.PENDING)) {
-				return JDFJobState.SUBMITTED;
-			} else {
-				return JDFJobState.FINISHED;
-			}
-		} else {
-			return JDFJobState.CREATED;
-		}
-	}
+                Gson gson = new Gson();
+                ArrebolJob arrebolJob = gson.fromJson(arrebolJobJson, ArrebolJob.class);
+                this.updateJob(job, arrebolJob);
+            } else {
+                LOGGER.info("ArrebolJobId from Job [" + job.getId() + "] is null.");
+            }
+        } catch (GetJobException e) {
+            LOGGER.error(e.getMessage(), e);
+        }
+        return job;
+    }
 
-	public enum ArrebolTaskState {
-		PENDING("PENDING"), FAILED("FAILED"), FINISHED("FINISHED"), RUNNING("RUNNING"), CLOSED("CLOSED");
+    private void updateJob(JDFJob job, ArrebolJob arrebolJob) {
+        updateTasksState(job.getTaskList(), arrebolJob.getTasks());
+        LOGGER.info("Updated tasks state from job [" + job.getId() + "].");
+        updateJobState(job, arrebolJob.getJobState());
+    }
 
-		private String desc;
+    private void updateTasksState(Map<String, Task> tasks, Map<String, ArrebolTask> arrebolTasks) {
 
-		ArrebolTaskState(String desc) {
-			this.desc = desc;
-		}
+        for (ArrebolTask arrebolTask : arrebolTasks.values()) {
+            String taskId = arrebolTask.getTaskSpec().getId();
+            Task task = tasks.get(taskId);
 
-		public String getDesc() {
-			return this.desc;
-		}
+            ArrebolTaskState arrebolTaskState = arrebolTask.getState();
+            TaskState taskState = getTaskState(arrebolTaskState);
+            task.setState(taskState);
+            LOGGER.debug("Updated task [" + task.getId() + "] to state " + taskState.toString());
+        }
+    }
 
-		public static ArrebolTaskState getTaskStateFromDesc(String desc) {
-			for (ArrebolTaskState ts : values()) {
-				if (ts.getDesc().equals(desc)) {
-					return ts;
-				}
-			}
-			return null;
-		}
-	}
+    private void updateJobState(JDFJob job, ArrebolJobState arrebolJobState) {
+        JDFJobState jdfJobState = this.getJobState(arrebolJobState);
+        job.setState(jdfJobState);
+        LOGGER.info("Updated job [" + job.getId() + "] to state " + jdfJobState.toString());
+    }
+
+    private TaskState getTaskState(ArrebolTaskState arrebolTaskState) {
+        switch (arrebolTaskState) {
+            case RUNNING:
+                return TaskState.RUNNING;
+            case FINISHED:
+                return TaskState.FINISHED;
+            case PENDING:
+                return TaskState.READY;
+            default:
+                return null;
+        }
+    }
+
+    private JDFJobState getJobState(ArrebolJobState arrebolJobState) {
+        switch (arrebolJobState) {
+            case SUBMITTED:
+                return JDFJobState.SUBMITTED;
+            case READY:
+                return JDFJobState.RUNNING;
+            case RUNNING:
+                return JDFJobState.RUNNING;
+            default:
+                return null;
+        }
+    }
 }
