@@ -69,16 +69,12 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
 
     private TaskState getTaskState(ArrebolTaskState arrebolTaskState) {
         switch (arrebolTaskState) {
-            case FAILED:
-                return TaskState.FAILED;
             case RUNNING:
                 return TaskState.RUNNING;
             case FINISHED:
                 return TaskState.FINISHED;
             case PENDING:
                 return TaskState.READY;
-            case CLOSED:
-                return TaskState.COMPLETED;
             default:
                 return null;
         }
@@ -89,13 +85,9 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
             case SUBMITTED:
                 return JDFJobState.SUBMITTED;
             case READY:
-                return JDFJobState.CREATED;
+                return JDFJobState.RUNNING;
             case RUNNING:
-                return JDFJobState.SUBMITTED;
-            case FINISHED:
-                return JDFJobState.FINISHED;
-            case FAILED:
-                return JDFJobState.FAILED;
+                return JDFJobState.RUNNING;
             default:
                 return null;
         }
