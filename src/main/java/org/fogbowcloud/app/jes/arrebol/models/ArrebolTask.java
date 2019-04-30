@@ -6,6 +6,8 @@ public class ArrebolTask {
 
     private ArrebolTaskState state;
 
+    private ArrebolTaskSpec taskSpec;
+
     public ArrebolTask(String id) {
         this.id = id;
     }
@@ -18,7 +20,7 @@ public class ArrebolTask {
         return state;
     }
 
-    public void setState(ArrebolTaskState state) {
-        this.state = state;
+    public ArrebolTaskSpec getTaskSpec(){
+        return this.taskSpec;
     }
 }

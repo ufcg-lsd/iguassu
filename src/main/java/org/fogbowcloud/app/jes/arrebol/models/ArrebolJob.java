@@ -16,9 +16,7 @@ public class ArrebolJob {
     private Map<String, ArrebolTask> tasks;
 
     public ArrebolJob(String label, Collection<ArrebolTask> tasks){
-        this.id = UUID.randomUUID().toString();
         this.jobState = ArrebolJobState.SUBMITTED;
-
         this.tasks = new HashMap<>();
 
         for(ArrebolTask task: tasks) {
