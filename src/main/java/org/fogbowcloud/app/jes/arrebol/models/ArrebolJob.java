@@ -1,9 +1,6 @@
 package org.fogbowcloud.app.jes.arrebol.models;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 public class ArrebolJob {
 
@@ -13,15 +10,12 @@ public class ArrebolJob {
 
     private ArrebolJobState jobState;
 
-    private Map<String, ArrebolTask> tasks;
+    private List<ArrebolTask> tasks;
 
     public ArrebolJob(String label, Collection<ArrebolTask> tasks){
         this.jobState = ArrebolJobState.SUBMITTED;
-        this.tasks = new HashMap<>();
-
-        for(ArrebolTask task: tasks) {
-            this.tasks.put(task.getId(), task);
-        }
+        this.tasks = new LinkedList<>();
+        this.tasks.addAll(tasks);
     }
 
     public String getId(){
@@ -36,8 +30,7 @@ public class ArrebolJob {
         this.jobState = jobState;
     }
 
-    public Map<String, ArrebolTask> getTasks(){
-        Map<String, ArrebolTask> mapTasks = new HashMap<>(this.tasks);
-        return mapTasks;
+    public List<ArrebolTask> getTasks(){
+        return new LinkedList<>(this.tasks);
     }
 }

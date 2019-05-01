@@ -119,11 +119,7 @@ public class IguassuController {
 
         String externalOAuthToken = getAccessTokenByOwnerUsername(userName);
 
-        JDFJob jobBuilt = buildJobFromJDFFile(job, jdfFilePath,jobSpec, userName, externalOAuthToken);
-
-        this.createdJobs.put(jobBuilt.getId(), jobBuilt);
-
-        return job;
+        return buildJobFromJDFFile(job, jdfFilePath,jobSpec, userName, externalOAuthToken);
     }
 
     private JobSpecification compile(String jobId, String jdfFilePath) throws CompilerException {
@@ -151,18 +147,8 @@ public class IguassuController {
             job.failCreation();
         }
 
-
-//        Thread t = new Thread(new AsyncJobBuilder(job, jdfFilePath, this.properties, this.jobDataStore, jobSpec,
-//                userName, externalOAuthToken),"job_creation: " + job.getId());
-//        LOGGER.debug("Thread " + t.getName() + " is in state: " + t.getState() + " with job: " + t.getName());
-//        t.start();
-//        LOGGER.debug("Thread " + t.getName() + "with job" + t.getName() + " started");
         return job;
     }
-
-//    public void waitForJobCreation(String jobId) throws InterruptedException {
-//        createdJobs.get(jobId).join();
-//    }
 
     public ArrayList<JDFJob> getAllJobs(String owner) {
         return (ArrayList<JDFJob>) this.jobDataStore.getAllByOwner(owner);
