@@ -6,10 +6,8 @@ ARG IGUASSU_BRANCH
 RUN \
     apt-get update -y && \
     apt-get upgrade -y && \
-    apt-get install -y maven curl git lsof && \
-    curl -sL https://deb.nodesource.com/setup_11.x | bash - && \
-    apt-get install -y nodejs
-
+    apt-get install -y maven curl git lsof
+    
 #Set environment variables
 ENV HOME /root
 
