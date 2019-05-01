@@ -14,8 +14,7 @@ public class ArrebolJob {
 
     public ArrebolJob(String label, Collection<ArrebolTask> tasks){
         this.jobState = ArrebolJobState.SUBMITTED;
-        this.tasks = new LinkedList<>();
-        this.tasks.addAll(tasks);
+        this.tasks = new LinkedList<>(tasks);
     }
 
     public String getId(){
