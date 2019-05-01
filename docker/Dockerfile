@@ -6,8 +6,8 @@ ARG IGUASSU_BRANCH
 RUN \
     apt-get update -y && \
     apt-get upgrade -y && \
-    apt-get install -y maven curl git lsof
-    
+    apt-get install -y maven curl git lsof vim nano
+
 #Set environment variables
 ENV HOME /root
 
