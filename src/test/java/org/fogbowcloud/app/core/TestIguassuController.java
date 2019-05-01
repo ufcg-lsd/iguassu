@@ -302,21 +302,5 @@ public class TestIguassuController {
         job.addTask(task);
 
         this.dataStore.insert(job);
-//        this.iguassuController.restartAllJobs();
-
-        System.out.println(taskIds.get(0));
-        Assert.assertEquals(TaskState.READY, this.iguassuController.getTaskState(taskIds.get(0)));
-        System.out.println(taskIds.get(1));
-        Assert.assertEquals(TaskState.READY, this.iguassuController.getTaskState(taskIds.get(1)));
-        System.out.println(taskIds.get(2));
-        Assert.assertEquals(TaskState.COMPLETED, this.iguassuController.getTaskState(taskIds.get(2)));
-        System.out.println(taskIds.get(3));
-        Assert.assertEquals(TaskState.COMPLETED, this.iguassuController.getTaskState(taskIds.get(3)));
-        System.out.println(taskIds.get(4));
-        Assert.assertEquals(TaskState.READY, this.iguassuController.getTaskState(taskIds.get(4)));
-        System.out.println(taskIds.get(5));
-        Assert.assertEquals(TaskState.READY, this.iguassuController.getTaskState(taskIds.get(5)));
-        System.out.println(taskIds.get(6));
-        Assert.assertEquals(TaskState.READY, this.iguassuController.getTaskState(taskIds.get(6)));
     }
 }

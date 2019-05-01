@@ -2,12 +2,13 @@ package org.fogbowcloud.app.core;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.UUID;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.dto.JobDTO;
 import org.fogbowcloud.app.jdfcompiler.job.*;
 import org.fogbowcloud.app.jes.JobExecutionSystem;
 import org.fogbowcloud.app.core.constants.IguassuGeneralConstants;
@@ -15,7 +16,6 @@ import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.core.exceptions.IguassuException;
 import org.fogbowcloud.app.core.task.Task;
-import org.fogbowcloud.app.core.task.TaskState;
 import org.fogbowcloud.app.jes.arrebol.ArrebolJobExecutionSystem;
 import org.fogbowcloud.app.external.ExternalOAuthController;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
@@ -24,18 +24,12 @@ import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
-import org.fogbowcloud.app.api.http.controllers.JobController;
 import org.fogbowcloud.app.core.authenticator.IguassuAuthenticator;
 import org.fogbowcloud.app.core.authenticator.models.Credential;
 import org.fogbowcloud.app.core.authenticator.ThirdAppAuthenticator;
-import org.fogbowcloud.app.jes.arrebol.ArrebolJobSynchronizer;
-import org.fogbowcloud.app.jes.arrebol.JobSynchronizer;
 import org.fogbowcloud.app.utils.ManagerTimer;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import javax.annotation.PostConstruct;
 
 public class IguassuController {
 
@@ -43,35 +37,23 @@ public class IguassuController {
 
     private final Properties properties;
     private List<Integer> nonces;
-    private Map<String, Task> finishedTasks;
-    private Map<String, JDFJob> createdJobs;
     private JobDataStore jobDataStore;
     private OAuthTokenDataStore oAuthTokenDataStore;
     private IguassuAuthenticator authenticator;
     private ExternalOAuthController externalOAuthTokenController;
     private JobExecutionSystem jobExecutionSystem;
     private JDFJobBuilder jobBuilder;
-    
-    private JobSynchronizer jobSynchronizer;
-
-    @Autowired
-    private JobController jobController;
 
     private static ManagerTimer executionMonitorTimer = new ManagerTimer(Executors.newScheduledThreadPool(1));
 
     public IguassuController(Properties properties) throws IguassuException {
         validateProperties(properties);
         this.properties = properties;
-        this.finishedTasks = new ConcurrentHashMap<>();
-//        this.createdJobs = new ConcurrentHashMap<>();
-        this.createdJobs = new HashMap<>();
         this.externalOAuthTokenController = new ExternalOAuthController(properties);
         this.authenticator = new ThirdAppAuthenticator(this.properties);
         this.jobExecutionSystem = new ArrebolJobExecutionSystem(this.properties);
         this.jobBuilder = new JDFJobBuilder(this.properties);
     }
-
-
 
     public Properties getProperties() {
         return this.properties;
@@ -82,13 +64,6 @@ public class IguassuController {
         this.oAuthTokenDataStore = new OAuthTokenDataStore(this.properties.getProperty(IguassuGeneralConstants.DB_DATASTORE_URL));
 
         this.nonces = new ArrayList<>();
-
-        final int localJobsMonitorPeriod = Integer.valueOf(this.properties.getProperty(
-                IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD));
-
-        LOGGER.debug("Starting Execution Monitor, with period: " + localJobsMonitorPeriod);
-        ExecutionMonitorWithDB executionMonitor = new ExecutionMonitorWithDB(this, this.jobDataStore);
-        executionMonitorTimer.scheduleAtFixedRate(executionMonitor, 0, localJobsMonitorPeriod);
     }
 
     public JDFJob getJobById(String jobId, String owner) {
@@ -119,11 +94,7 @@ public class IguassuController {
 
         String externalOAuthToken = getAccessTokenByOwnerUsername(userName);
 
-        JDFJob jobBuilt = buildJobFromJDFFile(job, jdfFilePath,jobSpec, userName, externalOAuthToken);
-
-        this.createdJobs.put(jobBuilt.getId(), jobBuilt);
-
-        return job;
+        return buildJobFromJDFFile(job, jdfFilePath,jobSpec, userName, externalOAuthToken);
     }
 
     private JobSpecification compile(String jobId, String jdfFilePath) throws CompilerException {
@@ -151,18 +122,8 @@ public class IguassuController {
             job.failCreation();
         }
 
-
-//        Thread t = new Thread(new AsyncJobBuilder(job, jdfFilePath, this.properties, this.jobDataStore, jobSpec,
-//                userName, externalOAuthToken),"job_creation: " + job.getId());
-//        LOGGER.debug("Thread " + t.getName() + " is in state: " + t.getState() + " with job: " + t.getName());
-//        t.start();
-//        LOGGER.debug("Thread " + t.getName() + "with job" + t.getName() + " started");
         return job;
     }
-
-//    public void waitForJobCreation(String jobId) throws InterruptedException {
-//        createdJobs.get(jobId).join();
-//    }
 
     public ArrayList<JDFJob> getAllJobs(String owner) {
         return (ArrayList<JDFJob>) this.jobDataStore.getAllByOwner(owner);
@@ -203,20 +164,6 @@ public class IguassuController {
             }
         }
         return null;
-    }
-
-    public TaskState getTaskState(String taskId) {
-        return finishedTasks.get(taskId).getState();
-    }
-
-    public void moveTaskToFinished(Task task) {
-        JDFJob job = this.jobDataStore.getByJobId(
-                task.getMetadata(IguassuPropertiesConstants.JOB_ID),
-                task.getMetadata(IguassuPropertiesConstants.OWNER)
-        );
-        LOGGER.info("Moving task " + task.getId() + " from job " + job.getName() + " to finished");
-        this.finishedTasks.put(task.getId(), task);
-        updateJob(job);
     }
 
     public User authUser(String credentials) {
