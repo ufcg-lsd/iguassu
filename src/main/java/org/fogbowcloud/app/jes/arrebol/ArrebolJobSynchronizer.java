@@ -48,9 +48,9 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
         updateJobState(job, arrebolJob.getJobState());
     }
 
-    private void updateTasksState(Map<String, Task> tasks, Map<String, ArrebolTask> arrebolTasks) {
+    private void updateTasksState(Map<String, Task> tasks, List<ArrebolTask> arrebolTasks) {
 
-        for (ArrebolTask arrebolTask : arrebolTasks.values()) {
+        for (ArrebolTask arrebolTask : arrebolTasks) {
             String taskId = arrebolTask.getTaskSpec().getId();
             Task task = tasks.get(taskId);
 
@@ -63,8 +63,23 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
 
     private void updateJobState(JDFJob job, ArrebolJobState arrebolJobState) {
         JDFJobState jdfJobState = this.getJobState(arrebolJobState);
+
+        if (jdfJobState.equals(JDFJobState.RUNNING) && tasksFinished(job)) {
+            jdfJobState = JDFJobState.FINISHED;
+        }
+
         job.setState(jdfJobState);
         LOGGER.info("Updated job [" + job.getId() + "] to state " + jdfJobState.toString());
+    }
+
+    private boolean tasksFinished(JDFJob job) {
+        int tasksFinished = 0;
+
+        for (Task task : job.getTasks()) {
+            if (task.getState().equals(TaskState.FINISHED)) tasksFinished++;
+        }
+
+        return job.getTasks().size() == tasksFinished;
     }
 
     private TaskState getTaskState(ArrebolTaskState arrebolTaskState) {

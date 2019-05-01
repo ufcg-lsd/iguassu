@@ -120,7 +120,6 @@ public class JobDataStore extends DataStore<JDFJob> {
 			preparedStatement.setString(1, job.getId());
 			preparedStatement.setString(2, job.getOwner());
 			preparedStatement.setString(3, job.toJSON().toString());
-			preparedStatement.setString(4, job.getId());
 			
 			preparedStatement.execute();
 			connection.commit();
