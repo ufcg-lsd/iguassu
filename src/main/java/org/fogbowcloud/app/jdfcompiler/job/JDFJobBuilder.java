@@ -260,11 +260,11 @@ public class JDFJobBuilder {
 				+ " --data-binary @" + localFilePath + " --silent --output /dev/null "
 				+ " http://$server/remote.php/webdav/" + filePathToUpload + "); ";
 
-		String scpCommand = "\'server=" + fileDriverHostIp + "; "
+		String scpCommand = "server=" + fileDriverHostIp + "; "
 				+ "token=" + token + "; "
 				+ uploadCommand
 				+ " if [ \\$http_code == " + HttpStatus.UNAUTHORIZED + " ] ; then " + requestTokenCommand
-				+ uploadCommand + " fi \'";
+				+ uploadCommand + " fi";
 
 		return new Command(scpCommand);
 	}
@@ -277,12 +277,12 @@ public class JDFJobBuilder {
 				+ " --silent --output " + localFilePath + " /dev/null); ";
 		String extractHttpStatusCode = "http_code=${full_response:0:3}; ";
 
-		String scpCommand = "\'server=" + fileDriverHostIp + "; "
+		String scpCommand = "server=" + fileDriverHostIp + "; "
 				+ "token=" + token + "; "
 				+ downloadCommand
 				+ extractHttpStatusCode
-				+ " if [ \\$http_code == " + String.valueOf(HttpStatus.UNAUTHORIZED) + " ] ; then " + requestTokenCommand
-				+ " " + downloadCommand + " fi \'";
+				+ " if [ \\$http_code == " + HttpStatus.UNAUTHORIZED + " ] ; then " + requestTokenCommand
+				+ " " + downloadCommand + " fi";
 
 		return new Command(scpCommand);
 	}

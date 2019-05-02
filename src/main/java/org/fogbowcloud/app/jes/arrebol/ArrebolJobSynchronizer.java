@@ -103,6 +103,8 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
                 return JDFJobState.RUNNING;
             case RUNNING:
                 return JDFJobState.RUNNING;
+            case FAILED:
+                return JDFJobState.FAILED;
             default:
                 return null;
         }
