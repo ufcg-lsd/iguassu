@@ -10,6 +10,8 @@ import org.fogbowcloud.app.api.exceptions.StorageException;
 import org.fogbowcloud.app.api.http.services.FileSystemStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
+import org.fogbowcloud.app.core.task.Task;
+import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.core.authenticator.models.User;
@@ -56,13 +58,8 @@ public class JobController {
 
         User owner = this.jobService.authenticateUser(credentials);
         List<JDFJob> list = this.jobService.getAllJobs(owner);
-        List<JDFJob> syncList = new ArrayList<>();
-        for(JDFJob job : list) {
-            JDFJob syncJob = IguassuApplication.jobSynchronizer.synchronizeJob(job);
-            this.jobService.updateJob(job);
-            syncList.add(syncJob);
-        }
-        return new ResponseEntity<>(syncList, HttpStatus.OK);
+
+        return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
     @RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH, method = RequestMethod.GET)
@@ -84,9 +81,6 @@ public class JobController {
                 throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
             }
         }
-        
-        job = IguassuApplication.jobSynchronizer.synchronizeJob(job);
-        this.jobService.updateJob(job);
 
         return new ResponseEntity<>(job, HttpStatus.OK);
     }

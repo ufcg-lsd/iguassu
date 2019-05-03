@@ -120,6 +120,7 @@ public class JobDataStore extends DataStore<JDFJob> {
 			preparedStatement.setString(1, job.getId());
 			preparedStatement.setString(2, job.getOwner());
 			preparedStatement.setString(3, job.toJSON().toString());
+			preparedStatement.setString(4, job.getId());
 			
 			preparedStatement.execute();
 			connection.commit();
@@ -200,25 +201,26 @@ public class JobDataStore extends DataStore<JDFJob> {
 		}
 	}
 
-	public boolean deleteByJobId(String jobId, String owner) {
+	public int deleteByJobId(String jobId, String owner) {
 		LOGGER.debug("Deleting all jobs with id [" + jobId + "]");
 
 		PreparedStatement statement = null;
 		Connection conn = null;
+		int updateCount = -1;
 		try {
 			conn = getConnection();
 			statement = conn.prepareStatement(DELETE_BY_JOB_ID_SQL);
 			statement.setString(1, jobId);
 			statement.setString(2, owner);
-			//			conn.commit(); // database on autocommit
-			return statement.execute();
+
+			updateCount = statement.executeUpdate();
 		} catch (SQLException e) {
 			LOGGER.error("Couldn't delete registres on " + JOBS_TABLE_NAME + " with Job id ["
 					+ jobId + "]", e);
-			return false;
 		} finally {
 			close(statement, conn);
 		}
+		return updateCount;
 	}
 
 	public JDFJob getObjFromDataStoreResult(ResultSet rs) throws SQLException {

@@ -237,12 +237,8 @@ public class TaskImpl implements Task {
         Specification specification = Specification.fromJSON(taskJSON.optJSONObject("specification"));
         Task task = new TaskImpl(taskJSON.optString("id"), specification, taskJSON.optString("uuid"));
         task.setRetries(taskJSON.optInt("retries"));
-        if (taskJSON.optBoolean("isFinished")) {
-            task.finish();
-        }
-        if (taskJSON.optBoolean("isFailed")) {
-            task.fail();
-        }
+        String taskState = taskJSON.optString("state");
+        task.setState(TaskState.getTaskStateFromDesc(taskState));
 
         JSONArray commands = taskJSON.optJSONArray("commands");
         for (int i = 0; i < commands.length(); i++) {
