@@ -2,13 +2,12 @@ package org.fogbowcloud.app.core;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.Executors;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.IguassuApplication;
+import org.fogbowcloud.app.core.monitor.JobStateMonitor;
 import org.fogbowcloud.app.jdfcompiler.job.*;
 import org.fogbowcloud.app.jes.JobExecutionSystem;
 import org.fogbowcloud.app.core.constants.IguassuGeneralConstants;
@@ -64,6 +63,8 @@ public class IguassuController {
         this.oAuthTokenDataStore = new OAuthTokenDataStore(this.properties.getProperty(IguassuGeneralConstants.DB_DATASTORE_URL));
 
         this.nonces = new ArrayList<>();
+        JobStateMonitor jobStateMonitor = new JobStateMonitor(jobDataStore);
+        executionMonitorTimer.scheduleAtFixedRate(jobStateMonitor, 3000, 5000);
     }
 
     public JDFJob getJobById(String jobId, String owner) {
