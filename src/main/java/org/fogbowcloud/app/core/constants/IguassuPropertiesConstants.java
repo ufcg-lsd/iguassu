@@ -20,6 +20,8 @@ public class IguassuPropertiesConstants {
 	public static final String JOB_ID  = "jobID";
 	public static final String OWNER = "owner";
 
+	public static final String JDF_FILE_PATH = "jdffilepath";
+
 	//____ Storage Service ____//
 	public static final String IGUASSU_SERVICE_HOST = "iguassu_service_host";
 	public static final String STORAGE_SERVICE_HOST = "storage_service_host";

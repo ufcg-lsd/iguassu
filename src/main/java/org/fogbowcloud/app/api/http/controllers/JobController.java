@@ -4,13 +4,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.IguassuApplication;
 import org.fogbowcloud.app.api.constants.ApiDocumentation;
 import org.fogbowcloud.app.api.exceptions.StorageException;
 import org.fogbowcloud.app.api.http.services.FileSystemStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
+import org.fogbowcloud.app.core.dto.JobResponseDTO;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
-import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
@@ -25,7 +24,6 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,14 +31,12 @@ import java.util.Map;
 @CrossOrigin
 @RestController
 @RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_ENDPOINT)
-@Api(description = ApiDocumentation.Job.API)
+@Api(ApiDocumentation.Job.API)
 public class JobController {
-    public static final String JDF_FILE_PATH = "jdffilepath";
     private final Logger LOGGER = Logger.getLogger(JobController.class);
 
     @Lazy
-    JobService jobService;
-
+    private JobService jobService;
     private final FileSystemStorageService storageService;
 
     @Autowired
@@ -57,14 +53,14 @@ public class JobController {
         LOGGER.info("Retrieving all jobs.");
 
         User owner = this.jobService.authenticateUser(credentials);
-        List<JDFJob> list = this.jobService.getAllJobs(owner);
+        List<JDFJob> allJobs = this.jobService.getAllJobs(owner);
 
-        return new ResponseEntity<>(list, HttpStatus.OK);
+        return new ResponseEntity<>(allJobs, HttpStatus.OK);
     }
 
     @RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH, method = RequestMethod.GET)
     @ApiOperation(value = ApiDocumentation.Job.GET_BY_ID_OPERATION)
-    public ResponseEntity<JDFJob> getJobById(
+    public ResponseEntity<JobResponseDTO> getJobById(
             @ApiParam(value = ApiDocumentation.Job.ID)
                 @PathVariable String jobId,
             @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
@@ -82,14 +78,14 @@ public class JobController {
             }
         }
 
-        return new ResponseEntity<>(job, HttpStatus.OK);
+        return new ResponseEntity<>(new JobResponseDTO(job), HttpStatus.OK);
     }
 
     @RequestMapping(method = RequestMethod.POST)
     @ApiOperation(value = ApiDocumentation.Job.CREATE_OPERATION)
-    public ResponseEntity<JobResponse> addJob(
+    public ResponseEntity<String> addJob(
             @ApiParam(value = ApiDocumentation.Job.CREATE_REQUEST_PARAM)
-                    @RequestParam(JobController.JDF_FILE_PATH) MultipartFile file, RedirectAttributes redirectAttributes,
+                    @RequestParam(IguassuPropertiesConstants.JDF_FILE_PATH) MultipartFile file, RedirectAttributes redirectAttributes,
             @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
                     @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) {
         LOGGER.info("Saving new Job.");
@@ -97,20 +93,20 @@ public class JobController {
         LOGGER.info(file.toString());
 
         Map<String, String> fieldMap = new HashMap<>();
-        fieldMap.put(JDF_FILE_PATH, null);
+        fieldMap.put(IguassuPropertiesConstants.JDF_FILE_PATH, null);
         fieldMap.put(IguassuPropertiesConstants.X_CREDENTIALS, null);
 
         this.storageService.store(file, fieldMap);
         User owner = this.jobService.authenticateUser(credentials);
 
-        String jdf = fieldMap.get(JDF_FILE_PATH);
+        String jdf = fieldMap.get(IguassuPropertiesConstants.JDF_FILE_PATH);
         if (jdf == null) {
             LOGGER.info("Could not store  new job from user " + owner.getUsername());
             throw new StorageException("Could not store  new job from user " + owner.getUsername());
         }
 
         String jobId;
-        String jdfAbsolutePath = fieldMap.get(JDF_FILE_PATH);
+        String jdfAbsolutePath = fieldMap.get(IguassuPropertiesConstants.JDF_FILE_PATH);
         try {
             LOGGER.info("jdfpath <" + jdfAbsolutePath + ">");
             jobId = this.jobService.addJob(jdfAbsolutePath, owner);
@@ -122,14 +118,12 @@ public class JobController {
             LOGGER.error("Could not read JDF file.", e);
             throw new StorageException("Could not read JDF file.");
         }
-
-        JobResponse mJobId = new JobResponse(jobId);
-        return new ResponseEntity<>(mJobId, HttpStatus.CREATED);
+        return new ResponseEntity<>(jobId, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH, method = RequestMethod.DELETE)
     @ApiOperation(value = ApiDocumentation.Job.DELETE_OPERATION)
-    public ResponseEntity<JobResponse> stopJob(
+    public ResponseEntity<String> stopJob(
             @ApiParam(value = ApiDocumentation.Job.ID)
                 @PathVariable String jobId,
             @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
@@ -146,19 +140,6 @@ public class JobController {
             throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
         }
 
-        JobResponse jobResponse = new JobResponse(stoppedJobId);
-        return new ResponseEntity<>(jobResponse, HttpStatus.OK);
+        return new ResponseEntity<>(stoppedJobId, HttpStatus.ACCEPTED);
     }
-
-    public class JobResponse {
-        private String id;
-        public JobResponse(String id) { this.id = id; }
-        public String getId() {
-            return this.id;
-        }
-        public void setIt(String id) {
-            this.id = id;
-        }
-    }
-
 }

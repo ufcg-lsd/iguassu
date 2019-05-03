@@ -9,7 +9,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
-import org.fogbowcloud.app.core.dto.JobDTO;
+import org.fogbowcloud.app.core.dto.ArrebolJobDTO;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jes.exceptions.GetJobException;
 import org.fogbowcloud.app.jes.exceptions.SubmitJobException;
@@ -67,8 +67,8 @@ public class ArrebolRequestsHelper {
         return jobIdArrebol;
     }
 
-    public JobDTO getJob(String jobArrebolId) throws GetJobException {
-        return this.gson.fromJson(getJobJSON(jobArrebolId), JobDTO.class);
+    public ArrebolJobDTO getJob(String jobArrebolId) throws GetJobException {
+        return this.gson.fromJson(getJobJSON(jobArrebolId), ArrebolJobDTO.class);
     }
     
     public String getJobJSON(String jobArrebolId) throws GetJobException {
@@ -88,8 +88,8 @@ public class ArrebolRequestsHelper {
         LOGGER.info("Building JSON body of Job : [" + job.getId() + "]");
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        JobDTO jobDTO = new JobDTO(job);
-        String json = gson.toJson(jobDTO);
+        ArrebolJobDTO arrebolJobDTO = new ArrebolJobDTO(job);
+        String json = gson.toJson(arrebolJobDTO);
 
         return new StringEntity(json);
     }

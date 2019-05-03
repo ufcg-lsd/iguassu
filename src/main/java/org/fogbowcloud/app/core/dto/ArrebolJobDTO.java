@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JobDTO implements Serializable {
+public class ArrebolJobDTO implements Serializable {
     /**
      * 
      */
@@ -14,7 +14,7 @@ public class JobDTO implements Serializable {
     private String label;
     private List<TaskSpecDTO> tasksSpecs;
 
-    public JobDTO(JDFJob job) {
+    public ArrebolJobDTO(JDFJob job) {
         this.tasksSpecs = new ArrayList<>();
         this.label = job.getName();
         populateTaskSpec(job);
