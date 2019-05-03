@@ -136,11 +136,12 @@ public class IguassuController {
 
     public String stopJob(String jobId, String owner) {
         // TODO: Stop job at Arrebol
-        boolean isStopped = this.jobDataStore.deleteByJobId(jobId, owner);
-        if (isStopped) {
+        int updateCount  = this.jobDataStore.deleteByJobId(jobId, owner);
+        LOGGER.info("job deleted: " + jobId + this.jobDataStore.getByJobId(jobId, owner));
+        if (updateCount >= 1) {
             return jobId;
         } else {
-            LOGGER.error("jobDataStore returns false for deleteByJobId to the job with id [" + jobId + "]");
+            LOGGER.error("Job with id [" + jobId + "] not found in the Datastore.");
             return null;
         }
     }
