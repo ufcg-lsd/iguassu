@@ -4,8 +4,6 @@ import java.util.*;
 
 public class ArrebolJob {
 
-    private static final long serialVersionUID = -6111900503095749695L;
-
     private String id;
 
     private ArrebolJobState jobState;

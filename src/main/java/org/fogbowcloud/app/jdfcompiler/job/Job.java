@@ -6,65 +6,49 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
-
-import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.task.Task;
 
 public abstract class Job implements Serializable {
 
-	private static final long serialVersionUID = -6111900503095749695L;
-	private static final Logger LOGGER = Logger.getLogger(Job.class);
+    private static final long serialVersionUID = -6111900503095749695L;
 
-	private Map<String, Task> taskList;
-	private final ReentrantReadWriteLock taskReadyLock;
-	private boolean isCreated;
+    private Map<String, Task> taskList;
+    private final ReentrantReadWriteLock taskReadyLock;
 
-	public Job(List<Task> tasks) {
-		this.isCreated = true;
-		this.taskList = new HashMap<>();
-		this.taskReadyLock = new ReentrantReadWriteLock();
-		addTasks(tasks);
-	}
+    public Job(List<Task> tasks) {
+        this.taskList = new HashMap<>();
+        this.taskReadyLock = new ReentrantReadWriteLock();
+        addTasks(tasks);
+    }
 
-	public void addTask(Task task) {
-		LOGGER.debug("Adding task " + task.getId());
-		taskReadyLock.writeLock().lock();
-		try {
-			getTaskList().put(task.getId(), task);
-		} finally {
-			taskReadyLock.writeLock().unlock();
-		}
-	}
+    public void addTask(Task task) {
+        taskReadyLock.writeLock().lock();
+        try {
+            getTaskList().put(task.getId(), task);
+        } finally {
+            taskReadyLock.writeLock().unlock();
+        }
+    }
 
-	private void addTasks(List<Task> tasks) {
-		for(Task task : tasks){
-			addTask(task);
-		}
-	}
-	
-	public List<Task> getTasks(){
-		return new ArrayList<>(taskList.values());
-	}
-	
-	public abstract void setState(JDFJobState state);
+    private void addTasks(List<Task> tasks) {
+        for (Task task : tasks) {
+            addTask(task);
+        }
+    }
 
-	public abstract String getId();
+    public List<Task> getTasks() {
+        return new ArrayList<>(taskList.values());
+    }
 
-	public boolean isCreated() {
-		return this.isCreated;
-	}
+    public abstract void setState(JDFJobState state);
 
-	public void setCreated() { this.isCreated = true; }
+    public abstract String getId();
 
-	public void restart() {
-		this.isCreated = false;
-	}
+    public Map<String, Task> getTaskList() {
+        return taskList;
+    }
 
-	public Map<String, Task> getTaskList() {
-		return taskList;
-	}
-
-	public void setTaskList(Map<String, Task> taskList) {
-		this.taskList = taskList;
-	}
+    public void setTaskList(Map<String, Task> taskList) {
+        this.taskList = taskList;
+    }
 }

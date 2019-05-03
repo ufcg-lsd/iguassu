@@ -26,7 +26,6 @@ import org.mockito.Mockito;
 public class TestIguassuController {
 
     private static final String FAKE_UUID = "1234";
-    private static final String FAKE_CLOUD_NAME = "cloudfake";
     private static final String FAKE_OWNER = "testowner";
     private static final String FAKE_TASK_ID = "testtaskId";
     private static final String FAKE_IMAGE_FLAVOR_NAME = "testimage";
@@ -277,13 +276,11 @@ public class TestIguassuController {
         task = new TaskImpl("TaskNumber-" + 2 + "-" + UUID.randomUUID(), spec, "0000");
         task.setState(TaskState.FINISHED);
         taskIds.add(task.getId());
-        task.finish();
         job.addTask(task);
 
         task = new TaskImpl("TaskNumber-" + 3 + "-" + UUID.randomUUID(), spec, "0000");
         task.setState(TaskState.COMPLETED);
         taskIds.add(task.getId());
-        task.finish();
         job.addTask(task);
 
         task = new TaskImpl("TaskNumber-" + 4 + "-" + UUID.randomUUID(), spec, "0000");

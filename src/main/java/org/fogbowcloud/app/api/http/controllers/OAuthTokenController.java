@@ -56,7 +56,7 @@ public class OAuthTokenController {
 
     @RequestMapping(method = RequestMethod.DELETE)
     @ApiOperation(value = ApiDocumentation.OAuthToken.DELETE_OPERATION)
-    public ResponseEntity deleteAllOAuthTokens() {
+    public ResponseEntity<List<OAuthToken>> deleteAllOAuthTokens() {
         LOGGER.info("Deleting all OAuth tokens.");
 
         this.oAuthService.deleteAllTokens();

@@ -5,12 +5,9 @@ import org.fogbowcloud.app.core.command.Command;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import java.util.*;
 
 public class TaskImpl implements Task {
-
-    private static final long serialVersionUID = -8068456932331499162L;
 
     private static final Logger LOGGER = Logger.getLogger(TaskImpl.class);
 
@@ -29,25 +26,15 @@ public class TaskImpl implements Task {
     private TaskState state;
     private List<Command> commands;
     private List<String> commandsStr;
-    private List<String> processes;
     private Map<String, String> metadata;
-    private boolean isFailed;
-    private boolean isFinished;
-    private int retries;
-    private long startedRunningAt;
 
     public TaskImpl(String id, Specification specification, String uuid) {
         this.commands = new ArrayList<>();
-        this.processes =  new ArrayList<>();
         this.metadata = new HashMap<>();
-        this.isFailed = false;
-        this.isFinished = false;
         this.id = id;
-        this.retries = -1;
         this.specification = specification;
         this.state = TaskState.READY;
         this.uuid = uuid;
-        this.startedRunningAt = Long.MAX_VALUE;
         this.commandsStr = new ArrayList<>();
     }
 
@@ -73,22 +60,6 @@ public class TaskImpl implements Task {
     }
 
     @Override
-    public Task clone() {
-        TaskImpl taskClone = new TaskImpl(UUID.randomUUID() + "_clonedFrom_" + getId(),
-                getSpecification(), getUUID());
-        Map<String, String> allMetadata = getAllMetadata();
-        for (String attribute : allMetadata.keySet()) {
-            taskClone.putMetadata(attribute, allMetadata.get(attribute));
-        }
-
-        List<Command> commands = getAllCommands();
-        for (Command command : commands) {
-            taskClone.addCommand(command);
-        }
-        return taskClone;
-    }
-
-    @Override
     public List<Command> getAllCommands() {
         return commands;
     }
@@ -109,88 +80,13 @@ public class TaskImpl implements Task {
     }
 
     @Override
-    public void finish(){
-        this.isFinished = true;
-        setState(TaskState.COMPLETED);
-    }
-
-    @Override
-    public boolean isFinished() {
-        return this.isFinished;
-    }
-
-    @Override
     public void addCommand(Command command) {
         commands.add(command);
     }
 
     @Override
-    public void fail() {
-        isFailed = true;
-    }
-
-    @Override
-    public boolean isFailed() {
-        return isFailed;
-    }
-
-    @Override
-    public boolean checkTimeOuted() {
-        String timeOutRaw = getMetadata(METADATA_TASK_TIMEOUT);
-
-        if (timeOutRaw == null || timeOutRaw.trim().isEmpty()){
-            return false;
-        }
-        long timeOut;
-        try {
-            timeOut = Long.parseLong(timeOutRaw);
-        } catch (NumberFormatException e){
-            LOGGER.error("Timeout badly formated, ignoring it: ", e);
-            return false;
-        }
-        return System.currentTimeMillis() - this.startedRunningAt > timeOut;
-    }
-
-    @Override
-    public void startedRunning() {
-        this.startedRunningAt = System.currentTimeMillis();
-        this.retries++;
-    }
-
-    @Override
-    public boolean mayRetry() {
-        if (getMetadata(METADATA_MAX_RESOURCE_CONN_RETRIES) != null) {
-            return getRetries() <= Integer.parseInt(getMetadata(METADATA_MAX_RESOURCE_CONN_RETRIES));
-        }
-        return false;
-    }
-
-    @Override
-    public int getRetries() {
-        return retries;
-    }
-
-    @Override
-    public void setRetries(int retries) {
-        this.retries = retries;
-    }
-
-
-    @Override
-    public void addProcessId(String procId) {
-        this.processes.add(procId);
-    }
-
-    @Override
     public int getNumberOfCommands() {
         return commands.size();
-    }
-
-
-    @Override
-    public List<String> getProcessId() {
-
-        return this.processes;
     }
 
     @Override
@@ -199,7 +95,9 @@ public class TaskImpl implements Task {
     }
 
     @Override
-    public void setState(TaskState state) { this.state = state; }
+    public void setState(TaskState state) {
+        this.state = state;
+    }
 
     @Override
     public String getUUID() {
@@ -209,11 +107,8 @@ public class TaskImpl implements Task {
     public JSONObject toJSON() {
         try {
             JSONObject task = new JSONObject();
-            task.put("isFinished", this.isFinished());
-            task.put("isFailed", this.isFailed());
             task.put("id", this.getId());
             task.put("specification", this.getSpecification().toJSON());
-            task.put("retries", this.getRetries());
             task.put("uuid", this.getUUID());
             task.put("state", this.state.getDesc());
             JSONArray commands = new JSONArray();
@@ -234,9 +129,10 @@ public class TaskImpl implements Task {
     }
 
     public static Task fromJSON(JSONObject taskJSON) {
-        Specification specification = Specification.fromJSON(taskJSON.optJSONObject("specification"));
-        Task task = new TaskImpl(taskJSON.optString("id"), specification, taskJSON.optString("uuid"));
-        task.setRetries(taskJSON.optInt("retries"));
+        Specification specification =
+                Specification.fromJSON(taskJSON.optJSONObject("specification"));
+        Task task =
+                new TaskImpl(taskJSON.optString("id"), specification, taskJSON.optString("uuid"));
         String taskState = taskJSON.optString("state");
         task.setState(TaskState.getTaskStateFromDesc(taskState));
 
@@ -279,6 +175,7 @@ public class TaskImpl implements Task {
             return false;
         if (specification == null) {
             return other.specification == null;
-        } else return specification.equals(other.specification);
+        } else
+            return specification.equals(other.specification);
     }
 }

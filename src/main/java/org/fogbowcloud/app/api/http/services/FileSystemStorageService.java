@@ -8,7 +8,6 @@ import java.util.Map;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.api.http.controllers.JobController;
 import org.fogbowcloud.app.api.exceptions.StorageException;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.springframework.stereotype.Service;
