@@ -143,7 +143,7 @@ public class JobController {
 
     @RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH, method = RequestMethod.DELETE)
     @ApiOperation(value = ApiDocumentation.Job.DELETE_OPERATION)
-    public ResponseEntity<String> stopJob(
+    public ResponseEntity<SimpleJobResponse> stopJob(
             @ApiParam(value = ApiDocumentation.Job.ID)
                 @PathVariable String jobId,
             @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
@@ -160,6 +160,17 @@ public class JobController {
             throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
         }
 
-        return new ResponseEntity<>(stoppedJobId, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(new SimpleJobResponse(stoppedJobId), HttpStatus.ACCEPTED);
+    }
+
+    public class SimpleJobResponse {
+        private String id;
+        public SimpleJobResponse(String id) { this.id = id; }
+        public String getId() {
+            return this.id;
+        }
+        public void setIt(String id) {
+            this.id = id;
+        }
     }
 }
