@@ -65,8 +65,28 @@ public class JobController {
                 @PathVariable String jobId,
             @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
                 @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) throws InvalidParameterException {
-        LOGGER.info("Retrieving job with id " + jobId + "].");
+        LOGGER.info("Retrieving job with id [" + jobId + "].");
 
+        JDFJob job = getJDFJob(jobId, credentials);
+
+        return new ResponseEntity<>(new JobResponseDTO(job), HttpStatus.OK);
+    }
+    
+    @RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH + "/" + ApiDocumentation.ApiEndpoints.TASKS_ENDPOINT, method = RequestMethod.GET)
+    @ApiOperation(value = ApiDocumentation.Job.GET_TASKS_OPERATION)
+    public ResponseEntity<List<Task>> getJobTasks(
+            @ApiParam(value = ApiDocumentation.Job.ID)
+                @PathVariable String jobId,
+            @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
+                @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) throws InvalidParameterException {
+        LOGGER.info("Retrieving tasks from job with id [" + jobId + "].");
+
+        JDFJob job = getJDFJob(jobId, credentials);
+
+        return new ResponseEntity<>(job.getTasks(), HttpStatus.OK);
+    }
+
+    private JDFJob getJDFJob(String jobId, String credentials) throws InvalidParameterException {
         User owner = this.jobService.authenticateUser(credentials);
         JDFJob job = this.jobService.getJobById(jobId, owner);
 
@@ -77,8 +97,7 @@ public class JobController {
                 throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
             }
         }
-
-        return new ResponseEntity<>(new JobResponseDTO(job), HttpStatus.OK);
+        return job;
     }
 
     @RequestMapping(method = RequestMethod.POST)
