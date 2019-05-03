@@ -59,8 +59,6 @@ public class JobController {
         User owner = this.jobService.authenticateUser(credentials);
         List<JDFJob> list = this.jobService.getAllJobs(owner);
 
-        LOGGER.info("job list :" + list.toString());
-
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 

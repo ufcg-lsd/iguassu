@@ -73,19 +73,19 @@ public class IguassuController {
 
     public String addJob(String jdfFilePath, User owner)
             throws CompilerException {
-      LOGGER.debug("Adding job  of owner " + owner.getUsername() + " to scheduler");
-      // TODO change this method name
+        LOGGER.debug("Adding job  of owner " + owner.getUsername() + " to scheduler");
+        // TODO change this method name
 
-      JDFJob job = buildJob(jdfFilePath, owner);
+        JDFJob job = buildJob(jdfFilePath, owner);
 
-      String joIdArrebol = this.jobExecutionSystem.execute(job);
-      job.setJobIdArrebol(joIdArrebol);
+        String joIdArrebol = this.jobExecutionSystem.execute(job);
+        job.setJobIdArrebol(joIdArrebol);
 
-      LOGGER.info("Arrebol Id: " + job.getJobIdArrebol());
+        LOGGER.info("Arrebol Id: " + job.getJobIdArrebol());
 
-      this.jobDataStore.insert(job);
+        this.jobDataStore.insert(job);
 
-      return job.getId();
+        return job.getId();
     }
 
     public JDFJob buildJob(String jdfFilePath, User owner) throws CompilerException {
@@ -95,7 +95,7 @@ public class IguassuController {
 
         String externalOAuthToken = getAccessTokenByOwnerUsername(userName);
 
-        return buildJobFromJDFFile(job, jdfFilePath,jobSpec, userName, externalOAuthToken);
+        return buildJobFromJDFFile(job, jdfFilePath, jobSpec, userName, externalOAuthToken);
     }
 
     private JobSpecification compile(String jobId, String jdfFilePath) throws CompilerException {
@@ -108,7 +108,7 @@ public class IguassuController {
     }
 
     private JDFJob buildJobFromJDFFile(JDFJob job, String jdfFilePath, JobSpecification jobSpec, String userName,
-                                   String externalOAuthToken) {
+                                       String externalOAuthToken) {
         try {
             this.jobBuilder.createJobFromJDFFile(job, jdfFilePath, jobSpec,
                     userName, externalOAuthToken);
@@ -136,11 +136,12 @@ public class IguassuController {
 
     public String stopJob(String jobId, String owner) {
         // TODO: Stop job at Arrebol
-        boolean isStopped = this.jobDataStore.deleteByJobId(jobId, owner);
-        if (isStopped) {
+        final int updateCount = this.jobDataStore.deleteByJobId(jobId, owner);
+
+        if (updateCount >= 1) {
             return jobId;
         } else {
-            LOGGER.error("jobDataStore returns false for deleteByJobId to the job with id [" + jobId + "]");
+            LOGGER.error("Job with id [" + jobId + "] not found in the Datastore.");
             return null;
         }
     }
