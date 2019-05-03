@@ -184,4 +184,16 @@ public class JDFJob extends Job implements Serializable {
 	public int hashCode() {
 		return Objects.hash(jobId, owner);
 	}
+
+	@Override
+	public String toString() {
+		return "JDFJob{" +
+				"jobId='" + jobId + '\'' +
+				", owner='" + owner + '\'' +
+				", userId='" + userId + '\'' +
+				", name='" + name + '\'' +
+				", state=" + state +
+				", jobIdArrebol='" + jobIdArrebol + '\'' +
+				'}';
+	}
 }

@@ -58,15 +58,9 @@ public class JobController {
 
         User owner = this.jobService.authenticateUser(credentials);
         List<JDFJob> list = this.jobService.getAllJobs(owner);
-        if(list.size() > 0){
-            LOGGER.info(list.get(0).toJSON().toString());
-            /*
-            JDFJob j = list.get(0);
-            JDFJob novo = new JDFJob(j.getJobId(), j.getOwner(), new ArrayList<>(), "USERIDDI");
-            novo.setState(JDFJobState.FAILED);
-            jobService.updateJob(novo);
-            */
-        }
+
+        LOGGER.info("job list :" + list.toString());
+
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 

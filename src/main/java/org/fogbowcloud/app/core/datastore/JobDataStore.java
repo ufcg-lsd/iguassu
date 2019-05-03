@@ -120,6 +120,7 @@ public class JobDataStore extends DataStore<JDFJob> {
 			preparedStatement.setString(1, job.getId());
 			preparedStatement.setString(2, job.getOwner());
 			preparedStatement.setString(3, job.toJSON().toString());
+			preparedStatement.setString(4, job.getId());
 			
 			preparedStatement.execute();
 			connection.commit();
@@ -210,8 +211,11 @@ public class JobDataStore extends DataStore<JDFJob> {
 			statement = conn.prepareStatement(DELETE_BY_JOB_ID_SQL);
 			statement.setString(1, jobId);
 			statement.setString(2, owner);
-			//			conn.commit(); // database on autocommit
-			return statement.execute();
+
+			boolean res = statement.execute();
+
+			conn.commit(); // database on autocommit
+			return res;
 		} catch (SQLException e) {
 			LOGGER.error("Couldn't delete registres on " + JOBS_TABLE_NAME + " with Job id ["
 					+ jobId + "]", e);
