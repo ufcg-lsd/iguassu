@@ -3,6 +3,7 @@ package org.fogbowcloud.app.api.http.controllers;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.ApiDocumentation;
 import org.fogbowcloud.app.api.exceptions.StorageException;
@@ -10,7 +11,7 @@ import org.fogbowcloud.app.api.http.services.FileSystemStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
 import org.fogbowcloud.app.core.dto.JobResponseDTO;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
+import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.core.authenticator.models.User;
@@ -65,8 +66,28 @@ public class JobController {
                 @PathVariable String jobId,
             @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
                 @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) throws InvalidParameterException {
-        LOGGER.info("Retrieving job with id " + jobId + "].");
+        LOGGER.info("Retrieving job with id [" + jobId + "].");
 
+        JDFJob job = getJDFJob(jobId, credentials);
+
+        return new ResponseEntity<>(new JobResponseDTO(job), HttpStatus.OK);
+    }
+    
+    @RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH + "/" + ApiDocumentation.ApiEndpoints.TASKS_ENDPOINT, method = RequestMethod.GET)
+    @ApiOperation(value = ApiDocumentation.Job.GET_TASKS_OPERATION)
+    public ResponseEntity<List<Task>> getJobTasks(
+            @ApiParam(value = ApiDocumentation.Job.ID)
+                @PathVariable String jobId,
+            @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
+                @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) throws InvalidParameterException {
+        LOGGER.info("Retrieving tasks from job with id [" + jobId + "].");
+
+        JDFJob job = getJDFJob(jobId, credentials);
+
+        return new ResponseEntity<>(job.getTasks(), HttpStatus.OK);
+    }
+
+    private JDFJob getJDFJob(String jobId, String credentials) throws InvalidParameterException {
         User owner = this.jobService.authenticateUser(credentials);
         JDFJob job = this.jobService.getJobById(jobId, owner);
 
@@ -77,8 +98,7 @@ public class JobController {
                 throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
             }
         }
-
-        return new ResponseEntity<>(new JobResponseDTO(job), HttpStatus.OK);
+        return job;
     }
 
     @RequestMapping(method = RequestMethod.POST)
