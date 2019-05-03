@@ -10,6 +10,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.http.controllers.JobController;
 import org.fogbowcloud.app.api.exceptions.StorageException;
+import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -29,10 +30,10 @@ public class FileSystemStorageService {
                 throw new StorageException(errorMsg);
             }
             try (InputStream inputStream = file.getInputStream()) {
-                if (formFieldsToLoad.containsKey(JobController.JDF_FILE_PATH)) {
+                if (formFieldsToLoad.containsKey(IguassuPropertiesConstants.JDF_FILE_PATH)) {
                     final String fileContent = IOUtils.toString(inputStream);
                     final File tempFile = createTmpFile(fileContent, fileName);
-                    formFieldsToLoad.put(JobController.JDF_FILE_PATH, tempFile.getAbsolutePath());
+                    formFieldsToLoad.put(IguassuPropertiesConstants.JDF_FILE_PATH, tempFile.getAbsolutePath());
                 }
             }
         }
