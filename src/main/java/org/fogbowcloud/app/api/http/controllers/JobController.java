@@ -3,6 +3,7 @@ package org.fogbowcloud.app.api.http.controllers;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.ApiDocumentation;
 import org.fogbowcloud.app.api.exceptions.StorageException;
@@ -10,7 +11,7 @@ import org.fogbowcloud.app.api.http.services.FileSystemStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
 import org.fogbowcloud.app.core.dto.JobResponseDTO;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
+import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.core.authenticator.models.User;
