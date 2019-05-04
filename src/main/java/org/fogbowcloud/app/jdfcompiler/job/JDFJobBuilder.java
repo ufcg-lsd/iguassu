@@ -301,6 +301,6 @@ public class JDFJobBuilder {
 	}
 
 	private String getIguassuHost() {
-		return "https://" + this.properties.getProperty(IguassuPropertiesConstants.IGUASSU_SERVICE_HOST) + "/api/v1";
+		return this.properties.getProperty(IguassuPropertiesConstants.IGUASSU_SERVICE_HOST);
 	}
 }
