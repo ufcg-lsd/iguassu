@@ -19,7 +19,7 @@ import java.util.List;
 @CrossOrigin
 @RestController
 @RequestMapping(value = ApiDocumentation.ApiEndpoints.OAUTH_TOKEN_ENDPOINT)
-@Api(description = ApiDocumentation.OAuthToken.API)
+@Api(ApiDocumentation.OAuthToken.API)
 public class OAuthTokenController {
     private final Logger LOGGER = Logger.getLogger(OAuthTokenController.class);
 

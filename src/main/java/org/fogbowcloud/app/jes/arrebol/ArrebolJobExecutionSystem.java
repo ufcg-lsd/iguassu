@@ -5,7 +5,7 @@ import java.util.Properties;
 import javax.print.attribute.standard.JobState;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.dto.JobDTO;
+import org.fogbowcloud.app.core.dto.ArrebolJobDTO;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jes.JobExecutionSystem;
 import org.fogbowcloud.app.jes.exceptions.GetJobException;
@@ -39,7 +39,7 @@ public class ArrebolJobExecutionSystem implements JobExecutionSystem {
 
     // TODO this return JDF
     @Override
-    public JobDTO getJob(String jobId) {
+    public ArrebolJobDTO getJob(String jobId) {
         try {
             return requestsHelper.getJob(jobId);
         } catch (GetJobException e) {

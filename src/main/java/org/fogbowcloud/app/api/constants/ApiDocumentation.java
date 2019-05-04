@@ -6,6 +6,7 @@ public class ApiDocumentation {
 		public static final String NONCE_ENDPOINT = "nonce";
 		public static final String JOB_ENDPOINT = "job";
 		public static final String JOB_PATH = "/{jobId}";
+		public static final String TASKS_ENDPOINT = "tasks";
 	}
 
 	public static class ApiInfo {
@@ -25,6 +26,7 @@ public class ApiDocumentation {
 		public static final String GET_OPERATION = "Lists all jobs.";
 		public static final String GET_BY_ID_OPERATION = "Get a specific job.";
 		public static final String DELETE_OPERATION = "Deletes a specific job.";
+		public static final String GET_TASKS_OPERATION = "Get tasks of a specific job.";
 
 		public static final String ID = "The ID of the specific job.";
 		public static final String CREATE_REQUEST_PARAM = "Request parameter of URL";
