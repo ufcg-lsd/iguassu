@@ -3,7 +3,6 @@ package org.fogbowcloud.app.api.http.controllers;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.ApiDocumentation;
 import org.fogbowcloud.app.api.exceptions.StorageException;
@@ -23,9 +22,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
@@ -48,15 +47,19 @@ public class JobController {
 
     @RequestMapping(method = RequestMethod.GET)
     @ApiOperation(value = ApiDocumentation.Job.GET_OPERATION)
-    public ResponseEntity<List<JDFJob>> getAllJobs(
+    public ResponseEntity<List<JobResponseDTO>> getAllJobs(
             @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
                 @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) {
         LOGGER.info("Retrieving all jobs.");
 
         User owner = this.jobService.authenticateUser(credentials);
         List<JDFJob> allJobs = this.jobService.getAllJobs(owner);
+        List<JobResponseDTO> jobs = new LinkedList<>();
+        for(JDFJob job : allJobs) {
+            jobs.add(new JobResponseDTO(job));
+        }
 
-        return new ResponseEntity<>(allJobs, HttpStatus.OK);
+        return new ResponseEntity<>(jobs, HttpStatus.OK);
     }
 
     @RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH, method = RequestMethod.GET)
@@ -143,7 +146,7 @@ public class JobController {
 
     @RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH, method = RequestMethod.DELETE)
     @ApiOperation(value = ApiDocumentation.Job.DELETE_OPERATION)
-    public ResponseEntity<String> stopJob(
+    public ResponseEntity<SimpleJobResponse> stopJob(
             @ApiParam(value = ApiDocumentation.Job.ID)
                 @PathVariable String jobId,
             @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
@@ -160,6 +163,17 @@ public class JobController {
             throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
         }
 
-        return new ResponseEntity<>(stoppedJobId, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(new SimpleJobResponse(stoppedJobId), HttpStatus.ACCEPTED);
+    }
+
+    public class SimpleJobResponse {
+        private String id;
+        public SimpleJobResponse(String id) { this.id = id; }
+        public String getId() {
+            return this.id;
+        }
+        public void setIt(String id) {
+            this.id = id;
+        }
     }
 }
