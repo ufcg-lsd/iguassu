@@ -16,8 +16,9 @@ else
 	mkdir datastores
 fi
 
-if [ -f "/tmp/blowoutdb" ]; then
-    rm /tmp/blowoutdb
+if [ -f "/tmp/iguassudb" ]; then
+    rm /tmp/iguassudb
 fi
 
-mvn spring-boot:run &
+sudo nohup mvn spring-boot:run -Drun.profiles=staging &
+exit 0

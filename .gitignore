@@ -26,3 +26,4 @@ test/blowout2.conf
 logs/
 
 iguassu.iml
+nohup.out

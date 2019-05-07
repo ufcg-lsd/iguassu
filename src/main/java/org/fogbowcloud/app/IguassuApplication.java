@@ -9,6 +9,7 @@ import org.fogbowcloud.app.jes.arrebol.JobSynchronizer;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.system.ApplicationPidFileWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -49,7 +50,9 @@ public class IguassuApplication {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(IguassuApplication.class, args);
+        SpringApplication springApplication = new SpringApplication(IguassuApplication.class);
+        springApplication.addListeners(new ApplicationPidFileWriter("./bin/shutdown.pid"));
+        springApplication.run(args);
     }
 
     @Bean
