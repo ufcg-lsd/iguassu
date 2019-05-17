@@ -67,7 +67,7 @@ public class TestOAuthTokenDataStore {
         OAuthToken retrievedToken = this.datastore.getTokenByAccessToken(FAKE_ACCESS_TOKEN);
         assertNotNull(retrievedToken);
         assertEquals(token.getRefreshToken(), retrievedToken.getRefreshToken());
-        assertEquals(token.getUsernameOwner(), retrievedToken.getUsernameOwner());
+        assertEquals(token.getUserId(), retrievedToken.getUserId());
         assertEquals(token.getExpirationDate(), retrievedToken.getExpirationDate());
     }
 

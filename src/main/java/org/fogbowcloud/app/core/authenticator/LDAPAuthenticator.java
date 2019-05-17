@@ -132,11 +132,6 @@ public class LDAPAuthenticator implements IguassuAuthenticator {
 	}
 
 	@Override
-	public String getAuthenticatorName() {
-		return AUTH_NAME;
-	}
-
-	@Override
 	public User addUser(String username, String password) {
 		throw new RuntimeException("Add a user is not allowed in the LDAP authenticator plugin.");
 	}

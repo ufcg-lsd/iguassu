@@ -44,17 +44,12 @@ public class OAuthTokenController {
 
         try {
             if (authorizationCode != null && !authorizationCode.trim().isEmpty()) {
-                LOGGER.info("Requesting an Access Token, Refresh Token, User Id and an Expiration Time from the follow" +
-                        " Authorization Code [ " + authorizationCode + "]");
-                LOGGER.info("App ids: " + applicationIdentifiers);
 
                 final OAuthToken oAuthToken = this.oAuthService.requestAccessToken(authorizationCode, applicationIdentifiers);
 
-                this.oAuthService.storeOAuthToken(oAuthToken);
-
                 return new ResponseEntity<>(oAuthToken, HttpStatus.CREATED);
             } else {
-                return new ResponseEntity<>("\"{ message:\"\"The authorization code is invalid.\" }",
+                return new ResponseEntity<>("The authorization code is invalid.",
                         HttpStatus.BAD_REQUEST);
             }
         }

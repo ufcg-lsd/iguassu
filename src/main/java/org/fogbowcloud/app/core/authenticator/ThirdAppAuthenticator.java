@@ -67,10 +67,5 @@ public class ThirdAppAuthenticator implements IguassuAuthenticator {
         return user;
     }
 
-    @Override
-    public String getAuthenticatorName() {
-        return AUTH_NAME;
-    }
-
 }
 

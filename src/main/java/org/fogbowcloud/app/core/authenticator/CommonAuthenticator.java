@@ -60,11 +60,6 @@ public class CommonAuthenticator implements IguassuAuthenticator {
 	}
 
 	@Override
-	public String getAuthenticatorName() {
-		return AUTH_NAME;
-	}
-
-	@Override
 	public User addUser(String username, String publicKey) {
 		try {
 			User user = new UserImpl(username, publicKey);

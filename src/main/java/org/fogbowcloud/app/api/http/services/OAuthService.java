@@ -9,7 +9,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.IguassuFacade;
 import org.fogbowcloud.app.core.authenticator.models.ApplicationIdentifiers;
-import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.authenticator.models.User;
@@ -37,12 +36,11 @@ public class OAuthService {
     @Autowired
     private Properties properties;
 
-
     public void storeOAuthToken(OAuthToken oAuthToken) {
-        User user = this.iguassuFacade.getUser(oAuthToken.getUsernameOwner());
+        User user = this.iguassuFacade.getUser(oAuthToken.getUserId());
         if (user == null) {
-            this.iguassuFacade.addUser(oAuthToken.getUsernameOwner(), oAuthToken.getAccessToken());
-            LOGGER.info("User " + oAuthToken.getUsernameOwner() + " was added.");
+            this.iguassuFacade.addUser(oAuthToken.getUserId(), oAuthToken.getAccessToken());
+            LOGGER.info("User " + oAuthToken.getUserId() + " was added.");
         }
         this.iguassuFacade.storeOAuthToken(oAuthToken);
     }
@@ -91,7 +89,6 @@ public class OAuthService {
                 public String getName() {
                     return "Authorization";
                 }
-
                 @Override
                 public String getValue() {
                     return "Basic " + authHeadersEncoded;
@@ -107,7 +104,9 @@ public class OAuthService {
                 final String oauthTokenRawResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, requestUrl,
                                 headers, null);
                 if (oauthTokenRawResponse != null) {
-                    return gson.fromJson(oauthTokenRawResponse, OAuthToken.class);
+                    OAuthToken token = gson.fromJson(oauthTokenRawResponse, OAuthToken.class);
+                    token.updateExpirationDate();
+                    return token;
                 } else {
                     throw new Exception("You can't use the same authorization code twice");
                 }
