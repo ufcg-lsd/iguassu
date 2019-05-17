@@ -13,7 +13,7 @@ import org.fogbowcloud.app.core.dto.ArrebolJobDTO;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jes.exceptions.GetJobException;
 import org.fogbowcloud.app.jes.exceptions.SubmitJobException;
-import org.fogbowcloud.app.jes.http.HttpWrapper;
+import org.fogbowcloud.app.core.http.HttpWrapper;
 
 import java.util.LinkedList;
 

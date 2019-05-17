@@ -13,6 +13,7 @@ public class IguassuPropertiesConstants {
 	public static final String ENCRYPTION_TYPE = "encryption_type";
 
 	public static final String X_CREDENTIALS = "X-auth-credentials";
+	public static final String X_IDENTIFIERS = "X-auth-identifiers";
 	public static final String AUTHENTICATION_PLUGIN = "authentication_plugin";
 	public static final String LDAP_AUTHENTICATION_URL = "iguassu.ldap.auth.url";
 	public static final String LDAP_AUTHENTICATION_BASE = "iguassu.ldap.base";

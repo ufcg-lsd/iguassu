@@ -6,6 +6,8 @@ import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.ApiDocumentation;
 import org.fogbowcloud.app.api.http.services.OAuthService;
+import org.fogbowcloud.app.core.authenticator.models.ApplicationIdentifiers;
+import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +42,34 @@ public class OAuthTokenController {
 
         this.oAuthService.storeOAuthToken(oAuthToken);
         return new ResponseEntity<>(oAuthToken, HttpStatus.CREATED);
+    }
+
+    @RequestMapping(method = RequestMethod.POST)
+    @ApiOperation(value = ApiDocumentation.OAuthToken.REQUEST_ACCESS_TOKEN)
+    public ResponseEntity requestAccessToken(
+            @ApiParam(value = ApiDocumentation.OAuthToken.REQUEST_ACCESS_TOKEN_BODY_MSG)
+            @RequestBody String authorizationCode,
+            @ApiParam(value = ApiDocumentation.CommonParameters.OAUTH_CREDENTIALS)
+            @RequestHeader(value= IguassuPropertiesConstants.X_IDENTIFIERS) ApplicationIdentifiers applicationIdentifiers) throws Exception {
+
+        try {
+            if (authorizationCode != null && !authorizationCode.trim().isEmpty()) {
+                LOGGER.info("Requesting an Access Token, Refresh Token, User Id and an Expiration Time from the follow" +
+                        " Authorization Code [ " + authorizationCode + "]");
+                LOGGER.info("App ids: " + applicationIdentifiers);
+
+                final OAuthToken oAuthToken = this.oAuthService.requestAccessToken(authorizationCode, applicationIdentifiers);
+
+                return new ResponseEntity<>(oAuthToken, HttpStatus.CREATED);
+            } else {
+                return new ResponseEntity<>("\"{ message:\"\"The authorization code is invalid.\" }",
+                        HttpStatus.BAD_REQUEST);
+            }
+        }
+        catch (Exception e){
+            return new ResponseEntity<>("\"{ message:\"\"The authorization failed with error" + e.getMessage() +
+                    ".\" }", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @RequestMapping(value = "/{ownerUsername}", method = RequestMethod.GET)
