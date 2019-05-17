@@ -2,7 +2,6 @@ package org.fogbowcloud.app.jes.arrebol;
 
 import com.google.gson.Gson;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.core.task.TaskState;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;

@@ -22,12 +22,7 @@ import org.springframework.http.HttpStatus;
 public class JDFJobBuilder {
 	private static final Logger LOGGER = Logger.getLogger(JDFJobBuilder.class);
 
-	private static final String SSH_SCP_PRE_COMMAND = "-o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no";
 	private static final String DEFAULT_FLAVOR_NAME = "default-compute-flavor";
-	private static final String ENV_PRIVATE_KEY_FILE = "PRIVATE_KEY_FILE";
-	private static final String REMOTE_HOST = "HOST";
-	private static final String ENV_SSH_PORT = "SSH_PORT";
-	private static final String ENV_SSH_USER = "SSH_USER";
 
 	private final Properties properties;
 
@@ -210,29 +205,6 @@ public class JDFJobBuilder {
 		task.addCommand(command);
 	}
 
-	private String getDirectoryTree(String destination) {
-		int lastDir = destination.lastIndexOf(File.separator);
-		if (lastDir == -1 ) {
-			return "";
-		}
-		return destination.substring(0, lastDir);
-	}
-
-	private Command mkdirRemoteFolder(String folder) {
-		if (folder.equals("")) {
-			return null;
-		}
-		String mkdirCommand = "mkdir -p " + folder;
-		return new Command(mkdirCommand);
-	}
-
-	private Command stageInCommand(String localFile, String remoteFile) {
-		String scpCommand = "scp " + SSH_SCP_PRE_COMMAND + " -P $" + ENV_SSH_PORT
-				+ " -i $" + ENV_PRIVATE_KEY_FILE + " " + localFile + " $"
-				+ ENV_SSH_USER + "@" + "$" + REMOTE_HOST + ":" + remoteFile;
-		return new Command(scpCommand);
-	}
-
 	/**
 	 * This method translates the Ourgrid output IOBlocks to JDL Input
 	 *
@@ -244,13 +216,6 @@ public class JDFJobBuilder {
 									String externalOAuthToken) {
 		List<JDLCommand> initBlocks = taskSpec.getFinalBlocks();
 		addCommands(initBlocks, jobId, task, userName, externalOAuthToken);
-	}
-
-	private Command stageOutCommand(String remoteFile, String localFile) {
-		String scpCommand = "scp " + SSH_SCP_PRE_COMMAND + " -P $" + ENV_SSH_PORT
-				+ " -i $" + ENV_PRIVATE_KEY_FILE + " $" + ENV_SSH_USER + "@" + "$"
-				+ REMOTE_HOST + ": " + remoteFile + " " + localFile;
-		return new Command(scpCommand);
 	}
 
 	private Command uploadFileCommands(String localFilePath, String filePathToUpload, String userName, String token) {
@@ -285,14 +250,6 @@ public class JDFJobBuilder {
 				+ " " + downloadCommand + " fi";
 
 		return new Command(scpCommand);
-	}
-
-	private Command mkdirLocalFolder(String folder) {
-		if (folder.equals("")) {
-			return null;
-		}
-		String mkdirCommand = "su $UserID ; " + "mkdir -p " + folder;
-		return new Command(mkdirCommand);
 	}
 
 	private String getUserExternalOAuthTokenRequestCommand(String userName) {

@@ -4,7 +4,6 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
 import java.util.concurrent.Executors;
-
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.IguassuApplication;
 import org.fogbowcloud.app.core.monitor.JobStateMonitor;
@@ -16,6 +15,8 @@ import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.core.exceptions.IguassuException;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.jes.arrebol.ArrebolJobExecutionSystem;
+import org.fogbowcloud.app.jes.arrebol.ArrebolJobSynchronizer;
+import org.fogbowcloud.app.jes.arrebol.JobSynchronizer;
 import org.fogbowcloud.app.external.ExternalOAuthController;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
@@ -59,11 +60,16 @@ public class IguassuController {
     }
 
     public void init() {
-        this.jobDataStore = new JobDataStore(this.properties.getProperty(IguassuGeneralConstants.DB_DATASTORE_URL));
-        this.oAuthTokenDataStore = new OAuthTokenDataStore(this.properties.getProperty(IguassuGeneralConstants.DB_DATASTORE_URL));
+        this.jobDataStore =
+                new JobDataStore(
+                        this.properties.getProperty(IguassuGeneralConstants.DB_DATASTORE_URL));
+        this.oAuthTokenDataStore =
+                new OAuthTokenDataStore(
+                        this.properties.getProperty(IguassuGeneralConstants.DB_DATASTORE_URL));
+        JobSynchronizer jobSynchronizer = new ArrebolJobSynchronizer(properties);
 
         this.nonces = new ArrayList<>();
-        JobStateMonitor jobStateMonitor = new JobStateMonitor(jobDataStore);
+        JobStateMonitor jobStateMonitor = new JobStateMonitor(jobDataStore, jobSynchronizer);
         executionMonitorTimer.scheduleAtFixedRate(jobStateMonitor, 3000, 5000);
     }
 

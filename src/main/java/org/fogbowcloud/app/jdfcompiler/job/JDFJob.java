@@ -85,16 +85,6 @@ public class JDFJob extends Job implements Serializable {
 		return this.owner;
 	}
 
-	public float completionPercentage() {
-		List<Task> tasks = getTasks();
-		if (tasks.size() == 0) return 100.0f;
-		float completedTasks = 0.0f;
-		for (Task task : tasks) {
-			if (task.isFinished()) completedTasks++;
-		}
-		return (float) (100.0*completedTasks/tasks.size());
-	}
-
 	public Task getTaskById(String taskId) {
 		return this.getTaskList().get(taskId);
 	}
@@ -114,7 +104,6 @@ public class JDFJob extends Job implements Serializable {
 	public void failCreation() {
 		this.state = JDFJobState.FAILED;
 	}
-
 	
 	public String getUserId() {
 		return this.userId;
@@ -171,14 +160,15 @@ public class JDFJob extends Job implements Serializable {
         return jdfJob;
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) return true;
-		if (o == null || getClass() != o.getClass()) return false;
-		JDFJob jdfJob = (JDFJob) o;
-		return jobId.equals(jdfJob.jobId) &&
-				owner.equals(jdfJob.owner);
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        JDFJob jdfJob = (JDFJob) o;
+        return jobId.equals(jdfJob.jobId) && owner.equals(jdfJob.owner);
+    }
 
 	@Override
 	public int hashCode() {
