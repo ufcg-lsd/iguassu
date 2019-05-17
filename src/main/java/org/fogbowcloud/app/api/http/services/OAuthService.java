@@ -31,7 +31,7 @@ public class OAuthService {
     private static final Logger LOGGER = Logger.getLogger(OAuthService.class);
 
     @Lazy
-    private final IguassuFacade iguassuFacade;
+    final IguassuFacade iguassuFacade;
 
     @Lazy
     private final Properties properties;

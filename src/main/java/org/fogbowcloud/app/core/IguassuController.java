@@ -7,6 +7,7 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.IguassuApplication;
 import org.fogbowcloud.app.core.monitor.JobStateMonitor;
+import org.fogbowcloud.app.external.ExternalOAuthConstants;
 import org.fogbowcloud.app.jdfcompiler.job.*;
 import org.fogbowcloud.app.jes.JobExecutionSystem;
 import org.fogbowcloud.app.core.constants.IguassuGeneralConstants;
@@ -237,28 +238,22 @@ public class IguassuController {
     }
 
     private static boolean checkProperties(Properties properties) {
-        if (!properties.containsKey(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD)) {
-            LOGGER.error(requiredPropertyMessage(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD));
+        if (!properties.containsKey(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID)) {
+            LOGGER.error(requiredPropertyMessage(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID));
             return false;
         }
-        if (!properties.containsKey(IguassuPropertiesConstants.IGUASSU_PRIVATE_KEY_FILEPATH)) {
-            LOGGER.error(requiredPropertyMessage(IguassuPropertiesConstants.IGUASSU_PRIVATE_KEY_FILEPATH));
+
+        if (!properties.containsKey(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET)) {
+            LOGGER.error(requiredPropertyMessage(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET));
             return false;
         }
-        if (properties.containsKey(IguassuPropertiesConstants.ENCRYPTION_TYPE)) {
-            try {
-                MessageDigest.getInstance(properties.getProperty(IguassuPropertiesConstants.ENCRYPTION_TYPE));
-            } catch (NoSuchAlgorithmException e) {
-                String builder = "Property " +
-                        IguassuPropertiesConstants.ENCRYPTION_TYPE +
-                        "(" +
-                        properties.getProperty(IguassuPropertiesConstants.ENCRYPTION_TYPE) +
-                        ") does not refer to a valid encryption algorithm." +
-                        " Valid options are 'MD5', 'SHA-1' and 'SHA-256'.";
-                LOGGER.error(builder);
-                return false;
-            }
+
+        if (!properties.containsKey(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_TOKEN_URL)) {
+            LOGGER.error(requiredPropertyMessage(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_TOKEN_URL));
+            return false;
         }
+
+
         LOGGER.debug("All properties are set");
         return true;
     }
