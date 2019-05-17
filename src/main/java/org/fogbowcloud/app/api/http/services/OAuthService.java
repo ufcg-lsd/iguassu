@@ -105,9 +105,13 @@ public class OAuthService {
 
             try {
                 final String oauthTokenRawResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, requestUrl,
-                        headers, null);
+                                headers, null);
+                if (oauthTokenRawResponse != null) {
+                    return gson.fromJson(oauthTokenRawResponse, OAuthToken.class);
+                } else {
+                    throw new Exception("You can't use the same authorization code twice");
+                }
 
-                return gson.fromJson(oauthTokenRawResponse, OAuthToken.class);
             } catch (Exception e) {
                 throw new Exception("OAuth Token request failed with message, " + e.getMessage());
             }

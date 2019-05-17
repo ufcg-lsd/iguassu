@@ -67,16 +67,8 @@ public class HttpWrapper {
 
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            try {
-                if (entity != null) {
-                    EntityUtils.toString(entity);
-                }
-            } catch (Exception e) {
-                LOGGER.info("Error while trying extract HTTP Entity with error message: " + e.getMessage());
-            }
         }
-        return null;
+        return entity.toString();
     }
 
     private static HttpUriRequest instantiateRequest(String method, String endpoint, StringEntity body) {
