@@ -31,16 +31,12 @@ public class OAuthService {
     private static final Logger LOGGER = Logger.getLogger(OAuthService.class);
 
     @Lazy
-    final IguassuFacade iguassuFacade;
-
-    @Lazy
-    private final Properties properties;
+    @Autowired
+    private IguassuFacade iguassuFacade;
 
     @Autowired
-    public OAuthService(IguassuFacade iguassuFacade, Properties properties) {
-        this.iguassuFacade = iguassuFacade;
-        this.properties = properties;
-    }
+    private Properties properties;
+
 
     public void storeOAuthToken(OAuthToken oAuthToken) {
         User user = this.iguassuFacade.getUser(oAuthToken.getUsernameOwner());
@@ -72,16 +68,21 @@ public class OAuthService {
         this.iguassuFacade.deleteAllExternalOAuthTokens();
     }
 
-    public OAuthToken requestAccessToken(String authorizationCode, ApplicationIdentifiers applicationIdentifiers) throws Exception {
+    public OAuthToken requestAccessToken(String authorizationCode, String applicationIdentifiers) throws Exception {
         final String knownClientId = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID);
         final String knownSecret = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
+        final Gson gson = new Gson();
 
-        if (applicationIdentifiers.getClientId().equals(knownClientId)
-                && applicationIdentifiers.getSecret().equals(knownSecret)) {
+        final String rawCode = gson.fromJson(authorizationCode, JsonObject.class).get("authorizationCode").getAsString();
+
+        ApplicationIdentifiers applicationIds = gson.fromJson(applicationIdentifiers, ApplicationIdentifiers.class);
+
+        if (applicationIds.getClientId().equals(knownClientId)
+                && applicationIds.getSecret().equals(knownSecret)) {
             final String baseUrl = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_TOKEN_URL);
-            final String requestUrl = baseUrl + "?grant_type=authorization_code&code="+authorizationCode+
-                    "&redirect_uri="+applicationIdentifiers.getRedirectUri();
-            final String authHeadersDecoded = applicationIdentifiers.getClientId() + ":" + applicationIdentifiers.getSecret();
+            final String requestUrl = baseUrl + "?grant_type=authorization_code&code="+rawCode+
+                    "&redirect_uri="+applicationIds.getRedirectUri();
+            final String authHeadersDecoded = applicationIds.getClientId() + ":" + applicationIds.getSecret();
             final String authHeadersEncoded = Base64.getEncoder().encodeToString(authHeadersDecoded.getBytes());
 
             List<Header> headers = new LinkedList<>();
@@ -105,7 +106,6 @@ public class OAuthService {
             try {
                 final String oauthTokenRawResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, requestUrl,
                         headers, null);
-                Gson gson = new Gson();
 
                 return gson.fromJson(oauthTokenRawResponse, OAuthToken.class);
             } catch (Exception e) {

@@ -1,5 +1,6 @@
 package org.fogbowcloud.app.api.http.controllers;
 
+import com.google.gson.JsonObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -34,23 +35,12 @@ public class OAuthTokenController {
     }
 
     @RequestMapping(method = RequestMethod.POST)
-    @ApiOperation(value = ApiDocumentation.OAuthToken.STORE_OPERATION)
-    public ResponseEntity<OAuthToken> storeOAuthToken(
-            @ApiParam(value = ApiDocumentation.OAuthToken.CREATE_REQUEST_BODY)
-            @RequestBody OAuthToken oAuthToken) {
-        LOGGER.info("Saving new OAuth Token.");
-
-        this.oAuthService.storeOAuthToken(oAuthToken);
-        return new ResponseEntity<>(oAuthToken, HttpStatus.CREATED);
-    }
-
-    @RequestMapping(method = RequestMethod.POST)
     @ApiOperation(value = ApiDocumentation.OAuthToken.REQUEST_ACCESS_TOKEN)
     public ResponseEntity requestAccessToken(
             @ApiParam(value = ApiDocumentation.OAuthToken.REQUEST_ACCESS_TOKEN_BODY_MSG)
             @RequestBody String authorizationCode,
             @ApiParam(value = ApiDocumentation.CommonParameters.OAUTH_CREDENTIALS)
-            @RequestHeader(value= IguassuPropertiesConstants.X_IDENTIFIERS) ApplicationIdentifiers applicationIdentifiers) throws Exception {
+            @RequestHeader(value= IguassuPropertiesConstants.X_IDENTIFIERS) String applicationIdentifiers) throws Exception {
 
         try {
             if (authorizationCode != null && !authorizationCode.trim().isEmpty()) {
@@ -60,6 +50,8 @@ public class OAuthTokenController {
 
                 final OAuthToken oAuthToken = this.oAuthService.requestAccessToken(authorizationCode, applicationIdentifiers);
 
+                this.oAuthService.storeOAuthToken(oAuthToken);
+
                 return new ResponseEntity<>(oAuthToken, HttpStatus.CREATED);
             } else {
                 return new ResponseEntity<>("\"{ message:\"\"The authorization code is invalid.\" }",
@@ -67,8 +59,8 @@ public class OAuthTokenController {
             }
         }
         catch (Exception e){
-            return new ResponseEntity<>("\"{ message:\"\"The authorization failed with error" + e.getMessage() +
-                    ".\" }", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("The authorization failed with error [" + e.getMessage() +
+                    "]", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

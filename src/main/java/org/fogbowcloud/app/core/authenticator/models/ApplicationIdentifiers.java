@@ -1,10 +1,7 @@
 package org.fogbowcloud.app.core.authenticator.models;
 
-import org.springframework.stereotype.Component;
-
 import java.util.Objects;
 
-@Component
 public class ApplicationIdentifiers {
     private String clientId;
     private String secret;
