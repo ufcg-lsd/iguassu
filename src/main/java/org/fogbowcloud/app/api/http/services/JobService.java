@@ -22,7 +22,7 @@ public class JobService {
 
     @Lazy
     @Autowired
-    IguassuFacade iguassuFacade;
+    private IguassuFacade iguassuFacade;
 
     private final Logger LOGGER = Logger.getLogger(JobService.class);
 

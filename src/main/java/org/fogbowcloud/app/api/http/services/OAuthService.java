@@ -36,15 +36,6 @@ public class OAuthService {
     @Autowired
     private Properties properties;
 
-    public void storeOAuthToken(OAuthToken oAuthToken) {
-        User user = this.iguassuFacade.getUser(oAuthToken.getUserId());
-        if (user == null) {
-            this.iguassuFacade.addUser(oAuthToken.getUserId(), oAuthToken.getAccessToken());
-            LOGGER.info("User " + oAuthToken.getUserId() + " was added.");
-        }
-        this.iguassuFacade.storeOAuthToken(oAuthToken);
-    }
-
     public List<OAuthToken> getAll() {
         return this.iguassuFacade.getAllOAuthTokens();
     }
@@ -104,11 +95,12 @@ public class OAuthService {
                 final String oauthTokenRawResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, requestUrl,
                                 headers, null);
                 if (oauthTokenRawResponse != null) {
-                    OAuthToken token = gson.fromJson(oauthTokenRawResponse, OAuthToken.class);
-                    token.updateExpirationDate();
-                    return token;
+                    OAuthToken oAuthToken = gson.fromJson(oauthTokenRawResponse, OAuthToken.class);
+                    oAuthToken.updateExpirationDate();
+                    storeOAuthToken(oAuthToken);
+                    return oAuthToken;
                 } else {
-                    throw new Exception("You can't use the same authorization code twice");
+                    throw new Exception("You can't use the same authorization code twice.");
                 }
 
             } catch (Exception e) {
@@ -120,5 +112,14 @@ public class OAuthService {
             throw new UnauthorizedRequestException("Your application identifiers are not enable to " +
                     "request an Access Token.");
         }
+    }
+
+    private void storeOAuthToken(OAuthToken oAuthToken) {
+        User user = this.iguassuFacade.getUser(oAuthToken.getUserId());
+        if (user == null) {
+            this.iguassuFacade.addUser(oAuthToken.getUserId(), oAuthToken.getAccessToken());
+            LOGGER.info("User " + oAuthToken.getUserId() + " was added.");
+        }
+        this.iguassuFacade.storeOAuthToken(oAuthToken);
     }
 }

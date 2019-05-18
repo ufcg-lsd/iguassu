@@ -40,7 +40,7 @@ public class OAuthTokenController {
             @ApiParam(value = ApiDocumentation.OAuthToken.REQUEST_ACCESS_TOKEN_BODY_MSG)
             @RequestBody String authorizationCode,
             @ApiParam(value = ApiDocumentation.CommonParameters.OAUTH_CREDENTIALS)
-            @RequestHeader(value= IguassuPropertiesConstants.X_IDENTIFIERS) String applicationIdentifiers) throws Exception {
+            @RequestHeader(value = IguassuPropertiesConstants.X_IDENTIFIERS) String applicationIdentifiers) {
 
         try {
             if (authorizationCode != null && !authorizationCode.trim().isEmpty()) {
