@@ -1,6 +1,6 @@
 package org.fogbowcloud.app.api.constants;
 
-public class OAuth {
+public class OAuthPropertiesKeys {
 
     public static final String ACCESS_TOKEN_JSON_KEY = "access_token";
     public static final String REFRESH_TOKEN_JSON_KEY = "refresh_token";

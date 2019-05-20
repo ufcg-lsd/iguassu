@@ -31,7 +31,7 @@ public class OAuthTokenController {
         this.oAuthService = oAuthService;
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     @ApiOperation(value = ApiDocumentation.OAuthToken.REQUEST_ACCESS_TOKEN)
     public ResponseEntity requestAccessToken(
             @ApiParam(value = ApiDocumentation.OAuthToken.REQUEST_ACCESS_TOKEN_BODY_MSG)
@@ -56,7 +56,7 @@ public class OAuthTokenController {
         }
     }
 
-    @RequestMapping(value = "/{ownerUsername}", method = RequestMethod.GET)
+    @GetMapping(value = "/{ownerUsername}")
     @ApiOperation(value = ApiDocumentation.OAuthToken.GET_BY_USER)
     public ResponseEntity<OAuthTokenResponse> getAccessTokenBy(
             @ApiParam(value = ApiDocumentation.OAuthToken.USER_NAME)
@@ -68,7 +68,7 @@ public class OAuthTokenController {
         return new ResponseEntity<>(dataResponse, HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.DELETE)
+    @DeleteMapping
     @ApiOperation(value = ApiDocumentation.OAuthToken.DELETE_OPERATION)
     public ResponseEntity<List<OAuthToken>> deleteAllOAuthTokens() {
         LOGGER.info("Deleting all OAuth tokens.");

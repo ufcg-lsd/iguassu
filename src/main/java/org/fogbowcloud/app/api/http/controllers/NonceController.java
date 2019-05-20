@@ -19,7 +19,7 @@ public class NonceController {
     @Autowired
     private IguassuFacade iguassuFacade;
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     @ApiOperation(value = ApiDocumentation.Nonce.GET_OPERATION)
     public ResponseEntity<String> getNonce() {
         return new ResponseEntity<>(String.valueOf(this.iguassuFacade.getNonce()),

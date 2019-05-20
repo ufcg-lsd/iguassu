@@ -5,7 +5,7 @@ import org.junit.Test;
 import java.util.concurrent.TimeUnit;
 import static org.junit.Assert.*;
 
-public class TestOAuthToken {
+public class TestOAuthPropertiesKeysToken {
 
     @Test
     public void hasExpired() throws InterruptedException {

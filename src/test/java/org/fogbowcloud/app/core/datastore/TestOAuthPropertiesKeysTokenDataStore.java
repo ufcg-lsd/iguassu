@@ -9,7 +9,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-public class TestOAuthTokenDataStore {
+public class TestOAuthPropertiesKeysTokenDataStore {
 
     private final static String DATASTORE_URL = "jdbc:h2:/tmp/iguassudb";
     private final static String FAKE_ACCESS_TOKEN = "fake-access-token";

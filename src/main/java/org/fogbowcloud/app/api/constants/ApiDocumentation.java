@@ -40,9 +40,7 @@ public class ApiDocumentation {
 	public static class OAuthToken {
 		public static final String API = "Manages tokens";
 		public static final String REQUEST_ACCESS_TOKEN = "Request an access token by an Authorization Code";
-		public static final String STORE_OPERATION = "Store an token.";
 		public static final String DELETE_OPERATION = "Deletes all tokens.";
-		public static final String CREATE_REQUEST_BODY = "The body of the request must specify the OAuthToken";
 		public static final String GET_BY_USER = "Gets the token of user";
 
 		public static final String USER_NAME = "The name of the specific user";

@@ -2,7 +2,7 @@ package org.fogbowcloud.app.core.datastore;
 
 import com.google.gson.annotations.SerializedName;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.api.constants.OAuth;
+import org.fogbowcloud.app.api.constants.OAuthPropertiesKeys;
 import org.json.JSONObject;
 
 import java.sql.Date;
@@ -10,16 +10,16 @@ import java.sql.Timestamp;
 
 public class OAuthToken {
 
-    @SerializedName(OAuth.ACCESS_TOKEN_JSON_KEY)
+    @SerializedName(OAuthPropertiesKeys.ACCESS_TOKEN_JSON_KEY)
     private String accessToken;
 
-    @SerializedName(OAuth.REFRESH_TOKEN_JSON_KEY)
+    @SerializedName(OAuthPropertiesKeys.REFRESH_TOKEN_JSON_KEY)
     private String refreshToken;
 
-    @SerializedName(OAuth.USER_ID_JSON_KEY)
+    @SerializedName(OAuthPropertiesKeys.USER_ID_JSON_KEY)
     private String userId;
 
-    @SerializedName(OAuth.EXPIRES_IN_JSON_KEY)
+    @SerializedName(OAuthPropertiesKeys.EXPIRES_IN_JSON_KEY)
     private int expirationTime;
 
     private Date expirationDate;
@@ -39,13 +39,13 @@ public class OAuthToken {
     public static OAuthToken fromJSON(JSONObject tokenJson) {
         LOGGER.info("Reading Token from JSON");
 
-        long dateStr = tokenJson.getLong(OAuth.EXPIRES_IN_JSON_KEY);
+        long dateStr = tokenJson.getLong(OAuthPropertiesKeys.EXPIRES_IN_JSON_KEY);
         Date expirationDate = new Date(dateStr);
 
         OAuthToken token = new OAuthToken(
-                tokenJson.optString(OAuth.ACCESS_TOKEN_JSON_KEY),
-                tokenJson.optString(OAuth.REFRESH_TOKEN_JSON_KEY),
-                tokenJson.optString(OAuth.USER_ID_JSON_KEY),
+                tokenJson.optString(OAuthPropertiesKeys.ACCESS_TOKEN_JSON_KEY),
+                tokenJson.optString(OAuthPropertiesKeys.REFRESH_TOKEN_JSON_KEY),
+                tokenJson.optString(OAuthPropertiesKeys.USER_ID_JSON_KEY),
                 expirationDate);
 
         LOGGER.debug("Job read from JSON is from owner: " + token.getUserId());
