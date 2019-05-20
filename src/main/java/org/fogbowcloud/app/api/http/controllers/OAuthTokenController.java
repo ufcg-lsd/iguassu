@@ -1,13 +1,11 @@
 package org.fogbowcloud.app.api.http.controllers;
 
-import com.google.gson.JsonObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.ApiDocumentation;
 import org.fogbowcloud.app.api.http.services.OAuthService;
-import org.fogbowcloud.app.core.authenticator.models.ApplicationIdentifiers;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
@@ -19,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping(value = ApiDocumentation.ApiEndpoints.OAUTH_TOKEN_ENDPOINT)
 @Api(ApiDocumentation.OAuthToken.API)
