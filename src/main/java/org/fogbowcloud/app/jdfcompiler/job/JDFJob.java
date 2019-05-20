@@ -1,14 +1,12 @@
 package org.fogbowcloud.app.jdfcompiler.job;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.io.Serializable;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.UUID;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.blowout.core.model.task.Task;
-import org.fogbowcloud.blowout.core.model.task.TaskImpl;
+import org.fogbowcloud.app.core.task.Task;
+import org.fogbowcloud.app.core.task.TaskImpl;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,11 +14,12 @@ import org.json.JSONObject;
 /**
  * It add the job name, job name and sched path to the {@link Job} abstraction.
  */
-public class JDFJob extends Job {
+public class JDFJob extends Job implements Serializable {
 	private static final Logger LOGGER = Logger.getLogger(JDFJob.class);
 	private static final long serialVersionUID = 7780896231796955706L;
 
 	private static final String JSON_HEADER_JOB_ID = "jobId";
+	private static final String JSON_HEADER_JOB_ID_ARREBOL = "jobIdArrebol";
 	private static final String JSON_HEADER_NAME = "name";
 	private static final String JSON_HEADER_UUID = "uuid";
 	private static final String JSON_HEADER_STATE = "state";
@@ -32,6 +31,7 @@ public class JDFJob extends Job {
 	private final String userId;
 	private String name;
 	private JDFJobState state;
+	private String jobIdArrebol;
 	
 	public JDFJob(String jobId, String owner, List<Task> taskList, String userID) {
 		super(taskList);
@@ -42,10 +42,37 @@ public class JDFJob extends Job {
 		this.state = JDFJobState.SUBMITTED;
 	}
 
+	public JDFJob(String jobId, String owner, List<Task> taskList, String userID, String jobIdArrebol) {
+		super(taskList);
+		this.name = "";
+		this.jobId = jobId;
+		this.owner = owner;
+		this.userId = userID;
+		this.state = JDFJobState.SUBMITTED;
+		this.jobIdArrebol = jobIdArrebol;
+	}
+
 	public JDFJob(String owner, List<Task> taskList, String userID) {
 		this(UUID.randomUUID().toString(), owner, taskList, userID);
 	}
 
+	@Override
+	public void setState(JDFJobState state) {
+		this.state = state;
+	}
+
+	public String getJobId() {
+		return jobId;
+	}
+	
+	public String getJobIdArrebol() {
+		return jobIdArrebol;
+	}
+	
+	public void setJobIdArrebol(String jobIdArrebol) {
+		this.jobIdArrebol = jobIdArrebol;
+	}
+	
 	public String getId() {
 		return jobId;
 	}
@@ -56,16 +83,6 @@ public class JDFJob extends Job {
 
 	public String getOwner() {
 		return this.owner;
-	}
-
-	public float completionPercentage() {
-		List<Task> tasks = getTasks();
-		if (tasks.size() == 0) return 100.0f;
-		float completedTasks = 0.0f;
-		for (Task task : tasks) {
-			if (task.isFinished()) completedTasks++;
-		}
-		return (float) (100.0*completedTasks/tasks.size());
 	}
 
 	public Task getTaskById(String taskId) {
@@ -87,16 +104,6 @@ public class JDFJob extends Job {
 	public void failCreation() {
 		this.state = JDFJobState.FAILED;
 	}
-
-	@Override
-	public void finish(Task task) {
-		getTaskById(task.getId()).finish();
-	}
-
-	@Override
-	public void fail(Task task) {
-		// TODO Auto-generated method stub
-	}
 	
 	public String getUserId() {
 		return this.userId;
@@ -110,6 +117,7 @@ public class JDFJob extends Job {
 			job.put(JSON_HEADER_OWNER, this.getOwner());
 			job.put(JSON_HEADER_UUID, this.getUserId());
 			job.put(JSON_HEADER_STATE, this.getState().value());
+			job.put(JSON_HEADER_JOB_ID_ARREBOL, this.jobIdArrebol);
 			JSONArray tasks = new JSONArray();
 			Map<String, Task> taskList = this.getTaskList();
 			for (Entry<String, Task> entry : taskList.entrySet()) {
@@ -123,6 +131,7 @@ public class JDFJob extends Job {
 		}
 	}
 
+	// TODO implement JSON_HEADER_JOB_ID_ARREBOL
 	public static JDFJob fromJSON(JSONObject job) {
         LOGGER.info("Reading Job from JSON");
         List<Task> tasks = new ArrayList<>();
@@ -138,7 +147,8 @@ public class JDFJob extends Job {
 				job.optString(JSON_HEADER_JOB_ID),
 				job.optString(JSON_HEADER_OWNER),
 				tasks,
-				job.optString(JSON_HEADER_UUID)
+				job.optString(JSON_HEADER_UUID),
+						job.optString(JSON_HEADER_JOB_ID_ARREBOL)
 		);
 		jdfJob.setFriendlyName(job.optString(JSON_HEADER_NAME));
 		try {
@@ -149,39 +159,31 @@ public class JDFJob extends Job {
         LOGGER.debug("Job read from JSON is from owner: " + job.optString(JSON_HEADER_OWNER));
         return jdfJob;
 	}
-	
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        JDFJob jdfJob = (JDFJob) o;
+        return jobId.equals(jdfJob.jobId) && owner.equals(jdfJob.owner);
+    }
+
 	@Override
-	public boolean equals(Object job2) {
-		if (job2 instanceof JDFJob) {
-			if (this.toJSON().similar(((JDFJob) job2).toJSON())) {
-				return true;
-			}
-		}
-		return false;
+	public int hashCode() {
+		return Objects.hash(jobId, owner);
 	}
 
-	public enum JDFJobState {
-		SUBMITTED("Submitted"),
-		FAILED("Failed"),
-		CREATED("Created");
-
-		private String desc;
-
-		JDFJobState(String desc) {
-			this.desc = desc;
-		}
-
-		public String value() {
-			return this.desc;
-		}
-
-		public static JDFJobState create(String desc) throws Exception{
-			for (JDFJobState ts : values()) {
-				if(ts.value().equals(desc)){
-					return ts;
-				}
-			}
-			throw new Exception("Invalid task state");
-		}
+	@Override
+	public String toString() {
+		return "JDFJob{" +
+				"jobId='" + jobId + '\'' +
+				", owner='" + owner + '\'' +
+				", userId='" + userId + '\'' +
+				", name='" + name + '\'' +
+				", state=" + state +
+				", jobIdArrebol='" + jobIdArrebol + '\'' +
+				'}';
 	}
 }

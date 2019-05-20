@@ -3,19 +3,17 @@ package org.fogbowcloud.app;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.IguassuController;
 import org.fogbowcloud.app.core.constants.IguassuGeneralConstants;
-import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
-import org.springframework.boot.context.embedded.EmbeddedServletContainerInitializedEvent;
-import org.springframework.context.ApplicationListener;
 import org.springframework.context.annotation.Lazy;
 
 import java.io.FileInputStream;
 import java.util.Properties;
 
-public class IguassuMainRunner implements CommandLineRunner, ApplicationListener<EmbeddedServletContainerInitializedEvent> {
+public class IguassuMainRunner implements CommandLineRunner {
 
     private static final Logger LOGGER = Logger.getLogger(IguassuMainRunner.class);
+    private static String CONF_FILE_PATH = IguassuGeneralConstants.DEFAULT_IGUASSU_CONF_FILE_PATH;
 
     @Autowired
     private Properties properties;
@@ -24,36 +22,25 @@ public class IguassuMainRunner implements CommandLineRunner, ApplicationListener
     @Autowired
     IguassuController iguassuController;
 
-    private String iguassuConfPath = IguassuGeneralConstants.DEFAULT_IGUASSU_CONF_FILE_PATH;
-    private String schedConfPath = IguassuGeneralConstants.DEFAULT_SCHED_CONF_FILE_PATH;
-    private int port;
-
     @Override
     public void run(String... args) throws Exception {
-        LOGGER.info("Running IguassuMainRunner.");
+        LOGGER.info("Running " + IguassuMainRunner.class.getName());
         if (args.length > 0) {
-            iguassuConfPath = args[0];
-            schedConfPath = args[1];
-            LOGGER.info("Loaded conf paths.");
+            CONF_FILE_PATH = args[0];
+            LOGGER.info("Configurations imported of path " + CONF_FILE_PATH + ".");
+
         } else {
-            LOGGER.info("Loaded default conf paths.");
+            LOGGER.info("Configurations of default path " + CONF_FILE_PATH + ".");
         }
-        loadProperties(iguassuConfPath, schedConfPath, port);
+        loadProperties(CONF_FILE_PATH);
     }
 
-    @Override
-    public void onApplicationEvent(EmbeddedServletContainerInitializedEvent event) {
-        port = event.getEmbeddedServletContainer().getPort();
-        LOGGER.info("Get server port.");
-    }
-
-    private void loadProperties(String iguassuConfPath, String schedConfPath, int port) {
+    private void loadProperties(String iguassuConfPath) {
         try {
             properties.load(new FileInputStream(iguassuConfPath));
-            properties.load(new FileInputStream(schedConfPath));
-            properties.setProperty(IguassuPropertiesConstants.REST_SERVER_PORT, String.valueOf(port));
-            LOGGER.info("Loaded properties.");
+            LOGGER.info("Configurations of file " + iguassuConfPath + " was loaded with success.");
         } catch (Exception e) {
+            LOGGER.info("Configuration file was not founded or not loaded with success.");
             System.exit(1);
         }
     }

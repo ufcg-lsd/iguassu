@@ -15,7 +15,7 @@ import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 @EnableWebMvc
 @RestController
 @RequestMapping(value = ApiDocumentation.ApiEndpoints.NONCE_ENDPOINT)
-@Api(description = ApiDocumentation.Nonce.API)
+@Api(ApiDocumentation.Nonce.API)
 public class NonceController {
     @Lazy
     @Autowired

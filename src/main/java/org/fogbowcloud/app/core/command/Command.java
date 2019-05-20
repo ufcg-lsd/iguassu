@@ -1,0 +1,77 @@
+package org.fogbowcloud.app.core.command;
+
+import org.apache.log4j.Logger;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.Serializable;
+import java.util.Objects;
+
+public class Command implements Serializable {
+    private static final long serialVersionUID = 5281647552435522413L;
+    private static final Logger LOGGER = Logger.getLogger(Command.class);
+
+    public enum State {
+       QUEUED, RUNNING, FINISHED, FAILED
+    }
+
+    private final String command;
+    private State state;
+
+    public Command(String command, State state) {
+        this.command = command;
+        this.state = state;
+    }
+
+    public Command(String command) {
+        this(command, State.QUEUED);
+    }
+
+    public String getCommand() {
+        return command;
+    }
+
+    public void setState(State state) {
+        this.state = state;
+    }
+
+    public State getState() {
+        return this.state;
+    }
+
+    public Command clone() {
+        return new Command(this.command, this.state);
+    }
+
+    public JSONObject toJSON() {
+        try {
+            JSONObject command = new JSONObject();
+            command.put("command", this.getCommand());
+            command.put("state", this.getState().toString());
+            return command;
+        } catch (JSONException e) {
+            LOGGER.debug("Error while trying to create a JSON from command", e);
+            return null;
+        }
+    }
+
+    public static Command fromJSON(JSONObject commandJSON) {
+        Command command = new Command(commandJSON.optString("command"));
+        command.setState(State.valueOf(commandJSON.optString("state")));
+        return command;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Command command1 = (Command) o;
+        return command.equals(command1.command) &&
+                state == command1.state;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(command, state);
+    }
+}

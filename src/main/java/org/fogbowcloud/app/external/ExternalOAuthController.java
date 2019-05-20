@@ -1,6 +1,5 @@
 package org.fogbowcloud.app.external;
 
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
@@ -9,7 +8,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.json.JSONObject;
-import org.json.XML;
 
 import java.io.IOException;
 import java.sql.Date;

@@ -8,17 +8,16 @@ import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.core.authenticator.models.Status;
 import org.fogbowcloud.app.core.authenticator.models.User;
-import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.List;
 
 @Lazy
-@Component
+@Service
 public class JobService {
 
     @Lazy
@@ -28,13 +27,13 @@ public class JobService {
     private final Logger LOGGER = Logger.getLogger(JobService.class);
 
     public List<JDFJob> getAllJobs(User owner) {
-        return this.iguassuFacade.getAllJobs(owner.getUser());
+        return this.iguassuFacade.getAllJobs(owner.getUsername());
     }
 
     public JDFJob getJobById(String jobId, User owner) throws InvalidParameterException {
-        JDFJob job = this.iguassuFacade.getJobById(jobId, owner.getUser());
+        JDFJob job = this.iguassuFacade.getJobById(jobId, owner.getUsername());
         if (job == null) {
-            job = this.iguassuFacade.getJobByName(jobId, owner.getUser());
+            job = this.iguassuFacade.getJobByName(jobId, owner.getUsername());
             if (job == null) {
                 LOGGER.info("Could not find job with id " + jobId + " for user " + owner.getUsername());
                 throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
@@ -54,9 +53,12 @@ public class JobService {
         return this.iguassuFacade.stopJob(jobId, owner);
     }
 
-    public String addJob(String jdfFilePath, User owner)
-            throws CompilerException, BlowoutException, IOException {
+    public String addJob(String jdfFilePath, User owner) throws CompilerException, IOException {
         return this.iguassuFacade.addJob(jdfFilePath, owner);
+    }
+
+    public void updateJob(JDFJob job){
+        this.iguassuFacade.updateJob(job);
     }
 
     public User authenticateUser(String credentials) {
@@ -85,5 +87,4 @@ public class JobService {
         }
         return owner;
     }
-
 }

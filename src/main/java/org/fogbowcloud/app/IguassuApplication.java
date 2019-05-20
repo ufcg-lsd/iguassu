@@ -3,10 +3,10 @@ package org.fogbowcloud.app;
 import org.fogbowcloud.app.core.IguassuController;
 import org.fogbowcloud.app.core.IguassuFacade;
 import org.fogbowcloud.app.core.exceptions.IguassuException;
-import org.fogbowcloud.blowout.core.exception.BlowoutException;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.system.ApplicationPidFileWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -29,9 +29,10 @@ public class IguassuApplication {
 
     @Bean
     @Lazy
-    public IguassuFacade iguassuFacade(Properties properties) throws BlowoutException, IguassuException {
+    public IguassuFacade iguassuFacade(Properties properties) throws IguassuException {
         IguassuController iguassuController = new IguassuController(properties);
         IguassuFacade iguassuFacade = new IguassuFacade(iguassuController);
+
         try {
             iguassuFacade.init();
         } catch (Exception e) {
@@ -41,7 +42,9 @@ public class IguassuApplication {
     }
 
     public static void main(String[] args) {
-        SpringApplication.run(IguassuApplication.class, args);
+        SpringApplication springApplication = new SpringApplication(IguassuApplication.class);
+        springApplication.addListeners(new ApplicationPidFileWriter("./bin/shutdown.pid"));
+        springApplication.run(args);
     }
 
     @Bean
@@ -51,11 +54,10 @@ public class IguassuApplication {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
                 registry.addMapping("/**")
-                        .allowedOrigins("*").
-                        allowedHeaders("*")
+                        .allowedOrigins("*")
+                        .allowedHeaders("*")
                         .allowedMethods(HTTP_METHODS_SUPPORTED);
             }
         };
     }
-
 }
