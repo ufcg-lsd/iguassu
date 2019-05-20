@@ -1,35 +1,38 @@
 package org.fogbowcloud.app.core;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.util.*;
-import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.IguassuApplication;
-import org.fogbowcloud.app.core.monitor.JobStateMonitor;
-import org.fogbowcloud.app.jdfcompiler.job.*;
-import org.fogbowcloud.app.jes.JobExecutionSystem;
+import org.fogbowcloud.app.core.authenticator.IguassuAuthenticator;
+import org.fogbowcloud.app.core.authenticator.ThirdAppAuthenticator;
+import org.fogbowcloud.app.core.authenticator.models.Credential;
+import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.constants.IguassuGeneralConstants;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
+import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.core.exceptions.IguassuException;
+import org.fogbowcloud.app.core.monitor.JobStateMonitor;
 import org.fogbowcloud.app.core.task.Task;
+import org.fogbowcloud.app.external.ExternalOAuthConstants;
+import org.fogbowcloud.app.external.ExternalOAuthController;
+import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
+import org.fogbowcloud.app.jdfcompiler.job.JDFJobBuilder;
+import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
+import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
+import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
+import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
+import org.fogbowcloud.app.jes.JobExecutionSystem;
 import org.fogbowcloud.app.jes.arrebol.ArrebolJobExecutionSystem;
 import org.fogbowcloud.app.jes.arrebol.ArrebolJobSynchronizer;
 import org.fogbowcloud.app.jes.arrebol.JobSynchronizer;
-import org.fogbowcloud.app.external.ExternalOAuthController;
-import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
-import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
-import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
-import org.fogbowcloud.app.core.datastore.OAuthToken;
-import org.fogbowcloud.app.core.authenticator.models.User;
-import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
-import org.fogbowcloud.app.core.authenticator.IguassuAuthenticator;
-import org.fogbowcloud.app.core.authenticator.models.Credential;
-import org.fogbowcloud.app.core.authenticator.ThirdAppAuthenticator;
 import org.fogbowcloud.app.utils.ManagerTimer;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Properties;
+import java.util.UUID;
+import java.util.concurrent.Executors;
 
 public class IguassuController {
 
@@ -237,28 +240,22 @@ public class IguassuController {
     }
 
     private static boolean checkProperties(Properties properties) {
-        if (!properties.containsKey(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD)) {
-            LOGGER.error(requiredPropertyMessage(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD));
+        if (!properties.containsKey(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID)) {
+            LOGGER.error(requiredPropertyMessage(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID));
             return false;
         }
-        if (!properties.containsKey(IguassuPropertiesConstants.IGUASSU_PRIVATE_KEY_FILEPATH)) {
-            LOGGER.error(requiredPropertyMessage(IguassuPropertiesConstants.IGUASSU_PRIVATE_KEY_FILEPATH));
+
+        if (!properties.containsKey(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET)) {
+            LOGGER.error(requiredPropertyMessage(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET));
             return false;
         }
-        if (properties.containsKey(IguassuPropertiesConstants.ENCRYPTION_TYPE)) {
-            try {
-                MessageDigest.getInstance(properties.getProperty(IguassuPropertiesConstants.ENCRYPTION_TYPE));
-            } catch (NoSuchAlgorithmException e) {
-                String builder = "Property " +
-                        IguassuPropertiesConstants.ENCRYPTION_TYPE +
-                        "(" +
-                        properties.getProperty(IguassuPropertiesConstants.ENCRYPTION_TYPE) +
-                        ") does not refer to a valid encryption algorithm." +
-                        " Valid options are 'MD5', 'SHA-1' and 'SHA-256'.";
-                LOGGER.error(builder);
-                return false;
-            }
+
+        if (!properties.containsKey(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_TOKEN_URL)) {
+            LOGGER.error(requiredPropertyMessage(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_TOKEN_URL));
+            return false;
         }
+
+
         LOGGER.debug("All properties are set");
         return true;
     }

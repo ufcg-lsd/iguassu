@@ -61,10 +61,10 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
     }
 
     public boolean insert(OAuthToken token) {
-        LOGGER.debug("Inserting access token [" + token.getAccessToken() + "] with owner [" + token.getUsernameOwner() + "]");
+        LOGGER.debug("Inserting access token [" + token.getAccessToken() + "] with owner [" + token.getUserId() + "]");
 
         if (token.getAccessToken() == null || token.getAccessToken().isEmpty()
-                || token.getUsernameOwner() == null || token.getUsernameOwner().isEmpty()) {
+                || token.getUserId() == null || token.getUserId().isEmpty()) {
             LOGGER.warn("Access token and owner must not be null.");
             return false;
         }
@@ -77,7 +77,7 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
             preparedStatement = connection.prepareStatement(INSERT_TOKEN_TABLE_SQL);
             preparedStatement.setString(1, token.getAccessToken());
             preparedStatement.setString(2, token.getRefreshToken());
-            preparedStatement.setString(3, token.getUsernameOwner());
+            preparedStatement.setString(3, token.getUserId());
             preparedStatement.setDate (4, token.getExpirationDate());
 
             preparedStatement.execute();
@@ -99,10 +99,10 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
     }
 
     public boolean update(String oldAccessToken, OAuthToken token) {
-        LOGGER.debug("Updating access token [" + token.getAccessToken() + "] from owner [" + token.getUsernameOwner() + "]");
+        LOGGER.debug("Updating access token [" + token.getAccessToken() + "] from owner [" + token.getUserId() + "]");
 
         if (token.getAccessToken() == null || token.getAccessToken().isEmpty()
-                || token.getUsernameOwner() == null || token.getUsernameOwner().isEmpty()) {
+                || token.getUserId() == null || token.getUserId().isEmpty()) {
             LOGGER.warn("Access token and owner must not be null.");
             return false;
         }
@@ -115,7 +115,7 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
             preparedStatement = connection.prepareStatement(UPDATE_TOKEN_TABLE_SQL);
             preparedStatement.setString(1, token.getAccessToken());
             preparedStatement.setString(2, token.getRefreshToken());
-            preparedStatement.setString(3, token.getUsernameOwner());
+            preparedStatement.setString(3, token.getUserId());
             preparedStatement.setDate(4, token.getExpirationDate());
             preparedStatement.setString(5, oldAccessToken);
 

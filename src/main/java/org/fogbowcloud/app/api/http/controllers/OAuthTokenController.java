@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.ApiDocumentation;
 import org.fogbowcloud.app.api.http.services.OAuthService;
+import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin
 @RestController
 @RequestMapping(value = ApiDocumentation.ApiEndpoints.OAUTH_TOKEN_ENDPOINT)
 @Api(ApiDocumentation.OAuthToken.API)
@@ -31,18 +31,32 @@ public class OAuthTokenController {
         this.oAuthService = oAuthService;
     }
 
-    @RequestMapping(method = RequestMethod.POST)
-    @ApiOperation(value = ApiDocumentation.OAuthToken.STORE_OPERATION)
-    public ResponseEntity<OAuthToken> storeOAuthToken(
-            @ApiParam(value = ApiDocumentation.OAuthToken.CREATE_REQUEST_BODY)
-            @RequestBody OAuthToken oAuthToken) {
-        LOGGER.info("Saving new OAuth Token.");
+    @PostMapping
+    @ApiOperation(value = ApiDocumentation.OAuthToken.REQUEST_ACCESS_TOKEN)
+    public ResponseEntity requestAccessToken(
+            @ApiParam(value = ApiDocumentation.OAuthToken.REQUEST_ACCESS_TOKEN_BODY_MSG)
+            @RequestBody String authorizationCode,
+            @ApiParam(value = ApiDocumentation.CommonParameters.OAUTH_CREDENTIALS)
+            @RequestHeader(value = IguassuPropertiesConstants.X_IDENTIFIERS) String applicationIdentifiers) {
 
-        this.oAuthService.storeOAuthToken(oAuthToken);
-        return new ResponseEntity<>(oAuthToken, HttpStatus.CREATED);
+        try {
+            if (authorizationCode != null && !authorizationCode.trim().isEmpty()) {
+
+                final OAuthToken oAuthToken = this.oAuthService.requestAccessToken(authorizationCode, applicationIdentifiers);
+
+                return new ResponseEntity<>(oAuthToken, HttpStatus.CREATED);
+            } else {
+                return new ResponseEntity<>("The authorization code is invalid.",
+                        HttpStatus.BAD_REQUEST);
+            }
+        }
+        catch (Exception e){
+            return new ResponseEntity<>("The authorization failed with error [" + e.getMessage() +
+                    "]", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
-    @RequestMapping(value = "/{ownerUsername}", method = RequestMethod.GET)
+    @GetMapping(value = "/{ownerUsername}")
     @ApiOperation(value = ApiDocumentation.OAuthToken.GET_BY_USER)
     public ResponseEntity<OAuthTokenResponse> getAccessTokenBy(
             @ApiParam(value = ApiDocumentation.OAuthToken.USER_NAME)
@@ -54,7 +68,7 @@ public class OAuthTokenController {
         return new ResponseEntity<>(dataResponse, HttpStatus.OK);
     }
 
-    @RequestMapping(method = RequestMethod.DELETE)
+    @DeleteMapping
     @ApiOperation(value = ApiDocumentation.OAuthToken.DELETE_OPERATION)
     public ResponseEntity<List<OAuthToken>> deleteAllOAuthTokens() {
         LOGGER.info("Deleting all OAuth tokens.");

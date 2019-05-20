@@ -28,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-@CrossOrigin
 @RestController
 @RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_ENDPOINT)
 @Api(ApiDocumentation.Job.API)
@@ -45,7 +44,7 @@ public class JobController {
         this.jobService = jobService;
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     @ApiOperation(value = ApiDocumentation.Job.GET_OPERATION)
     public ResponseEntity<List<JobResponseDTO>> getAllJobs(
             @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
@@ -62,7 +61,7 @@ public class JobController {
         return new ResponseEntity<>(jobs, HttpStatus.OK);
     }
 
-    @RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH, method = RequestMethod.GET)
+    @GetMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH)
     @ApiOperation(value = ApiDocumentation.Job.GET_BY_ID_OPERATION)
     public ResponseEntity<JobResponseDTO> getJobById(
             @ApiParam(value = ApiDocumentation.Job.ID)
@@ -76,7 +75,7 @@ public class JobController {
         return new ResponseEntity<>(new JobResponseDTO(job), HttpStatus.OK);
     }
     
-    @RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH + "/" + ApiDocumentation.ApiEndpoints.TASKS_ENDPOINT, method = RequestMethod.GET)
+    @GetMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH + "/" + ApiDocumentation.ApiEndpoints.TASKS_ENDPOINT)
     @ApiOperation(value = ApiDocumentation.Job.GET_TASKS_OPERATION)
     public ResponseEntity<List<Task>> getJobTasks(
             @ApiParam(value = ApiDocumentation.Job.ID)
@@ -104,7 +103,7 @@ public class JobController {
         return job;
     }
 
-    @RequestMapping(method = RequestMethod.POST)
+    @PostMapping
     @ApiOperation(value = ApiDocumentation.Job.CREATE_OPERATION)
     public ResponseEntity<String> addJob(
             @ApiParam(value = ApiDocumentation.Job.CREATE_REQUEST_PARAM)
@@ -144,7 +143,7 @@ public class JobController {
         return new ResponseEntity<>(jobId, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH, method = RequestMethod.DELETE)
+    @DeleteMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH)
     @ApiOperation(value = ApiDocumentation.Job.DELETE_OPERATION)
     public ResponseEntity<SimpleJobResponse> stopJob(
             @ApiParam(value = ApiDocumentation.Job.ID)

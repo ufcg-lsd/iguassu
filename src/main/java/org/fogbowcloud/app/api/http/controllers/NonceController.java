@@ -9,23 +9,20 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
-@CrossOrigin
-@EnableWebMvc
 @RestController
 @RequestMapping(value = ApiDocumentation.ApiEndpoints.NONCE_ENDPOINT)
 @Api(ApiDocumentation.Nonce.API)
 public class NonceController {
+
     @Lazy
     @Autowired
-    IguassuFacade iguassuFacade;
+    private IguassuFacade iguassuFacade;
 
-    @RequestMapping(method = RequestMethod.GET)
+    @GetMapping
     @ApiOperation(value = ApiDocumentation.Nonce.GET_OPERATION)
     public ResponseEntity<String> getNonce() {
-        int nonce = this.iguassuFacade.getNonce();
-        String nonceStr = String.valueOf(nonce);
-        return new ResponseEntity<String>(nonceStr, HttpStatus.OK);
+        return new ResponseEntity<>(String.valueOf(this.iguassuFacade.getNonce()),
+                HttpStatus.OK);
     }
 }
