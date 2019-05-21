@@ -44,7 +44,6 @@ public class TestIguassuController {
                 "org.fogbowcloud.app.utils.authenticator.CommonAuthenticator"
         );
         properties.put(IguassuPropertiesConstants.IGUASSU_PUBLIC_KEY, FAKE_PUBLIC_KEY);
-        properties.put(IguassuPropertiesConstants.IGUASSU_PRIVATE_KEY_FILEPATH, FAKE_PRIVATE_KEY_FILE_PATH);
 
         properties.put(IguassuPropertiesConstants.REMOTE_OUTPUT_FOLDER, "/tmp");
         properties.put(IguassuPropertiesConstants.LOCAL_OUTPUT_FOLDER, "/tmp");

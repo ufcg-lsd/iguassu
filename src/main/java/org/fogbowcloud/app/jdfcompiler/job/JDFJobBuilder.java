@@ -22,8 +22,6 @@ import org.springframework.http.HttpStatus;
 public class JDFJobBuilder {
 	private static final Logger LOGGER = Logger.getLogger(JDFJobBuilder.class);
 
-	private static final String DEFAULT_FLAVOR_NAME = "default-compute-flavor";
-
 	private final Properties properties;
 
 	public JDFJobBuilder(Properties properties) {
@@ -56,7 +54,7 @@ public class JDFJobBuilder {
 
 				jobRequirements = jobRequirements.replace("(", "").replace(")", "");
 
-				String image = this.properties.getProperty(DEFAULT_FLAVOR_NAME);
+				String image = null;
 
 				for (String req : jobRequirements.split("and")) {
 					if (req.trim().startsWith("image")) {
