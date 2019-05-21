@@ -7,6 +7,7 @@ import java.util.UUID;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.command.Command;
+import org.fogbowcloud.app.core.constants.DockerConstants;
 import org.fogbowcloud.app.core.constants.FogbowConstants;
 import org.fogbowcloud.app.core.task.Specification;
 import org.fogbowcloud.app.core.task.Task;
@@ -64,18 +65,7 @@ public class JDFJobBuilder {
 
 				Specification spec = new Specification(image, userName);
 
-				int i = 0;
-				for (String req : jobRequirements.split("and")) {
-					if (i == 0 && !req.trim().startsWith("image")) {
-						i++;
-						spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, req);
-					} else if (!req.trim().startsWith("image")) {
-						spec.addRequirement(
-								FogbowConstants.METADATA_FOGBOW_REQUIREMENTS,
-								spec.getRequirementValue(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS) + " && " + req
-						);
-					}
-				}
+				addAllRequirements(jobRequirements, spec);
 
 				spec.addRequirement(FogbowConstants.METADATA_REQUEST_TYPE, "one-time");
 				int taskID = 0;
@@ -131,6 +121,27 @@ public class JDFJobBuilder {
 			}
 		} else {
 			throw new IllegalArgumentException("File: " + file.getAbsolutePath() + " does not exists.");
+		}
+	}
+
+	private void addAllRequirements(String jobRequirements, Specification spec){
+		for (String req : jobRequirements.split("and")) {
+			if(req.startsWith(DockerConstants.PREFIX_DOCKER_REQUIREMENTS)){
+				String requirements = spec.getRequirementValue(DockerConstants.METADATA_DOCKER_REQUIREMENTS);
+				if(requirements == null){
+					spec.addRequirement(DockerConstants.METADATA_DOCKER_REQUIREMENTS, req);
+				} else {
+					spec.addRequirement(DockerConstants.METADATA_DOCKER_REQUIREMENTS, requirements + " && " + req);
+				}
+			} else if(!req.trim().startsWith("image")){
+				String requirements = spec.getRequirementValue(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS);
+				if(requirements == null){
+					spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, req);
+				} else {
+					spec.addRequirement(
+							FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, requirements + " && " + req);
+				}
+			}
 		}
 	}
 
