@@ -5,9 +5,7 @@ public class IguassuPropertiesConstants {
 	public static final String EXECUTION_MONITOR_PERIOD = "execution_monitor_period";
 	public static final String DATASTORES_USERS = "datastores/users";
 	public static final String DATASTORES_USERS_DB = "datastores/users.db";
-	
 	public static final String IGUASSU_PUBLIC_KEY = "iguassu_public_key";
-	public static final String IGUASSU_PRIVATE_KEY_FILEPATH = "iguassu_private_key_filepath";
 	public static final String LOCAL_OUTPUT_FOLDER = "local_output";
 	public static final String REMOTE_OUTPUT_FOLDER = "remote_output_folder";
 	public static final String ENCRYPTION_TYPE = "encryption_type";
