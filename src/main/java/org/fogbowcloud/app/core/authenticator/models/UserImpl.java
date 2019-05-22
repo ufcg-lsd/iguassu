@@ -5,31 +5,30 @@ import org.json.JSONObject;
 
 public class UserImpl implements User {
 
-	private String username;
-	private String publicKey;
+	private String userId;
+	private String iguassuToken;
 	private boolean active;
 
-	public UserImpl(String username, String publicKey) {
-		this.username = username;
-		this.publicKey = publicKey;
+	public UserImpl(String userId, String iguassuToken) {
+		this.userId = userId;
+		this.iguassuToken = iguassuToken;
 		this.setActive(true);
 	}
 
-	@Override
-	public String getUser() {
-		return username;
+	public String getUserIdentification() {
+		return userId;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 	
-	public String getPublicKey() {
-		return publicKey;
+	public String getIguassuToken() {
+		return iguassuToken;
 	}
 
-	public void setPublicKey(String publicKey) {
-		this.publicKey = publicKey;
+	public void setIguassuToken(String iguassuToken) {
+		this.iguassuToken = iguassuToken;
 	}
 	
 	public boolean isActive() {
@@ -42,19 +41,18 @@ public class UserImpl implements User {
 
 	public JSONObject toJSON() throws JSONException {
 		JSONObject user = new JSONObject();
-		user.put("username", this.username);
-		user.put("publicKey", this.publicKey);
+		user.put("userId", this.userId);
+		user.put("iguassuToken", this.iguassuToken);
 		user.put("active", this.active);
 		return user;
 	}
 
-	public static UserImpl fromJSON(JSONObject userJSON) {
-		return new UserImpl(userJSON.optString("username"),
-				userJSON.optString("publicKey"));
+	public static User fromJSON(JSONObject userJSON) {
+		return new UserImpl(userJSON.optString("userId"),
+				userJSON.optString("iguassuToken"));
 	}
 
-	@Override
-	public String getUsername() {
-		return this.username;
+	public String getUserId() {
+		return this.userId;
 	}
 }

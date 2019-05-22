@@ -5,6 +5,7 @@ import static org.mockito.Mockito.*;
 
 import java.util.*;
 
+import org.fogbowcloud.app.core.authenticator.models.UserImpl;
 import org.fogbowcloud.app.core.constants.IguassuGeneralConstants;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.task.Specification;
@@ -12,7 +13,6 @@ import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.core.task.TaskImpl;
 import org.fogbowcloud.app.core.task.TaskState;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.app.core.authenticator.models.LDAPUser;
 import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.json.JSONException;
@@ -116,9 +116,9 @@ public class TestIguassuController {
     @Test
     public void testAddJob() throws Exception {
         String jdfFilePath = "";
-        User user = new LDAPUser("testuser", "'this is a test user'");
+        User user = new UserImpl("testuser", "'this is a test user'");
 
-        JDFJob job = new JDFJob(user.getUser(), new ArrayList<Task>(), user.getUsername());
+        JDFJob job = new JDFJob(user.getUserIdentification(), new ArrayList<Task>(), user.getUserIdentification());
         Mockito.doReturn(job).when(this.iguassuController).buildJob(
                 Mockito.anyString(),
                 Mockito.any(User.class)
@@ -127,7 +127,7 @@ public class TestIguassuController {
         String id = this.iguassuController.addJob(jdfFilePath, user);
         Assert.assertEquals(id, job.getId());
         Mockito.verify(this.dataStore).insert(job);
-        Assert.assertTrue(this.dataStore.getByJobId(id, user.getUser()).equals(job));
+        Assert.assertTrue(this.dataStore.getByJobId(id, user.getUserIdentification()).equals(job));
     }
 
     @Test

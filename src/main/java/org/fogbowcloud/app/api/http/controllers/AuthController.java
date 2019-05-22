@@ -7,7 +7,6 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.ApiDocumentation;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
-import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -15,10 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
-@RequestMapping(value = ApiDocumentation.ApiEndpoints.OAUTH_TOKEN_ENDPOINT)
+@RequestMapping(value = ApiDocumentation.ApiEndpoints.AUTH_ENDPOINT)
 @Api(ApiDocumentation.Auth.API)
 public class AuthController {
     private final Logger LOGGER = Logger.getLogger(AuthController.class);
@@ -31,10 +28,10 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @PostMapping
+    @PostMapping(value = ApiDocumentation.ApiEndpoints.OAUTH2_ENDPOINT)
     @ApiOperation(value = ApiDocumentation.Auth.AUTHENTICATE_USER)
-    public ResponseEntity authenticateUser(
-            @ApiParam(value = ApiDocumentation.Auth.REQUEST_ACCESS_TOKEN_BODY_MSG)
+    public ResponseEntity authenticate(
+            @ApiParam(value = ApiDocumentation.Auth.AUTHORIZATION_CODE)
             @RequestBody String authorizationCode,
             @ApiParam(value = ApiDocumentation.CommonParameters.OAUTH_CREDENTIALS)
             @RequestHeader(value = IguassuPropertiesConstants.X_IDENTIFIERS) String applicationIdentifiers) {

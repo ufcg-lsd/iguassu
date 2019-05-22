@@ -94,9 +94,9 @@ public class JobController {
         JDFJob job = this.jobService.getJobById(jobId, owner);
 
         if (job == null) {
-            job = this.jobService.getJobByName(jobId, owner.getUser());
+            job = this.jobService.getJobByName(jobId, owner.getUserIdentification());
             if (job == null) {
-                LOGGER.info("Could not find job with id " + jobId + " for user " + owner.getUsername());
+                LOGGER.info("Could not find job with id " + jobId + " for user " + owner.getUserIdentification());
                 throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
             }
         }
@@ -123,8 +123,8 @@ public class JobController {
 
         String jdf = fieldMap.get(IguassuPropertiesConstants.JDF_FILE_PATH);
         if (jdf == null) {
-            LOGGER.info("Could not store  new job from user " + owner.getUsername());
-            throw new StorageException("Could not store  new job from user " + owner.getUsername());
+            LOGGER.info("Could not store  new job from user " + owner.getUserIdentification());
+            throw new StorageException("Could not store  new job from user " + owner.getUserIdentification());
         }
 
         String jobId;
@@ -155,10 +155,10 @@ public class JobController {
 
         User owner = this.jobService.authenticateUser(credentials);
 
-        String stoppedJobId = this.jobService.stopJob(jobId, owner.getUser());
+        String stoppedJobId = this.jobService.stopJob(jobId, owner.getUserIdentification());
 
         if (stoppedJobId == null) {
-            LOGGER.info("Could not find job with id " + jobId + " for user " + owner.getUsername());
+            LOGGER.info("Could not find job with id " + jobId + " for user " + owner.getUserIdentification());
             throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
         }
 

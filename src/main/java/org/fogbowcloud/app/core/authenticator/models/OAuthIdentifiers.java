@@ -2,12 +2,12 @@ package org.fogbowcloud.app.core.authenticator.models;
 
 import java.util.Objects;
 
-public class ApplicationIdentifiers {
+public class OAuthIdentifiers {
     private String clientId;
     private String secret;
     private String redirectUri;
 
-    public ApplicationIdentifiers(String clientId, String secret, String redirectUri) {
+    public OAuthIdentifiers(String clientId, String secret, String redirectUri) {
         this.clientId = clientId;
         this.secret = secret;
         this.redirectUri = redirectUri;
@@ -41,7 +41,7 @@ public class ApplicationIdentifiers {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        ApplicationIdentifiers that = (ApplicationIdentifiers) o;
+        OAuthIdentifiers that = (OAuthIdentifiers) o;
         return clientId.equals(that.clientId) &&
                 secret.equals(that.secret) &&
                 Objects.equals(redirectUri, that.redirectUri);

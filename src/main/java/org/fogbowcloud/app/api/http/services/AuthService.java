@@ -8,7 +8,7 @@ import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.IguassuFacade;
-import org.fogbowcloud.app.core.authenticator.models.ApplicationIdentifiers;
+import org.fogbowcloud.app.core.authenticator.models.OAuthIdentifiers;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.authenticator.models.User;
@@ -64,7 +64,7 @@ public class AuthService {
 
         final String rawCode = gson.fromJson(authorizationCode, JsonObject.class).get("authorizationCode").getAsString();
 
-        ApplicationIdentifiers applicationIds = gson.fromJson(applicationIdentifiers, ApplicationIdentifiers.class);
+        OAuthIdentifiers applicationIds = gson.fromJson(applicationIdentifiers, OAuthIdentifiers.class);
 
         if (applicationIds.getClientId().equals(knownClientId)
                 && applicationIds.getSecret().equals(knownSecret)) {

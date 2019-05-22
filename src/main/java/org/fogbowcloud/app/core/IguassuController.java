@@ -53,7 +53,7 @@ public class IguassuController {
         validateProperties(properties);
         this.properties = properties;
         this.externalOAuthTokenController = new ExternalOAuthController(properties);
-        this.authenticator = new ThirdAppAuthenticator(this.properties);
+        this.authenticator = new ThirdAppAuthenticator();
         this.jobExecutionSystem = new ArrebolJobExecutionSystem(this.properties);
         this.jobBuilder = new JDFJobBuilder(this.properties);
     }
@@ -82,7 +82,7 @@ public class IguassuController {
 
     public String addJob(String jdfFilePath, User owner)
             throws CompilerException {
-        LOGGER.debug("Adding job  of owner " + owner.getUsername() + " to scheduler");
+        LOGGER.debug("Adding job  of owner " + owner.getUserIdentification() + " to scheduler");
         // TODO change this method name
 
         JDFJob job = buildJob(jdfFilePath, owner);
@@ -98,8 +98,8 @@ public class IguassuController {
     }
 
     public JDFJob buildJob(String jdfFilePath, User owner) throws CompilerException {
-        String userName = owner.getUsername();
-        JDFJob job = new JDFJob(owner.getUser(), new ArrayList<>(), userName);
+        String userName = owner.getUserIdentification();
+        JDFJob job = new JDFJob(owner.getUserIdentification(), new ArrayList<>(), userName);
         JobSpecification jobSpec = compile(job.getId(), jdfFilePath);
 
         String externalOAuthToken = getAccessTokenByOwnerUsername(userName);
@@ -211,9 +211,9 @@ public class IguassuController {
         return this.authenticator.getUserByUsername(username);
     }
 
-    public User addUser(String username, String publicKey) {
+    public User addUser(String username, String iguassuToken) {
         try {
-            return this.authenticator.addUser(username, publicKey);
+            return this.authenticator.addUser(username, iguassuToken);
         } catch (Exception e) {
             throw new RuntimeException("Could not add user", e);
         }

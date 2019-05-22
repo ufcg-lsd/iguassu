@@ -58,8 +58,8 @@ public class IguassuFacade {
         return iguassuController.getUser(username);
     }
 
-    public User addUser(String username, String publicKey) {
-        return iguassuController.addUser(username, publicKey);
+    public User addUser(String username, String iguassuToken) {
+        return iguassuController.addUser(username, iguassuToken);
     }
 
     public boolean storeOAuthToken(OAuthToken oAuthToken){

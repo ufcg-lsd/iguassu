@@ -1,12 +1,12 @@
 package org.fogbowcloud.app;
 
 import org.fogbowcloud.app.core.IguassuController;
+import org.fogbowcloud.app.core.authenticator.models.UserImpl;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.exceptions.IguassuException;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.app.core.authenticator.models.LDAPUser;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -49,7 +49,7 @@ public class TestAsyncJobBuilder {
     public void testAsyncJobCreation() {
         try {
 
-            String id = iguassuController.addJob(SIMPLE_JOB_EXAMPLE, new LDAPUser(user, username));
+            String id = iguassuController.addJob(SIMPLE_JOB_EXAMPLE, new UserImpl(user, username));
 
             JDFJob job = iguassuController.getJobById(id, user);
             Assert.assertEquals(JDFJobState.SUBMITTED, job.getState());
@@ -70,7 +70,7 @@ public class TestAsyncJobBuilder {
     public void testDeleteJobWhileBeingCreated() {
         try {
 
-            String id = iguassuController.addJob(SIMPLE_JOB_EXAMPLE, new LDAPUser(user, username));
+            String id = iguassuController.addJob(SIMPLE_JOB_EXAMPLE, new UserImpl(user, username));
 
             JDFJob job = iguassuController.getJobById(id, user);
             Assert.assertEquals(JDFJobState.SUBMITTED, job.getState());

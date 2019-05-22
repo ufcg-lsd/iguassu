@@ -27,15 +27,15 @@ public class JobService {
     private final Logger LOGGER = Logger.getLogger(JobService.class);
 
     public List<JDFJob> getAllJobs(User owner) {
-        return this.iguassuFacade.getAllJobs(owner.getUsername());
+        return this.iguassuFacade.getAllJobs(owner.getUserIdentification());
     }
 
     public JDFJob getJobById(String jobId, User owner) throws InvalidParameterException {
-        JDFJob job = this.iguassuFacade.getJobById(jobId, owner.getUsername());
+        JDFJob job = this.iguassuFacade.getJobById(jobId, owner.getUserIdentification());
         if (job == null) {
-            job = this.iguassuFacade.getJobByName(jobId, owner.getUsername());
+            job = this.iguassuFacade.getJobByName(jobId, owner.getUserIdentification());
             if (job == null) {
-                LOGGER.info("Could not find job with id " + jobId + " for user " + owner.getUsername());
+                LOGGER.info("Could not find job with id " + jobId + " for user " + owner.getUserIdentification());
                 throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
             }
         }
@@ -65,7 +65,7 @@ public class JobService {
         User owner;
         try {
             owner = this.iguassuFacade.authUser(credentials);
-            LOGGER.info("Retrieving user " + owner.getUsername());
+            LOGGER.info("Retrieving user " + owner.getUserIdentification());
         } catch (GeneralSecurityException e) {
             LOGGER.error("Error trying to authenticate", e);
             throw new ResourceException(
