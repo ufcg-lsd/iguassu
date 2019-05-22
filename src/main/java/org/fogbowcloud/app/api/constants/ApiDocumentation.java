@@ -37,9 +37,10 @@ public class ApiDocumentation {
 		public static final String GET_OPERATION = "Creates a nonce";
 	}
 
-	public static class OAuthToken {
-		public static final String API = "Manages tokens";
-		public static final String REQUEST_ACCESS_TOKEN = "Request an access token by an Authorization Code";
+	public static class Auth {
+		public static final String API = "Manages authentication and authorization";
+		public static final String AUTHENTICATE_USER = "Authenticate an user returning an Iguassu token " +
+				"from OAuth Authorization Code";
 		public static final String DELETE_OPERATION = "Deletes all tokens.";
 		public static final String GET_BY_USER = "Gets the token of user";
 

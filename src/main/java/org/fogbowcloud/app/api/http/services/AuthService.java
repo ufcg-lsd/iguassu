@@ -26,8 +26,8 @@ import java.util.Properties;
 
 @Lazy
 @Component
-public class OAuthService {
-    private static final Logger LOGGER = Logger.getLogger(OAuthService.class);
+public class AuthService {
+    private static final Logger LOGGER = Logger.getLogger(AuthService.class);
 
     @Lazy
     @Autowired
