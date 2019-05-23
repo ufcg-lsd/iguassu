@@ -19,11 +19,6 @@ public class UserImpl implements User {
 	public String getUserIdentification() {
 		return userId;
 	}
-
-	@Override
-	public String getSecret() {
-		return this.iguassuToken;
-	}
 	
 	public boolean isActive() {
 		return active;
