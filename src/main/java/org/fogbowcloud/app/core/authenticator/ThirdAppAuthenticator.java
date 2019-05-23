@@ -48,12 +48,12 @@ public class ThirdAppAuthenticator implements IguassuAuthenticator {
     }
 
     @Override
-    public User getUserByUsername(String username) {
+    public User getUserByUsername(String userId) {
         User user = null;
-        String userJSONString = this.userList.get(username);
+        String userJSONString = this.userList.get(userId);
 
         if (userJSONString == null || userJSONString.isEmpty()) {
-            LOGGER.info("There is no user with username " + username);
+            LOGGER.info("There is no user with username " + userId);
             return null;
         }
         try {

@@ -15,20 +15,14 @@ public class UserImpl implements User {
 		this.setActive(true);
 	}
 
+	@Override
 	public String getUserIdentification() {
 		return userId;
 	}
 
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-	
-	public String getIguassuToken() {
-		return iguassuToken;
-	}
-
-	public void setIguassuToken(String iguassuToken) {
-		this.iguassuToken = iguassuToken;
+	@Override
+	public String getSecret() {
+		return this.iguassuToken;
 	}
 	
 	public boolean isActive() {
@@ -50,9 +44,5 @@ public class UserImpl implements User {
 	public static User fromJSON(JSONObject userJSON) {
 		return new UserImpl(userJSON.optString("userId"),
 				userJSON.optString("iguassuToken"));
-	}
-
-	public String getUserId() {
-		return this.userId;
 	}
 }

@@ -212,6 +212,7 @@ public class IguassuController {
     }
 
     public User addUser(String username, String iguassuToken) {
+
         try {
             return this.authenticator.addUser(username, iguassuToken);
         } catch (Exception e) {

@@ -57,10 +57,6 @@ public class JobService {
         return this.iguassuFacade.addJob(jdfFilePath, owner);
     }
 
-    public void updateJob(JDFJob job){
-        this.iguassuFacade.updateJob(job);
-    }
-
     public User authenticateUser(String credentials) {
         User owner;
         try {
