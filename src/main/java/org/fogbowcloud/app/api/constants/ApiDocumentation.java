@@ -1,13 +1,13 @@
 package org.fogbowcloud.app.api.constants;
 
 public class ApiDocumentation {
-    public static class ApiEndpoints {
+    public static class ApiEndpoint {
         public static final String AUTH_ENDPOINT = "auth";
         public static final String NONCE_ENDPOINT = "nonce";
         public static final String JOB_ENDPOINT = "job";
         public static final String JOB_PATH = "/{jobId}";
         public static final String TASKS_ENDPOINT = "tasks";
-        public static final String OAUTH2_ENDPOINT = "oauth2";
+        public static final String OAUTH2_ENDPOINT = "/oauth2";
     }
 
     public static class ApiInfo {
@@ -47,7 +47,8 @@ public class ApiDocumentation {
     }
 
     public static class CommonParameters {
-        public static final String CREDENTIALS = "The header of the request";
+        public static final String USER_CREDENTIALS = "The header of the request must specify a valid Iguassu Token " +
+                "and User Identifier";
         public static final String OAUTH_CREDENTIALS = "The header of the request must contain the right client id, " +
                 "secret and redirect uri";
 

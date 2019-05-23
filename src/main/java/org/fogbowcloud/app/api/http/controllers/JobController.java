@@ -29,7 +29,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = ApiDocumentation.ApiEndpoints.JOB_ENDPOINT)
+@RequestMapping(value = ApiDocumentation.ApiEndpoint.JOB_ENDPOINT)
 @Api(ApiDocumentation.Job.API)
 public class JobController {
     private final Logger LOGGER = Logger.getLogger(JobController.class);
@@ -47,7 +47,7 @@ public class JobController {
     @GetMapping
     @ApiOperation(value = ApiDocumentation.Job.GET_OPERATION)
     public ResponseEntity<List<JobResponseDTO>> getAllJobs(
-            @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
+            @ApiParam(value = ApiDocumentation.CommonParameters.USER_CREDENTIALS)
                 @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) {
         LOGGER.info("Retrieving all jobs.");
 
@@ -61,12 +61,12 @@ public class JobController {
         return new ResponseEntity<>(jobs, HttpStatus.OK);
     }
 
-    @GetMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH)
+    @GetMapping(value = ApiDocumentation.ApiEndpoint.JOB_PATH)
     @ApiOperation(value = ApiDocumentation.Job.GET_BY_ID_OPERATION)
     public ResponseEntity<JobResponseDTO> getJobById(
             @ApiParam(value = ApiDocumentation.Job.ID)
                 @PathVariable String jobId,
-            @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
+            @ApiParam(value = ApiDocumentation.CommonParameters.USER_CREDENTIALS)
                 @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) throws InvalidParameterException {
         LOGGER.info("Retrieving job with id [" + jobId + "].");
 
@@ -75,12 +75,12 @@ public class JobController {
         return new ResponseEntity<>(new JobResponseDTO(job), HttpStatus.OK);
     }
     
-    @GetMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH + "/" + ApiDocumentation.ApiEndpoints.TASKS_ENDPOINT)
+    @GetMapping(value = ApiDocumentation.ApiEndpoint.JOB_PATH + "/" + ApiDocumentation.ApiEndpoint.TASKS_ENDPOINT)
     @ApiOperation(value = ApiDocumentation.Job.GET_TASKS_OPERATION)
     public ResponseEntity<List<Task>> getJobTasks(
             @ApiParam(value = ApiDocumentation.Job.ID)
                 @PathVariable String jobId,
-            @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
+            @ApiParam(value = ApiDocumentation.CommonParameters.USER_CREDENTIALS)
                 @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) throws InvalidParameterException {
         LOGGER.info("Retrieving tasks from job with id [" + jobId + "].");
 
@@ -108,7 +108,7 @@ public class JobController {
     public ResponseEntity<String> addJob(
             @ApiParam(value = ApiDocumentation.Job.CREATE_REQUEST_PARAM)
                     @RequestParam(IguassuPropertiesConstants.JDF_FILE_PATH) MultipartFile file, RedirectAttributes redirectAttributes,
-            @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
+            @ApiParam(value = ApiDocumentation.CommonParameters.USER_CREDENTIALS)
                     @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) {
         LOGGER.info("Saving new Job.");
 
@@ -143,12 +143,12 @@ public class JobController {
         return new ResponseEntity<>(jobId, HttpStatus.CREATED);
     }
 
-    @DeleteMapping(value = ApiDocumentation.ApiEndpoints.JOB_PATH)
+    @DeleteMapping(value = ApiDocumentation.ApiEndpoint.JOB_PATH)
     @ApiOperation(value = ApiDocumentation.Job.DELETE_OPERATION)
     public ResponseEntity<SimpleJobResponse> stopJob(
             @ApiParam(value = ApiDocumentation.Job.ID)
                 @PathVariable String jobId,
-            @ApiParam(value = ApiDocumentation.CommonParameters.CREDENTIALS)
+            @ApiParam(value = ApiDocumentation.CommonParameters.USER_CREDENTIALS)
                 @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials)
             throws InvalidParameterException {
         LOGGER.info("Deleting job with Id " + jobId + ".");

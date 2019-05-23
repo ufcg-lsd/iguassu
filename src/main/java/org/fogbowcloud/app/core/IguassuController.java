@@ -255,7 +255,6 @@ public class IguassuController {
             return false;
         }
 
-
         LOGGER.debug("All properties are set");
         return true;
     }
@@ -287,14 +286,6 @@ public class IguassuController {
         return accessToken;
     }
 
-    public void deleteOAuthTokenByAcessToken(String accessToken) {
-        this.oAuthTokenDataStore.deleteByAccessToken(accessToken);
-    }
-
-    public void deleteAllExternalOAuthTokens() {
-        this.oAuthTokenDataStore.deleteAll();
-    }
-
     private String refreshExternalOAuthToken(String ownerUsername) {
         List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(ownerUsername);
 
@@ -314,5 +305,9 @@ public class IguassuController {
         for (OAuthToken token : tokenList) {
             deleteOAuthTokenByAcessToken(token.getAccessToken());
         }
+    }
+
+    private void deleteOAuthTokenByAcessToken(String accessToken) {
+        this.oAuthTokenDataStore.deleteByAccessToken(accessToken);
     }
 }

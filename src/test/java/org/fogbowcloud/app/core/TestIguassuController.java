@@ -38,11 +38,6 @@ public class TestIguassuController {
     @Before
     public void setUp() throws Exception {
         Properties properties = new Properties();
-        properties.put(IguassuPropertiesConstants.EXECUTION_MONITOR_PERIOD, "60000");
-        properties.put(
-                IguassuPropertiesConstants.AUTHENTICATION_PLUGIN,
-                "org.fogbowcloud.app.utils.authenticator.CommonAuthenticator"
-        );
         properties.put(IguassuPropertiesConstants.IGUASSU_PUBLIC_KEY, FAKE_PUBLIC_KEY);
         properties.put(IguassuPropertiesConstants.IGUASSU_PRIVATE_KEY_FILEPATH, FAKE_PRIVATE_KEY_FILE_PATH);
 

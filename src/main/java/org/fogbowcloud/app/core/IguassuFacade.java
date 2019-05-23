@@ -54,28 +54,20 @@ public class IguassuFacade {
         return iguassuController.getNonce();
     }
 
-    public User getUser(String username){
-        return iguassuController.getUser(username);
+    public User getUser(String userId){
+        return iguassuController.getUser(userId);
     }
 
-    public User addUser(String username, String iguassuToken) {
-        return iguassuController.addUser(username, iguassuToken);
+    public User addUser(String userId, String iguassuToken) {
+        return iguassuController.addUser(userId, iguassuToken);
     }
 
-    public boolean storeOAuthToken(OAuthToken oAuthToken){
-        return iguassuController.storeOAuthToken(oAuthToken);
+    public void storeOAuthToken(OAuthToken oAuthToken){
+        iguassuController.storeOAuthToken(oAuthToken);
     }
 
     public List<OAuthToken> getAllOAuthTokens(){
         return iguassuController.getAllOAuthTokens();
-    }
-
-    public String getAccessTokenByOwnerUsername(String ownerUsername){
-        return iguassuController.getAccessTokenByOwnerUsername(ownerUsername);
-    }
-
-    public void deleteAllExternalOAuthTokens(){
-        iguassuController.deleteAllExternalOAuthTokens();
     }
 
 }

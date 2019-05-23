@@ -9,7 +9,8 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.IguassuFacade;
 import org.fogbowcloud.app.core.authenticator.models.OAuthIdentifiers;
-import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
+import org.fogbowcloud.app.core.authenticator.models.RandomString;
+import org.fogbowcloud.app.core.dto.AuthResponse;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
@@ -18,11 +19,7 @@ import org.fogbowcloud.app.external.ExternalOAuthConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-
-import java.util.Base64;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 @Lazy
 @Component
@@ -40,24 +37,7 @@ public class AuthService {
         return this.iguassuFacade.getAllOAuthTokens();
     }
 
-    public String getAccessTokenByOwnerUsername(String ownerUsername) throws InvalidParameterException {
-        String accessToken = this.iguassuFacade.getAccessTokenByOwnerUsername(ownerUsername);
-
-        if (accessToken != null) {
-            return accessToken;
-        }
-
-		String messageError = "There is no access token for external file driver for user " + ownerUsername
-				+ ". Request failed.";
-		LOGGER.error(messageError);
-		throw new InvalidParameterException(messageError);
-    }
-
-    public void deleteAllTokens() {
-        this.iguassuFacade.deleteAllExternalOAuthTokens();
-    }
-
-    public OAuthToken requestAccessToken(String authorizationCode, String applicationIdentifiers) throws Exception {
+    public AuthResponse authenticateWithOAuth2(String authorizationCode, String applicationIdentifiers) throws Exception {
         final String knownClientId = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID);
         final String knownSecret = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
         final Gson gson = new Gson();
@@ -92,13 +72,16 @@ public class AuthService {
             });
 
             try {
-                final String oauthTokenRawResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, requestUrl,
+                final String oAuthTokenRawResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, requestUrl,
                                 headers, null);
-                if (oauthTokenRawResponse != null) {
-                    OAuthToken oAuthToken = gson.fromJson(oauthTokenRawResponse, OAuthToken.class);
+                if (oAuthTokenRawResponse != null) {
+                    OAuthToken oAuthToken = gson.fromJson(oAuthTokenRawResponse, OAuthToken.class);
                     oAuthToken.updateExpirationDate();
-                    storeOAuthToken(oAuthToken);
-                    return oAuthToken;
+
+                    final String iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
+                    this.storeOAuthToken(oAuthToken, iguassuToken);
+
+                    return new AuthResponse(oAuthToken.getUserId(), iguassuToken);
                 } else {
                     throw new Exception("You can't use the same authorization code twice.");
                 }
@@ -114,12 +97,18 @@ public class AuthService {
         }
     }
 
-    private void storeOAuthToken(OAuthToken oAuthToken) {
+    private void storeOAuthToken(OAuthToken oAuthToken, String iguassuToken) {
         User user = this.iguassuFacade.getUser(oAuthToken.getUserId());
         if (user == null) {
-            this.iguassuFacade.addUser(oAuthToken.getUserId(), oAuthToken.getAccessToken());
-            LOGGER.info("User " + oAuthToken.getUserId() + " was added.");
+            this.iguassuFacade.addUser(oAuthToken.getUserId(), iguassuToken);
+            LOGGER.info("OAuth2 tokens for the user " + oAuthToken.getUserId() + " was stored.");
         }
         this.iguassuFacade.storeOAuthToken(oAuthToken);
+    }
+
+    private String generateIguassuToken(String userId) {
+        final String sessionToken = new RandomString(21, userId).nextString();
+
+        return Base64.getEncoder().encodeToString(sessionToken.getBytes());
     }
 }
