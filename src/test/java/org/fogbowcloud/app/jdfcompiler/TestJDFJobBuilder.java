@@ -31,7 +31,7 @@ public class TestJDFJobBuilder {
 	@Test
 	public void testJDFCompilation () throws CompilerException, IOException, InterruptedException {
 		Properties properties = new Properties();
-		properties.setProperty(IguassuPropertiesConstants.IGUASSU_PRIVATE_KEY_FILEPATH, "file path");
+
 		User owner = new UserImpl("iguassuService", "iguassuService");
 		JDFJob testJob = new JDFJob(owner.getUserIdentification(), new ArrayList<>(), owner.getUserIdentification());
 		CommonCompiler commonCompiler = new CommonCompiler();

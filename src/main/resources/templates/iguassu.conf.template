@@ -17,10 +17,6 @@ oauth_storage_service_client_secret=
 #### Storage Service ####
 storage_service_host=
 iguassu_service_host=
-
+''
 #### Default
 default_compute_flavor_spec=defaulResource.json
-
-#### Properties to SSH communication ####
-iguassu_public_key=
-iguassu_private_key_filepath=/home/user/.ssh/id_rsa
