@@ -15,8 +15,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = ApiDocumentation.ApiEndpoint.AUTH_ENDPOINT)
-@Api(ApiDocumentation.Auth.API)
+@RequestMapping(value = ApiDocumentation.Endpoint.AUTH_ENDPOINT)
+@Api(ApiDocumentation.Auth.API_DESCRIPTION)
 public class AuthController {
     private final Logger LOGGER = Logger.getLogger(AuthController.class);
 
@@ -28,7 +28,7 @@ public class AuthController {
         this.authService = authService;
     }
 
-    @PostMapping(value = ApiDocumentation.ApiEndpoint.OAUTH2_ENDPOINT)
+    @PostMapping(value = ApiDocumentation.Endpoint.OAUTH2_ENDPOINT)
     @ApiOperation(value = ApiDocumentation.Auth.AUTHENTICATE_USER)
     public ResponseEntity<?> authenticate(
             @ApiParam(value = ApiDocumentation.Auth.AUTHORIZATION_CODE)

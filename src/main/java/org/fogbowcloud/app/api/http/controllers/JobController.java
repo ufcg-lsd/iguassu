@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping(value = ApiDocumentation.ApiEndpoint.JOB_ENDPOINT)
-@Api(ApiDocumentation.Job.API)
+@RequestMapping(value = ApiDocumentation.Endpoint.JOB_ENDPOINT)
+@Api(ApiDocumentation.Job.API_DESCRIPTION)
 public class JobController {
     private final Logger LOGGER = Logger.getLogger(JobController.class);
 
@@ -61,7 +61,7 @@ public class JobController {
         return new ResponseEntity<>(jobs, HttpStatus.OK);
     }
 
-    @GetMapping(value = ApiDocumentation.ApiEndpoint.JOB_PATH)
+    @GetMapping(value = ApiDocumentation.Endpoint.JOB_PATH)
     @ApiOperation(value = ApiDocumentation.Job.GET_BY_ID_OPERATION)
     public ResponseEntity<JobResponseDTO> getJobById(
             @ApiParam(value = ApiDocumentation.Job.ID)
@@ -75,7 +75,7 @@ public class JobController {
         return new ResponseEntity<>(new JobResponseDTO(job), HttpStatus.OK);
     }
     
-    @GetMapping(value = ApiDocumentation.ApiEndpoint.JOB_PATH + "/" + ApiDocumentation.ApiEndpoint.TASKS_ENDPOINT)
+    @GetMapping(value = ApiDocumentation.Endpoint.JOB_PATH + "/" + ApiDocumentation.Endpoint.TASKS_ENDPOINT)
     @ApiOperation(value = ApiDocumentation.Job.GET_TASKS_OPERATION)
     public ResponseEntity<List<Task>> getJobTasks(
             @ApiParam(value = ApiDocumentation.Job.ID)
@@ -143,7 +143,7 @@ public class JobController {
         return new ResponseEntity<>(jobId, HttpStatus.CREATED);
     }
 
-    @DeleteMapping(value = ApiDocumentation.ApiEndpoint.JOB_PATH)
+    @DeleteMapping(value = ApiDocumentation.Endpoint.JOB_PATH)
     @ApiOperation(value = ApiDocumentation.Job.DELETE_OPERATION)
     public ResponseEntity<SimpleJobResponse> stopJob(
             @ApiParam(value = ApiDocumentation.Job.ID)

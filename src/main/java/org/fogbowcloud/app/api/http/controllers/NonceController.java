@@ -11,8 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping(value = ApiDocumentation.ApiEndpoint.NONCE_ENDPOINT)
-@Api(ApiDocumentation.Nonce.API)
+@RequestMapping(value = ApiDocumentation.Endpoint.NONCE_ENDPOINT)
+@Api(ApiDocumentation.Nonce.API_DESCRIPTION)
 public class NonceController {
 
     @Lazy

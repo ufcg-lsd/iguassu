@@ -1,7 +1,7 @@
 package org.fogbowcloud.app.api.constants;
 
 public class ApiDocumentation {
-    public static class ApiEndpoint {
+    public static class Endpoint {
         public static final String AUTH_ENDPOINT = "auth";
         public static final String NONCE_ENDPOINT = "nonce";
         public static final String JOB_ENDPOINT = "job";
@@ -14,15 +14,15 @@ public class ApiDocumentation {
         public static final String API_TITLE = "Iguassu";
         public static final String API_DESCRIPTION = "Iguassu is a tool for monitoring and executing jobs in " +
                 "a multi-cloud environment federated by the fogbow middleware. " +
-                "Iguassu allows the user to harness cloud resources without bothering about the details of the cloud infrastructure.";
-
+                "Iguassu allows the user to harness cloud resources without bothering about the details of the " +
+                "cloud infrastructure.";
         public static final String CONTACT_NAME = "Iguassu";
         public static final String CONTACT_URL = "";
         public static final String CONTACT_EMAIL = "";
     }
 
     public static class Job {
-        public static final String API = "Manages jobs.";
+        public static final String API_DESCRIPTION = "Manages jobs.";
         public static final String CREATE_OPERATION = "Creates an job.";
         public static final String GET_OPERATION = "Lists all jobs.";
         public static final String GET_BY_ID_OPERATION = "Get a specific job.";
@@ -34,12 +34,12 @@ public class ApiDocumentation {
     }
 
     public static class Nonce {
-        public static final String API = "Manages nonces";
+        public static final String API_DESCRIPTION = "Manages nonces";
         public static final String GET_OPERATION = "Creates a nonce";
     }
 
     public static class Auth {
-        public static final String API = "Manages authentication and authorization";
+        public static final String API_DESCRIPTION = "Manages authentication and authorization";
         public static final String AUTHENTICATE_USER = "Authenticate an user returning an Iguassu token " +
                 "from OAuth Authorization Code";
         public static final String AUTHORIZATION_CODE = "The body of the request must specify a valid OAuth2" +
