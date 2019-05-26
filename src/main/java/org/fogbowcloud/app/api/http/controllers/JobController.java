@@ -107,7 +107,7 @@ public class JobController {
     @ApiOperation(value = ApiDocumentation.Job.CREATE_OPERATION)
     public ResponseEntity<String> addJob(
             @ApiParam(value = ApiDocumentation.Job.CREATE_REQUEST_PARAM)
-                    @RequestParam(IguassuPropertiesConstants.JDF_FILE_PATH) MultipartFile file, RedirectAttributes redirectAttributes,
+                    @RequestParam(IguassuPropertiesConstants.JDF_FILE_PATH) MultipartFile file,
             @ApiParam(value = ApiDocumentation.CommonParameters.USER_CREDENTIALS)
                     @RequestHeader(value=IguassuPropertiesConstants.X_CREDENTIALS) String credentials) {
         LOGGER.info("Saving new Job.");

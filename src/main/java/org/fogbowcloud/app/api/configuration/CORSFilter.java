@@ -1,6 +1,7 @@
 package org.fogbowcloud.app.api.configuration;
 
 import static org.fogbowcloud.app.api.constants.CORSProperties.*;
+
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -34,7 +35,7 @@ public class CORSFilter implements Filter {
 
             response.setHeader(ALLOWED_METHODS_HEADER, ALLOWED_METHODS_HEADER_VALUE);
 
-            response.setHeader(ALLOWED_HEADERS_HEADER, ALLOWED_HEADERS_HEADER_VALUE);
+            response.setHeader(ALLOWED_HEADERS_HEADER, ALLOWED_HEADERS_HEADER_VALUES);
         }
 
         chain.doFilter(req, res);
