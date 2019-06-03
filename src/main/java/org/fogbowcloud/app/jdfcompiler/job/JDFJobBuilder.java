@@ -25,10 +25,14 @@ public class JDFJobBuilder {
 	private static final Logger LOGGER = Logger.getLogger(JDFJobBuilder.class);
 
 	private final Properties properties;
-	private final OAuthTokenDataStore oAuthTokenDataStore;
+	private OAuthTokenDataStore oAuthTokenDataStore;
+
+	public JDFJobBuilder(Properties properties) {
+		this.properties = properties;
+	}
 
 	public JDFJobBuilder(Properties properties, OAuthTokenDataStore oAuthTokenDataStore) {
-		this.properties = properties;
+		this(properties);
 		this.oAuthTokenDataStore = oAuthTokenDataStore;
 	}
 
