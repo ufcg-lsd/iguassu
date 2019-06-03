@@ -55,7 +55,7 @@ public class IguassuController {
         this.externalOAuthTokenController = new ExternalOAuthController(properties);
         this.authenticator = new ThirdAppAuthenticator();
         this.jobExecutionSystem = new ArrebolJobExecutionSystem(this.properties);
-        this.jobBuilder = new JDFJobBuilder(this.properties);
+        this.jobBuilder = new JDFJobBuilder(this.properties, this.oAuthTokenDataStore);
     }
 
     public Properties getProperties() {
@@ -310,5 +310,10 @@ public class IguassuController {
 
     private void deleteOAuthTokenByAcessToken(String accessToken) {
         this.oAuthTokenDataStore.deleteByAccessToken(accessToken);
+    }
+
+    public void removeOAuthTokens(String userId) {
+        List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(userId);
+        deleteTokens(tokensList);
     }
 }

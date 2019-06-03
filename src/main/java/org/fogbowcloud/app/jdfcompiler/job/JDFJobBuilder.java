@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.command.Command;
 import org.fogbowcloud.app.core.constants.DockerConstants;
 import org.fogbowcloud.app.core.constants.FogbowConstants;
+import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.core.task.Specification;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.core.task.TaskImpl;
@@ -24,9 +25,11 @@ public class JDFJobBuilder {
 	private static final Logger LOGGER = Logger.getLogger(JDFJobBuilder.class);
 
 	private final Properties properties;
+	private final OAuthTokenDataStore oAuthTokenDataStore;
 
-	public JDFJobBuilder(Properties properties) {
+	public JDFJobBuilder(Properties properties, OAuthTokenDataStore oAuthTokenDataStore) {
 		this.properties = properties;
+		this.oAuthTokenDataStore = oAuthTokenDataStore;
 	}
 
 	/**
@@ -229,7 +232,7 @@ public class JDFJobBuilder {
 
 	private Command uploadFileCommands(String localFilePath, String filePathToUpload, String userName, String token) {
 		String fileDriverHostIp = this.properties.getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_HOST);
-		String requestTokenCommand = getUserExternalOAuthTokenRequestCommand(userName);
+		String requestTokenCommand = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(userName).get(0).getAccessToken();
 		String uploadCommand = " http_code=$(curl --write-out %{http_code} -X PUT --header \"Authorization:Bearer $token\" "
 				+ " --data-binary @" + localFilePath + " --silent --output /dev/null "
 				+ " http://$server/remote.php/webdav/" + filePathToUpload + "); ";
@@ -245,7 +248,7 @@ public class JDFJobBuilder {
 
 	private Command downloadFileCommands(String localFilePath, String filePathToDownload, String userName, String token) {
 		String fileDriverHostIp = this.properties.getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_HOST);
-		String requestTokenCommand = getUserExternalOAuthTokenRequestCommand(userName);
+		String requestTokenCommand = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(userName).get(0).getAccessToken();
 		String downloadCommand = " full_response=$(curl --write-out %{http_code} --header \"Authorization:Bearer $token\" "
 				+ " http://$server/remote.php/webdav/" + filePathToDownload
 				+ " --silent --output " + localFilePath + " /dev/null); ";
@@ -261,12 +264,4 @@ public class JDFJobBuilder {
 		return new Command(scpCommand);
 	}
 
-	private String getUserExternalOAuthTokenRequestCommand(String userName) {
-		String myIguassuHttpServiceIp = getIguassuHost();
-		return "token=$(curl --request GET --url " + myIguassuHttpServiceIp + "/oauthtoken/" + userName + "); ";
-	}
-
-	private String getIguassuHost() {
-		return this.properties.getProperty(IguassuPropertiesConstants.IGUASSU_SERVICE_HOST);
-	}
 }

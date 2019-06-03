@@ -102,6 +102,8 @@ public class AuthService {
         if (user == null) {
             this.iguassuFacade.addUser(oAuthToken.getUserId(), iguassuToken);
             LOGGER.info("OAuth2 tokens for the user " + oAuthToken.getUserId() + " was stored.");
+        } else {
+            this.iguassuFacade.removeOAuthTokens(oAuthToken.getUserId());
         }
         this.iguassuFacade.storeOAuthToken(oAuthToken);
     }
