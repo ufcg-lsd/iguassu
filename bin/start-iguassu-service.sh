@@ -24,3 +24,4 @@ if [ -f "/tmp/iguassudb" ]; then
 fi
 
 nohup mvn spring-boot:run &
+exit 0
