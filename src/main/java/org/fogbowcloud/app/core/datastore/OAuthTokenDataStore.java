@@ -13,25 +13,25 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
     private static final String TOKENS_TABLE_NAME = "iguassu_tokens";
     private static final String ACCESS_TOKEN = "access_token";
     private static final String REFRESH_TOKEN = "refresh_token";
-    private static final String TOKEN_OWNER_USERNAME = "token_owner_username";
-    private static final String EXPIRATION_TIME = "expiration_date";
+    private static final String USER_ID = "user_id";
+    private static final String EXPIRES_IN = "expires_in";
 
     private static final String CREATE_TABLE_STATEMENT = "CREATE TABLE IF NOT EXISTS " + TOKENS_TABLE_NAME + "("
             + ACCESS_TOKEN + " VARCHAR(255) PRIMARY KEY, "
             + REFRESH_TOKEN + " VARCHAR(255), "
-            + TOKEN_OWNER_USERNAME + " VARCHAR(255), "
-            + EXPIRATION_TIME + " DATE )";
+            + USER_ID + " VARCHAR(255), "
+            + EXPIRES_IN + " DATE )";
 
     private static final String INSERT_TOKEN_TABLE_SQL = "INSERT INTO " + TOKENS_TABLE_NAME
             + " VALUES(?, ?, ?, ?)";
 
     private static final String UPDATE_TOKEN_TABLE_SQL = "UPDATE " + TOKENS_TABLE_NAME + " SET "
-            + ACCESS_TOKEN + " = ?, " + REFRESH_TOKEN + " = ?, " + TOKEN_OWNER_USERNAME + " = ?, " + EXPIRATION_TIME
+            + ACCESS_TOKEN + " = ?, " + REFRESH_TOKEN + " = ?, " + USER_ID + " = ?, " + EXPIRES_IN
             + " = ? WHERE " + ACCESS_TOKEN + " = ?";
 
     private static final String GET_ALL_TOKENS = "SELECT * FROM " + TOKENS_TABLE_NAME;
     private static final String GET_TOKEN_BY_ACCESS_TOKEN = GET_ALL_TOKENS + " WHERE " + ACCESS_TOKEN + " = ? ";
-    private static final String GET_TOKEN_BY_OWNER_USERNAME = GET_ALL_TOKENS + " WHERE " + TOKEN_OWNER_USERNAME + " = ? ";
+    private static final String GET_TOKEN_BY_OWNER_USERNAME = GET_ALL_TOKENS + " WHERE " + USER_ID + " = ? ";
 
     private static final String DELETE_ALL_TOKENS_TABLE_SQL = "DELETE FROM " + TOKENS_TABLE_NAME;
     private static final String DELETE_TOKEN_BY_ACCESS_TOKEN_SQL = DELETE_ALL_TOKENS_TABLE_SQL
@@ -204,14 +204,14 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
     public OAuthToken getObjFromDataStoreResult(ResultSet rs) throws SQLException {
         String accessToken = rs.getString(ACCESS_TOKEN);
         String refreshToken = rs.getString(REFRESH_TOKEN);
-        String ownerUsername = rs.getString(TOKEN_OWNER_USERNAME);
-        Date expirationTime = rs.getDate(EXPIRATION_TIME);
+        String ownerUsername = rs.getString(USER_ID);
+        Date expirationTime = rs.getDate(EXPIRES_IN);
         long expirationTimeInMillisecondes = expirationTime.getTime();
 
         String strJson = "{" + ACCESS_TOKEN + ":" + accessToken + ","
                 + REFRESH_TOKEN + ":" + refreshToken + ","
-                + TOKEN_OWNER_USERNAME + ":" + ownerUsername + ","
-                + EXPIRATION_TIME + ":" + expirationTimeInMillisecondes + "}";
+                + USER_ID + ":" + ownerUsername + ","
+                + EXPIRES_IN + ":" + expirationTimeInMillisecondes + "}";
         JSONObject tokenJson = new JSONObject(strJson);
         OAuthToken token = OAuthToken.fromJSON(tokenJson);
         return token;
