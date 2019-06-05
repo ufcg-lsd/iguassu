@@ -55,7 +55,6 @@ public class IguassuController {
         this.externalOAuthTokenController = new ExternalOAuthController(properties);
         this.authenticator = new ThirdAppAuthenticator();
         this.jobExecutionSystem = new ArrebolJobExecutionSystem(this.properties);
-        this.jobBuilder = new JDFJobBuilder(this.properties, this.oAuthTokenDataStore);
     }
 
     public Properties getProperties() {
@@ -69,6 +68,7 @@ public class IguassuController {
         this.oAuthTokenDataStore =
                 new OAuthTokenDataStore(
                         this.properties.getProperty(IguassuGeneralConstants.DB_DATASTORE_URL));
+        this.jobBuilder = new JDFJobBuilder(this.properties, this.oAuthTokenDataStore);
         JobSynchronizer jobSynchronizer = new ArrebolJobSynchronizer(properties);
 
         this.nonces = new ArrayList<>();
