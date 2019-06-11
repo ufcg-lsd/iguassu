@@ -73,8 +73,6 @@ public class TestIguassuController {
         job.finishCreation();
         this.iguassuController.getJobDataStore().insert(job);
 
-//        this.iguassuController.restartAllJobs();
-
         Assert.assertEquals(1, this.iguassuController.getAllJobs(FAKE_OWNER).size());
         JDFJob job1 = this.iguassuController.getAllJobs(FAKE_OWNER).get(0);
         assert (job1.equals(job));

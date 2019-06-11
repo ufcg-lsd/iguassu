@@ -105,17 +105,17 @@ public class Specification implements Serializable {
         return JSONUtils.toMap(jsonStr);
     }
 
-    public String getvCPU() {
-        return getFogbowRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU);
-    }
-
-    public String getMemory() {
-        return getFogbowRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2RAM);
-    }
-
-    public String getDisk() {
-        return getFogbowRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2disk);
-    }
+//    public String getvCPU() {
+//        return getFogbowRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU);
+//    }
+//
+//    public String getMemory() {
+//        return getFogbowRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2RAM);
+//    }
+//
+//    public String getDisk() {
+//        return getFogbowRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2disk);
+//    }
 
     private String getFogbowRequirement(String fogbowRequirementKey) {
         String fogbowRequirements = getRequirementValue(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS);

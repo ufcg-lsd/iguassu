@@ -33,7 +33,6 @@ public class TestJobSpec {
 	public void setUp() {
 		BasicConfigurator.resetConfiguration();
 		BasicConfigurator.configure();
-		Configuration.getInstance(FakeConfiguration.FAKE_CONFIG_CLASS_NAME);
 	}
 
 	@After
