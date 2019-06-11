@@ -55,46 +55,53 @@ public class AuthService {
             final String authHeadersEncoded = Base64.getEncoder().encodeToString(authHeadersDecoded.getBytes());
 
             List<Header> headers = new LinkedList<>();
-            headers.add(new Header() {
-                @Override
-                public String getName() {
-                    return "Authorization";
-                }
-                @Override
-                public String getValue() {
-                    return "Basic " + authHeadersEncoded;
-                }
+            mountsHeaders(headers, authHeadersEncoded);
 
-                @Override
-                public HeaderElement[] getElements() throws ParseException {
-                    return new HeaderElement[0];
-                }
-            });
+            return requestOAuthAccessToken(requestUrl, headers, gson);
 
-            try {
-                final String oAuthTokenRawResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, requestUrl,
-                                headers, null);
-                if (oAuthTokenRawResponse != null) {
-                    OAuthToken oAuthToken = gson.fromJson(oAuthTokenRawResponse, OAuthToken.class);
-                    oAuthToken.updateExpirationDate();
-
-                    final String iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
-                    this.storeOAuthToken(oAuthToken, iguassuToken);
-
-                    return new AuthResponse(oAuthToken.getUserId(), iguassuToken);
-                } else {
-                    throw new Exception("You can't use the same authorization code twice.");
-                }
-
-            } catch (Exception e) {
-                throw new Exception("OAuth Token request failed with message, " + e.getMessage());
-            }
-        }
-
-        else {
+        } else {
             throw new UnauthorizedRequestException("Your application identifiers are not enable to " +
                     "request an Access Token.");
         }
+    }
+
+    private AuthResponse requestOAuthAccessToken(String requestUrl, List<Header> headers, Gson gson) throws Exception {
+        try {
+            final String oAuthTokenRawResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, requestUrl,
+                    headers, null);
+            if (oAuthTokenRawResponse != null) {
+                OAuthToken oAuthToken = gson.fromJson(oAuthTokenRawResponse, OAuthToken.class);
+                oAuthToken.updateExpirationDate();
+
+                final String iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
+                this.storeOAuthToken(oAuthToken, iguassuToken);
+
+                return new AuthResponse(oAuthToken.getUserId(), iguassuToken);
+            } else {
+                throw new Exception("You can't use the same authorization code twice.");
+            }
+
+        } catch (Exception e) {
+            throw new Exception("OAuth Token request failed with message, " + e.getMessage());
+        }
+    }
+
+    private void mountsHeaders(List<Header> headers, String authHeadersEncoded) {
+        headers.add(new Header() {
+            @Override
+            public String getName() {
+                return "Authorization";
+            }
+            @Override
+            public String getValue() {
+                return "Basic " + authHeadersEncoded;
+            }
+
+            @Override
+            public HeaderElement[] getElements() throws ParseException {
+                return new HeaderElement[0];
+            }
+        });
     }
 
     private void storeOAuthToken(OAuthToken oAuthToken, String iguassuToken) {
