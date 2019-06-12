@@ -42,10 +42,6 @@ public class IguassuFacade {
         return iguassuController.stopJob(jobId, owner);
     }
 
-    public void updateJob(JDFJob job) {
-        this.iguassuController.updateJob(job);
-    }
-
     public User authUser(String credentials) throws IOException, GeneralSecurityException {
         return iguassuController.authUser(credentials);
     }
@@ -54,28 +50,23 @@ public class IguassuFacade {
         return iguassuController.getNonce();
     }
 
-    public User getUser(String username){
-        return iguassuController.getUser(username);
+    public User getUser(String userId){
+        return iguassuController.getUser(userId);
     }
 
-    public User addUser(String username, String publicKey) {
-        return iguassuController.addUser(username, publicKey);
+    public User addUser(String userId, String iguassuToken) {
+        return iguassuController.addUser(userId, iguassuToken);
     }
 
-    public boolean storeOAuthToken(OAuthToken oAuthToken){
-        return iguassuController.storeOAuthToken(oAuthToken);
+    public void storeOAuthToken(OAuthToken oAuthToken){
+        iguassuController.storeOAuthToken(oAuthToken);
     }
 
     public List<OAuthToken> getAllOAuthTokens(){
         return iguassuController.getAllOAuthTokens();
     }
 
-    public String getAccessTokenByOwnerUsername(String ownerUsername){
-        return iguassuController.getAccessTokenByOwnerUsername(ownerUsername);
+    public void removeOAuthTokens(String userId) {
+        this.iguassuController.removeOAuthTokens(userId);
     }
-
-    public void deleteAllExternalOAuthTokens(){
-        iguassuController.deleteAllExternalOAuthTokens();
-    }
-
 }

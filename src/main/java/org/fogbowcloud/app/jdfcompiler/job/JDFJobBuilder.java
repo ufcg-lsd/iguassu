@@ -9,6 +9,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.command.Command;
 import org.fogbowcloud.app.core.constants.DockerConstants;
 import org.fogbowcloud.app.core.constants.FogbowConstants;
+import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.core.task.Specification;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.core.task.TaskImpl;
@@ -24,9 +25,15 @@ public class JDFJobBuilder {
 	private static final Logger LOGGER = Logger.getLogger(JDFJobBuilder.class);
 
 	private final Properties properties;
+	private OAuthTokenDataStore oAuthTokenDataStore;
 
 	public JDFJobBuilder(Properties properties) {
 		this.properties = properties;
+	}
+
+	public JDFJobBuilder(Properties properties, OAuthTokenDataStore oAuthTokenDataStore) {
+		this(properties);
+		this.oAuthTokenDataStore = oAuthTokenDataStore;
 	}
 
 	/**
@@ -72,28 +79,6 @@ public class JDFJobBuilder {
 				for (TaskSpecification taskSpec : jobSpec.getTaskSpecs()) {
 					if (Thread.interrupted())
 						throw new InterruptedException();
-					ProcessBuilder ps = new ProcessBuilder("id","-u", job.getUserId());
-
-					//From the DOC:  Initially, this property is false, meaning that the
-					//standard output and error output of a subprocess are sent to two
-					//separate streams
-					ps.redirectErrorStream(true);
-
-					Process pr = ps.start();
-
-					BufferedReader in = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-					try {
-						pr.waitFor();
-					} catch (InterruptedException e) {
-						LOGGER.debug("could not finish the query on user UUID", e);
-					}
-					String inputLine;
-					StringBuilder resultBuilder = new StringBuilder();
-					while ((inputLine = in.readLine()) != null) {
-				        resultBuilder.append(inputLine);
-				    }
-					String result = resultBuilder.toString();
-					LOGGER.debug("Result of the Process Builder: " + result);
 
 					String uuid = UUID.randomUUID().toString();
 					Task task = new TaskImpl("TaskNumber" + "-" + taskID + "-" + uuid, spec, uuid);
@@ -229,8 +214,8 @@ public class JDFJobBuilder {
 
 	private Command uploadFileCommands(String localFilePath, String filePathToUpload, String userName, String token) {
 		String fileDriverHostIp = this.properties.getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_HOST);
-		String requestTokenCommand = getUserExternalOAuthTokenRequestCommand(userName);
-		String uploadCommand = " http_code=$(curl --write-out %{http_code} -X PUT --header \"Authorization:Bearer $token\" "
+		String requestTokenCommand = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(userName).get(0).getAccessToken();
+		String uploadCommand = " http_code=$(curl --write-out %{http_code} -X PUT --header \"Authorization:Bearer \"$token "
 				+ " --data-binary @" + localFilePath + " --silent --output /dev/null "
 				+ " http://$server/remote.php/webdav/" + filePathToUpload + "); ";
 
@@ -245,8 +230,8 @@ public class JDFJobBuilder {
 
 	private Command downloadFileCommands(String localFilePath, String filePathToDownload, String userName, String token) {
 		String fileDriverHostIp = this.properties.getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_HOST);
-		String requestTokenCommand = getUserExternalOAuthTokenRequestCommand(userName);
-		String downloadCommand = " full_response=$(curl --write-out %{http_code} --header \"Authorization:Bearer $token\" "
+		String requestTokenCommand = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(userName).get(0).getAccessToken();
+		String downloadCommand = " full_response=$(curl --write-out %{http_code} --header \"Authorization:Bearer \"$token"
 				+ " http://$server/remote.php/webdav/" + filePathToDownload
 				+ " --silent --output " + localFilePath + " /dev/null); ";
 		String extractHttpStatusCode = "http_code=${full_response:0:3}; ";
@@ -261,12 +246,4 @@ public class JDFJobBuilder {
 		return new Command(scpCommand);
 	}
 
-	private String getUserExternalOAuthTokenRequestCommand(String userName) {
-		String myIguassuHttpServiceIp = getIguassuHost();
-		return "token=$(curl --request GET --url " + myIguassuHttpServiceIp + "/oauthtoken/" + userName + "); ";
-	}
-
-	private String getIguassuHost() {
-		return this.properties.getProperty(IguassuPropertiesConstants.IGUASSU_SERVICE_HOST);
-	}
 }

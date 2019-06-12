@@ -53,9 +53,8 @@ public class IguassuController {
         validateProperties(properties);
         this.properties = properties;
         this.externalOAuthTokenController = new ExternalOAuthController(properties);
-        this.authenticator = new ThirdAppAuthenticator(this.properties);
+        this.authenticator = new ThirdAppAuthenticator();
         this.jobExecutionSystem = new ArrebolJobExecutionSystem(this.properties);
-        this.jobBuilder = new JDFJobBuilder(this.properties);
     }
 
     public Properties getProperties() {
@@ -69,6 +68,7 @@ public class IguassuController {
         this.oAuthTokenDataStore =
                 new OAuthTokenDataStore(
                         this.properties.getProperty(IguassuGeneralConstants.DB_DATASTORE_URL));
+        this.jobBuilder = new JDFJobBuilder(this.properties, this.oAuthTokenDataStore);
         JobSynchronizer jobSynchronizer = new ArrebolJobSynchronizer(properties);
 
         this.nonces = new ArrayList<>();
@@ -82,7 +82,7 @@ public class IguassuController {
 
     public String addJob(String jdfFilePath, User owner)
             throws CompilerException {
-        LOGGER.debug("Adding job  of owner " + owner.getUsername() + " to scheduler");
+        LOGGER.debug("Adding job  of owner " + owner.getUserIdentification() + " to scheduler");
         // TODO change this method name
 
         JDFJob job = buildJob(jdfFilePath, owner);
@@ -98,8 +98,8 @@ public class IguassuController {
     }
 
     public JDFJob buildJob(String jdfFilePath, User owner) throws CompilerException {
-        String userName = owner.getUsername();
-        JDFJob job = new JDFJob(owner.getUser(), new ArrayList<>(), userName);
+        String userName = owner.getUserIdentification();
+        JDFJob job = new JDFJob(owner.getUserIdentification(), new ArrayList<>(), userName);
         JobSpecification jobSpec = compile(job.getId(), jdfFilePath);
 
         String externalOAuthToken = getAccessTokenByOwnerUsername(userName);
@@ -211,9 +211,10 @@ public class IguassuController {
         return this.authenticator.getUserByUsername(username);
     }
 
-    public User addUser(String username, String publicKey) {
+    public User addUser(String username, String iguassuToken) {
+
         try {
-            return this.authenticator.addUser(username, publicKey);
+            return this.authenticator.addUser(username, iguassuToken);
         } catch (Exception e) {
             throw new RuntimeException("Could not add user", e);
         }
@@ -255,7 +256,6 @@ public class IguassuController {
             return false;
         }
 
-
         LOGGER.debug("All properties are set");
         return true;
     }
@@ -287,14 +287,6 @@ public class IguassuController {
         return accessToken;
     }
 
-    public void deleteOAuthTokenByAcessToken(String accessToken) {
-        this.oAuthTokenDataStore.deleteByAccessToken(accessToken);
-    }
-
-    public void deleteAllExternalOAuthTokens() {
-        this.oAuthTokenDataStore.deleteAll();
-    }
-
     private String refreshExternalOAuthToken(String ownerUsername) {
         List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(ownerUsername);
 
@@ -314,5 +306,14 @@ public class IguassuController {
         for (OAuthToken token : tokenList) {
             deleteOAuthTokenByAcessToken(token.getAccessToken());
         }
+    }
+
+    private void deleteOAuthTokenByAcessToken(String accessToken) {
+        this.oAuthTokenDataStore.deleteByAccessToken(accessToken);
+    }
+
+    public void removeOAuthTokens(String userId) {
+        List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(userId);
+        deleteTokens(tokensList);
     }
 }

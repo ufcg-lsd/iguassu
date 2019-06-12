@@ -5,34 +5,34 @@ import org.json.JSONObject;
 
 public class Credential {
 
-	private static final String USER_NAME_KEY = "username";
-	private static final String USER_TOKEN_KEY = "token";
+	private static final String USER_ID_JSON_KEY = "userId";
+	private static final String IGUASSU_TOKEN_JSON_KEY = "iguassuToken";
 	private static final String NONCE_KEY = "nonce";
 
-	private String username;
-	private String token;
+	private String userId;
+	private String iguassuToken;
 	private Integer nonce;
 	
-	public Credential(String username, String token, Integer nonce) {
-		this.username = username;
-		this.token = token;
+	public Credential(String userId, String iguassuToken, Integer nonce) {
+		this.userId = userId;
+		this.iguassuToken = iguassuToken;
 		this.nonce = nonce;
 	}
 
-	public String getUsername() {
-		return username;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setUsername(String username) {
-		this.username = username;
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
-	public String getToken() {
-		return token;
+	public String getIguassuToken() {
+		return iguassuToken;
 	}
 
-	public void setToken(String token) {
-		this.token = token;
+	public void setIguassuToken(String iguassuToken) {
+		this.iguassuToken = iguassuToken;
 	}
 
 	public Integer getNonce() {
@@ -45,16 +45,16 @@ public class Credential {
 	
 	public static Credential fromJSON(JSONObject credential) {
 		return new Credential(
-				credential.optString(USER_NAME_KEY),
-				credential.optString(USER_TOKEN_KEY),
+				credential.optString(USER_ID_JSON_KEY),
+				credential.optString(IGUASSU_TOKEN_JSON_KEY),
 				credential.optInt(NONCE_KEY));
 	}
 	
 	public JSONObject toJSON() {
 		JSONObject credential = new JSONObject();
 		try {
-			credential.put(USER_NAME_KEY, this.username);
-			credential.put(USER_TOKEN_KEY, this.token);
+			credential.put(USER_ID_JSON_KEY, this.userId);
+			credential.put(IGUASSU_TOKEN_JSON_KEY, this.iguassuToken);
 			credential.put(NONCE_KEY, this.nonce);
 		} catch (JSONException e) {
 			return null;

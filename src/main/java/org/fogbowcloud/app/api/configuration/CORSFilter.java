@@ -1,6 +1,7 @@
 package org.fogbowcloud.app.api.configuration;
 
 import static org.fogbowcloud.app.api.constants.CORSProperties.*;
+
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
@@ -24,22 +25,25 @@ public class CORSFilter implements Filter {
             HttpServletRequest request = (HttpServletRequest) req;
             HttpServletResponse response = (HttpServletResponse) res;
 
-            final String origin = request.getHeader("Origin");
+            final String origin = request.getHeader(VARY_HEADER_VALUE);
             response.setHeader(ALLOWED_ORIGINS_HEADER, allowedOrigins.contains(origin) ? origin : "*");
-            response.setHeader("Vary", "Origin");
+            response.setHeader(VARY_HEADER, VARY_HEADER_VALUE);
 
-            response.setHeader(MAX_AGE_HEADER, "3600");
+            response.setHeader(MAX_AGE_HEADER, MAX_AGE_HEADER_VALUE);
 
-            response.setHeader(ALLOWED_CREDENTIALS_HEADER, "true");
+            response.setHeader(ALLOWED_CREDENTIALS_HEADER, ALLOWED_CREDENTIALS_HEADER_VALUE);
 
             response.setHeader(ALLOWED_METHODS_HEADER, ALLOWED_METHODS_HEADER_VALUE);
 
-            response.setHeader(ALLOWED_HEADERS_HEADER, ALLOWED_HEADERS_HEADER_VALUE);
+            response.setHeader(ALLOWED_HEADERS_HEADER, ALLOWED_HEADERS_HEADER_VALUES);
         }
 
         chain.doFilter(req, res);
     }
 
+    /**
+     * Part of the filter contract but not applied in our context.
+     */
     public void init(FilterConfig filterConfig) { }
 
     /**

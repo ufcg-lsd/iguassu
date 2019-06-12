@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.fogbowcloud.app.core.authenticator.models.LDAPUser;
 import org.fogbowcloud.app.core.authenticator.models.User;
+import org.fogbowcloud.app.core.authenticator.models.UserImpl;
 import org.fogbowcloud.app.core.command.Command;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
@@ -31,8 +31,9 @@ public class TestJDFJobBuilder {
 	@Test
 	public void testJDFCompilation () throws CompilerException, IOException, InterruptedException {
 		Properties properties = new Properties();
-		User owner = new LDAPUser("iguassuService", "iguassuService");
-		JDFJob testJob = new JDFJob(owner.getUser(), new ArrayList<>(), owner.getUsername());
+
+		User owner = new UserImpl("iguassuService", "iguassuService");
+		JDFJob testJob = new JDFJob(owner.getUserIdentification(), new ArrayList<>(), owner.getUserIdentification());
 		CommonCompiler commonCompiler = new CommonCompiler();
 		commonCompiler.compile(SIMPLE_JOB_EXAMPLE, FileType.JDF);
 		JobSpecification jobSpec = (JobSpecification) commonCompiler.getResult().get(0);

@@ -11,19 +11,16 @@ import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
 import java.io.File;
-import java.util.Properties;
 import java.util.concurrent.ConcurrentMap;
 
 public class ThirdAppAuthenticator implements IguassuAuthenticator {
 
     private static final Logger LOGGER = Logger.getLogger(ThirdAppAuthenticator.class);
 
-    public static final String AUTH_NAME = "third_app_auth";
-
     private DB usersDB;
     private ConcurrentMap<String, String> userList;
 
-    public ThirdAppAuthenticator(Properties properties) {
+    public ThirdAppAuthenticator() {
         final File usersFile = new File(IguassuPropertiesConstants.DATASTORES_USERS_DB);
         this.usersDB = DBMaker.newFileDB(usersFile).make();
         this.usersDB.checkShouldCreate(IguassuPropertiesConstants.DATASTORES_USERS);
@@ -32,18 +29,18 @@ public class ThirdAppAuthenticator implements IguassuAuthenticator {
 
     @Override
     public User authenticateUser(Credential credential) {
-        User user = getUserByUsername(credential.getUsername());
-        LOGGER.debug("Authenticating user with userId: " + user.getUsername());
+        User user = getUserByUsername(credential.getUserId());
+        LOGGER.debug("Authenticating user with userId: " + user.getUserIdentification());
         return user;
     }
 
     @Override
-    public User addUser(String username, String token) {
+    public User addUser(String username, String iguassuToken) {
         try {
-            User user = new UserImpl(username, token);
+            User user = new UserImpl(username, iguassuToken);
             this.userList.put(username, ((UserImpl) user).toJSON().toString());
             this.usersDB.commit();
-            LOGGER.info("User with username " + username + " added.");
+            LOGGER.info("User with userId " + username + " added.");
             return user;
         } catch (Exception e) {
             throw new RuntimeException("Could not add user", e);
@@ -51,12 +48,12 @@ public class ThirdAppAuthenticator implements IguassuAuthenticator {
     }
 
     @Override
-    public User getUserByUsername(String username) {
+    public User getUserByUsername(String userId) {
         User user = null;
-        String userJSONString = this.userList.get(username);
+        String userJSONString = this.userList.get(userId);
 
         if (userJSONString == null || userJSONString.isEmpty()) {
-            LOGGER.info("There is no user with username " + username);
+            LOGGER.info("There is no user with username " + userId);
             return null;
         }
         try {
