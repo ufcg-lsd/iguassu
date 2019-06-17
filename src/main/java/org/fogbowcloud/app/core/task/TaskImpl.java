@@ -110,7 +110,7 @@ public class TaskImpl implements Task {
             task.put("id", this.getId());
             task.put("specification", this.getSpecification().toJSON());
             task.put("uuid", this.getUUID());
-            task.put("state", this.state.getDesc());
+            task.put("state", this.state.getDescription());
             JSONArray commands = new JSONArray();
             for (Command command : this.getAllCommands()) {
                 commands.put(command.toJSON());

@@ -43,9 +43,30 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
     }
 
     private void updateJob(JDFJob job, ArrebolJob arrebolJob) {
+        updateCommandsState(job.getTaskList(), arrebolJob.getTasks());
         updateTasksState(job.getTaskList(), arrebolJob.getTasks());
         LOGGER.info("Updated tasks state from job [" + job.getId() + "].");
         updateJobState(job, arrebolJob.getJobState());
+    }
+
+    private void updateCommandsState(Map<String, Task> iguassuTasks, List<ArrebolTask> arrebolTasks) {
+        // To Review This produce some collateral effect, attempt for this.
+        for (ArrebolTask arrebolTask : arrebolTasks) {
+            String taskIguassuId = arrebolTask.getId();
+            Task iguassuTask = iguassuTasks.get(taskIguassuId);
+
+            if (iguassuTask != null) {
+                ArrebolTaskState arrebolTaskState = arrebolTask.getState();
+                TaskState newIguassuTaskState = getTaskState(arrebolTaskState);
+                iguassuTask.setState(newIguassuTaskState);
+
+                updateCommands(arrebolTask, iguassuTask);
+            }
+        }
+    }
+
+    private void updateCommands(ArrebolTask arrebolTask, Task iguassuTask) {
+        // take the information about commands in arrebolTask and update the iguassuTask
     }
 
     private void updateTasksState(Map<String, Task> tasks, List<ArrebolTask> arrebolTasks) {
@@ -89,7 +110,7 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
             case FINISHED:
                 return TaskState.FINISHED;
             case PENDING:
-                return TaskState.READY;
+                return TaskState.PENDING;
             default:
                 return null;
         }

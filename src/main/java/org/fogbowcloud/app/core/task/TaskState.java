@@ -8,21 +8,22 @@ public enum TaskState {
     COMPLETED("Completed"),
     FAILED("Failed"),
     NOT_CREATED("Not Created"),
-    TIMEDOUT("Timedout");
+    TIMEDOUT("Timedout"),
+    PENDING("Pending");
 
-    private String desc;
+    private String description;
 
-    TaskState(String desc){
-        this.desc = desc;
+    TaskState(String description){
+        this.description = description;
     }
 
-    public String getDesc(){
-        return this.desc;
+    public String getDescription(){
+        return this.description;
     }
 
     public static TaskState getTaskStateFromDesc(String desc) {
         for (TaskState ts : values()) {
-            if(ts.getDesc().equals(desc)){
+            if(ts.getDescription().equals(desc)){
                 return ts;
             }
         }
