@@ -11,31 +11,27 @@ public class Command implements Serializable {
     private static final long serialVersionUID = 5281647552435522413L;
     private static final Logger LOGGER = Logger.getLogger(Command.class);
 
-    public enum State {
-       QUEUED, RUNNING, FINISHED, FAILED
-    }
-
     private final String command;
-    private State state;
+    private CommandState state;
 
-    public Command(String command, State state) {
+    public Command(String command, CommandState state) {
         this.command = command;
         this.state = state;
     }
 
     public Command(String command) {
-        this(command, State.QUEUED);
+        this(command, CommandState.QUEUED);
     }
 
     public String getCommand() {
         return command;
     }
 
-    public void setState(State state) {
+    public void setState(CommandState state) {
         this.state = state;
     }
 
-    public State getState() {
+    public CommandState getState() {
         return this.state;
     }
 
@@ -57,7 +53,7 @@ public class Command implements Serializable {
 
     public static Command fromJSON(JSONObject commandJSON) {
         Command command = new Command(commandJSON.optString("command"));
-        command.setState(State.valueOf(commandJSON.optString("state")));
+        command.setState(CommandState.valueOf(commandJSON.optString("state")));
         return command;
     }
 

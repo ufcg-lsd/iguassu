@@ -2,6 +2,8 @@ package org.fogbowcloud.app.jes.arrebol;
 
 import com.google.gson.Gson;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.core.command.Command;
+import org.fogbowcloud.app.core.command.CommandState;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.core.task.TaskState;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
@@ -56,17 +58,19 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
             Task iguassuTask = iguassuTasks.get(taskIguassuId);
 
             if (iguassuTask != null) {
-                ArrebolTaskState arrebolTaskState = arrebolTask.getState();
-                TaskState newIguassuTaskState = getTaskState(arrebolTaskState);
-                iguassuTask.setState(newIguassuTaskState);
-
                 updateCommands(arrebolTask, iguassuTask);
             }
         }
     }
 
     private void updateCommands(ArrebolTask arrebolTask, Task iguassuTask) {
-        // take the information about commands in arrebolTask and update the iguassuTask
+        List<ArrebolCommand> arrebolCommands = arrebolTask.getTaskSpec().getCommands();
+        for(int i = 0; i < arrebolCommands.size(); i++){
+            ArrebolCommand arrebolCommand = arrebolCommands.get(i);
+            Command command = iguassuTask.getAllCommands().get(i);
+            CommandState commandState = getCommandState(arrebolCommand.getState());
+            command.setState(commandState);
+        }
     }
 
     private void updateTasksState(Map<String, Task> tasks, List<ArrebolTask> arrebolTasks) {
@@ -103,6 +107,20 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
         return job.getTasks().size() == tasksFinished;
     }
 
+    private CommandState getCommandState(ArrebolCommandState arrebolCommandState) {
+        switch (arrebolCommandState) {
+            case RUNNING:
+            case UNSTARTED:
+                return CommandState.RUNNING;
+            case FINISHED:
+                return CommandState.FINISHED;
+            case FAILED:
+                return CommandState.FAILED;
+            default:
+                return null;
+        }
+    }
+
     private TaskState getTaskState(ArrebolTaskState arrebolTaskState) {
         switch (arrebolTaskState) {
             case RUNNING:
@@ -111,6 +129,8 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
                 return TaskState.FINISHED;
             case PENDING:
                 return TaskState.PENDING;
+            case FAILED:
+                return TaskState.FAILED;
             default:
                 return null;
         }
