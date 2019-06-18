@@ -12,6 +12,8 @@ bigjob.py
 
 *.db
 datastores/
+bin/shutdown.pid
+
 
 iguassu.conf
 sched.conf
