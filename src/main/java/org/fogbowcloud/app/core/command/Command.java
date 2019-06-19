@@ -10,13 +10,16 @@ import java.util.Objects;
 public class Command implements Serializable {
     private static final long serialVersionUID = 5281647552435522413L;
     private static final Logger LOGGER = Logger.getLogger(Command.class);
+    private static final int UNDETERMINED_RESULT = Integer.MAX_VALUE; 
 
     private final String command;
     private CommandState state;
+    private int exitCode;
 
     public Command(String command, CommandState state) {
         this.command = command;
         this.state = state;
+        this.exitCode = UNDETERMINED_RESULT;
     }
 
     public Command(String command) {
@@ -33,6 +36,14 @@ public class Command implements Serializable {
 
     public CommandState getState() {
         return this.state;
+    }
+    
+    public void setExitCode(int exitCode) {
+        this.exitCode = exitCode;
+    }
+
+    public int getExitCode() {
+        return this.exitCode;
     }
 
     public Command clone() {

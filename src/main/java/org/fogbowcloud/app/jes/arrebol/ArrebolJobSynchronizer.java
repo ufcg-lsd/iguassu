@@ -45,44 +45,36 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
     }
 
     private void updateJob(JDFJob job, ArrebolJob arrebolJob) {
-        updateCommandsState(job.getTaskList(), arrebolJob.getTasks());
-        updateTasksState(job.getTaskList(), arrebolJob.getTasks());
+        updateTasks(job.getTaskList(), arrebolJob.getTasks());
         LOGGER.info("Updated tasks state from job [" + job.getId() + "].");
         updateJobState(job, arrebolJob.getJobState());
     }
 
-    private void updateCommandsState(Map<String, Task> iguassuTasks, List<ArrebolTask> arrebolTasks) {
+    private void updateTasks(Map<String, Task> iguassuTasks, List<ArrebolTask> arrebolTasks) {
         // To Review This produce some collateral effect, attempt for this.
         for (ArrebolTask arrebolTask : arrebolTasks) {
             String taskIguassuId = arrebolTask.getId();
             Task iguassuTask = iguassuTasks.get(taskIguassuId);
 
             if (iguassuTask != null) {
-                updateCommands(arrebolTask, iguassuTask);
+                updateTaskCommands(arrebolTask, iguassuTask);
+                
+                ArrebolTaskState arrebolTaskState = arrebolTask.getState();
+                TaskState taskState = getTaskState(arrebolTaskState);
+                iguassuTask.setState(taskState);
+                LOGGER.debug("Updated task [" + iguassuTask.getId() + "] to state " + taskState.toString());
             }
         }
     }
 
-    private void updateCommands(ArrebolTask arrebolTask, Task iguassuTask) {
+    private void updateTaskCommands(ArrebolTask arrebolTask, Task iguassuTask) {
         List<ArrebolCommand> arrebolCommands = arrebolTask.getTaskSpec().getCommands();
         for(int i = 0; i < arrebolCommands.size(); i++){
-            ArrebolCommand arrebolCommand = arrebolCommands.get(i);
+            ArrebolCommand arrebolCmd = arrebolCommands.get(i);
             Command command = iguassuTask.getAllCommands().get(i);
-            CommandState commandState = getCommandState(arrebolCommand.getState());
+            CommandState commandState = getCommandState(arrebolCmd.getState());
             command.setState(commandState);
-        }
-    }
-
-    private void updateTasksState(Map<String, Task> tasks, List<ArrebolTask> arrebolTasks) {
-
-        for (ArrebolTask arrebolTask : arrebolTasks) {
-            String taskId = arrebolTask.getTaskSpec().getId();
-            Task task = tasks.get(taskId);
-
-            ArrebolTaskState arrebolTaskState = arrebolTask.getState();
-            TaskState taskState = getTaskState(arrebolTaskState);
-            task.setState(taskState);
-            LOGGER.debug("Updated task [" + task.getId() + "] to state " + taskState.toString());
+            command.setExitCode(arrebolCmd.getExitcode());
         }
     }
 
