@@ -53,7 +53,7 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
     private void updateTasks(Map<String, Task> iguassuTasks, List<ArrebolTask> arrebolTasks) {
         // To Review This produce some collateral effect, attempt for this.
         for (ArrebolTask arrebolTask : arrebolTasks) {
-            String taskIguassuId = arrebolTask.getId();
+            String taskIguassuId = arrebolTask.getTaskSpec().getId();
             Task iguassuTask = iguassuTasks.get(taskIguassuId);
 
             if (iguassuTask != null) {
@@ -80,23 +80,8 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
 
     private void updateJobState(JDFJob job, ArrebolJobState arrebolJobState) {
         JDFJobState jdfJobState = this.getJobState(arrebolJobState);
-
-        if (jdfJobState.equals(JDFJobState.RUNNING) && tasksFinished(job)) {
-            jdfJobState = JDFJobState.FINISHED;
-        }
-
         job.setState(jdfJobState);
         LOGGER.info("Updated job [" + job.getId() + "] to state " + jdfJobState.toString());
-    }
-
-    private boolean tasksFinished(JDFJob job) {
-        int tasksFinished = 0;
-
-        for (Task task : job.getTasks()) {
-            if (task.getState().equals(TaskState.FINISHED)) tasksFinished++;
-        }
-
-        return job.getTasks().size() == tasksFinished;
     }
 
     private CommandState getCommandState(ArrebolCommandState arrebolCommandState) {
@@ -138,6 +123,8 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
                 return JDFJobState.RUNNING;
             case FAILED:
                 return JDFJobState.FAILED;
+            case FINISHED:
+                return JDFJobState.FINISHED;
             default:
                 return null;
         }
