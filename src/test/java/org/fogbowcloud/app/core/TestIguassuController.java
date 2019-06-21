@@ -116,7 +116,7 @@ public class TestIguassuController {
                 Mockito.any(User.class)
         );
 
-        String id = this.iguassuController.addJob(jdfFilePath, user);
+        String id = this.iguassuController.submitJob(jdfFilePath, user);
         Assert.assertEquals(id, job.getId());
         Mockito.verify(this.dataStore).insert(job);
         Assert.assertTrue(this.dataStore.getByJobId(id, user.getUserIdentification()).equals(job));
