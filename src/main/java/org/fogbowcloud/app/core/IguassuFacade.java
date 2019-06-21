@@ -26,8 +26,8 @@ public class IguassuFacade {
         return iguassuController.getJobById(id, owner);
     }
 
-    public String addJob(String jdfFilePath, User owner) throws CompilerException, IOException {
-        return iguassuController.addJob(jdfFilePath, owner);
+    public String submitJob(String jdfFilePath, User owner) throws CompilerException, IOException {
+        return iguassuController.submitJob(jdfFilePath, owner);
     }
 
     public ArrayList<JDFJob> getAllJobs(String owner) {
