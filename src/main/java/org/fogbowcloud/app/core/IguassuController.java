@@ -29,6 +29,7 @@ import org.fogbowcloud.app.jes.JobExecutionSystem;
 import org.fogbowcloud.app.jes.arrebol.ArrebolJobExecutionSystem;
 import org.fogbowcloud.app.jes.arrebol.ArrebolJobSynchronizer;
 import org.fogbowcloud.app.jes.arrebol.JobSynchronizer;
+import org.fogbowcloud.app.utils.JDFUtil;
 import org.fogbowcloud.app.utils.ManagerTimer;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -123,7 +124,7 @@ public class IguassuController {
     String userIdentification = owner.getUserIdentification();
     JDFJob job = new JDFJob(owner.getUserIdentification(), new ArrayList<>(), userIdentification);
     JobSpecification jobSpec = compile(job.getId(), jdfFilePath);
-
+      JDFUtil.removeEmptySpaceFromVariables(jobSpec);
     String externalOAuthToken = getAccessTokenByOwnerUsername(userIdentification);
 
     return buildJobFromJDFFile(job, jdfFilePath, jobSpec, userIdentification, externalOAuthToken);
