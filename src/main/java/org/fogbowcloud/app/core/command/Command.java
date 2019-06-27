@@ -1,5 +1,6 @@
 package org.fogbowcloud.app.core.command;
 
+import java.util.Collection;
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,10 +14,12 @@ public class Command implements Serializable {
     private static final int UNDETERMINED_RESULT = Integer.MAX_VALUE; 
 
     private final String command;
+    private final String rawCommand;
     private CommandState state;
     private int exitCode;
 
     public Command(String command, CommandState state) {
+        this.rawCommand = command;
         this.command = command;
         this.state = state;
         this.exitCode = UNDETERMINED_RESULT;
@@ -24,6 +27,13 @@ public class Command implements Serializable {
 
     public Command(String command) {
         this(command, CommandState.QUEUED);
+    }
+
+    public Command(String command, String rawCommand){
+        this.command = command;
+        this.rawCommand = rawCommand;
+        this.state = CommandState.QUEUED;
+        this.exitCode = UNDETERMINED_RESULT;
     }
 
     public String getCommand() {
@@ -44,6 +54,10 @@ public class Command implements Serializable {
 
     public int getExitCode() {
         return this.exitCode;
+    }
+
+    public String getRawCommand(){
+        return this.rawCommand;
     }
 
     public Command clone() {
