@@ -11,21 +11,11 @@ public class TaskImpl implements Task {
 
     private static final Logger LOGGER = Logger.getLogger(TaskImpl.class);
 
-    public static final String ENV_LOCAL_OUT_DIR = "";
-
-    public static final String METADATA_REMOTE_OUTPUT_FOLDER = "remote_output_folder";
-    public static final String METADATA_LOCAL_OUTPUT_FOLDER = "local_output_folder";
-    public static final String METADATA_REMOTE_COMMAND_EXIT_PATH = "remote_command_exit_path";
-    public static final String METADATA_RESOURCE_ID = "resource_id";
-    public static final String METADATA_TASK_TIMEOUT = "task_timeout";
-    public static final String METADATA_MAX_RESOURCE_CONN_RETRIES = "max_conn_retries";
-
     private String id;
     private String uuid;
     private Specification specification;
     private TaskState state;
     private List<Command> commands;
-    private List<String> commandsStr;
     private Map<String, String> metadata;
 
     public TaskImpl(String id, Specification specification, String uuid) {
@@ -35,13 +25,6 @@ public class TaskImpl implements Task {
         this.specification = specification;
         this.state = TaskState.READY;
         this.uuid = uuid;
-        this.commandsStr = new ArrayList<>();
-    }
-
-    private void populateCommandStrList() {
-        for (int i = 0; i < this.commands.size(); i++) {
-            this.commandsStr.add(this.commands.get(i).getCommand());
-        }
     }
 
     @Override
@@ -65,8 +48,11 @@ public class TaskImpl implements Task {
     }
 
     public List<String> getAllCommandsInStr() {
-        populateCommandStrList();
-        return this.commandsStr;
+        List<String> commandsStr = new ArrayList<>();
+        for(int i = 0; i < this.commands.size(); i++){
+            commandsStr.add(this.commands.get(i).getCommand());
+        }
+        return commandsStr;
     }
 
     @Override

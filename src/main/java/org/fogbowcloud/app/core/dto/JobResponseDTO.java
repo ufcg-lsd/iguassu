@@ -7,6 +7,7 @@ public class JobResponseDTO {
 
     private String id;
     private String name;
+    private String timeStamp;
     private JDFJobState state;
 
     public JobResponseDTO(JDFJob job) {
@@ -16,6 +17,7 @@ public class JobResponseDTO {
     public void setFields(JDFJob jdfJob) {
         this.id = jdfJob.getId();
         this.name = jdfJob.getName();
+        this.timeStamp = jdfJob.getTimeStamp();
         this.state = jdfJob.getState();
     }
 
@@ -41,5 +43,9 @@ public class JobResponseDTO {
 
     public void setState(JDFJobState state) {
         this.state = state;
+    }
+
+    public String getTimeStamp(){
+        return this.timeStamp;
     }
 }

@@ -1,7 +1,9 @@
 package org.fogbowcloud.app.jdfcompiler.job;
 
 import java.io.Serializable;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -33,6 +35,7 @@ public class JDFJob extends Job implements Serializable {
     private final String jobId;
     private final String owner;
     private final String userId;
+    private final String timeStamp;
     private String name;
     private JDFJobState state;
     private String jobIdArrebol;
@@ -44,6 +47,7 @@ public class JDFJob extends Job implements Serializable {
         this.owner = owner;
         this.userId = userID;
         this.state = JDFJobState.CREATED;
+        this.timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss").format(Calendar.getInstance().getTime());
     }
 
     public JDFJob(String jobId, String owner, List<Task> taskList, String userID,
@@ -55,6 +59,7 @@ public class JDFJob extends Job implements Serializable {
         this.userId = userID;
         this.state = JDFJobState.CREATED;
         this.jobIdArrebol = jobIdArrebol;
+        this.timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss").format(Calendar.getInstance().getTime());
     }
 
     public JDFJob(String owner, List<Task> taskList, String userID) {
@@ -141,6 +146,10 @@ public class JDFJob extends Job implements Serializable {
 
     public String getUserId() {
         return this.userId;
+    }
+
+    public String getTimeStamp(){
+        return this.timeStamp;
     }
 
     public JSONObject toJSON() {

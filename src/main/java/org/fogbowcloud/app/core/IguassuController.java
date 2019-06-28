@@ -124,7 +124,7 @@ public class IguassuController {
     String userIdentification = owner.getUserIdentification();
     JDFJob job = new JDFJob(owner.getUserIdentification(), new ArrayList<>(), userIdentification);
     JobSpecification jobSpec = compile(job.getId(), jdfFilePath);
-      JDFUtil.removeEmptySpaceFromVariables(jobSpec);
+    JDFUtil.removeEmptySpaceFromVariables(jobSpec);
     String externalOAuthToken = getAccessTokenByOwnerUsername(userIdentification);
 
     return buildJobFromJDFFile(job, jdfFilePath, jobSpec, userIdentification, externalOAuthToken);

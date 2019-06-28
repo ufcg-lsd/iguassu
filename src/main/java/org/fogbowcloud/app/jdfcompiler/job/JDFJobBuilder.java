@@ -82,11 +82,6 @@ public class JDFJobBuilder {
 
 					String uuid = UUID.randomUUID().toString();
 					Task task = new TaskImpl("TaskNumber" + "-" + taskID + "-" + uuid, spec, uuid);
-					task.putMetadata(TaskImpl.METADATA_REMOTE_OUTPUT_FOLDER,
-							this.properties.getProperty(IguassuPropertiesConstants.REMOTE_OUTPUT_FOLDER));
-					
-					task.putMetadata(TaskImpl.METADATA_REMOTE_COMMAND_EXIT_PATH,
-							this.properties.getProperty(IguassuPropertiesConstants.REMOTE_OUTPUT_FOLDER) + "/exit");
 					task.putMetadata(IguassuPropertiesConstants.JOB_ID, job.getId());
 					task.putMetadata(IguassuPropertiesConstants.OWNER, job.getOwner());
 
@@ -111,22 +106,24 @@ public class JDFJobBuilder {
 
 	private void addAllRequirements(String jobRequirements, Specification spec){
 		for (String req : jobRequirements.split("and")) {
-			if(req.startsWith(DockerConstants.PREFIX_DOCKER_REQUIREMENTS)){
-				String requirements = spec.getRequirementValue(DockerConstants.METADATA_DOCKER_REQUIREMENTS);
-				if(requirements == null){
-					spec.addRequirement(DockerConstants.METADATA_DOCKER_REQUIREMENTS, req);
-				} else {
-					spec.addRequirement(DockerConstants.METADATA_DOCKER_REQUIREMENTS, requirements + " && " + req);
-				}
-			} else if(!req.trim().startsWith("image")){
-				String requirements = spec.getRequirementValue(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS);
-				if(requirements == null){
-					spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, req);
-				} else {
-					spec.addRequirement(
-							FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, requirements + " && " + req);
-				}
-			}
+		    if(req != null && !req.isEmpty()){
+            if(req.startsWith(DockerConstants.PREFIX_DOCKER_REQUIREMENTS)){
+                String requirements = spec.getRequirementValue(DockerConstants.METADATA_DOCKER_REQUIREMENTS);
+                if(requirements == null){
+                    spec.addRequirement(DockerConstants.METADATA_DOCKER_REQUIREMENTS, req);
+                } else {
+                    spec.addRequirement(DockerConstants.METADATA_DOCKER_REQUIREMENTS, requirements + " && " + req);
+                }
+            } else if(!req.trim().startsWith("image")){
+                String requirements = spec.getRequirementValue(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS);
+                if(requirements == null){
+                    spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, req);
+                } else {
+                    spec.addRequirement(
+                        FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, requirements + " && " + req);
+                }
+            }
+        }
 		}
 	}
 
@@ -176,15 +173,15 @@ public class JDFJobBuilder {
 		String sourceFile = command.getEntry().getSourceFile();
 		String destination = command.getEntry().getDestination();
 		String IOType = command.getEntry().getCommand().toUpperCase();
-
+    String rawCommand = IOType + " " + sourceFile + " " + destination;
 		switch (IOType) {
 			case "PUT": case "STORE":
-				Command uploadFileCommand = uploadFileCommands(sourceFile, destination, userName, externalOAuthToken);
+				Command uploadFileCommand = uploadFileCommands(sourceFile, destination, userName, externalOAuthToken, rawCommand);
 				task.addCommand(uploadFileCommand);
 				LOGGER.debug("JobId: " + jobId + " task: " + task.getId() + " upload command:" + uploadFileCommand.getCommand());
 				break;
 			case "GET":
-                Command downloadFileCommand = downloadFileCommands(sourceFile, destination, userName, externalOAuthToken);
+                Command downloadFileCommand = downloadFileCommands(sourceFile, destination, userName, externalOAuthToken, rawCommand);
                 task.addCommand(downloadFileCommand);
 				LOGGER.debug("JobId: " + jobId + " task: " + task.getId() + " download command:" + downloadFileCommand.getCommand());
 				break;
@@ -192,7 +189,7 @@ public class JDFJobBuilder {
 	}
 
 	private void addRemoteCommand(String jobId, Task task, RemoteCommand remCommand) {
-		String commandStr = remCommand.getContent();;
+		String commandStr = remCommand.getContent();
 
 		Command command = new Command(commandStr);
 		LOGGER.debug("JobId: " + jobId + " task: " + task.getId() + " remote command: " + remCommand.getContent());
@@ -212,7 +209,7 @@ public class JDFJobBuilder {
 		addCommands(initBlocks, jobId, task, userName, externalOAuthToken);
 	}
 
-	private Command uploadFileCommands(String localFilePath, String filePathToUpload, String userName, String token) {
+	private Command uploadFileCommands(String localFilePath, String filePathToUpload, String userName, String token, String rawCommand) {
 		String fileDriverHostIp = this.properties.getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_HOST);
 		String requestTokenCommand = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(userName).get(0).getAccessToken();
 		String uploadCommand = " http_code=$(curl --write-out %{http_code} -X PUT --header \"Authorization:Bearer \"$token "
@@ -225,10 +222,10 @@ public class JDFJobBuilder {
 				+ " if [ \\$http_code == " + HttpStatus.UNAUTHORIZED + " ] ; then " + requestTokenCommand
 				+ uploadCommand + " fi";
 
-		return new Command(scpCommand);
+		return new Command(scpCommand, rawCommand);
 	}
 
-	private Command downloadFileCommands(String localFilePath, String filePathToDownload, String userName, String token) {
+	private Command downloadFileCommands(String localFilePath, String filePathToDownload, String userName, String token, String rawCommand) {
 		String fileDriverHostIp = this.properties.getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_HOST);
 		String requestTokenCommand = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(userName).get(0).getAccessToken();
 		String downloadCommand = " full_response=$(curl --write-out %{http_code} --header \"Authorization:Bearer \"$token"
@@ -243,7 +240,7 @@ public class JDFJobBuilder {
 				+ " if [ \\$http_code == " + HttpStatus.UNAUTHORIZED + " ] ; then " + requestTokenCommand
 				+ " " + downloadCommand + " fi";
 
-		return new Command(scpCommand);
+		return new Command(scpCommand, rawCommand);
 	}
 
 }
