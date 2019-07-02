@@ -19,7 +19,7 @@ public class JobResponseDTO {
     public void setFields(JDFJob jdfJob) {
         this.id = jdfJob.getId();
         this.name = jdfJob.getName();
-        this.date = getDate(jdfJob.getTimeStamp());
+        this.date = timestampToDate(jdfJob.getTimeStamp());
         this.state = jdfJob.getState();
     }
 
@@ -47,7 +47,11 @@ public class JobResponseDTO {
         this.state = state;
     }
 
-    private String getDate(long timestamp){
+    public String getDate(){
+        return this.date;
+    }
+
+    private String timestampToDate(long timestamp){
         Date date = new java.util.Date(timestamp*1000L);
         SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         sdf.setTimeZone(java.util.TimeZone.getTimeZone("GMT-3"));
