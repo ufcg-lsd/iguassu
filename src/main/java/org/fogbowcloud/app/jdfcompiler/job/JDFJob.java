@@ -18,7 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * It add the job name, job name and sched path to the {@link Job} abstraction.
+ * It add the job name, and sched path to the {@link Job} abstraction.
  */
 public class JDFJob extends Job implements Serializable {
 
@@ -32,18 +32,19 @@ public class JDFJob extends Job implements Serializable {
     private static final String JSON_HEADER_STATE = "state";
     private static final String JSON_HEADER_OWNER = "owner";
     private static final String JSON_HEADER_TASKS = "tasks";
+    private static final String JSON_HEADER_TIMESTAMP = "timestamp";
 
     private final String jobId;
     private final String owner;
     private final String userId;
-    private final long timestamp;
+    private long timestamp;
     private String name;
     private JDFJobState state;
     private String jobIdArrebol;
 
     public JDFJob(String jobId, String owner, List<Task> taskList, String userID) {
         super(taskList);
-        this.name = "";
+        this.name = userID + "_job";
         this.jobId = jobId;
         this.owner = owner;
         this.userId = userID;
@@ -57,11 +58,16 @@ public class JDFJob extends Job implements Serializable {
         this.jobIdArrebol = jobIdArrebol;
     }
 
+    private JDFJob(String jobId, String owner, List<Task> taskList, String userID,
+        String jobIdArrebol, long timestamp) {
+        this(jobId, owner, taskList, userID, jobIdArrebol);
+        this.timestamp = timestamp;
+    }
+
     public JDFJob(String owner, List<Task> taskList, String userID) {
         this(UUID.randomUUID().toString(), owner, taskList, userID);
     }
 
-    // TODO implement JSON_HEADER_JOB_ID_ARREBOL
     public static JDFJob fromJSON(JSONObject job) {
         LOGGER.info("Reading Job from JSON");
         List<Task> tasks = new ArrayList<>();
@@ -78,9 +84,11 @@ public class JDFJob extends Job implements Serializable {
             job.optString(JSON_HEADER_OWNER),
             tasks,
             job.optString(JSON_HEADER_UUID),
-            job.optString(JSON_HEADER_JOB_ID_ARREBOL)
+            job.optString(JSON_HEADER_JOB_ID_ARREBOL),
+            job.optLong(JSON_HEADER_TIMESTAMP)
         );
         jdfJob.setFriendlyName(job.optString(JSON_HEADER_NAME));
+
         try {
             jdfJob.state = JDFJobState.create(job.optString(JSON_HEADER_STATE));
         } catch (Exception e) {
@@ -156,6 +164,8 @@ public class JDFJob extends Job implements Serializable {
             job.put(JSON_HEADER_UUID, this.getUserId());
             job.put(JSON_HEADER_STATE, this.getState().value());
             job.put(JSON_HEADER_JOB_ID_ARREBOL, this.jobIdArrebol);
+            job.put(JSON_HEADER_TIMESTAMP, this.timestamp);
+
             JSONArray tasks = new JSONArray();
             Map<String, Task> taskList = this.getTaskList();
             for (Entry<String, Task> entry : taskList.entrySet()) {
@@ -193,7 +203,8 @@ public class JDFJob extends Job implements Serializable {
             ", owner='" + owner + '\'' +
             ", userId='" + userId + '\'' +
             ", name='" + name + '\'' +
-            ", state=" + state +
+            ", timestamp='" + timestamp + '\'' +
+            ", state=" + state + '\'' +
             ", jobIdArrebol='" + jobIdArrebol + '\'' +
             '}';
     }

@@ -55,7 +55,9 @@ public class JDFJobBuilder {
 		if (file.exists()) {
 			if (file.canRead()) {
 
-				job.setFriendlyName(jobSpec.getLabel());				
+				if (!jobSpec.getLabel().trim().isEmpty()) {
+					job.setFriendlyName(jobSpec.getLabel());
+				}
 
 				String jobRequirements = jobSpec.getRequirements();
 				LOGGER.debug("JobReq: " + jobRequirements);
