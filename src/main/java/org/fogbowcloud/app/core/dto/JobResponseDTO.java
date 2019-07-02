@@ -9,17 +9,17 @@ public class JobResponseDTO {
 
     private String id;
     private String name;
-    private String date;
+    private String creationDate;
     private JDFJobState state;
 
     public JobResponseDTO(JDFJob job) {
         setFields(job);
     }
 
-    public void setFields(JDFJob jdfJob) {
+    private void setFields(JDFJob jdfJob) {
         this.id = jdfJob.getId();
         this.name = jdfJob.getName();
-        this.date = timestampToDate(jdfJob.getTimeStamp());
+        this.creationDate = timestampToDate(jdfJob.getTimeStamp());
         this.state = jdfJob.getState();
     }
 
@@ -47,8 +47,8 @@ public class JobResponseDTO {
         this.state = state;
     }
 
-    public String getDate(){
-        return this.date;
+    public String getCreationDate(){
+        return this.creationDate;
     }
 
     private String timestampToDate(long timestamp){
