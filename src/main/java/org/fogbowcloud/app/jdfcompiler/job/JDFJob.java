@@ -2,6 +2,7 @@ package org.fogbowcloud.app.jdfcompiler.job;
 
 import java.io.Serializable;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -35,7 +36,7 @@ public class JDFJob extends Job implements Serializable {
     private final String jobId;
     private final String owner;
     private final String userId;
-    private final String timeStamp;
+    private final long timestamp;
     private String name;
     private JDFJobState state;
     private String jobIdArrebol;
@@ -47,19 +48,13 @@ public class JDFJob extends Job implements Serializable {
         this.owner = owner;
         this.userId = userID;
         this.state = JDFJobState.CREATED;
-        this.timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss").format(Calendar.getInstance().getTime());
+        this.timestamp = Instant.now().getEpochSecond();
     }
 
     public JDFJob(String jobId, String owner, List<Task> taskList, String userID,
         String jobIdArrebol) {
-        super(taskList);
-        this.name = "";
-        this.jobId = jobId;
-        this.owner = owner;
-        this.userId = userID;
-        this.state = JDFJobState.CREATED;
+        this(jobId, owner, taskList, userID);
         this.jobIdArrebol = jobIdArrebol;
-        this.timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss").format(Calendar.getInstance().getTime());
     }
 
     public JDFJob(String owner, List<Task> taskList, String userID) {
@@ -148,8 +143,8 @@ public class JDFJob extends Job implements Serializable {
         return this.userId;
     }
 
-    public String getTimeStamp(){
-        return this.timeStamp;
+    public long getTimeStamp(){
+        return this.timestamp;
     }
 
     public JSONObject toJSON() {
