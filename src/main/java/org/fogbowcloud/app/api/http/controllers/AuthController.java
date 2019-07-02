@@ -51,7 +51,7 @@ public class AuthController {
         }
         catch (Exception e){
             return new ResponseEntity<>("The authorization failed with error [" + e.getMessage() +
-                    "]", HttpStatus.INTERNAL_SERVER_ERROR);
+                    "]", HttpStatus.UNAUTHORIZED);
         }
     }
 }
