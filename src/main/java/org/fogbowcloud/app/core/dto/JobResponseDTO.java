@@ -1,5 +1,7 @@
 package org.fogbowcloud.app.core.dto;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
 
@@ -7,17 +9,17 @@ public class JobResponseDTO {
 
     private String id;
     private String name;
-    private String timeStamp;
+    private String creationDate;
     private JDFJobState state;
 
     public JobResponseDTO(JDFJob job) {
         setFields(job);
     }
 
-    public void setFields(JDFJob jdfJob) {
+    private void setFields(JDFJob jdfJob) {
         this.id = jdfJob.getId();
         this.name = jdfJob.getName();
-        this.timeStamp = jdfJob.getTimeStamp();
+        this.creationDate = timestampToDate(jdfJob.getTimeStamp());
         this.state = jdfJob.getState();
     }
 
@@ -45,7 +47,14 @@ public class JobResponseDTO {
         this.state = state;
     }
 
-    public String getTimeStamp(){
-        return this.timeStamp;
+    public String getCreationDate(){
+        return this.creationDate;
+    }
+
+    private String timestampToDate(long timestamp){
+        Date date = new java.util.Date(timestamp*1000L);
+        SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        sdf.setTimeZone(java.util.TimeZone.getTimeZone("GMT-3"));
+        return sdf.format(date);
     }
 }
