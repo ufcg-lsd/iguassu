@@ -175,10 +175,12 @@ public class JDFJobBuilder {
 		String sourceFile = command.getEntry().getSourceFile();
 		String destination = command.getEntry().getDestination();
 		String IOType = command.getEntry().getCommand().toUpperCase();
-    String rawCommand = IOType + " " + sourceFile + " " + destination;
+    	String rawCommand = IOType + " " + sourceFile + " " + destination;
 		switch (IOType) {
 			case "PUT": case "STORE":
 				Command uploadFileCommand = uploadFileCommands(sourceFile, destination, userName, externalOAuthToken, rawCommand);
+				LOGGER.debug(rawCommand);
+
 				task.addCommand(uploadFileCommand);
 				LOGGER.debug("JobId: " + jobId + " task: " + task.getId() + " upload command:" + uploadFileCommand.getCommand());
 				break;
