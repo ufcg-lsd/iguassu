@@ -4,6 +4,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.fogbowcloud.app.api.http.services.JobService;
 import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.fogbowcloud.app.core.dto.JobResponseDTO;
+import org.fogbowcloud.app.core.dto.TaskDTO;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
@@ -85,7 +87,7 @@ public class JobController {
     @GetMapping(value = ApiDocumentation.Endpoint.JOB_PATH + "/"
         + ApiDocumentation.Endpoint.TASKS_ENDPOINT)
     @ApiOperation(value = ApiDocumentation.Job.GET_TASKS_OPERATION)
-    public ResponseEntity<List<Task>> getJobTasks(
+    public ResponseEntity<List<TaskDTO>> getJobTasks(
         @ApiParam(value = ApiDocumentation.Job.ID)
         @PathVariable String jobId,
         @ApiParam(value = ApiDocumentation.CommonParameters.USER_CREDENTIALS)
@@ -94,8 +96,16 @@ public class JobController {
         LOGGER.info("Retrieving tasks from job with id [" + jobId + "].");
 
         JDFJob job = getJDFJob(jobId, credentials);
+        List<TaskDTO> taskDTOS = toTasksDTOList(job.getTasks());
+        return new ResponseEntity<>(taskDTOS, HttpStatus.OK);
+    }
 
-        return new ResponseEntity<>(job.getTasks(), HttpStatus.OK);
+    private List<TaskDTO> toTasksDTOList(List<Task> tasks){
+        List<TaskDTO> l = new ArrayList<>();
+        for(Task t : tasks){
+            l.add(new TaskDTO(t));
+        }
+        return l;
     }
 
     private JDFJob getJDFJob(String jobId, String credentials) throws InvalidParameterException {
