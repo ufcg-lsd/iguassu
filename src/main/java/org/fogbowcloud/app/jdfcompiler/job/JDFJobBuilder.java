@@ -25,6 +25,9 @@ public class JDFJobBuilder {
 
 	private final Properties properties;
 	private OAuthTokenDataStore oAuthTokenDataStore;
+	private static final String REQUIREMENTS_IMAGE_KEY = "image";
+	private static final String REQUIREMENTS_SEPARATOR = "and";
+	private static final String REQUIREMENTS_CONCAT_STR = " && ";
 
 	public JDFJobBuilder(Properties properties) {
 		this.properties = properties;
@@ -60,17 +63,10 @@ public class JDFJobBuilder {
 
 				String jobRequirements = jobSpec.getRequirements();
 				LOGGER.debug("JobReq: " + jobRequirements);
-
 				jobRequirements = jobRequirements.replace("(", "").replace(")", "");
 
-				String image = null;
 
-				for (String req : jobRequirements.split("and")) {
-					if (req.trim().startsWith("image")) {
-						image = req.split("==")[1].trim();
-					}
-				}
-
+				String image = getImageFromJobRequirements(jobRequirements);
 				Specification spec = new Specification(image, userName);
 
 				addAllRequirements(jobRequirements, spec);
@@ -105,18 +101,30 @@ public class JDFJobBuilder {
 	}
 
 	private void addAllRequirements(String jobRequirements, Specification spec){
-		for (String req : jobRequirements.split("and")) {
+		for (String req : jobRequirements.split(REQUIREMENTS_SEPARATOR)) {
 		    if(req != null && !req.isEmpty()){
             if(req.startsWith(DockerConstants.PREFIX_DOCKER_REQUIREMENTS)){
                 String requirements = spec.getRequirementValue(DockerConstants.METADATA_DOCKER_REQUIREMENTS);
                 if(requirements == null){
                     spec.addRequirement(DockerConstants.METADATA_DOCKER_REQUIREMENTS, req);
                 } else {
-                    spec.addRequirement(DockerConstants.METADATA_DOCKER_REQUIREMENTS, requirements + " && " + req);
+                    spec.addRequirement(DockerConstants.METADATA_DOCKER_REQUIREMENTS, requirements + REQUIREMENTS_CONCAT_STR + req);
                 }
             }
         }
 		}
+	}
+
+	private String getImageFromJobRequirements(String requirements){
+		String image = null;
+
+		for (String req : requirements.split(REQUIREMENTS_SEPARATOR)) {
+			if (req.trim().startsWith(REQUIREMENTS_IMAGE_KEY)) {
+				image = req.split("==")[1].trim();
+			}
+		}
+
+		return image;
 	}
 
 	/**
