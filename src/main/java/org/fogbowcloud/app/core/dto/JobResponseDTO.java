@@ -53,7 +53,7 @@ public class JobResponseDTO {
 
     private String timestampToDate(long timestamp){
         Date date = new java.util.Date(timestamp*1000L);
-        SimpleDateFormat sdf = new java.text.SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         sdf.setTimeZone(java.util.TimeZone.getTimeZone("GMT-3"));
         return sdf.format(date);
     }
