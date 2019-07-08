@@ -7,6 +7,7 @@ import org.apache.http.HeaderElement;
 import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.api.exceptions.NotFoundAccessToken;
 import org.fogbowcloud.app.core.IguassuFacade;
 import org.fogbowcloud.app.core.authenticator.models.OAuthIdentifiers;
 import org.fogbowcloud.app.core.authenticator.models.RandomString;
@@ -119,5 +120,26 @@ public class AuthService {
         final String sessionToken = new RandomString(21, userId).nextString();
 
         return Base64.getEncoder().encodeToString(sessionToken.getBytes());
+    }
+
+    public AuthDTO refreshToken(String accessToken) throws Exception {
+        final Gson gson = new Gson();
+        OAuthToken oAuthToken = this.iguassuFacade.getTokenByAccessToken(accessToken);
+        if(oAuthToken != null){
+            String refreshToken = oAuthToken.getRefreshToken();
+            final String baseUrl = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_TOKEN_URL);
+            final String requestUrl = baseUrl + "?grant_type=refresh_token&refresh_token="+refreshToken;
+            String clientId = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID);
+            String clientSecret = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
+
+            final String authHeadersDecoded = clientId + ":" + clientSecret;
+            final String authHeadersEncoded = Base64.getEncoder().encodeToString(authHeadersDecoded.getBytes());
+
+            List<Header> headers = new LinkedList<>();
+            mountsHeaders(headers, authHeadersEncoded);
+            return requestOAuthAccessToken(requestUrl, headers, gson);
+        } else {
+            throw new NotFoundAccessToken("Not found access token.");
+        }
     }
 }

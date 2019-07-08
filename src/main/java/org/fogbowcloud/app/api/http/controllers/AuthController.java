@@ -3,6 +3,7 @@ package org.fogbowcloud.app.api.http.controllers;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import javax.ws.rs.PathParam;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.ApiDocumentation;
 import org.fogbowcloud.app.api.http.services.AuthService;
@@ -52,6 +53,17 @@ public class AuthController {
         catch (Exception e){
             return new ResponseEntity<>("The authorization failed with error [" + e.getMessage() +
                     "]", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PostMapping(ApiDocumentation.Endpoint.OAUTH2_REFRESH_TOKEN_ENDPOINT)
+    public ResponseEntity<?> refreshToken(@PathVariable String accessToken){
+        try {
+            AuthDTO authDTO = this.authService.refreshToken(accessToken);
+            return new ResponseEntity<>(authDTO, HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 }

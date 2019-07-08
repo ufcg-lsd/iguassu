@@ -18,7 +18,6 @@ import org.fogbowcloud.app.core.exceptions.IguassuException;
 import org.fogbowcloud.app.core.monitor.JobStateMonitor;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.external.ExternalOAuthConstants;
-import org.fogbowcloud.app.external.ExternalOAuthController;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJobBuilder;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
@@ -44,14 +43,12 @@ public class IguassuController {
   private JobDataStore jobDataStore;
   private OAuthTokenDataStore oAuthTokenDataStore;
   private IguassuAuthenticator authenticator;
-  private ExternalOAuthController externalOAuthTokenController;
   private JobExecutionSystem jobExecutionSystem;
   private JDFJobBuilder jobBuilder;
 
   public IguassuController(Properties properties) throws IguassuException {
     validateProperties(properties);
     this.properties = properties;
-    this.externalOAuthTokenController = new ExternalOAuthController(properties);
     this.authenticator = new ThirdAppAuthenticator();
     this.jobExecutionSystem = new ArrebolJobExecutionSystem(this.properties);
   }
@@ -283,27 +280,27 @@ public class IguassuController {
     }
 
     if (accessToken == null && tokensList.size() != 0) {
-      accessToken = refreshExternalOAuthToken(ownerUsername);
+//      accessToken = refreshExternalOAuthToken(ownerUsername);
     }
 
     return accessToken;
   }
 
-  private String refreshExternalOAuthToken(String ownerUsername) {
-    List<OAuthToken> tokensList = this.oAuthTokenDataStore
-        .getAccessTokenByOwnerUsername(ownerUsername);
-
-    String accessToken = null;
-    if (tokensList.size() != 0) {
-      OAuthToken someToken = tokensList.get(0);
-      String someRefreshToken = someToken.getRefreshToken();
-      OAuthToken newOAuthToken = this.externalOAuthTokenController.refreshToken(someRefreshToken);
-      accessToken = newOAuthToken.getAccessToken();
-      deleteTokens(tokensList);
-      storeOAuthToken(newOAuthToken);
-    }
-    return accessToken;
-  }
+//  private String refreshExternalOAuthToken(String ownerUsername) {
+//    List<OAuthToken> tokensList = this.oAuthTokenDataStore
+//        .getAccessTokenByOwnerUsername(ownerUsername);
+//
+//    String accessToken = null;
+//    if (tokensList.size() != 0) {
+//      OAuthToken someToken = tokensList.get(0);
+//      String someRefreshToken = someToken.getRefreshToken();
+//      OAuthToken newOAuthToken = this.externalOAuthTokenController.refreshToken(someRefreshToken);
+//      accessToken = newOAuthToken.getAccessToken();
+//      deleteTokens(tokensList);
+//      storeOAuthToken(newOAuthToken);
+//    }
+//    return accessToken;
+//  }
 
   private void deleteTokens(List<OAuthToken> tokenList) {
     for (OAuthToken token : tokenList) {
@@ -318,5 +315,9 @@ public class IguassuController {
   public void removeOAuthTokens(String userId) {
     List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(userId);
     deleteTokens(tokensList);
+  }
+
+  public OAuthToken getTokenByAccessToken(String accessToken){
+    return this.oAuthTokenDataStore.getTokenByAccessToken(accessToken);
   }
 }

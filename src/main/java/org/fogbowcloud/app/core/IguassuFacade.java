@@ -69,4 +69,8 @@ public class IguassuFacade {
     public void removeOAuthTokens(String userId) {
         this.iguassuController.removeOAuthTokens(userId);
     }
+
+    public OAuthToken getTokenByAccessToken(String accessToken){
+        return this.iguassuController.getTokenByAccessToken(accessToken);
+    }
 }
