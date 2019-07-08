@@ -2,7 +2,6 @@ package org.fogbowcloud.app.core.task;
 
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.constants.FogbowConstants;
 import org.fogbowcloud.app.utils.JSONUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
