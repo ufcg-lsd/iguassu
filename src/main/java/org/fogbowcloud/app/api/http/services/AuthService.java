@@ -10,7 +10,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.IguassuFacade;
 import org.fogbowcloud.app.core.authenticator.models.OAuthIdentifiers;
 import org.fogbowcloud.app.core.authenticator.models.RandomString;
-import org.fogbowcloud.app.core.dto.AuthResponse;
+import org.fogbowcloud.app.core.dto.AuthDTO;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
@@ -37,7 +37,7 @@ public class AuthService {
         return this.iguassuFacade.getAllOAuthTokens();
     }
 
-    public AuthResponse authenticateWithOAuth2(String authorizationCode, String applicationIdentifiers) throws Exception {
+    public AuthDTO authenticateWithOAuth2(String authorizationCode, String applicationIdentifiers) throws Exception {
         final String knownClientId = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID);
         final String knownSecret = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
         final Gson gson = new Gson();
@@ -65,7 +65,7 @@ public class AuthService {
         }
     }
 
-    private AuthResponse requestOAuthAccessToken(String requestUrl, List<Header> headers, Gson gson) throws Exception {
+    private AuthDTO requestOAuthAccessToken(String requestUrl, List<Header> headers, Gson gson) throws Exception {
         try {
             final String oAuthTokenRawResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, requestUrl,
                     headers, null);
@@ -76,7 +76,7 @@ public class AuthService {
                 final String iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
                 this.storeOAuthToken(oAuthToken, iguassuToken);
 
-                return new AuthResponse(oAuthToken.getUserId(), iguassuToken);
+                return new AuthDTO(oAuthToken.getUserId(), iguassuToken);
             } else {
                 throw new Exception("You can't use the same authorization code twice.");
             }

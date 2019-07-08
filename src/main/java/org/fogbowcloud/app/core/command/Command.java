@@ -1,5 +1,6 @@
 package org.fogbowcloud.app.core.command;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import io.swagger.models.auth.In;
 import java.io.Serializable;
 import java.util.Objects;

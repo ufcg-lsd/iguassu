@@ -11,7 +11,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
-import org.fogbowcloud.app.core.dto.ArrebolJobDTO;
+import org.fogbowcloud.app.core.dto.arrebol.ArrebolJobDTO;
 import org.fogbowcloud.app.core.http.HttpWrapper;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jes.exceptions.GetJobException;

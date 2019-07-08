@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.dto;
+package org.fogbowcloud.app.core.dto.arrebol;
 
 import org.fogbowcloud.app.core.task.Specification;
 import java.io.Serializable;
