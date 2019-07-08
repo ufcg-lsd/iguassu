@@ -1,11 +1,11 @@
 package org.fogbowcloud.app.core.dto;
 
-public class AuthResponse {
+public class AuthDTO {
 
     private String iguassuToken;
     private String userId;
 
-    public AuthResponse(String userId, String iguassuToken) {
+    public AuthDTO(String userId, String iguassuToken) {
         this.iguassuToken = iguassuToken;
         this.userId = userId;
     }
@@ -31,7 +31,7 @@ public class AuthResponse {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        AuthResponse that = (AuthResponse) o;
+        AuthDTO that = (AuthDTO) o;
 
         if (!iguassuToken.equals(that.iguassuToken)) return false;
         return userId.equals(that.userId);

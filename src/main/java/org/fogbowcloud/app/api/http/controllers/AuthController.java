@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.ApiDocumentation;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
-import org.fogbowcloud.app.core.dto.AuthResponse;
+import org.fogbowcloud.app.core.dto.AuthDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -38,7 +38,7 @@ public class AuthController {
 
         try {
             if (authorizationCode != null && !authorizationCode.trim().isEmpty()) {
-                final AuthResponse userAuthenticatedInfo = this.authService
+                final AuthDTO userAuthenticatedInfo = this.authService
                         .authenticateWithOAuth2(authorizationCode, applicationIdentifiers);
 
                 LOGGER.info("Authenticated successfully.");
