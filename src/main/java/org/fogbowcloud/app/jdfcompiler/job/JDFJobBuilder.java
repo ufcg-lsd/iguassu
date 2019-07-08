@@ -8,7 +8,6 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.command.Command;
 import org.fogbowcloud.app.core.constants.DockerConstants;
-import org.fogbowcloud.app.core.constants.FogbowConstants;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.core.task.Specification;
 import org.fogbowcloud.app.core.task.Task;
@@ -76,7 +75,6 @@ public class JDFJobBuilder {
 
 				addAllRequirements(jobRequirements, spec);
 
-				spec.addRequirement(FogbowConstants.METADATA_REQUEST_TYPE, "one-time");
 				int taskID = 0;
 				for (TaskSpecification taskSpec : jobSpec.getTaskSpecs()) {
 					if (Thread.interrupted())
@@ -115,14 +113,6 @@ public class JDFJobBuilder {
                     spec.addRequirement(DockerConstants.METADATA_DOCKER_REQUIREMENTS, req);
                 } else {
                     spec.addRequirement(DockerConstants.METADATA_DOCKER_REQUIREMENTS, requirements + " && " + req);
-                }
-            } else if(!req.trim().startsWith("image")){
-                String requirements = spec.getRequirementValue(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS);
-                if(requirements == null){
-                    spec.addRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, req);
-                } else {
-                    spec.addRequirement(
-                        FogbowConstants.METADATA_FOGBOW_REQUIREMENTS, requirements + " && " + req);
                 }
             }
         }

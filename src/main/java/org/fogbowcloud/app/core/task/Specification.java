@@ -2,7 +2,6 @@ package org.fogbowcloud.app.core.task;
 
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.constants.FogbowConstants;
 import org.fogbowcloud.app.utils.JSONUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -103,57 +102,6 @@ public class Specification implements Serializable {
 
     public static Map<String, String> toMap(String jsonStr) {
         return JSONUtils.toMap(jsonStr);
-    }
-
-//    public String getvCPU() {
-//        return getFogbowRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2vCPU);
-//    }
-//
-//    public String getMemory() {
-//        return getFogbowRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2RAM);
-//    }
-//
-//    public String getDisk() {
-//        return getFogbowRequirement(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS_Glue2disk);
-//    }
-
-    private String getFogbowRequirement(String fogbowRequirementKey) {
-        String fogbowRequirements = getRequirementValue(FogbowConstants.METADATA_FOGBOW_REQUIREMENTS);
-
-        if (fogbowRequirements == null) {
-            return null;
-        }
-
-        fogbowRequirements = fogbowRequirements.trim().replaceAll(" +", " ");
-
-        boolean found = fogbowRequirements.contains(fogbowRequirementKey);
-
-        String fogbowRequirementValue = "";
-        if (found) {
-            String[] strAsArray = fogbowRequirements.split(" ");
-            String currentItemKey, currentItemOperator, currentItemValue;
-
-            for (int i = 0; i < strAsArray.length; i++) {
-
-                currentItemKey = strAsArray[i];
-                currentItemOperator = strAsArray[i+1];
-                currentItemValue = strAsArray[i+2];
-
-                if (currentItemKey.equals(fogbowRequirementKey)) {
-                    switch (currentItemOperator) {
-                        case "<=":
-                        case "==":
-                        case ">=":
-                            fogbowRequirementValue = currentItemValue;
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                }
-            }
-        }
-        return fogbowRequirementValue;
     }
 
     @Override
