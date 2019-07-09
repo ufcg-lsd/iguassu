@@ -1,6 +1,5 @@
 package org.fogbowcloud.app.core.datastore;
 
-import java.math.BigDecimal;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 
