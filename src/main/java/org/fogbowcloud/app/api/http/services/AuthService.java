@@ -110,8 +110,6 @@ public class AuthService {
         if (user == null) {
             this.iguassuFacade.addUser(oAuthToken.getUserId(), iguassuToken);
             LOGGER.info("OAuth2 tokens for the user " + oAuthToken.getUserId() + " was stored.");
-        } else {
-            this.iguassuFacade.removeOAuthTokens(oAuthToken.getUserId());
         }
         this.iguassuFacade.storeOAuthToken(oAuthToken);
     }
@@ -122,24 +120,57 @@ public class AuthService {
         return Base64.getEncoder().encodeToString(sessionToken.getBytes());
     }
 
-    public AuthDTO refreshToken(String accessToken) throws Exception {
-        final Gson gson = new Gson();
+    public OAuthToken refreshToken(String accessToken) throws Exception {
         OAuthToken oAuthToken = this.iguassuFacade.getTokenByAccessToken(accessToken);
-        if(oAuthToken != null){
-            String refreshToken = oAuthToken.getRefreshToken();
-            final String baseUrl = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_TOKEN_URL);
-            final String requestUrl = baseUrl + "?grant_type=refresh_token&refresh_token="+refreshToken;
-            String clientId = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID);
-            String clientSecret = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
+        List<OAuthToken> tokens = this.iguassuFacade.getAllTokenByUserName(oAuthToken.getUserId());
+        if(Objects.nonNull(oAuthToken) && tokens.contains(oAuthToken)){
+            for(OAuthToken o : tokens){
+                if(o.getVersion() > oAuthToken.getVersion()){
+                    return o;
+                }
+            }
+            OAuthToken refreshedToken = refreshToken(oAuthToken);
+            final String iguassuToken = this.generateIguassuToken(refreshedToken.getUserId());
+            this.storeOAuthToken(refreshedToken, iguassuToken);
 
-            final String authHeadersDecoded = clientId + ":" + clientSecret;
-            final String authHeadersEncoded = Base64.getEncoder().encodeToString(authHeadersDecoded.getBytes());
-
-            List<Header> headers = new LinkedList<>();
-            mountsHeaders(headers, authHeadersEncoded);
-            return requestOAuthAccessToken(requestUrl, headers, gson);
+            final long oldVersions = oAuthToken.getVersion() - 1;
+            if(oldVersions >= 0){
+                this.iguassuFacade.removeOAuthTokens(oAuthToken.getUserId(), oldVersions);
+            }
+            return refreshedToken;
         } else {
-            throw new NotFoundAccessToken("Not found access token.");
+            throw new NotFoundAccessToken("The accessToken[" + accessToken +"] was not found");
         }
     }
+
+    private OAuthToken refreshToken(OAuthToken oAuthToken) throws Exception {
+        final Gson gson = new Gson();
+        String refreshToken = oAuthToken.getRefreshToken();
+        final String baseUrl = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_TOKEN_URL);
+        final String requestUrl = baseUrl + "?grant_type=refresh_token&refresh_token=" + refreshToken;
+
+        List<Header> headers = new LinkedList<>();
+        mountsAuthorizationHeader(headers);
+
+        try {
+            final String oAuthTokenRawResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, requestUrl, headers, null);
+            OAuthToken refreshOAuthToken = gson.fromJson(oAuthTokenRawResponse, OAuthToken.class);
+            refreshOAuthToken.updateExpirationDate();
+            refreshOAuthToken.setVersion(oAuthToken.getVersion() + 1);
+            return refreshOAuthToken;
+        } catch (Exception e){
+            throw new Exception("error while refreshing the token");
+        }
+    }
+
+    private void mountsAuthorizationHeader(List<Header> headers){
+        String clientId = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID);
+        String clientSecret = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
+
+        final String authHeadersDecoded = clientId + ":" + clientSecret;
+        final String authHeadersEncoded = Base64.getEncoder().encodeToString(authHeadersDecoded.getBytes());
+
+        mountsHeaders(headers, authHeadersEncoded);
+    }
+
 }

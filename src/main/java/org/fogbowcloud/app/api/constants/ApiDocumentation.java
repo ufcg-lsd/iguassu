@@ -8,7 +8,7 @@ public class ApiDocumentation {
         public static final String JOB_PATH = "/{jobId}";
         public static final String TASKS_ENDPOINT = "tasks";
         public static final String OAUTH2_ENDPOINT = "/oauth2";
-        public static final String OAUTH2_REFRESH_TOKEN_ENDPOINT = "/refreshToken/{accessToken}";
+        public static final String OAUTH2_REFRESH_TOKEN_ENDPOINT = "/refresh/{accessToken}";
     }
 
     public static class ApiInfo {

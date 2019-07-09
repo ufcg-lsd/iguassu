@@ -8,6 +8,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.ApiDocumentation;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
+import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.dto.AuthDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -59,7 +60,7 @@ public class AuthController {
     @PostMapping(ApiDocumentation.Endpoint.OAUTH2_REFRESH_TOKEN_ENDPOINT)
     public ResponseEntity<?> refreshToken(@PathVariable String accessToken){
         try {
-            AuthDTO authDTO = this.authService.refreshToken(accessToken);
+            OAuthToken authDTO = this.authService.refreshToken(accessToken);
             return new ResponseEntity<>(authDTO, HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace();

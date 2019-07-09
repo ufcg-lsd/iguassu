@@ -266,11 +266,10 @@ public class IguassuController {
     return this.oAuthTokenDataStore.getAll();
   }
 
-  public String getAccessTokenByOwnerUsername(String ownerUsername) {
+  private String getAccessTokenByOwnerUsername(String ownerUsername) {
     LOGGER.debug("Getting access token of file driver for user " + ownerUsername);
 
-    List<OAuthToken> tokensList = this.oAuthTokenDataStore
-        .getAccessTokenByOwnerUsername(ownerUsername);
+    List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(ownerUsername);
 
     String accessToken = null;
     for (OAuthToken token : tokensList) {
@@ -279,11 +278,16 @@ public class IguassuController {
       }
     }
 
-    if (accessToken == null && tokensList.size() != 0) {
+//    if (accessToken == null && tokensList.size() != 0) {
 //      accessToken = refreshExternalOAuthToken(ownerUsername);
-    }
+//    }
 
     return accessToken;
+  }
+
+  public List<OAuthToken> getAllTokensByOwnerUsername(String ownerUsername){
+    List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(ownerUsername);
+    return tokensList;
   }
 
 //  private String refreshExternalOAuthToken(String ownerUsername) {
@@ -319,5 +323,14 @@ public class IguassuController {
 
   public OAuthToken getTokenByAccessToken(String accessToken){
     return this.oAuthTokenDataStore.getTokenByAccessToken(accessToken);
+  }
+
+  public void removeOAuthTokens(String userId, Long version) {
+    List<OAuthToken> oAuthTokens = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(userId);
+    for(OAuthToken token : oAuthTokens){
+      if(token.getVersion() == version){
+        this.oAuthTokenDataStore.deleteByAccessToken(token.getAccessToken());
+      }
+    }
   }
 }
