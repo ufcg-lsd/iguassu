@@ -248,8 +248,8 @@ public class JDFJobBuilder {
 	}
 
 	private String getRefreshTokenCommand(){
-		final String iguassuUrl = this.properties.getProperty(IguassuPropertiesConstants.IGUASSU_BASE_URL);
-		final String refreshTokenUrl = String.format("%s/api/v1/auth/refresh/${token}", iguassuUrl);
+		final String iguassuUrl = this.properties.getProperty(IguassuPropertiesConstants.IGUASSU_SERVER_HOST);
+		final String refreshTokenUrl = String.format("%s/auth/refresh/${token}", iguassuUrl);
 		final String refreshTokenCommand = String.format("curl -X POST %s", refreshTokenUrl);
 		return refreshTokenCommand;
 	}
