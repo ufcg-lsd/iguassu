@@ -15,6 +15,7 @@ oauth_storage_service_client_id=
 oauth_storage_service_client_secret=
 
 #### Storage Service ####
+#Requires adding http
 storage_service_host=
 iguassu_service_host=
 ''
