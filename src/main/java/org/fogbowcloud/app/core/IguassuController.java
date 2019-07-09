@@ -6,6 +6,8 @@ import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.api.exceptions.NotFoundAccessToken;
+import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.core.authenticator.IguassuAuthenticator;
 import org.fogbowcloud.app.core.authenticator.ThirdAppAuthenticator;
 import org.fogbowcloud.app.core.authenticator.models.Credential;
@@ -32,6 +34,7 @@ import org.fogbowcloud.app.utils.JDFUtil;
 import org.fogbowcloud.app.utils.ManagerTimer;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 public class IguassuController {
 
@@ -45,6 +48,9 @@ public class IguassuController {
   private IguassuAuthenticator authenticator;
   private JobExecutionSystem jobExecutionSystem;
   private JDFJobBuilder jobBuilder;
+
+  @Autowired
+  private AuthService authService;
 
   public IguassuController(Properties properties) throws IguassuException {
     validateProperties(properties);
@@ -122,7 +128,12 @@ public class IguassuController {
     JDFJob job = new JDFJob(owner.getUserIdentification(), new ArrayList<>(), userIdentification);
     JobSpecification jobSpec = compile(job.getId(), jdfFilePath);
     JDFUtil.removeEmptySpaceFromVariables(jobSpec);
-    String externalOAuthToken = getAccessTokenByOwnerUsername(userIdentification);
+    String externalOAuthToken = null;
+    try {
+      externalOAuthToken = getAccessTokenByOwnerUsername(userIdentification);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
 
     return buildJobFromJDFFile(job, jdfFilePath, jobSpec, userIdentification, externalOAuthToken);
   }
@@ -266,59 +277,34 @@ public class IguassuController {
     return this.oAuthTokenDataStore.getAll();
   }
 
-  private String getAccessTokenByOwnerUsername(String ownerUsername) {
+  private String getAccessTokenByOwnerUsername(String ownerUsername) throws Exception {
     LOGGER.debug("Getting access token of file driver for user " + ownerUsername);
+    OAuthToken oAuthToken = this.getLatestAccessToken(ownerUsername);
+    if (oAuthToken != null){
+        if (!oAuthToken.hasExpired()) {
+          return oAuthToken.getAccessToken();
+        } else {
+          return authService.refreshToken(ownerUsername);
+        }
+    } else {
+      throw new NotFoundAccessToken("Not found tokens from user[" + ownerUsername + "].");
+    }
+  }
 
-    List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(ownerUsername);
-
-    String accessToken = null;
-    for (OAuthToken token : tokensList) {
-      if (!token.hasExpired()) {
-        accessToken = token.getAccessToken();
+  private OAuthToken getLatestAccessToken(String userName){
+    OAuthToken latestToken = null;
+    List<OAuthToken> tokens = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(userName);
+    for(OAuthToken t : tokens){
+      if(latestToken == null || t.getVersion() > latestToken.getVersion()){
+        latestToken = t;
       }
     }
-
-//    if (accessToken == null && tokensList.size() != 0) {
-//      accessToken = refreshExternalOAuthToken(ownerUsername);
-//    }
-
-    return accessToken;
+    return latestToken;
   }
 
   public List<OAuthToken> getAllTokensByOwnerUsername(String ownerUsername){
     List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(ownerUsername);
     return tokensList;
-  }
-
-//  private String refreshExternalOAuthToken(String ownerUsername) {
-//    List<OAuthToken> tokensList = this.oAuthTokenDataStore
-//        .getAccessTokenByOwnerUsername(ownerUsername);
-//
-//    String accessToken = null;
-//    if (tokensList.size() != 0) {
-//      OAuthToken someToken = tokensList.get(0);
-//      String someRefreshToken = someToken.getRefreshToken();
-//      OAuthToken newOAuthToken = this.externalOAuthTokenController.refreshToken(someRefreshToken);
-//      accessToken = newOAuthToken.getAccessToken();
-//      deleteTokens(tokensList);
-//      storeOAuthToken(newOAuthToken);
-//    }
-//    return accessToken;
-//  }
-
-  private void deleteTokens(List<OAuthToken> tokenList) {
-    for (OAuthToken token : tokenList) {
-      deleteOAuthTokenByAcessToken(token.getAccessToken());
-    }
-  }
-
-  private void deleteOAuthTokenByAcessToken(String accessToken) {
-    this.oAuthTokenDataStore.deleteByAccessToken(accessToken);
-  }
-
-  public void removeOAuthTokens(String userId) {
-    List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(userId);
-    deleteTokens(tokensList);
   }
 
   public OAuthToken getTokenByAccessToken(String accessToken){
