@@ -60,8 +60,8 @@ public class AuthController {
     @PostMapping(ApiDocumentation.Endpoint.OAUTH2_REFRESH_TOKEN_ENDPOINT)
     public ResponseEntity<?> refreshToken(@PathVariable String accessToken){
         try {
-            OAuthToken authDTO = this.authService.refreshToken(accessToken);
-            return new ResponseEntity<>(authDTO, HttpStatus.CREATED);
+            String refreshedAccessToken = this.authService.refreshToken(accessToken);
+            return new ResponseEntity<>(refreshedAccessToken, HttpStatus.CREATED);
         } catch (Exception e) {
             e.printStackTrace();
             return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);

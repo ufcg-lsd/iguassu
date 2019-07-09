@@ -213,15 +213,16 @@ public class JDFJobBuilder {
 
 	private Command uploadFileCommands(String localFilePath, String filePathToUpload, String userName, String token, String rawCommand) {
 		String fileDriverHostIp = this.properties.getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_HOST);
-		String requestTokenCommand = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(userName).get(0).getAccessToken();
+		String requestTokenCommand = this.getRefreshTokenCommand();
 		String uploadCommand = " http_code=$(curl --write-out %{http_code} -X PUT --header \"Authorization:Bearer \"$token "
 				+ " --data-binary @" + localFilePath + " --silent --output /dev/null "
-				+ " http://$server/remote.php/webdav/" + filePathToUpload + "); ";
+				+ "$server/remote.php/webdav/" + filePathToUpload + "); ";
 
 		String scpCommand = "server=" + fileDriverHostIp + "; "
 				+ "token=" + token + "; "
 				+ uploadCommand
-				+ " if [ \\$http_code == " + HttpStatus.UNAUTHORIZED + " ] ; then " + requestTokenCommand
+				+ " if [ $http_code == " + HttpStatus.UNAUTHORIZED.toString() + " ] ; then "
+			  + "token=$(" + requestTokenCommand + ");"
 				+ uploadCommand + " fi";
 
 		return new Command(scpCommand, rawCommand);
@@ -229,9 +230,9 @@ public class JDFJobBuilder {
 
 	private Command downloadFileCommands(String localFilePath, String filePathToDownload, String userName, String token, String rawCommand) {
 		String fileDriverHostIp = this.properties.getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_HOST);
-		String requestTokenCommand = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(userName).get(0).getAccessToken();
+		String requestTokenCommand = this.getRefreshTokenCommand();
 		String downloadCommand = " full_response=$(curl --write-out %{http_code} --header \"Authorization:Bearer \"$token"
-				+ " http://$server/remote.php/webdav/" + filePathToDownload
+				+ " $server/remote.php/webdav/" + filePathToDownload
 				+ " --silent --output " + localFilePath + " /dev/null); ";
 		String extractHttpStatusCode = "http_code=${full_response:0:3}; ";
 
@@ -239,10 +240,18 @@ public class JDFJobBuilder {
 				+ "token=" + token + "; "
 				+ downloadCommand
 				+ extractHttpStatusCode
-				+ " if [ \\$http_code == " + HttpStatus.UNAUTHORIZED + " ] ; then " + requestTokenCommand
-				+ " " + downloadCommand + " fi";
+				+ " if [ $http_code == " + HttpStatus.UNAUTHORIZED.toString() + " ] ; then "
+			  + "token=$(" + requestTokenCommand + "); "
+				+ downloadCommand + " fi";
 
 		return new Command(scpCommand, rawCommand);
+	}
+
+	private String getRefreshTokenCommand(){
+		final String iguassuUrl = this.properties.getProperty(IguassuPropertiesConstants.IGUASSU_BASE_URL);
+		final String refreshTokenUrl = String.format("%s/api/v1/auth/refresh/${token}", iguassuUrl);
+		final String refreshTokenCommand = String.format("curl -X POST %s", refreshTokenUrl);
+		return refreshTokenCommand;
 	}
 
 }

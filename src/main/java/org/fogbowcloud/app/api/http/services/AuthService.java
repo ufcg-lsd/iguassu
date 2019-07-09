@@ -120,13 +120,13 @@ public class AuthService {
         return Base64.getEncoder().encodeToString(sessionToken.getBytes());
     }
 
-    public OAuthToken refreshToken(String accessToken) throws Exception {
+    public String refreshToken(String accessToken) throws Exception {
         OAuthToken oAuthToken = this.iguassuFacade.getTokenByAccessToken(accessToken);
         List<OAuthToken> tokens = this.iguassuFacade.getAllTokenByUserName(oAuthToken.getUserId());
         if(Objects.nonNull(oAuthToken) && tokens.contains(oAuthToken)){
             for(OAuthToken o : tokens){
                 if(o.getVersion() > oAuthToken.getVersion()){
-                    return o;
+                    return o.getAccessToken();
                 }
             }
             OAuthToken refreshedToken = refreshToken(oAuthToken);
@@ -137,7 +137,7 @@ public class AuthService {
             if(oldVersions >= 0){
                 this.iguassuFacade.removeOAuthTokens(oAuthToken.getUserId(), oldVersions);
             }
-            return refreshedToken;
+            return refreshedToken.getAccessToken();
         } else {
             throw new NotFoundAccessToken("The accessToken[" + accessToken +"] was not found");
         }

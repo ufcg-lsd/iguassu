@@ -26,4 +26,6 @@ public class IguassuPropertiesConstants {
 	 *  Arrebol batch jobs execution system configs
 	 */
 	public static final String ARREBOL_BASE_URL = "arrebol_base_url";
+
+	public static final String IGUASSU_BASE_URL = "iguassu_base_url";
 }
