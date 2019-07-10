@@ -27,6 +27,7 @@ public class TestJDFJobBuilder {
 	private static final String SIMPLE_JOB_EXAMPLE = RESOURCE_DIR + File.separator + "SimpleJob2.jdf";
 	private static final String FAKE_USER_NAME = "fake-username";
 	private static final String FAKE_EXTERNAL_OAUTH_TOKEN = "fake-external-oauth-token";
+	private static final Long FAKE_TOKEN_VERSION = 0L;
 
 	@Test
 	public void testJDFCompilation () throws CompilerException, IOException, InterruptedException {
@@ -44,7 +45,8 @@ public class TestJDFJobBuilder {
 				SIMPLE_JOB_EXAMPLE,
 				jobSpec,
 				FAKE_USER_NAME,
-				FAKE_EXTERNAL_OAUTH_TOKEN
+				FAKE_EXTERNAL_OAUTH_TOKEN,
+				FAKE_TOKEN_VERSION
 		);
 		List<Task> tasks = testJob.getTasks();
 		

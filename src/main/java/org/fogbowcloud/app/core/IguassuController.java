@@ -128,14 +128,14 @@ public class IguassuController {
     JDFJob job = new JDFJob(owner.getUserIdentification(), new ArrayList<>(), userIdentification);
     JobSpecification jobSpec = compile(job.getId(), jdfFilePath);
     JDFUtil.removeEmptySpaceFromVariables(jobSpec);
-    String externalOAuthToken = null;
+    OAuthToken oAuthToken = null;
     try {
-      externalOAuthToken = getAccessTokenByOwnerUsername(userIdentification);
+      oAuthToken = getCurrentTokenByUserId(userIdentification);
     } catch (Exception e) {
       e.printStackTrace();
     }
 
-    return buildJobFromJDFFile(job, jdfFilePath, jobSpec, userIdentification, externalOAuthToken);
+    return buildJobFromJDFFile(job, jdfFilePath, jobSpec, userIdentification, oAuthToken.getAccessToken(), oAuthToken.getVersion());
   }
 
   private JobSpecification compile(String jobId, String jdfFilePath) throws CompilerException {
@@ -148,10 +148,10 @@ public class IguassuController {
 
   private JDFJob buildJobFromJDFFile(JDFJob job, String jdfFilePath, JobSpecification jobSpec,
       String userName,
-      String externalOAuthToken) {
+      String externalOAuthToken, Long tokenVersion) {
     try {
       this.jobBuilder.createJobFromJDFFile(job, jdfFilePath, jobSpec,
-          userName, externalOAuthToken);
+          userName, externalOAuthToken, tokenVersion);
 
       LOGGER.info("Job [" + job.getId() + "] was built with success at time: " + System
           .currentTimeMillis());
@@ -275,20 +275,6 @@ public class IguassuController {
 
   public List<OAuthToken> getAllOAuthTokens() {
     return this.oAuthTokenDataStore.getAll();
-  }
-
-  private String getAccessTokenByOwnerUsername(String ownerUsername) throws Exception {
-    LOGGER.debug("Getting access token of file driver for user " + ownerUsername);
-    OAuthToken oAuthToken = this.getCurrentTokenByUserId(ownerUsername);
-    if (oAuthToken != null){
-        if (!oAuthToken.hasExpired()) {
-          return oAuthToken.getAccessToken();
-        } else {
-          return authService.refreshToken(ownerUsername, oAuthToken.getVersion());
-        }
-    } else {
-      throw new NotFoundAccessToken("Not found tokens from user[" + ownerUsername + "].");
-    }
   }
 
   public OAuthToken getCurrentTokenByUserId(String userId) {
