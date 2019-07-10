@@ -66,15 +66,11 @@ public class IguassuFacade {
         return iguassuController.getAllOAuthTokens();
     }
 
-    public void removeOAuthTokens(String userId, Long version) {
-        this.iguassuController.removeOAuthTokens(userId, version);
+    public OAuthToken getCurrentTokenByUserId(String userId) {
+        return this.iguassuController.getCurrentTokenByUserId(userId);
     }
 
-    public OAuthToken getTokenByAccessToken(String accessToken){
-        return this.iguassuController.getTokenByAccessToken(accessToken);
-    }
-
-    public List<OAuthToken> getAllTokenByUserName(String userName){
-        return this.iguassuController.getAllTokensByOwnerUsername(userName);
+    public boolean deleteOAuthToken(OAuthToken oAuthToken) {
+        return this.iguassuController.deleteOAuthToken(oAuthToken);
     }
 }

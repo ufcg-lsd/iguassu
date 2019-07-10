@@ -120,26 +120,20 @@ public class AuthService {
         return Base64.getEncoder().encodeToString(sessionToken.getBytes());
     }
 
-    public String refreshToken(String accessToken) throws Exception {
-        OAuthToken oAuthToken = this.iguassuFacade.getTokenByAccessToken(accessToken);
-        List<OAuthToken> tokens = this.iguassuFacade.getAllTokenByUserName(oAuthToken.getUserId());
-        if(Objects.nonNull(oAuthToken) && tokens.contains(oAuthToken) && oAuthToken.hasExpired()){
-            for(OAuthToken o : tokens){
-                if(o.getVersion() > oAuthToken.getVersion()){
-                    return o.getAccessToken();
-                }
-            }
+    public String refreshToken(String userId, Long version) throws Exception {
+        OAuthToken oAuthToken = this.iguassuFacade.getCurrentTokenByUserId(userId);
+        if(Objects.isNull(oAuthToken)){
+            throw new NotFoundAccessToken("Was not found token for user[" + userId + "]");
+        }
+        if(oAuthToken.getVersion() > version){
+            return oAuthToken.getAccessToken();
+        } else if(oAuthToken.getVersion() == version){
             OAuthToken refreshedToken = refreshToken(oAuthToken);
-            final String iguassuToken = this.generateIguassuToken(refreshedToken.getUserId());
-            this.storeOAuthToken(refreshedToken, iguassuToken);
-
-            final long oldVersions = oAuthToken.getVersion() - 1;
-            if(oldVersions >= 0){
-                this.iguassuFacade.removeOAuthTokens(oAuthToken.getUserId(), oldVersions);
-            }
+            this.iguassuFacade.storeOAuthToken(refreshedToken);
+            this.iguassuFacade.deleteOAuthToken(oAuthToken);
             return refreshedToken.getAccessToken();
         } else {
-            throw new NotFoundAccessToken("The accessToken[" + accessToken +"] was not found");
+            throw new IllegalArgumentException("Version is invalid");
         }
     }
 

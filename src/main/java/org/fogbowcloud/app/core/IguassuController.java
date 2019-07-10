@@ -279,44 +279,30 @@ public class IguassuController {
 
   private String getAccessTokenByOwnerUsername(String ownerUsername) throws Exception {
     LOGGER.debug("Getting access token of file driver for user " + ownerUsername);
-    OAuthToken oAuthToken = this.getLatestAccessToken(ownerUsername);
+    OAuthToken oAuthToken = this.getCurrentTokenByUserId(ownerUsername);
     if (oAuthToken != null){
         if (!oAuthToken.hasExpired()) {
           return oAuthToken.getAccessToken();
         } else {
-          return authService.refreshToken(ownerUsername);
+          return authService.refreshToken(ownerUsername, oAuthToken.getVersion());
         }
     } else {
       throw new NotFoundAccessToken("Not found tokens from user[" + ownerUsername + "].");
     }
   }
 
-  private OAuthToken getLatestAccessToken(String userName){
-    OAuthToken latestToken = null;
-    List<OAuthToken> tokens = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(userName);
-    for(OAuthToken t : tokens){
-      if(latestToken == null || t.getVersion() > latestToken.getVersion()){
-        latestToken = t;
-      }
-    }
-    return latestToken;
-  }
-
-  public List<OAuthToken> getAllTokensByOwnerUsername(String ownerUsername){
-    List<OAuthToken> tokensList = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(ownerUsername);
-    return tokensList;
-  }
-
-  public OAuthToken getTokenByAccessToken(String accessToken){
-    return this.oAuthTokenDataStore.getTokenByAccessToken(accessToken);
-  }
-
-  public void removeOAuthTokens(String userId, Long version) {
+  public OAuthToken getCurrentTokenByUserId(String userId) {
+    OAuthToken oAuthToken = null;
     List<OAuthToken> oAuthTokens = this.oAuthTokenDataStore.getAccessTokenByOwnerUsername(userId);
-    for(OAuthToken token : oAuthTokens){
-      if(token.getVersion() == version){
-        this.oAuthTokenDataStore.deleteByAccessToken(token.getAccessToken());
+    for(OAuthToken t : oAuthTokens){
+      if(oAuthToken == null || oAuthToken.getVersion() < t.getVersion()){
+        oAuthToken = t;
       }
     }
+    return oAuthToken;
+  }
+
+  public boolean deleteOAuthToken(OAuthToken oAuthToken) {
+    return this.oAuthTokenDataStore.deleteByAccessToken(oAuthToken.getAccessToken());
   }
 }
