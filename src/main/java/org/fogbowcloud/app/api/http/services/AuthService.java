@@ -123,7 +123,7 @@ public class AuthService {
     public String refreshToken(String accessToken) throws Exception {
         OAuthToken oAuthToken = this.iguassuFacade.getTokenByAccessToken(accessToken);
         List<OAuthToken> tokens = this.iguassuFacade.getAllTokenByUserName(oAuthToken.getUserId());
-        if(Objects.nonNull(oAuthToken) && tokens.contains(oAuthToken)){
+        if(Objects.nonNull(oAuthToken) && tokens.contains(oAuthToken) && oAuthToken.hasExpired()){
             for(OAuthToken o : tokens){
                 if(o.getVersion() > oAuthToken.getVersion()){
                     return o.getAccessToken();
