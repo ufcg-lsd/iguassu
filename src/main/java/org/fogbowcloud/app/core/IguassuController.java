@@ -131,6 +131,9 @@ public class IguassuController {
     OAuthToken oAuthToken = null;
     try {
       oAuthToken = getCurrentTokenByUserId(userIdentification);
+      if(oAuthToken.hasExpired()){
+        oAuthToken = this.authService.refreshAndDelete(oAuthToken);
+      }
     } catch (Exception e) {
       e.printStackTrace();
     }

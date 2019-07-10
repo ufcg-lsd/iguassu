@@ -126,15 +126,23 @@ public class AuthService {
             throw new NotFoundAccessToken("Was not found token for user[" + userId + "]");
         }
         if(oAuthToken.getVersion() > version){
-            return oAuthToken.getAccessToken();
+            if(oAuthToken.hasExpired()){
+                return refreshAndDelete(oAuthToken).getAccessToken();
+            } else {
+                return oAuthToken.getAccessToken();
+            }
         } else if(oAuthToken.getVersion() == version){
-            OAuthToken refreshedToken = refreshToken(oAuthToken);
-            this.iguassuFacade.storeOAuthToken(refreshedToken);
-            this.iguassuFacade.deleteOAuthToken(oAuthToken);
-            return refreshedToken.getAccessToken();
+            return refreshAndDelete(oAuthToken).getAccessToken();
         } else {
-            throw new IllegalArgumentException("Version is invalid");
+            throw new IllegalArgumentException("Invalid version");
         }
+    }
+
+   public OAuthToken refreshAndDelete(OAuthToken oAuthToken) throws Exception {
+        OAuthToken refreshedToken = refreshToken(oAuthToken);
+        this.iguassuFacade.storeOAuthToken(refreshedToken);
+        this.iguassuFacade.deleteOAuthToken(oAuthToken);
+        return refreshedToken;
     }
 
     private OAuthToken refreshToken(OAuthToken oAuthToken) throws Exception {
