@@ -123,7 +123,7 @@ public class AuthService {
     public String refreshToken(String userId, Long version) throws Exception {
         OAuthToken oAuthToken = this.iguassuFacade.getCurrentTokenByUserId(userId);
         if(Objects.isNull(oAuthToken)){
-            throw new NotFoundAccessToken("Was not found token for user[" + userId + "]");
+            throw new UnauthorizedRequestException("Was not found token for user[" + userId + "]");
         }
         if(oAuthToken.getVersion() > version){
             if(oAuthToken.hasExpired()){

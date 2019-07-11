@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 
 public class OAuthToken {
 
-    @SerializedName("version")
+    @SerializedName(OAuthPropertiesKeys.TOKEN_VERSION_JSON_KEY)
     private long version;
 
     @SerializedName(OAuthPropertiesKeys.ACCESS_TOKEN_JSON_KEY)
@@ -27,13 +27,14 @@ public class OAuthToken {
     private int expirationTime;
 
     private Date expirationDate;
+    private static final long INITIAL_VERSION = 0L;
 
     private static final Logger LOGGER = Logger.getLogger(OAuthToken.class);
 
     public OAuthToken() { }
 
     public OAuthToken(String accessToken, String refreshToken, String userId, Date expirationDate) {
-        this.version = 0L;
+        this.version = INITIAL_VERSION;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.userId = userId;
