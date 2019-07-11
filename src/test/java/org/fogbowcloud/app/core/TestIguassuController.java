@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 import java.util.*;
 
 import org.fogbowcloud.app.core.authenticator.models.UserImpl;
-import org.fogbowcloud.app.core.constants.IguassuGeneralConstants;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.task.Specification;
 import org.fogbowcloud.app.core.task.Task;
@@ -14,7 +13,6 @@ import org.fogbowcloud.app.core.task.TaskImpl;
 import org.fogbowcloud.app.core.task.TaskState;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.core.authenticator.models.User;
-import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
@@ -29,8 +27,6 @@ public class TestIguassuController {
     private static final String FAKE_OWNER = "testowner";
     private static final String FAKE_TASK_ID = "testtaskId";
     private static final String FAKE_IMAGE_FLAVOR_NAME = "testimage";
-    private static final String FAKE_PUBLIC_KEY = "testPublicKey";
-    private static final String FAKE_PRIVATE_KEY_FILE_PATH = "testPrivateKeyPath";
 
     private IguassuController iguassuController;
     private JobDataStore dataStore;
@@ -38,18 +34,8 @@ public class TestIguassuController {
     @Before
     public void setUp() throws Exception {
         Properties properties = new Properties();
-        properties.put(IguassuPropertiesConstants.IGUASSU_PUBLIC_KEY, FAKE_PUBLIC_KEY);
-
-        properties.put(IguassuPropertiesConstants.REMOTE_OUTPUT_FOLDER, "/tmp");
-        properties.put(IguassuPropertiesConstants.LOCAL_OUTPUT_FOLDER, "/tmp");
-
-        properties.put(IguassuPropertiesConstants.INFRA_RESOURCE_CONNECTION_TIMEOUT, "300000000");
-        properties.put(IguassuPropertiesConstants.INFRA_RESOURCE_IDLE_LIFETIME, "30000");
-        properties.put(IguassuPropertiesConstants.INFRA_IS_ELASTIC, "true");
-
-        properties.put(IguassuGeneralConstants.DB_DATASTORE_URL, "jdbc:h2:/tmp/datastores/testfogbowresourcesdatastore");
         this.iguassuController = Mockito.spy(new IguassuController(properties));
-        this.dataStore = Mockito.spy(new JobDataStore(properties.getProperty(IguassuGeneralConstants.DB_DATASTORE_URL)));
+        this.dataStore = Mockito.mock(JobDataStore.class);
 
         this.iguassuController.setDataStore(dataStore);
     }

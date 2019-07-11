@@ -21,10 +21,10 @@ public class ThirdAppAuthenticator implements IguassuAuthenticator {
     private ConcurrentMap<String, String> userList;
 
     public ThirdAppAuthenticator() {
-        final File usersFile = new File(IguassuPropertiesConstants.DATASTORES_USERS_DB);
+        final File usersFile = new File(IguassuPropertiesConstants.DATASTORES_USERS_DB_FILE_PATH);
         this.usersDB = DBMaker.newFileDB(usersFile).make();
-        this.usersDB.checkShouldCreate(IguassuPropertiesConstants.DATASTORES_USERS);
-        this.userList = this.usersDB.getHashMap(IguassuPropertiesConstants.DATASTORES_USERS);
+        this.usersDB.checkShouldCreate(IguassuPropertiesConstants.DATASTORES_USERS_FILE_PATH);
+        this.userList = this.usersDB.getHashMap(IguassuPropertiesConstants.DATASTORES_USERS_FILE_PATH);
     }
 
     @Override

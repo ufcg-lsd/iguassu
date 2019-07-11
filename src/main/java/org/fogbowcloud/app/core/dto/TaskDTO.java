@@ -16,6 +16,7 @@ public class TaskDTO {
     private TaskState state;
 
     public TaskDTO(Task task){
+        this.uuid = task.getUUID();
         this.id = task.getId();
         this.uuid = task.getUUID();
         this.commands = toCommandDTOList(task.getAllCommands());

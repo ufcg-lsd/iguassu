@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping(value = ApiDocumentation.Endpoint.AUTH_ENDPOINT)
 @Api(ApiDocumentation.Auth.API_DESCRIPTION)
 public class AuthController {
+
     private final Logger LOGGER = Logger.getLogger(AuthController.class);
 
     @Lazy
@@ -31,27 +32,38 @@ public class AuthController {
     @PostMapping(value = ApiDocumentation.Endpoint.OAUTH2_ENDPOINT)
     @ApiOperation(value = ApiDocumentation.Auth.AUTHENTICATE_USER)
     public ResponseEntity<?> authenticate(
-            @ApiParam(value = ApiDocumentation.Auth.AUTHORIZATION_CODE)
-            @RequestBody String authorizationCode,
-            @ApiParam(value = ApiDocumentation.CommonParameters.OAUTH_CREDENTIALS)
-            @RequestHeader(value = IguassuPropertiesConstants.X_IDENTIFIERS) String applicationIdentifiers) {
+        @ApiParam(value = ApiDocumentation.Auth.AUTHORIZATION_CODE)
+        @RequestBody String authorizationCode,
+        @ApiParam(value = ApiDocumentation.CommonParameters.OAUTH_CREDENTIALS)
+        @RequestHeader(value = IguassuPropertiesConstants.X_AUTH_APP_IDENTIFIERS) String applicationIdentifiers) {
 
         try {
             if (authorizationCode != null && !authorizationCode.trim().isEmpty()) {
                 final AuthDTO userAuthenticatedInfo = this.authService
-                        .authenticateWithOAuth2(authorizationCode, applicationIdentifiers);
+                    .authenticateWithOAuth2(authorizationCode, applicationIdentifiers);
 
                 LOGGER.info("Authenticated successfully.");
 
                 return new ResponseEntity<>(userAuthenticatedInfo, HttpStatus.CREATED);
             } else {
                 return new ResponseEntity<>("The authorization code is invalid.",
-                        HttpStatus.BAD_REQUEST);
+                    HttpStatus.BAD_REQUEST);
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             return new ResponseEntity<>("The authorization failed with error [" + e.getMessage() +
-                    "]", HttpStatus.UNAUTHORIZED);
+                "]", HttpStatus.UNAUTHORIZED);
+        }
+    }
+
+    @PostMapping(ApiDocumentation.Endpoint.OAUTH2_REFRESH_TOKEN_ENDPOINT)
+    public ResponseEntity<?> refreshToken(@PathVariable String userId,
+        @PathVariable Long tokenVersion) {
+        try {
+            String refreshedAccessToken = this.authService.refreshToken(userId, tokenVersion);
+            return new ResponseEntity<>(refreshedAccessToken, HttpStatus.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return new ResponseEntity(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }
 }

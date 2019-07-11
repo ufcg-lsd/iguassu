@@ -2,7 +2,7 @@ package org.fogbowcloud.app;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.IguassuController;
-import org.fogbowcloud.app.core.constants.IguassuGeneralConstants;
+import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Lazy;
@@ -13,7 +13,7 @@ import java.util.Properties;
 public class IguassuMainRunner implements CommandLineRunner {
 
     private static final Logger LOGGER = Logger.getLogger(IguassuMainRunner.class);
-    private static String CONF_FILE_PATH = IguassuGeneralConstants.DEFAULT_IGUASSU_CONF_FILE_PATH;
+    private static String CONF_FILE_PATH = IguassuPropertiesConstants.IGUASSU_CONF_FILE;
 
     @Autowired
     private Properties properties;

@@ -24,6 +24,7 @@ import java.util.*;
 @Lazy
 @Component
 public class AuthService {
+
     private static final Logger LOGGER = Logger.getLogger(AuthService.class);
 
     @Lazy
@@ -37,22 +38,30 @@ public class AuthService {
         return this.iguassuFacade.getAllOAuthTokens();
     }
 
-    public AuthDTO authenticateWithOAuth2(String authorizationCode, String applicationIdentifiers) throws Exception {
-        final String knownClientId = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID);
-        final String knownSecret = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
+    public AuthDTO authenticateWithOAuth2(String authorizationCode, String applicationIdentifiers)
+        throws Exception {
+        final String knownClientId = this.properties
+            .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID);
+        final String knownSecret = this.properties
+            .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
         final Gson gson = new Gson();
 
-        final String rawCode = gson.fromJson(authorizationCode, JsonObject.class).get("authorizationCode").getAsString();
+        final String rawCode = gson.fromJson(authorizationCode, JsonObject.class)
+            .get("authorizationCode").getAsString();
 
-        OAuthIdentifiers applicationIds = gson.fromJson(applicationIdentifiers, OAuthIdentifiers.class);
+        OAuthIdentifiers applicationIds = gson
+            .fromJson(applicationIdentifiers, OAuthIdentifiers.class);
 
         if (applicationIds.getClientId().equals(knownClientId)
-                && applicationIds.getSecret().equals(knownSecret)) {
-            final String baseUrl = this.properties.getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_TOKEN_URL);
-            final String requestUrl = baseUrl + "?grant_type=authorization_code&code="+rawCode+
-                    "&redirect_uri="+applicationIds.getRedirectUri();
-            final String authHeadersDecoded = applicationIds.getClientId() + ":" + applicationIds.getSecret();
-            final String authHeadersEncoded = Base64.getEncoder().encodeToString(authHeadersDecoded.getBytes());
+            && applicationIds.getSecret().equals(knownSecret)) {
+            final String baseUrl = this.properties
+                .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_TOKEN_URL);
+            final String requestUrl = baseUrl + "?grant_type=authorization_code&code=" + rawCode +
+                "&redirect_uri=" + applicationIds.getRedirectUri();
+            final String authHeadersDecoded =
+                applicationIds.getClientId() + ":" + applicationIds.getSecret();
+            final String authHeadersEncoded = Base64.getEncoder()
+                .encodeToString(authHeadersDecoded.getBytes());
 
             List<Header> headers = new LinkedList<>();
             mountsHeaders(headers, authHeadersEncoded);
@@ -60,14 +69,17 @@ public class AuthService {
             return requestOAuthAccessToken(requestUrl, headers, gson);
 
         } else {
-            throw new UnauthorizedRequestException("Your application identifiers are not enable to " +
+            throw new UnauthorizedRequestException(
+                "Your application identifiers are not enable to " +
                     "request an Access Token.");
         }
     }
 
-    private AuthDTO requestOAuthAccessToken(String requestUrl, List<Header> headers, Gson gson) throws Exception {
+    private AuthDTO requestOAuthAccessToken(String requestUrl, List<Header> headers, Gson gson)
+        throws Exception {
         try {
-            final String oAuthTokenRawResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, requestUrl,
+            final String oAuthTokenRawResponse = HttpWrapper
+                .doRequest(HttpPost.METHOD_NAME, requestUrl,
                     headers, null);
             if (oAuthTokenRawResponse != null) {
                 OAuthToken oAuthToken = gson.fromJson(oAuthTokenRawResponse, OAuthToken.class);
@@ -92,6 +104,7 @@ public class AuthService {
             public String getName() {
                 return "Authorization";
             }
+
             @Override
             public String getValue() {
                 return "Basic " + authHeadersEncoded;
@@ -109,8 +122,6 @@ public class AuthService {
         if (user == null) {
             this.iguassuFacade.addUser(oAuthToken.getUserId(), iguassuToken);
             LOGGER.info("OAuth2 tokens for the user " + oAuthToken.getUserId() + " was stored.");
-        } else {
-            this.iguassuFacade.removeOAuthTokens(oAuthToken.getUserId());
         }
         this.iguassuFacade.storeOAuthToken(oAuthToken);
     }
@@ -120,4 +131,66 @@ public class AuthService {
 
         return Base64.getEncoder().encodeToString(sessionToken.getBytes());
     }
+
+    public String refreshToken(String userId, Long version) throws Exception {
+        OAuthToken oAuthToken = this.iguassuFacade.getCurrentTokenByUserId(userId);
+        if (Objects.isNull(oAuthToken)) {
+            throw new UnauthorizedRequestException("Was not found token for user[" + userId + "]");
+        }
+        if (oAuthToken.getVersion() > version) {
+            if (oAuthToken.hasExpired()) {
+                return refreshAndDelete(oAuthToken).getAccessToken();
+            } else {
+                return oAuthToken.getAccessToken();
+            }
+        } else if (oAuthToken.getVersion() == version) {
+            return refreshAndDelete(oAuthToken).getAccessToken();
+        } else {
+            throw new IllegalArgumentException("Invalid version");
+        }
+    }
+
+    public OAuthToken refreshAndDelete(OAuthToken oAuthToken) throws Exception {
+        OAuthToken refreshedToken = refreshToken(oAuthToken);
+        this.iguassuFacade.storeOAuthToken(refreshedToken);
+        this.iguassuFacade.deleteOAuthToken(oAuthToken);
+        return refreshedToken;
+    }
+
+    private OAuthToken refreshToken(OAuthToken oAuthToken) throws Exception {
+        final Gson gson = new Gson();
+        String refreshToken = oAuthToken.getRefreshToken();
+        final String baseUrl = this.properties
+            .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_TOKEN_URL);
+        final String requestUrl =
+            baseUrl + "?grant_type=refresh_token&refresh_token=" + refreshToken;
+
+        List<Header> headers = new LinkedList<>();
+        mountsAuthorizationHeader(headers);
+
+        try {
+            final String oAuthTokenRawResponse = HttpWrapper
+                .doRequest(HttpPost.METHOD_NAME, requestUrl, headers, null);
+            OAuthToken refreshOAuthToken = gson.fromJson(oAuthTokenRawResponse, OAuthToken.class);
+            refreshOAuthToken.updateExpirationDate();
+            refreshOAuthToken.setVersion(oAuthToken.getVersion() + 1);
+            return refreshOAuthToken;
+        } catch (Exception e) {
+            throw new Exception("error while refreshing the token");
+        }
+    }
+
+    private void mountsAuthorizationHeader(List<Header> headers) {
+        String clientId = this.properties
+            .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID);
+        String clientSecret = this.properties
+            .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
+
+        final String authHeadersDecoded = clientId + ":" + clientSecret;
+        final String authHeadersEncoded = Base64.getEncoder()
+            .encodeToString(authHeadersDecoded.getBytes());
+
+        mountsHeaders(headers, authHeadersEncoded);
+    }
+
 }

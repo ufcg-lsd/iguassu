@@ -2,28 +2,29 @@ package org.fogbowcloud.app.core.constants;
 
 public class IguassuPropertiesConstants {
 
-	public static final String DATASTORES_USERS = "datastores/users";
-	public static final String DATASTORES_USERS_DB = "datastores/users.db";
-	public static final String IGUASSU_PUBLIC_KEY = "iguassu_public_key";
-	public static final String LOCAL_OUTPUT_FOLDER = "local_output";
-	public static final String REMOTE_OUTPUT_FOLDER = "remote_output_folder";
+    /*
+     *  Users datastore location.
+     */
+    public static final String DATASTORES_USERS_FILE_PATH = "datastores/users";
+    public static final String DATASTORES_USERS_DB_FILE_PATH = "datastores/users.db";
 
-	public static final String X_CREDENTIALS = "X-Auth-Credentials";
-	public static final String X_IDENTIFIERS = "X-Auth-Identifiers";
+    /*
+     *  Authentication and authorization custom headers.
+     */
+    public static final String X_AUTH_USER_CREDENTIALS = "X-Auth-User-Credentials";
+    public static final String X_AUTH_APP_IDENTIFIERS = "X-Auth-App-Identifiers";
 
-	public static final String JOB_ID  = "jobID";
-	public static final String OWNER = "owner";
+    /*
+     *  Service host addresses.
+     */
+    public static final String ARREBOL_SERVICE_HOST_URL = "arrebol_service_host_url";
+    public static final String IGUASSU_SERVICE_HOST_URL = "iguassu_service_host_url";
+    public static final String STORAGE_SERVICE_HOST_URL = "storage_service_host_url";
 
-	public static final String JDF_FILE_PATH = "jdffilepath";
-
-	public static final String STORAGE_SERVICE_HOST = "storage_service_host";
-
-	public static final String INFRA_IS_ELASTIC = "infra_is_elastic";
-	public static final String INFRA_RESOURCE_CONNECTION_TIMEOUT = "infra_resource_connection_timeout";
-	public static final String INFRA_RESOURCE_IDLE_LIFETIME = "infra_resource_idle_lifetime";
-
-	/*
-	 *  Arrebol batch jobs execution system configs
-	 */
-	public static final String ARREBOL_BASE_URL = "arrebol_base_url";
+    /*
+     *  General useful paths.
+     */
+    public static final String IGUASSU_CONF_FILE = "iguassu.conf";
+    public static final String DATABASE_HOST_URL = "database_host_url";
+    public static final String JDF_FILE_PATH = "jdffilepath";
 }

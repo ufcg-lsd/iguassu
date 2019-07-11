@@ -6,17 +6,16 @@
 ##                                                ##
 ####################################################
 
-#### Server configuration properties ####
-rest_server_port=8080
-
-#### Datastore configuration properties ####
+#### Datastore Service Configuration Properties ####
 oauth_storage_service_token_url=
 oauth_storage_service_client_id=
 oauth_storage_service_client_secret=
 
-#### Storage Service ####
-storage_service_host=
-iguassu_service_host=
-''
-#### Default
-default_compute_flavor_spec=defaulResource.json
+#### Service host addresses             ####
+#### Requires http prefix 'http://'     ####
+storage_service_host_url=http://storage-service-base-url
+iguassu_service_host_url=http://iguassu-service-base-url
+arrebol_service_host_url=http://arrebol-service-base-url
+
+#### Local JDBC database directory ####
+database_host_url=jdbc:sqlite:/path/to/db
