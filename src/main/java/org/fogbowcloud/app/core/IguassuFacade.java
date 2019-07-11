@@ -14,7 +14,7 @@ public class IguassuFacade {
 
     private IguassuController iguassuController;
 
-    public IguassuFacade(IguassuController iguassuController){
+    public IguassuFacade(IguassuController iguassuController) {
         this.iguassuController = iguassuController;
     }
 
@@ -22,7 +22,7 @@ public class IguassuFacade {
         iguassuController.init();
     }
 
-    public JDFJob getJobById(String id, String owner){
+    public JDFJob getJobById(String id, String owner) {
         return iguassuController.getJobById(id, owner);
     }
 
@@ -34,7 +34,7 @@ public class IguassuFacade {
         return iguassuController.getAllJobs(owner);
     }
 
-    public JDFJob getJobByName(String jobName, String owner){
+    public JDFJob getJobByName(String jobName, String owner) {
         return iguassuController.getJobByName(jobName, owner);
     }
 
@@ -50,7 +50,7 @@ public class IguassuFacade {
         return iguassuController.getNonce();
     }
 
-    public User getUser(String userId){
+    public User getUser(String userId) {
         return iguassuController.getUser(userId);
     }
 
@@ -58,11 +58,11 @@ public class IguassuFacade {
         return iguassuController.addUser(userId, iguassuToken);
     }
 
-    public void storeOAuthToken(OAuthToken oAuthToken){
+    public void storeOAuthToken(OAuthToken oAuthToken) {
         iguassuController.storeOAuthToken(oAuthToken);
     }
 
-    public List<OAuthToken> getAllOAuthTokens(){
+    public List<OAuthToken> getAllOAuthTokens() {
         return iguassuController.getAllOAuthTokens();
     }
 

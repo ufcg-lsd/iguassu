@@ -151,7 +151,7 @@ public class JDFJob extends Job implements Serializable {
         return this.userId;
     }
 
-    public long getTimeStamp(){
+    public long getTimeStamp() {
         return this.timestamp;
     }
 
