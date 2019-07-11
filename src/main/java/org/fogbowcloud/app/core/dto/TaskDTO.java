@@ -18,6 +18,7 @@ public class TaskDTO {
     public TaskDTO(Task task){
         this.uuid = task.getUUID();
         this.id = task.getId();
+        this.uuid = task.getUUID();
         this.commands = toCommandDTOList(task.getAllCommands());
         this.specification = task.getSpecification();
         this.state = task.getState();
@@ -50,5 +51,4 @@ public class TaskDTO {
     public String getUuid() {
         return uuid;
     }
-
 }
