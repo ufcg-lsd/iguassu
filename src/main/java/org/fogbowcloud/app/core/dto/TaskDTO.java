@@ -10,11 +10,13 @@ import org.fogbowcloud.app.core.task.TaskState;
 public class TaskDTO {
 
     private String id;
+    private String uuid;
     private List<CommandDTO> commands;
     private Specification specification;
     private TaskState state;
 
     public TaskDTO(Task task){
+        this.uuid = task.getUUID();
         this.id = task.getId();
         this.commands = toCommandDTOList(task.getAllCommands());
         this.specification = task.getSpecification();
@@ -44,4 +46,9 @@ public class TaskDTO {
     public TaskState getState() {
         return state;
     }
+
+    public String getUuid() {
+        return uuid;
+    }
+
 }
