@@ -5,7 +5,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.exceptions.StorageException;
@@ -15,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 @Service
 public class FileSystemStorageService {
+
     private final Logger LOGGER = Logger.getLogger(FileSystemStorageService.class);
 
     public void store(MultipartFile file, Map<String, String> formFieldsToLoad) {
@@ -32,11 +32,11 @@ public class FileSystemStorageService {
                 if (formFieldsToLoad.containsKey(IguassuPropertiesConstants.JDF_FILE_PATH)) {
                     final String fileContent = IOUtils.toString(inputStream);
                     final File tempFile = createTmpFile(fileContent, fileName);
-                    formFieldsToLoad.put(IguassuPropertiesConstants.JDF_FILE_PATH, tempFile.getAbsolutePath());
+                    formFieldsToLoad
+                        .put(IguassuPropertiesConstants.JDF_FILE_PATH, tempFile.getAbsolutePath());
                 }
             }
-        }
-        catch (IOException e) {
+        } catch (IOException e) {
             throw new StorageException("Failed to store file " + fileName, e);
         }
     }

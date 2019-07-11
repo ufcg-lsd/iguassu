@@ -18,7 +18,6 @@ import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
-import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.junit.Test;
 
 public class TestJDFJobBuilder {

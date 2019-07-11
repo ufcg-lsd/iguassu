@@ -16,6 +16,7 @@ import org.fogbowcloud.app.api.http.services.FileSystemStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
 import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
+import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.fogbowcloud.app.core.dto.JobResponseDTO;
 import org.fogbowcloud.app.core.dto.TaskDTO;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
@@ -56,7 +57,7 @@ public class JobController {
     @ApiOperation(value = ApiDocumentation.Job.GET_OPERATION)
     public ResponseEntity<List<JobResponseDTO>> getAllJobs(
         @ApiParam(value = ApiDocumentation.CommonParameters.USER_CREDENTIALS)
-        @RequestHeader(value = IguassuPropertiesConstants.X_CREDENTIALS) String credentials) {
+        @RequestHeader(value = IguassuPropertiesConstants.X_AUTH_USER_CREDENTIALS) String credentials) {
         LOGGER.info("Retrieving all jobs.");
 
         User owner = this.jobService.authenticateUser(credentials);
@@ -75,7 +76,7 @@ public class JobController {
         @ApiParam(value = ApiDocumentation.Job.ID)
         @PathVariable String jobId,
         @ApiParam(value = ApiDocumentation.CommonParameters.USER_CREDENTIALS)
-        @RequestHeader(value = IguassuPropertiesConstants.X_CREDENTIALS) String credentials)
+        @RequestHeader(value = IguassuPropertiesConstants.X_AUTH_USER_CREDENTIALS) String credentials)
         throws InvalidParameterException {
         LOGGER.info("Retrieving job with id [" + jobId + "].");
 
@@ -91,7 +92,7 @@ public class JobController {
         @ApiParam(value = ApiDocumentation.Job.ID)
         @PathVariable String jobId,
         @ApiParam(value = ApiDocumentation.CommonParameters.USER_CREDENTIALS)
-        @RequestHeader(value = IguassuPropertiesConstants.X_CREDENTIALS) String credentials)
+        @RequestHeader(value = IguassuPropertiesConstants.X_AUTH_USER_CREDENTIALS) String credentials)
         throws InvalidParameterException {
         LOGGER.info("Retrieving tasks from job with id [" + jobId + "].");
 
@@ -100,9 +101,9 @@ public class JobController {
         return new ResponseEntity<>(taskDTOS, HttpStatus.OK);
     }
 
-    private List<TaskDTO> toTasksDTOList(List<Task> tasks){
+    private List<TaskDTO> toTasksDTOList(List<Task> tasks) {
         List<TaskDTO> l = new ArrayList<>();
-        for(Task t : tasks){
+        for (Task t : tasks) {
             l.add(new TaskDTO(t));
         }
         return l;
@@ -130,14 +131,14 @@ public class JobController {
         @ApiParam(value = ApiDocumentation.Job.CREATE_REQUEST_PARAM)
         @RequestParam(IguassuPropertiesConstants.JDF_FILE_PATH) MultipartFile file,
         @ApiParam(value = ApiDocumentation.CommonParameters.USER_CREDENTIALS)
-        @RequestHeader(value = IguassuPropertiesConstants.X_CREDENTIALS) String credentials) {
+        @RequestHeader(value = IguassuPropertiesConstants.X_AUTH_USER_CREDENTIALS) String credentials) {
         LOGGER.info("Saving new Job.");
 
         LOGGER.info(file.toString());
 
         Map<String, String> fieldMap = new HashMap<>();
         fieldMap.put(IguassuPropertiesConstants.JDF_FILE_PATH, null);
-        fieldMap.put(IguassuPropertiesConstants.X_CREDENTIALS, null);
+        fieldMap.put(IguassuPropertiesConstants.X_AUTH_USER_CREDENTIALS, null);
 
         this.storageService.store(file, fieldMap);
         User owner = this.jobService.authenticateUser(credentials);
@@ -171,7 +172,7 @@ public class JobController {
         @ApiParam(value = ApiDocumentation.Job.ID)
         @PathVariable String jobId,
         @ApiParam(value = ApiDocumentation.CommonParameters.USER_CREDENTIALS)
-        @RequestHeader(value = IguassuPropertiesConstants.X_CREDENTIALS) String credentials)
+        @RequestHeader(value = IguassuPropertiesConstants.X_AUTH_USER_CREDENTIALS) String credentials)
         throws InvalidParameterException {
         LOGGER.info("Deleting job with Id " + jobId + ".");
 

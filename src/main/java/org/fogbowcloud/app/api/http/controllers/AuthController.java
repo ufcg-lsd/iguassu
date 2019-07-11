@@ -3,12 +3,10 @@ package org.fogbowcloud.app.api.http.controllers;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import javax.ws.rs.PathParam;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.ApiDocumentation;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
-import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.dto.AuthDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -36,7 +34,7 @@ public class AuthController {
             @ApiParam(value = ApiDocumentation.Auth.AUTHORIZATION_CODE)
             @RequestBody String authorizationCode,
             @ApiParam(value = ApiDocumentation.CommonParameters.OAUTH_CREDENTIALS)
-            @RequestHeader(value = IguassuPropertiesConstants.X_IDENTIFIERS) String applicationIdentifiers) {
+            @RequestHeader(value = IguassuPropertiesConstants.X_AUTH_APP_IDENTIFIERS) String applicationIdentifiers) {
 
         try {
             if (authorizationCode != null && !authorizationCode.trim().isEmpty()) {

@@ -26,7 +26,7 @@ public class ArrebolRequestsHelper {
 
     public ArrebolRequestsHelper(Properties properties) {
         // TODO review this names
-        ARREBOL_BASE_URL = properties.getProperty(IguassuPropertiesConstants.ARREBOL_BASE_URL);
+        ARREBOL_BASE_URL = properties.getProperty(IguassuPropertiesConstants.ARREBOL_SERVICE_HOST_URL);
         this.gson = new Gson();
     }
 
