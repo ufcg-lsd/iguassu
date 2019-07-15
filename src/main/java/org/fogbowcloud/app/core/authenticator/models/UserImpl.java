@@ -17,15 +17,27 @@ public class UserImpl implements User {
 
 	@Override
 	public String getUserIdentification() {
-		return userId;
-	}
-	
-	public boolean isActive() {
-		return active;
+		return this.userId;
 	}
 
-	public void setActive(boolean active) {
-		this.active = active;
+	@Override
+	public boolean isActive() {
+		return this.active;
+	}
+
+	@Override
+	public String getIguassuToken() {
+		return this.iguassuToken;
+	}
+
+	@Override
+	public void setActive(boolean isActive) {
+		this.active = isActive;
+	}
+
+	@Override
+	public void updateIguassuToken(String iguassuToken) {
+		this.iguassuToken = iguassuToken;
 	}
 
 	public JSONObject toJSON() throws JSONException {
@@ -37,7 +49,9 @@ public class UserImpl implements User {
 	}
 
 	public static User fromJSON(JSONObject userJSON) {
-		return new UserImpl(userJSON.optString("userId"),
-				userJSON.optString("iguassuToken"));
+		UserImpl user = new UserImpl(userJSON.optString("userId"),
+			userJSON.optString("iguassuToken"));
+		user.setActive(userJSON.optBoolean("active"));
+		return user;
 	}
 }

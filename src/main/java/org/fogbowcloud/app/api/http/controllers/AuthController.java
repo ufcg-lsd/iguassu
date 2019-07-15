@@ -45,14 +45,14 @@ public class AuthController {
         try {
             if (authorizationCode != null && !authorizationCode.trim().isEmpty()) {
                 final AuthDTO userAuthenticatedInfo = this.authService
-                    .authenticateWithOAuth2(authorizationCode, applicationIdentifiers);
+                    .authenticate(authorizationCode, applicationIdentifiers);
 
                 LOGGER.info(
                     "User " + userAuthenticatedInfo.getUserId() + " authenticated successfully.");
 
                 return new ResponseEntity<>(userAuthenticatedInfo, HttpStatus.CREATED);
             } else {
-                return new ResponseEntity<>("The authentication code is invalid.",
+                return new ResponseEntity<>("The authorization code is invalid.",
                     HttpStatus.BAD_REQUEST);
             }
         } catch (Exception e) {

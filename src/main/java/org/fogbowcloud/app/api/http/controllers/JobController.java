@@ -69,7 +69,7 @@ public class JobController {
         @ApiParam(value = CommonParameters.USER_CREDENTIALS)
         @RequestHeader(value = IguassuPropertiesConstants.X_AUTH_USER_CREDENTIALS) String userCredentials) {
         User user;
-        List<JobResponseDTO> jobs;
+
         try {
             user = this.authService.authorizeUser(userCredentials);
 
@@ -82,7 +82,7 @@ public class JobController {
         List<JDFJob> allJobs = this.jobService.getAllJobs(user);
         LOGGER.debug("Retrieving all jobs of user [ " + user.getUserIdentification() + " ]");
 
-        jobs = new LinkedList<>();
+        List<JobResponseDTO> jobs = new LinkedList<>();
         for (JDFJob job : allJobs) {
             jobs.add(new JobResponseDTO(job));
         }
@@ -149,10 +149,10 @@ public class JobController {
         fieldMap.put(IguassuPropertiesConstants.X_AUTH_USER_CREDENTIALS, null);
 
         this.storageService.store(file, fieldMap);
-        User owner;
+        User user;
 
         try {
-            owner = this.authService.authorizeUser(userCredentials);
+            user = this.authService.authorizeUser(userCredentials);
         } catch (UnauthorizedRequestException ure) {
             return new ResponseEntity<>(
                 "The authentication failed with error [" + ure.getMessage() +
@@ -161,16 +161,16 @@ public class JobController {
 
         final String jdf = fieldMap.get(IguassuPropertiesConstants.JDF_FILE_PATH);
         if (Objects.isNull(jdf)) {
-            LOGGER.info("Could not store  new job from user " + owner.getUserIdentification());
+            LOGGER.info("Could not store  new job from user " + user.getUserIdentification());
             throw new StorageException(
-                "Could not store new job from user " + owner.getUserIdentification());
+                "Could not store new job from user " + user.getUserIdentification());
         }
 
         String jobId;
         final String jdfAbsolutePath = fieldMap.get(IguassuPropertiesConstants.JDF_FILE_PATH);
         try {
             LOGGER.info("jdfpath <" + jdfAbsolutePath + ">");
-            jobId = this.jobService.submitJob(jdfAbsolutePath, owner);
+            jobId = this.jobService.submitJob(jdfAbsolutePath, user);
             LOGGER.info("Job " + jobId + " created at time: " + System.currentTimeMillis());
         } catch (CompilerException ce) {
             LOGGER.error(ce.getMessage(), ce);

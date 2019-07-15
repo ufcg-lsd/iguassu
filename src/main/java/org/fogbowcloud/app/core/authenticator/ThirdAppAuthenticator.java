@@ -1,5 +1,7 @@
 package org.fogbowcloud.app.core.authenticator;
 
+import java.io.File;
+import java.util.concurrent.ConcurrentMap;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.authenticator.models.Credential;
 import org.fogbowcloud.app.core.authenticator.models.User;
@@ -9,9 +11,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
-
-import java.io.File;
-import java.util.concurrent.ConcurrentMap;
 
 public class ThirdAppAuthenticator implements IguassuAuthenticator {
 
@@ -24,7 +23,8 @@ public class ThirdAppAuthenticator implements IguassuAuthenticator {
         final File usersFile = new File(IguassuPropertiesConstants.DATASTORES_USERS_DB_FILE_PATH);
         this.usersDB = DBMaker.newFileDB(usersFile).make();
         this.usersDB.checkShouldCreate(IguassuPropertiesConstants.DATASTORES_USERS_FILE_PATH);
-        this.userList = this.usersDB.getHashMap(IguassuPropertiesConstants.DATASTORES_USERS_FILE_PATH);
+        this.userList = this.usersDB
+            .getHashMap(IguassuPropertiesConstants.DATASTORES_USERS_FILE_PATH);
     }
 
     @Override
@@ -37,8 +37,8 @@ public class ThirdAppAuthenticator implements IguassuAuthenticator {
     @Override
     public User addUser(String username, String iguassuToken) {
         try {
-            User user = new UserImpl(username, iguassuToken);
-            this.userList.put(username, ((UserImpl) user).toJSON().toString());
+            UserImpl user = new UserImpl(username, iguassuToken);
+            this.userList.put(username, user.toJSON().toString());
             this.usersDB.commit();
             LOGGER.info("User with userId " + username + " added.");
             return user;

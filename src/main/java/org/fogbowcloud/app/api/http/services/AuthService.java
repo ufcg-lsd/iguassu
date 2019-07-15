@@ -48,7 +48,7 @@ public class AuthService {
         return this.iguassuFacade.getAllOAuthTokens();
     }
 
-    public AuthDTO authenticateWithOAuth2(String authorizationCode, String applicationIdentifiers)
+    public AuthDTO authenticate(String authorizationCode, String applicationIdentifiers)
         throws Exception {
         final String knownAppClientId = this.properties
             .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID);
@@ -86,10 +86,10 @@ public class AuthService {
     }
 
     public User authorizeUser(String userCredentials) throws UnauthorizedRequestException {
-        User owner;
+        User user;
         try {
-            owner = this.iguassuFacade.authUser(userCredentials);
-            LOGGER.info("Retrieving user " + owner.getUserIdentification());
+            user = this.iguassuFacade.authUser(userCredentials);
+            LOGGER.info("Retrieving user " + user.getUserIdentification());
         } catch (GeneralSecurityException e) {
             LOGGER.error("Error trying to authenticate", e);
             throw new UnauthorizedRequestException(
@@ -106,7 +106,7 @@ public class AuthService {
                 "Incorrect credentials! Try login again."
             );
         }
-        return owner;
+        return user;
     }
 
     public String refreshToken(String userId, Long version) throws Exception {
@@ -129,8 +129,8 @@ public class AuthService {
 
     public OAuthToken refreshAndDelete(OAuthToken oAuthToken) throws Exception {
         OAuthToken refreshedToken = refreshToken(oAuthToken);
-        this.iguassuFacade.storeOAuthToken(refreshedToken);
         this.iguassuFacade.deleteOAuthToken(oAuthToken);
+        this.iguassuFacade.storeOAuthToken(refreshedToken);
         return refreshedToken;
     }
 
@@ -187,8 +187,23 @@ public class AuthService {
                 OAuthToken oAuthToken = gson.fromJson(oAuthTokenRawResponse, OAuthToken.class);
                 oAuthToken.updateExpirationDate();
 
-                final String iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
-                this.storeOAuthToken(oAuthToken, iguassuToken);
+                User user = this.iguassuFacade.getUser(oAuthToken.getUserId());
+
+                String iguassuToken;
+                if (Objects.nonNull(user)) {
+                    if (user.isActive()) {
+                        iguassuToken = user.getIguassuToken();
+                    } else {
+                        iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
+                        user.setActive(true);
+                        user.updateIguassuToken(iguassuToken);
+                    }
+                } else {
+                    iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
+                    this.iguassuFacade.addUser(oAuthToken.getUserId(), iguassuToken);
+                    LOGGER.info(
+                        "OAuth2 tokens for the user " + oAuthToken.getUserId() + " was stored.");
+                }
 
                 return new AuthDTO(oAuthToken.getUserId(), iguassuToken);
             } else {
@@ -217,15 +232,6 @@ public class AuthService {
                 return new HeaderElement[0];
             }
         });
-    }
-
-    private void storeOAuthToken(OAuthToken oAuthToken, String iguassuToken) {
-        User user = this.iguassuFacade.getUser(oAuthToken.getUserId());
-        if (user == null) {
-            this.iguassuFacade.addUser(oAuthToken.getUserId(), iguassuToken);
-            LOGGER.info("OAuth2 tokens for the user " + oAuthToken.getUserId() + " was stored.");
-        }
-        this.iguassuFacade.storeOAuthToken(oAuthToken);
     }
 
     private String generateIguassuToken(String userId) {
