@@ -46,7 +46,6 @@ public class AuthController {
             if (authorizationCode != null && !authorizationCode.trim().isEmpty()) {
                 final AuthDTO userAuthenticatedInfo = this.authService
                     .authenticate(authorizationCode, applicationIdentifiers);
-
                 LOGGER.info(
                     "User " + userAuthenticatedInfo.getUserId() + " authenticated successfully.");
 
@@ -57,6 +56,7 @@ public class AuthController {
             }
         } catch (Exception e) {
             return new ResponseEntity<>("The authentication failed with error [" + e.getMessage() +
+
                 "]", HttpStatus.UNAUTHORIZED);
         }
     }

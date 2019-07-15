@@ -271,7 +271,8 @@ public class JDFJobBuilder {
         final String iguassuUrl = this.properties
             .getProperty(IguassuPropertiesConstants.IGUASSU_SERVICE_HOST_URL);
         final String refreshTokenUrl = String
-            .format("%s/auth/refresh/${userId}/${tokenVersion}", iguassuUrl, userId, tokenVersion);
+            .format("%s/auth/oauth2/refresh/${userId}/${tokenVersion}", iguassuUrl, userId,
+                tokenVersion);
         final String refreshTokenCommand = String.format("curl -X POST %s", refreshTokenUrl);
         return refreshTokenCommand;
     }

@@ -11,7 +11,7 @@ import java.sql.Timestamp;
 
 public class OAuthToken {
 
-    @SerializedName("version")
+    @SerializedName(OAuthPropertiesKeys.TOKEN_VERSION_JSON_KEY)
     private long version;
 
     @SerializedName(OAuthPropertiesKeys.ACCESS_TOKEN_JSON_KEY)
@@ -27,13 +27,15 @@ public class OAuthToken {
     private int expirationTime;
 
     private Date expirationDate;
+    private static final long INITIAL_VERSION = 0L;
 
     private static final Logger LOGGER = Logger.getLogger(OAuthToken.class);
 
-    public OAuthToken() { }
+    public OAuthToken() {
+    }
 
     public OAuthToken(String accessToken, String refreshToken, String userId, Date expirationDate) {
-        this.version = 0L;
+        this.version = INITIAL_VERSION;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.userId = userId;
@@ -41,7 +43,8 @@ public class OAuthToken {
         this.expirationTime = 3600;
     }
 
-    public OAuthToken(String accessToken, String refreshToken, String userId, Date expirationDate, long version) {
+    public OAuthToken(String accessToken, String refreshToken, String userId, Date expirationDate,
+        long version) {
         this.version = version;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
@@ -57,11 +60,11 @@ public class OAuthToken {
         Date expirationDate = new Date(dateStr);
 
         OAuthToken token = new OAuthToken(
-                tokenJson.optString(OAuthPropertiesKeys.ACCESS_TOKEN_JSON_KEY),
-                tokenJson.optString(OAuthPropertiesKeys.REFRESH_TOKEN_JSON_KEY),
-                tokenJson.optString(OAuthPropertiesKeys.USER_ID_JSON_KEY),
-                expirationDate,
-                tokenJson.getLong(OAuthPropertiesKeys.TOKEN_VERSION_JSON_KEY));
+            tokenJson.optString(OAuthPropertiesKeys.ACCESS_TOKEN_JSON_KEY),
+            tokenJson.optString(OAuthPropertiesKeys.REFRESH_TOKEN_JSON_KEY),
+            tokenJson.optString(OAuthPropertiesKeys.USER_ID_JSON_KEY),
+            expirationDate,
+            tokenJson.getLong(OAuthPropertiesKeys.TOKEN_VERSION_JSON_KEY));
 
         LOGGER.debug("Job read from JSON is from owner: " + token.getUserId());
         return token;
@@ -116,7 +119,7 @@ public class OAuthToken {
     }
 
     public void updateExpirationDate() {
-        Timestamp stamp = new Timestamp(System.currentTimeMillis() + (this.expirationTime*1000));
+        Timestamp stamp = new Timestamp(System.currentTimeMillis() + (this.expirationTime * 1000));
         this.expirationDate = new Date(stamp.getTime());
     }
 

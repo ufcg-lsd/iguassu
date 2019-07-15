@@ -5,13 +5,14 @@ public class ApiDocumentation {
     public static class Endpoint {
 
         public static final String AUTH = "auth";
-        public static final String NONCE = "/nonce";
+        public static final String NONCE = "nonce";
         public static final String JOB = "job";
         public static final String JOB_ID = "/{jobId}";
         public static final String TASK = "/task";
         public static final String STATUS = "/status";
         public static final String OAUTH_2 = "/oauth2";
         public static final String REFRESH_TOKEN_VERSION = "/refresh/{userId}/{tokenVersion}";
+
     }
 
     public static class ApiInfo {
