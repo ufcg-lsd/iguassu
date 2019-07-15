@@ -5,7 +5,7 @@ import org.fogbowcloud.app.core.authenticator.models.User;
 
 public interface IguassuAuthenticator {
 
-    User authenticateUser(Credential credential);
+    User authorizesUser(Credential credential);
 
     User addUser(String userId, String secretKey);
 

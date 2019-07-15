@@ -238,7 +238,7 @@ public class IguassuController {
         LOGGER.debug("Checking nonce");
         if (this.nonces.contains(credential.getNonce())) {
             this.nonces.remove(credential.getNonce());
-            user = this.authenticator.authenticateUser(credential);
+            user = this.authenticator.authorizesUser(credential);
         }
         return user;
     }

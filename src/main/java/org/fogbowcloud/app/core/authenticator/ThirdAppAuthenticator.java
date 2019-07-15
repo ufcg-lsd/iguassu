@@ -28,9 +28,9 @@ public class ThirdAppAuthenticator implements IguassuAuthenticator {
     }
 
     @Override
-    public User authenticateUser(Credential credential) {
+    public User authorizesUser(Credential credential) {
         User user = getUserByUsername(credential.getUserId());
-        LOGGER.debug("Authenticating user with userId: " + user.getUserIdentification());
+        LOGGER.debug("Authorizing user with userId: " + user.getUserIdentification());
         return user;
     }
 
