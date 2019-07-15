@@ -4,13 +4,14 @@ public class ApiDocumentation {
 
     public static class Endpoint {
 
-        public static final String AUTH_ENDPOINT = "auth";
-        public static final String NONCE_ENDPOINT = "nonce";
-        public static final String JOB_ENDPOINT = "job";
-        public static final String JOB_PATH = "/{jobId}";
-        public static final String TASKS_ENDPOINT = "tasks";
-        public static final String OAUTH2_ENDPOINT = "/oauth2";
-        public static final String OAUTH2_REFRESH_TOKEN_ENDPOINT = "/refresh/{userId}/{tokenVersion}";
+        public static final String AUTH = "auth";
+        public static final String NONCE = "/nonce";
+        public static final String JOB = "job";
+        public static final String JOB_ID = "/{jobId}";
+        public static final String TASK = "/task";
+        public static final String STATUS = "/status";
+        public static final String OAUTH_2 = "/oauth2";
+        public static final String REFRESH_TOKEN_VERSION = "/refresh/{userId}/{tokenVersion}";
     }
 
     public static class ApiInfo {
@@ -31,7 +32,7 @@ public class ApiDocumentation {
 
         public static final String API_DESCRIPTION = "Manages jobs.";
         public static final String CREATE_OPERATION = "Creates an job.";
-        public static final String GET_OPERATION = "Lists all jobs.";
+        public static final String GET_ALL_OPERATION = "Lists all jobs.";
         public static final String GET_BY_ID_OPERATION = "Get a specific job.";
         public static final String DELETE_OPERATION = "Deletes a specific job.";
         public static final String GET_TASKS_OPERATION = "Get tasks of a specific job.";
