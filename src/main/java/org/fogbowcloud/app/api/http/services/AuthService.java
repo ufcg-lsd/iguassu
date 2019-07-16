@@ -212,6 +212,8 @@ public class AuthService {
                         "OAuth2 tokens for the user " + oAuthToken.getUserId() + " was stored.");
                 }
 
+                this.storeNewToken(oAuthToken);
+
                 return new AuthDTO(oAuthToken.getUserId(), iguassuToken);
             } else {
                 throw new Exception("You can't use the same authorization code twice.");
@@ -220,6 +222,19 @@ public class AuthService {
         } catch (Exception e) {
             throw new Exception("OAuth Token request failed with message, " + e.getMessage());
         }
+    }
+
+    private void storeNewToken(OAuthToken oAuthToken) {
+        final int maxTokenQntd = 1;
+        final List<OAuthToken> allTokens = this.iguassuFacade.getAllOAuthTokens();
+
+        if (allTokens.size() > maxTokenQntd) {
+            for (OAuthToken token : allTokens) {
+                this.iguassuFacade.deleteOAuthToken(token);
+            }
+        }
+
+        this.iguassuFacade.storeOAuthToken(oAuthToken);
     }
 
     private void mountsHeaders(List<Header> headers, String authHeadersEncoded) {
