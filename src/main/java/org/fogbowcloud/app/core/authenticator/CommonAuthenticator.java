@@ -2,6 +2,7 @@ package org.fogbowcloud.app.core.authenticator;
 
 import java.io.File;
 import java.security.GeneralSecurityException;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentMap;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.authenticator.models.Credential;
@@ -30,7 +31,7 @@ public class CommonAuthenticator implements IguassuAuthenticator {
 
     @Override
     public User authorizesUser(Credential credential) throws GeneralSecurityException {
-        User user = getUserByUsername(credential.getUserId());
+        User user = Objects.requireNonNull(getUserByUsername(credential.getUserId()));
         LOGGER.debug("Authorizing user with userId: " + user.getUserIdentification());
 
         if (!user.getIguassuToken().equalsIgnoreCase(credential.getIguassuToken())) {

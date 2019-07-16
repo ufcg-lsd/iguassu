@@ -1,6 +1,7 @@
 package org.fogbowcloud.app.core.monitor;
 
 import java.time.Instant;
+import java.util.Objects;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.authenticator.IguassuAuthenticator;
 import org.fogbowcloud.app.core.authenticator.models.User;
@@ -25,7 +26,8 @@ public class SessionMonitor implements Runnable {
         LOGGER.debug("Starting verification of user sessions at time: " + now);
         final long oneHourInSeconds = 3600;
         for (final OAuthToken token : oAuthTokenDataStore.getAll()) {
-            final User currentUser = this.authenticator.getUserByUsername(token.getUserId());
+            final User currentUser = Objects
+                .requireNonNull(this.authenticator.getUserByUsername(token.getUserId()));
 
             if (Math.abs((now - currentUser.getSessionTime())) > oneHourInSeconds) {
                 LOGGER.debug(
