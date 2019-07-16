@@ -6,6 +6,11 @@ import org.json.JSONObject;
 
 public class UserImpl implements User {
 
+	private static final String USER_ID_JSON_KEY = "userId";
+	private static final String IGUASSU_TOKEN_JSON_KEY = "iguassuToken";
+	private static final String ACTIVE_JSON_KEY = "active";
+	private static final String SESSION_TIME_JSON_KEY = "sessionTime";
+
 	private String userId;
 	private String iguassuToken;
 	private boolean active;
@@ -55,16 +60,18 @@ public class UserImpl implements User {
 
 	public JSONObject toJSON() throws JSONException {
 		JSONObject user = new JSONObject();
-		user.put("userId", this.userId);
-		user.put("iguassuToken", this.iguassuToken);
-		user.put("active", this.active);
+		user.put(USER_ID_JSON_KEY, this.userId);
+		user.put(IGUASSU_TOKEN_JSON_KEY, this.iguassuToken);
+		user.put(ACTIVE_JSON_KEY, this.active);
+		user.put(SESSION_TIME_JSON_KEY, this.sessionTime);
 		return user;
 	}
 
 	public static User fromJSON(JSONObject userJSON) {
-		UserImpl user = new UserImpl(userJSON.optString("userId"),
-			userJSON.optString("iguassuToken"));
-		user.setActive(userJSON.optBoolean("active"));
+		UserImpl user = new UserImpl(userJSON.optString(USER_ID_JSON_KEY),
+			userJSON.optString(IGUASSU_TOKEN_JSON_KEY));
+		user.setActive(userJSON.optBoolean(ACTIVE_JSON_KEY));
+		user.sessionTime = userJSON.optLong(SESSION_TIME_JSON_KEY);
 		return user;
 	}
 }
