@@ -1,7 +1,15 @@
 package org.fogbowcloud.app.api.http.services;
 
+import static org.fogbowcloud.app.api.constants.OAuthPropertiesKeys.AUTHORIZATION_CODE_JSON_KEY;
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import java.security.GeneralSecurityException;
+import java.util.Base64;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.ParseException;
@@ -10,16 +18,15 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.IguassuFacade;
 import org.fogbowcloud.app.core.authenticator.models.OAuthIdentifiers;
 import org.fogbowcloud.app.core.authenticator.models.RandomString;
-import org.fogbowcloud.app.core.dto.AuthDTO;
-import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.authenticator.models.User;
+import org.fogbowcloud.app.core.datastore.OAuthToken;
+import org.fogbowcloud.app.core.dto.AuthDTO;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
 import org.fogbowcloud.app.core.http.HttpWrapper;
 import org.fogbowcloud.app.external.ExternalOAuthConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
-import java.util.*;
 
 @Lazy
 @Component
@@ -31,6 +38,7 @@ public class AuthService {
     @Autowired
     private IguassuFacade iguassuFacade;
 
+    @Lazy
     @Autowired
     private Properties properties;
 
@@ -38,33 +46,27 @@ public class AuthService {
         return this.iguassuFacade.getAllOAuthTokens();
     }
 
-    public AuthDTO authenticateWithOAuth2(String authorizationCode, String applicationIdentifiers)
+    public AuthDTO authenticate(String authorizationCode, String applicationIdentifiers)
         throws Exception {
-        final String knownClientId = this.properties
-            .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID);
-        final String knownSecret = this.properties
-            .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
+
         final Gson gson = new Gson();
 
         final String rawCode = gson.fromJson(authorizationCode, JsonObject.class)
-            .get("authorizationCode").getAsString();
+            .get(AUTHORIZATION_CODE_JSON_KEY).getAsString();
 
-        OAuthIdentifiers applicationIds = gson
+        final OAuthIdentifiers applicationIds = gson
             .fromJson(applicationIdentifiers, OAuthIdentifiers.class);
 
-        if (applicationIds.getClientId().equals(knownClientId)
-            && applicationIds.getSecret().equals(knownSecret)) {
+        if (isAReliableApp(applicationIds)) {
+
             final String baseUrl = this.properties
                 .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_TOKEN_URL);
             final String requestUrl = baseUrl + "?grant_type=authorization_code&code=" + rawCode +
                 "&redirect_uri=" + applicationIds.getRedirectUri();
-            final String authHeadersDecoded =
-                applicationIds.getClientId() + ":" + applicationIds.getSecret();
-            final String authHeadersEncoded = Base64.getEncoder()
-                .encodeToString(authHeadersDecoded.getBytes());
 
             List<Header> headers = new LinkedList<>();
-            mountsHeaders(headers, authHeadersEncoded);
+            mountsHeaders(headers,
+                encodeHeaders(applicationIds.getClientId(), applicationIds.getSecret()));
 
             return requestOAuthAccessToken(requestUrl, headers, gson);
 
@@ -75,61 +77,24 @@ public class AuthService {
         }
     }
 
-    private AuthDTO requestOAuthAccessToken(String requestUrl, List<Header> headers, Gson gson)
-        throws Exception {
+    public User authorizeUser(String userCredentials) throws UnauthorizedRequestException {
+        User user;
         try {
-            final String oAuthTokenRawResponse = HttpWrapper
-                .doRequest(HttpPost.METHOD_NAME, requestUrl,
-                    headers, null);
-            if (oAuthTokenRawResponse != null) {
-                OAuthToken oAuthToken = gson.fromJson(oAuthTokenRawResponse, OAuthToken.class);
-                oAuthToken.updateExpirationDate();
-
-                final String iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
-                this.storeOAuthToken(oAuthToken, iguassuToken);
-
-                return new AuthDTO(oAuthToken.getUserId(), iguassuToken);
-            } else {
-                throw new Exception("You can't use the same authorization code twice.");
-            }
-
-        } catch (Exception e) {
-            throw new Exception("OAuth Token request failed with message, " + e.getMessage());
+            user = this.iguassuFacade.authUser(userCredentials);
+            user.resetSession();
+            LOGGER.info("Retrieving user " + user.getUserIdentification());
+        } catch (GeneralSecurityException e) {
+            LOGGER.error("Error while trying authorize", e);
+            throw new UnauthorizedRequestException(
+                "There was an error trying to authenticate.\nTry again later."
+            );
+        } catch (NullPointerException e) {
+            LOGGER.error("Incorrect credentials! Try login again.");
+            throw new UnauthorizedRequestException(
+                "Incorrect credentials! Try login again."
+            );
         }
-    }
-
-    private void mountsHeaders(List<Header> headers, String authHeadersEncoded) {
-        headers.add(new Header() {
-            @Override
-            public String getName() {
-                return "Authorization";
-            }
-
-            @Override
-            public String getValue() {
-                return "Basic " + authHeadersEncoded;
-            }
-
-            @Override
-            public HeaderElement[] getElements() throws ParseException {
-                return new HeaderElement[0];
-            }
-        });
-    }
-
-    private void storeOAuthToken(OAuthToken oAuthToken, String iguassuToken) {
-        User user = this.iguassuFacade.getUser(oAuthToken.getUserId());
-        if (user == null) {
-            this.iguassuFacade.addUser(oAuthToken.getUserId(), iguassuToken);
-            LOGGER.info("OAuth2 tokens for the user " + oAuthToken.getUserId() + " was stored.");
-        }
-        this.iguassuFacade.storeOAuthToken(oAuthToken);
-    }
-
-    private String generateIguassuToken(String userId) {
-        final String sessionToken = new RandomString(21, userId).nextString();
-
-        return Base64.getEncoder().encodeToString(sessionToken.getBytes());
+        return user;
     }
 
     public String refreshToken(String userId, Long version) throws Exception {
@@ -152,9 +117,21 @@ public class AuthService {
 
     public OAuthToken refreshAndDelete(OAuthToken oAuthToken) throws Exception {
         OAuthToken refreshedToken = refreshToken(oAuthToken);
-        this.iguassuFacade.storeOAuthToken(refreshedToken);
         this.iguassuFacade.deleteOAuthToken(oAuthToken);
+        this.iguassuFacade.storeOAuthToken(refreshedToken);
         return refreshedToken;
+    }
+
+    private boolean isAReliableApp(OAuthIdentifiers applicationIds) {
+        final String knownAppClientId = this.properties
+            .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID);
+        final String knownSecret = this.properties
+            .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
+
+        return Objects.nonNull(applicationIds.getClientId()) && Objects
+            .nonNull(applicationIds.getSecret()) && applicationIds.getClientId()
+            .equals(knownAppClientId)
+            && applicationIds.getSecret().equals(knownSecret);
     }
 
     private OAuthToken refreshToken(OAuthToken oAuthToken) throws Exception {
@@ -193,4 +170,80 @@ public class AuthService {
         mountsHeaders(headers, authHeadersEncoded);
     }
 
+    private String encodeHeaders(String clientId, String secret) {
+        final String authHeadersDecoded =
+            clientId + ":" + secret;
+        return Objects.requireNonNull(Base64.getEncoder()
+            .encodeToString(authHeadersDecoded.getBytes()));
+    }
+
+    private AuthDTO requestOAuthAccessToken(String requestUrl, List<Header> headers, Gson gson)
+        throws Exception {
+        try {
+            final String oAuthTokenRawResponse = HttpWrapper
+                .doRequest(HttpPost.METHOD_NAME, requestUrl,
+                    headers, null);
+            if (oAuthTokenRawResponse != null) {
+                OAuthToken oAuthToken = gson.fromJson(oAuthTokenRawResponse, OAuthToken.class);
+                oAuthToken.updateExpirationDate();
+
+                User user = this.iguassuFacade.getUser(oAuthToken.getUserId());
+
+                String iguassuToken;
+                if (Objects.nonNull(user)) {
+                    LOGGER.debug("Found user [" + user.getUserIdentification() + "]");
+                    if (user.isActive()) {
+                        iguassuToken = user.getIguassuToken();
+                        LOGGER.debug("User [" + user.getUserIdentification()
+                            + "] is active and has a valid Iguassu Token.");
+                    } else {
+                        iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
+                        LOGGER.debug("Generating a new Iguassu Token for the user [" + user
+                            .getUserIdentification() + "].");
+                        user.setActive(true);
+                        LOGGER.debug("User [" + user.getUserIdentification()
+                            + "] setting to active.");
+                        user.updateIguassuToken(iguassuToken);
+                    }
+                } else {
+                    iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
+                    this.iguassuFacade.addUser(oAuthToken.getUserId(), iguassuToken);
+                    LOGGER.info(
+                        "OAuth2 tokens for the user " + oAuthToken.getUserId() + " was stored.");
+                }
+
+                return new AuthDTO(oAuthToken.getUserId(), iguassuToken);
+            } else {
+                throw new Exception("You can't use the same authorization code twice.");
+            }
+
+        } catch (Exception e) {
+            throw new Exception("OAuth Token request failed with message, " + e.getMessage());
+        }
+    }
+
+    private void mountsHeaders(List<Header> headers, String authHeadersEncoded) {
+        headers.add(new Header() {
+            @Override
+            public String getName() {
+                return "Authorization";
+            }
+
+            @Override
+            public String getValue() {
+                return "Basic " + authHeadersEncoded;
+            }
+
+            @Override
+            public HeaderElement[] getElements() throws ParseException {
+                return new HeaderElement[0];
+            }
+        });
+    }
+
+    private String generateIguassuToken(String userId) {
+        final String sessionToken = new RandomString(21, userId).nextString();
+
+        return Base64.getEncoder().encodeToString(sessionToken.getBytes());
+    }
 }

@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 import java.io.UnsupportedEncodingException;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Properties;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -56,10 +57,10 @@ public class ArrebolRequestsHelper {
             LOGGER.info("Job [" + job.getId() + "] was submitted with success to Arrebol.");
 
         } catch (Exception e) {
-            throw new SubmitJobException("Submit Job to Arrebol has FAILED: " + e.getMessage(), e);
+            throw new SubmitJobException("Submit Job to Arrebol has status FAILED: " + e.getMessage(), e);
         }
 
-        return jobIdArrebol;
+        return Objects.requireNonNull(jobIdArrebol);
     }
 
     public ArrebolJobDTO getJob(String jobArrebolId) throws GetJobException {

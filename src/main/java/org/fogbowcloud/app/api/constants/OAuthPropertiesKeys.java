@@ -7,5 +7,6 @@ public class OAuthPropertiesKeys {
     public static final String EXPIRES_IN_JSON_KEY = "expires_in";
     public static final String USER_ID_JSON_KEY = "user_id";
     public static final String TOKEN_VERSION_JSON_KEY = "version";
+    public static final String AUTHORIZATION_CODE_JSON_KEY = "authorizationCode";
 
 }

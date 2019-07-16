@@ -1,14 +1,11 @@
 package org.fogbowcloud.app.api.http.services;
 
 import java.io.IOException;
-import java.security.GeneralSecurityException;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.IguassuFacade;
-import org.fogbowcloud.app.core.authenticator.models.Status;
 import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
-import org.fogbowcloud.app.core.exceptions.ResourceException;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,32 +52,5 @@ public class JobService {
 
     public String submitJob(String jdfFilePath, User owner) throws CompilerException, IOException {
         return this.iguassuFacade.submitJob(jdfFilePath, owner);
-    }
-
-    public User authenticateUser(String credentials) {
-        User owner;
-        try {
-            owner = this.iguassuFacade.authUser(credentials);
-            LOGGER.info("Retrieving user " + owner.getUserIdentification());
-        } catch (GeneralSecurityException e) {
-            LOGGER.error("Error trying to authenticate", e);
-            throw new ResourceException(
-                Status.CLIENT_ERROR_UNAUTHORIZED,
-                "There was an error trying to authenticate.\nTry again later."
-            );
-        } catch (IOException e) {
-            LOGGER.error("Error trying to authenticate", e);
-            throw new ResourceException(
-                Status.CLIENT_ERROR_BAD_REQUEST,
-                "Failed to read request header."
-            );
-        } catch (NullPointerException e) {
-            LOGGER.error("Incorrect credentials! Try login again.");
-            throw new ResourceException(
-                Status.CLIENT_ERROR_UNAUTHORIZED,
-                "Incorrect credentials! Try login again."
-            );
-        }
-        return owner;
     }
 }

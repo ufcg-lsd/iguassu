@@ -1,14 +1,13 @@
 package org.fogbowcloud.app.core;
 
-import org.fogbowcloud.app.core.authenticator.models.User;
-import org.fogbowcloud.app.core.datastore.OAuthToken;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
-
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
+import org.fogbowcloud.app.core.authenticator.models.User;
+import org.fogbowcloud.app.core.datastore.OAuthToken;
+import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
+import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 
 public class IguassuFacade {
 
@@ -42,7 +41,7 @@ public class IguassuFacade {
         return iguassuController.stopJob(jobId, owner);
     }
 
-    public User authUser(String credentials) throws IOException, GeneralSecurityException {
+    public User authUser(String credentials) throws GeneralSecurityException {
         return iguassuController.authUser(credentials);
     }
 
@@ -54,8 +53,8 @@ public class IguassuFacade {
         return iguassuController.getUser(userId);
     }
 
-    public User addUser(String userId, String iguassuToken) {
-        return iguassuController.addUser(userId, iguassuToken);
+    public void addUser(String userId, String iguassuToken) {
+        iguassuController.addUser(userId, iguassuToken);
     }
 
     public void storeOAuthToken(OAuthToken oAuthToken) {
@@ -70,7 +69,7 @@ public class IguassuFacade {
         return this.iguassuController.getCurrentTokenByUserId(userId);
     }
 
-    public boolean deleteOAuthToken(OAuthToken oAuthToken) {
-        return this.iguassuController.deleteOAuthToken(oAuthToken);
+    public void deleteOAuthToken(OAuthToken oAuthToken) {
+        this.iguassuController.deleteOAuthToken(oAuthToken);
     }
 }
