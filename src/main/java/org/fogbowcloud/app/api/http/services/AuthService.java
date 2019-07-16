@@ -230,7 +230,9 @@ public class AuthService {
 
         if (allTokens.size() > maxTokenQntd) {
             for (OAuthToken token : allTokens) {
-                this.iguassuFacade.deleteOAuthToken(token);
+                if (token.getUserId().equalsIgnoreCase(oAuthToken.getUserId())) {
+                    this.iguassuFacade.deleteOAuthToken(token);
+                }
             }
         }
 
