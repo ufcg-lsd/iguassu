@@ -1,6 +1,7 @@
 package org.fogbowcloud.app.core.authenticator;
 
 import java.io.File;
+import java.security.GeneralSecurityException;
 import java.util.concurrent.ConcurrentMap;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.authenticator.models.Credential;
@@ -12,14 +13,14 @@ import org.json.JSONObject;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
 
-public class ThirdAppAuthenticator implements IguassuAuthenticator {
+public class CommonAuthenticator implements IguassuAuthenticator {
 
-    private static final Logger LOGGER = Logger.getLogger(ThirdAppAuthenticator.class);
+    private static final Logger LOGGER = Logger.getLogger(CommonAuthenticator.class);
 
     private DB usersDB;
     private ConcurrentMap<String, String> userList;
 
-    public ThirdAppAuthenticator() {
+    public CommonAuthenticator() {
         final File usersFile = new File(IguassuPropertiesConstants.DATASTORES_USERS_DB_FILE_PATH);
         this.usersDB = DBMaker.newFileDB(usersFile).make();
         this.usersDB.checkShouldCreate(IguassuPropertiesConstants.DATASTORES_USERS_FILE_PATH);
@@ -28,9 +29,15 @@ public class ThirdAppAuthenticator implements IguassuAuthenticator {
     }
 
     @Override
-    public User authorizesUser(Credential credential) {
+    public User authorizesUser(Credential credential) throws GeneralSecurityException {
         User user = getUserByUsername(credential.getUserId());
         LOGGER.debug("Authorizing user with userId: " + user.getUserIdentification());
+
+        if (!user.getIguassuToken().equalsIgnoreCase(credential.getIguassuToken())) {
+            throw new GeneralSecurityException(
+                "User " + user.getUserIdentification() + " not has a valid Iguassu token.");
+        }
+
         return user;
     }
 

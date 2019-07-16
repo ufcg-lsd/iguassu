@@ -1,5 +1,6 @@
 package org.fogbowcloud.app.core;
 
+import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -8,7 +9,7 @@ import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.core.authenticator.IguassuAuthenticator;
-import org.fogbowcloud.app.core.authenticator.ThirdAppAuthenticator;
+import org.fogbowcloud.app.core.authenticator.CommonAuthenticator;
 import org.fogbowcloud.app.core.authenticator.models.Credential;
 import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
@@ -54,7 +55,7 @@ public class IguassuController {
     public IguassuController(Properties properties) throws IguassuException {
         validateProperties(properties);
         this.properties = properties;
-        this.authenticator = new ThirdAppAuthenticator();
+        this.authenticator = new CommonAuthenticator();
         this.jobExecutionSystem = new ArrebolJobExecutionSystem(this.properties);
     }
 
@@ -219,7 +220,7 @@ public class IguassuController {
         return null;
     }
 
-    public User authUser(String credentials) {
+    public User authUser(String credentials) throws GeneralSecurityException {
         if (credentials == null) {
             LOGGER.error("Invalid credentials. Some of the fields are null.");
             return null;

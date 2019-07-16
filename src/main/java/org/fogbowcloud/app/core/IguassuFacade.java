@@ -41,7 +41,7 @@ public class IguassuFacade {
         return iguassuController.stopJob(jobId, owner);
     }
 
-    public User authUser(String credentials) throws IOException, GeneralSecurityException {
+    public User authUser(String credentials) throws GeneralSecurityException {
         return iguassuController.authUser(credentials);
     }
 

@@ -49,22 +49,16 @@ public class AuthService {
 
     public AuthDTO authenticate(String authorizationCode, String applicationIdentifiers)
         throws Exception {
-        final String knownAppClientId = this.properties
-            .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID);
-        final String knownSecret = this.properties
-            .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
+
         final Gson gson = new Gson();
 
         final String rawCode = gson.fromJson(authorizationCode, JsonObject.class)
             .get(AUTHORIZATION_CODE_JSON_KEY).getAsString();
 
-        OAuthIdentifiers applicationIds = gson
+        final OAuthIdentifiers applicationIds = gson
             .fromJson(applicationIdentifiers, OAuthIdentifiers.class);
 
-        if (Objects.nonNull(applicationIds.getClientId()) && Objects
-            .nonNull(applicationIds.getSecret()) && applicationIds.getClientId()
-            .equals(knownAppClientId)
-            && applicationIds.getSecret().equals(knownSecret)) {
+        if (isAReliableApp(applicationIds)) {
 
             final String baseUrl = this.properties
                 .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_TOKEN_URL);
@@ -93,11 +87,6 @@ public class AuthService {
             LOGGER.error("Error while trying authorize", e);
             throw new UnauthorizedRequestException(
                 "There was an error trying to authenticate.\nTry again later."
-            );
-        } catch (IOException e) {
-            LOGGER.error("Error trying to authenticate", e);
-            throw new UnauthorizedRequestException(
-                "Failed to read request header."
             );
         } catch (NullPointerException e) {
             LOGGER.error("Incorrect credentials! Try login again.");
@@ -131,6 +120,18 @@ public class AuthService {
         this.iguassuFacade.deleteOAuthToken(oAuthToken);
         this.iguassuFacade.storeOAuthToken(refreshedToken);
         return refreshedToken;
+    }
+
+    private boolean isAReliableApp(OAuthIdentifiers applicationIds) {
+        final String knownAppClientId = this.properties
+            .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID);
+        final String knownSecret = this.properties
+            .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
+
+        return Objects.nonNull(applicationIds.getClientId()) && Objects
+            .nonNull(applicationIds.getSecret()) && applicationIds.getClientId()
+            .equals(knownAppClientId)
+            && applicationIds.getSecret().equals(knownSecret);
     }
 
     private OAuthToken refreshToken(OAuthToken oAuthToken) throws Exception {
