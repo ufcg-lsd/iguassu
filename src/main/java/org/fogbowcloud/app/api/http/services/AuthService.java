@@ -4,7 +4,6 @@ import static org.fogbowcloud.app.api.constants.OAuthPropertiesKeys.AUTHORIZATIO
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.Base64;
 import java.util.LinkedList;
@@ -192,11 +191,18 @@ public class AuthService {
 
                 String iguassuToken;
                 if (Objects.nonNull(user)) {
+                    LOGGER.debug("Found user [" + user.getUserIdentification() + "]");
                     if (user.isActive()) {
                         iguassuToken = user.getIguassuToken();
+                        LOGGER.debug("User [" + user.getUserIdentification()
+                            + "] is active and has a valid Iguassu Token.");
                     } else {
                         iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
+                        LOGGER.debug("Generating a new Iguassu Token for the user [" + user
+                            .getUserIdentification() + "].");
                         user.setActive(true);
+                        LOGGER.debug("User [" + user.getUserIdentification()
+                            + "] setting to active.");
                         user.updateIguassuToken(iguassuToken);
                     }
                 } else {
