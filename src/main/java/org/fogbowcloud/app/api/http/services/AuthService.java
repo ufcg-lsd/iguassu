@@ -208,11 +208,10 @@ public class AuthService {
                 } else {
                     iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
                     this.iguassuFacade.addUser(oAuthToken.getUserId(), iguassuToken);
+                    this.iguassuFacade.storeOAuthToken(oAuthToken);
                     LOGGER.info(
                         "OAuth2 tokens for the user " + oAuthToken.getUserId() + " was stored.");
                 }
-
-                this.storeNewToken(oAuthToken);
 
                 return new AuthDTO(oAuthToken.getUserId(), iguassuToken);
             } else {
