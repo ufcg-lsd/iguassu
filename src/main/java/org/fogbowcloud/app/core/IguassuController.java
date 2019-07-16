@@ -31,7 +31,6 @@ import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jes.JobExecutionSystem;
 import org.fogbowcloud.app.jes.arrebol.ArrebolJobExecutionSystem;
 import org.fogbowcloud.app.jes.arrebol.ArrebolJobSynchronizer;
-import org.fogbowcloud.app.jes.arrebol.JobSynchronizer;
 import org.fogbowcloud.app.utils.JDFUtil;
 import org.fogbowcloud.app.utils.ManagerTimer;
 import org.json.JSONException;
@@ -105,11 +104,9 @@ public class IguassuController {
             new OAuthTokenDataStore(
                 this.properties.getProperty(IguassuPropertiesConstants.DATABASE_HOST_URL));
         this.jobBuilder = new JDFJobBuilder(this.properties);
-        JobSynchronizer jobSynchronizer = new ArrebolJobSynchronizer(properties);
-
         this.nonces = new ArrayList<>();
 
-        this.initMonitors(jobSynchronizer);
+        this.initMonitors();
     }
 
     public JDFJob getJobById(String jobId, String owner) {
@@ -153,11 +150,13 @@ public class IguassuController {
             Objects.requireNonNull(oAuthToken).getAccessToken(), oAuthToken.getVersion());
     }
 
-    private void initMonitors(JobSynchronizer jobSynchronizer) {
+    private void initMonitors() {
+
         final long JOB_MONITOR_INITIAL_DELAY = 3000;
         final long JOB_MONITOR_EXECUTION_PERIOD = 5000;
 
-        JobStateMonitor jobStateMonitor = new JobStateMonitor(this.jobDataStore, jobSynchronizer);
+        JobStateMonitor jobStateMonitor = new JobStateMonitor(this.jobDataStore,
+            new ArrebolJobSynchronizer(this.properties));
         executionMonitorTimer.scheduleAtFixedRate(jobStateMonitor, JOB_MONITOR_INITIAL_DELAY,
             JOB_MONITOR_EXECUTION_PERIOD);
 
