@@ -1,5 +1,6 @@
 package org.fogbowcloud.app.core.authenticator.models;
 
+import java.time.Instant;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -8,10 +9,12 @@ public class UserImpl implements User {
 	private String userId;
 	private String iguassuToken;
 	private boolean active;
+	private long sessionTime;
 
 	public UserImpl(String userId, String iguassuToken) {
 		this.userId = userId;
 		this.iguassuToken = iguassuToken;
+		this.resetSession();
 		this.setActive(true);
 	}
 
@@ -28,6 +31,16 @@ public class UserImpl implements User {
 	@Override
 	public String getIguassuToken() {
 		return this.iguassuToken;
+	}
+
+	@Override
+	public long getSessionTime() {
+		return this.sessionTime;
+	}
+
+	@Override
+	public void resetSession() {
+		this.sessionTime = Instant.now().getEpochSecond();
 	}
 
 	@Override

@@ -53,8 +53,8 @@ public class IguassuFacade {
         return iguassuController.getUser(userId);
     }
 
-    public User addUser(String userId, String iguassuToken) {
-        return iguassuController.addUser(userId, iguassuToken);
+    public void addUser(String userId, String iguassuToken) {
+        iguassuController.addUser(userId, iguassuToken);
     }
 
     public void storeOAuthToken(OAuthToken oAuthToken) {
@@ -69,7 +69,7 @@ public class IguassuFacade {
         return this.iguassuController.getCurrentTokenByUserId(userId);
     }
 
-    public boolean deleteOAuthToken(OAuthToken oAuthToken) {
-        return this.iguassuController.deleteOAuthToken(oAuthToken);
+    public void deleteOAuthToken(OAuthToken oAuthToken) {
+        this.iguassuController.deleteOAuthToken(oAuthToken);
     }
 }

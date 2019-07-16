@@ -82,6 +82,7 @@ public class AuthService {
         User user;
         try {
             user = this.iguassuFacade.authUser(userCredentials);
+            user.resetSession();
             LOGGER.info("Retrieving user " + user.getUserIdentification());
         } catch (GeneralSecurityException e) {
             LOGGER.error("Error while trying authorize", e);

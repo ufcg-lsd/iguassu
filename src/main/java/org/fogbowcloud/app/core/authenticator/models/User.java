@@ -11,4 +11,8 @@ public interface User {
 	void updateIguassuToken(String iguassuToken);
 
 	String getIguassuToken();
+
+	long getSessionTime();
+
+	void resetSession();
 }

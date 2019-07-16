@@ -3,13 +3,14 @@ package org.fogbowcloud.app.core;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.UUID;
 import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.http.services.AuthService;
-import org.fogbowcloud.app.core.authenticator.IguassuAuthenticator;
 import org.fogbowcloud.app.core.authenticator.CommonAuthenticator;
+import org.fogbowcloud.app.core.authenticator.IguassuAuthenticator;
 import org.fogbowcloud.app.core.authenticator.models.Credential;
 import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
@@ -18,6 +19,7 @@ import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.core.exceptions.IguassuException;
 import org.fogbowcloud.app.core.monitor.JobStateMonitor;
+import org.fogbowcloud.app.core.monitor.SessionMonitor;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.external.ExternalOAuthConstants;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
@@ -39,14 +41,18 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class IguassuController {
 
     private static final Logger LOGGER = Logger.getLogger(IguassuController.class);
+
     private static ManagerTimer executionMonitorTimer = new ManagerTimer(
         Executors.newScheduledThreadPool(1));
+    private static ManagerTimer sessionMonitorTime = new ManagerTimer(
+        Executors.newScheduledThreadPool(1));
+
     private final Properties properties;
+    private final IguassuAuthenticator authenticator;
+    private final JobExecutionSystem jobExecutionSystem;
     private List<Integer> nonces;
     private JobDataStore jobDataStore;
     private OAuthTokenDataStore oAuthTokenDataStore;
-    private IguassuAuthenticator authenticator;
-    private JobExecutionSystem jobExecutionSystem;
     private JDFJobBuilder jobBuilder;
 
     @Autowired
@@ -102,8 +108,8 @@ public class IguassuController {
         JobSynchronizer jobSynchronizer = new ArrebolJobSynchronizer(properties);
 
         this.nonces = new ArrayList<>();
-        JobStateMonitor jobStateMonitor = new JobStateMonitor(jobDataStore, jobSynchronizer);
-        executionMonitorTimer.scheduleAtFixedRate(jobStateMonitor, 3000, 5000);
+
+        this.initMonitors(jobSynchronizer);
     }
 
     public JDFJob getJobById(String jobId, String owner) {
@@ -144,7 +150,24 @@ public class IguassuController {
         }
 
         return buildJobFromJDFFile(job, jdfFilePath, jobSpec, userIdentification,
-            oAuthToken.getAccessToken(), oAuthToken.getVersion());
+            Objects.requireNonNull(oAuthToken).getAccessToken(), oAuthToken.getVersion());
+    }
+
+    private void initMonitors(JobSynchronizer jobSynchronizer) {
+        final long JOB_MONITOR_INITIAL_DELAY = 3000;
+        final long JOB_MONITOR_EXECUTION_PERIOD = 5000;
+
+        JobStateMonitor jobStateMonitor = new JobStateMonitor(this.jobDataStore, jobSynchronizer);
+        executionMonitorTimer.scheduleAtFixedRate(jobStateMonitor, JOB_MONITOR_INITIAL_DELAY,
+            JOB_MONITOR_EXECUTION_PERIOD);
+
+        final long SESSION_MONITOR_INITIAL_DELAY = 3000;
+        final long SESSION_MONITOR_EXECUTION_PERIOD = 3600000;
+
+        SessionMonitor sessionMonitor = new SessionMonitor(this.oAuthTokenDataStore,
+            this.authenticator);
+        sessionMonitorTime.scheduleAtFixedRate(sessionMonitor, SESSION_MONITOR_INITIAL_DELAY,
+            SESSION_MONITOR_EXECUTION_PERIOD);
     }
 
     private JobSpecification compile(String jobId, String jdfFilePath) throws CompilerException {
