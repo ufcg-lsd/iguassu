@@ -1,9 +1,8 @@
 package org.fogbowcloud.app.jes;
 
+import javax.print.attribute.standard.JobState;
 import org.fogbowcloud.app.core.dto.arrebol.ArrebolJobDTO;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-
-import javax.print.attribute.standard.JobState;
 
 public interface JobExecutionSystem {
 

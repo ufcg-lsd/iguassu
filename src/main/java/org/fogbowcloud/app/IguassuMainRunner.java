@@ -1,5 +1,7 @@
 package org.fogbowcloud.app;
 
+import java.io.FileInputStream;
+import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.IguassuController;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
@@ -7,20 +9,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Lazy;
 
-import java.io.FileInputStream;
-import java.util.Properties;
-
 public class IguassuMainRunner implements CommandLineRunner {
 
     private static final Logger LOGGER = Logger.getLogger(IguassuMainRunner.class);
     private static String CONF_FILE_PATH = IguassuPropertiesConstants.IGUASSU_CONF_FILE;
-
-    @Autowired
-    private Properties properties;
-
     @Lazy
     @Autowired
     IguassuController iguassuController;
+    @Autowired
+    private Properties properties;
 
     @Override
     public void run(String... args) throws Exception {

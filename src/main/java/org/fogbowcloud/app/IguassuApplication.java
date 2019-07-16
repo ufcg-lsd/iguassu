@@ -1,22 +1,26 @@
 package org.fogbowcloud.app;
 
+import java.util.Properties;
 import org.fogbowcloud.app.core.IguassuController;
 import org.fogbowcloud.app.core.IguassuFacade;
 import org.fogbowcloud.app.core.exceptions.IguassuException;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.data.rest.RepositoryRestMvcAutoConfiguration;
 import org.springframework.boot.system.ApplicationPidFileWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
-import java.util.Properties;
-
-@SpringBootApplication
+@SpringBootApplication(exclude = RepositoryRestMvcAutoConfiguration.class)
 public class IguassuApplication {
+
+    public static void main(String[] args) {
+        SpringApplication springApplication = new SpringApplication(IguassuApplication.class);
+        springApplication.addListeners(new ApplicationPidFileWriter("./bin/shutdown.pid"));
+        springApplication.run(args);
+    }
+
     @Bean
     CommandLineRunner cmdRunner() {
         return new IguassuMainRunner();
@@ -39,11 +43,5 @@ public class IguassuApplication {
             e.printStackTrace();
         }
         return iguassuFacade;
-    }
-
-    public static void main(String[] args) {
-        SpringApplication springApplication = new SpringApplication(IguassuApplication.class);
-        springApplication.addListeners(new ApplicationPidFileWriter("./bin/shutdown.pid"));
-        springApplication.run(args);
     }
 }

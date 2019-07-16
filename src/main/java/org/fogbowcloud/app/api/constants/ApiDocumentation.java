@@ -5,6 +5,7 @@ public class ApiDocumentation {
     public static class Endpoint {
 
         public static final String AUTH = "auth";
+        public static final String VERSION = "version";
         public static final String NONCE = "nonce";
         public static final String JOB = "job";
         public static final String JOB_ID = "/{jobId}";
@@ -47,6 +48,12 @@ public class ApiDocumentation {
 
         public static final String API_DESCRIPTION = "Manages nonces";
         public static final String GET_OPERATION = "Creates a nonce";
+    }
+
+    public static class Version {
+
+        public static final String DESCRIPTION = "Describes the current version of the Iguassu API.";
+        public static final String GET_OPERATION = "Returns the current version.";
     }
 
     public static class Auth {
