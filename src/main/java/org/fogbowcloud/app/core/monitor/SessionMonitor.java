@@ -29,10 +29,12 @@ public class SessionMonitor implements Runnable {
             final User currentUser = Objects
                 .requireNonNull(this.authenticator.getUserByUsername(token.getUserId()));
 
-            if (Math.abs((now - currentUser.getSessionTime())) > oneHourInSeconds) {
+            if ((Math.abs((now - currentUser.getSessionTime())) > oneHourInSeconds) && currentUser
+                .isActive()) {
                 LOGGER.debug(
                     "User [ " + currentUser.getUserIdentification() + " ] defined as not active.");
                 currentUser.setActive(false);
+                this.authenticator.updateUser(currentUser);
             }
         }
 

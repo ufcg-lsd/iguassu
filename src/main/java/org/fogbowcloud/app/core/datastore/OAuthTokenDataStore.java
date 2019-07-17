@@ -155,8 +155,7 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
     }
 
     public List<OAuthToken> getAccessTokenByOwnerUsername(String ownerUsername) {
-        List<OAuthToken> tokensList = executeQueryStatement(GET_TOKEN_BY_OWNER_USERNAME, ownerUsername);
-        return tokensList;
+        return executeQueryStatement(GET_TOKEN_BY_OWNER_USERNAME, ownerUsername);
     }
 
     public boolean deleteAll() {

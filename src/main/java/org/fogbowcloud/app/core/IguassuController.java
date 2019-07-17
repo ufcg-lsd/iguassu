@@ -113,6 +113,10 @@ public class IguassuController {
         return this.jobDataStore.getByJobId(jobId, owner);
     }
 
+    public void updateUser(User user) {
+        this.authenticator.updateUser(user);
+    }
+
     public String submitJob(String jdfFilePath, User owner)
         throws CompilerException {
         LOGGER.debug("Submitting job of owner " + owner.getUserIdentification() + " to scheduler.");
@@ -151,7 +155,11 @@ public class IguassuController {
     }
 
     private void initMonitors() {
+        initJobStateMonitor();
+        initSessionMonitor();
+    }
 
+    private void initJobStateMonitor() {
         final long JOB_MONITOR_INITIAL_DELAY = 3000;
         final long JOB_MONITOR_EXECUTION_PERIOD = 5000;
 
@@ -159,7 +167,9 @@ public class IguassuController {
             new ArrebolJobSynchronizer(this.properties));
         executionMonitorTimer.scheduleAtFixedRate(jobStateMonitor, JOB_MONITOR_INITIAL_DELAY,
             JOB_MONITOR_EXECUTION_PERIOD);
+    }
 
+    private void initSessionMonitor() {
         final long SESSION_MONITOR_INITIAL_DELAY = 3000;
         final long SESSION_MONITOR_EXECUTION_PERIOD = 3600000;
 

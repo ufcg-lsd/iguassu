@@ -1,35 +1,28 @@
 package org.fogbowcloud.app.core.datastore;
 
 import com.google.gson.annotations.SerializedName;
+import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.Objects;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.OAuthPropertiesKeys;
 import org.json.JSONObject;
 
-import java.sql.Date;
-import java.sql.Timestamp;
-
 public class OAuthToken {
 
+    private static final long INITIAL_VERSION = 0L;
+    private static final Logger LOGGER = Logger.getLogger(OAuthToken.class);
     @SerializedName(OAuthPropertiesKeys.TOKEN_VERSION_JSON_KEY)
     private long version;
-
     @SerializedName(OAuthPropertiesKeys.ACCESS_TOKEN_JSON_KEY)
     private String accessToken;
-
     @SerializedName(OAuthPropertiesKeys.REFRESH_TOKEN_JSON_KEY)
     private String refreshToken;
-
     @SerializedName(OAuthPropertiesKeys.USER_ID_JSON_KEY)
     private String userId;
-
     @SerializedName(OAuthPropertiesKeys.EXPIRES_IN_JSON_KEY)
     private int expirationTime;
-
     private Date expirationDate;
-    private static final long INITIAL_VERSION = 0L;
-
-    private static final Logger LOGGER = Logger.getLogger(OAuthToken.class);
 
     public OAuthToken() {
     }
@@ -110,6 +103,11 @@ public class OAuthToken {
         this.expirationDate = new Date(stamp.getTime() + expiresInMillisecond);
     }
 
+    public void setExpirationDate(Date expirationDate) {
+
+        this.expirationDate = expirationDate;
+    }
+
     public int getExpirationTime() {
         return expirationTime;
     }
@@ -121,11 +119,6 @@ public class OAuthToken {
     public void updateExpirationDate() {
         Timestamp stamp = new Timestamp(System.currentTimeMillis() + (this.expirationTime * 1000));
         this.expirationDate = new Date(stamp.getTime());
-    }
-
-    public void setExpirationDate(Date expirationDate) {
-
-        this.expirationDate = expirationDate;
     }
 
     public long getVersion() {

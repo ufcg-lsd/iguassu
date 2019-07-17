@@ -56,6 +56,24 @@ public class CommonAuthenticator implements IguassuAuthenticator {
     }
 
     @Override
+    public void updateUser(User currentUser) {
+        User outdatedUser = UserImpl
+            .fromJSON(new JSONObject(this.userList.get(currentUser.getUserIdentification())));
+
+        if (!outdatedUser.equals(currentUser)) {
+            LOGGER.debug(
+                "Updating user: " + this.userList.remove(currentUser.getUserIdentification()));
+            this.userList
+                .put(currentUser.getUserIdentification(), UserImpl.toJSON(currentUser).toString());
+            this.usersDB.commit();
+            LOGGER.debug("User updated: " + this.userList.get(currentUser.getUserIdentification()));
+        } else {
+            LOGGER.debug("User has no changes.");
+        }
+
+    }
+
+    @Override
     public User getUserByUsername(String userId) {
         User user = null;
         String userJSONString = this.userList.get(userId);
@@ -71,6 +89,7 @@ public class CommonAuthenticator implements IguassuAuthenticator {
         }
         return user;
     }
+
 
 }
 

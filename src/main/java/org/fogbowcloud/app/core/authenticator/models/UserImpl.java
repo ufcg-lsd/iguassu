@@ -1,6 +1,7 @@
 package org.fogbowcloud.app.core.authenticator.models;
 
 import java.time.Instant;
+import java.util.Objects;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -58,6 +59,10 @@ public class UserImpl implements User {
 		this.iguassuToken = iguassuToken;
 	}
 
+	public void setSessionTime(long sessionTime) {
+		this.sessionTime = sessionTime;
+	}
+
 	public JSONObject toJSON() throws JSONException {
 		JSONObject user = new JSONObject();
 		user.put(USER_ID_JSON_KEY, this.userId);
@@ -67,11 +72,40 @@ public class UserImpl implements User {
 		return user;
 	}
 
+	public static JSONObject toJSON(User user) throws JSONException {
+		JSONObject userJson = new JSONObject();
+		userJson.put(USER_ID_JSON_KEY, user.getUserIdentification());
+		userJson.put(IGUASSU_TOKEN_JSON_KEY, user.getIguassuToken());
+		userJson.put(ACTIVE_JSON_KEY, user.isActive());
+		userJson.put(SESSION_TIME_JSON_KEY, user.getSessionTime());
+		return userJson;
+	}
+
 	public static User fromJSON(JSONObject userJSON) {
 		UserImpl user = new UserImpl(userJSON.optString(USER_ID_JSON_KEY),
 			userJSON.optString(IGUASSU_TOKEN_JSON_KEY));
 		user.setActive(userJSON.optBoolean(ACTIVE_JSON_KEY));
-		user.sessionTime = userJSON.optLong(SESSION_TIME_JSON_KEY);
+		user.setSessionTime(userJSON.optLong(SESSION_TIME_JSON_KEY));
 		return user;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) {
+			return true;
+		}
+		if (o == null || getClass() != o.getClass()) {
+			return false;
+		}
+		UserImpl user = (UserImpl) o;
+		return active == user.active &&
+			sessionTime == user.sessionTime &&
+			userId.equals(user.userId) &&
+			iguassuToken.equals(user.iguassuToken);
+	}
+
+	@Override
+	public int hashCode() {
+		return Objects.hash(userId, iguassuToken, active, sessionTime);
 	}
 }
