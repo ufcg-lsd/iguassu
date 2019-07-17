@@ -24,7 +24,7 @@ public class SessionMonitor implements Runnable {
     public void run() {
         final long now = Instant.now().getEpochSecond();
         LOGGER.debug("Starting verification of user sessions at time: " + now);
-        final long oneHourInSeconds = 60;
+        final long oneHourInSeconds = 3600;
         for (final OAuthToken token : oAuthTokenDataStore.getAll()) {
             final User currentUser = Objects
                 .requireNonNull(this.authenticator.getUserByUsername(token.getUserId()));

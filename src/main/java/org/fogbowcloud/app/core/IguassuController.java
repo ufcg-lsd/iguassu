@@ -155,7 +155,11 @@ public class IguassuController {
     }
 
     private void initMonitors() {
+        initJobStateMonitor();
+        initSessionMonitor();
+    }
 
+    private void initJobStateMonitor() {
         final long JOB_MONITOR_INITIAL_DELAY = 3000;
         final long JOB_MONITOR_EXECUTION_PERIOD = 5000;
 
@@ -163,15 +167,16 @@ public class IguassuController {
             new ArrebolJobSynchronizer(this.properties));
         executionMonitorTimer.scheduleAtFixedRate(jobStateMonitor, JOB_MONITOR_INITIAL_DELAY,
             JOB_MONITOR_EXECUTION_PERIOD);
+    }
 
+    private void initSessionMonitor() {
         final long SESSION_MONITOR_INITIAL_DELAY = 3000;
         final long SESSION_MONITOR_EXECUTION_PERIOD = 3600000;
-        final long SESSION_MONITOR_EXECUTION_PERIOD_TEST = 20000;
 
         SessionMonitor sessionMonitor = new SessionMonitor(this.oAuthTokenDataStore,
             this.authenticator);
         sessionMonitorTime.scheduleAtFixedRate(sessionMonitor, SESSION_MONITOR_INITIAL_DELAY,
-            SESSION_MONITOR_EXECUTION_PERIOD_TEST);
+            SESSION_MONITOR_EXECUTION_PERIOD);
     }
 
     private JobSpecification compile(String jobId, String jdfFilePath) throws CompilerException {
