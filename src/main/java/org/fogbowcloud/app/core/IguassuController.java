@@ -113,6 +113,10 @@ public class IguassuController {
         return this.jobDataStore.getByJobId(jobId, owner);
     }
 
+    public void updateUser(User user) {
+        this.authenticator.updateUser(user);
+    }
+
     public String submitJob(String jdfFilePath, User owner)
         throws CompilerException {
         LOGGER.debug("Submitting job of owner " + owner.getUserIdentification() + " to scheduler.");
@@ -162,11 +166,12 @@ public class IguassuController {
 
         final long SESSION_MONITOR_INITIAL_DELAY = 3000;
         final long SESSION_MONITOR_EXECUTION_PERIOD = 3600000;
+        final long SESSION_MONITOR_EXECUTION_PERIOD_TEST = 20000;
 
         SessionMonitor sessionMonitor = new SessionMonitor(this.oAuthTokenDataStore,
             this.authenticator);
         sessionMonitorTime.scheduleAtFixedRate(sessionMonitor, SESSION_MONITOR_INITIAL_DELAY,
-            SESSION_MONITOR_EXECUTION_PERIOD);
+            SESSION_MONITOR_EXECUTION_PERIOD_TEST);
     }
 
     private JobSpecification compile(String jobId, String jdfFilePath) throws CompilerException {

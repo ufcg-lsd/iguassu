@@ -11,4 +11,6 @@ public interface IguassuAuthenticator {
     User addUser(String userId, String secretKey);
 
     User getUserByUsername(String userId);
+
+    void updateUser(User currentUser);
 }

@@ -57,6 +57,10 @@ public class IguassuFacade {
         iguassuController.addUser(userId, iguassuToken);
     }
 
+    public void updateUser(User user) {
+        iguassuController.updateUser(user);
+    }
+
     public void storeOAuthToken(OAuthToken oAuthToken) {
         iguassuController.storeOAuthToken(oAuthToken);
     }
