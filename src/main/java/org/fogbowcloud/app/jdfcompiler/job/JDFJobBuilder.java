@@ -227,44 +227,47 @@ public class JDFJobBuilder {
         String userName, String token, Long tokenVersion, String rawCommand) {
         String fileDriverHostIp = this.properties
             .getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_HOST_URL);
-        String requestTokenCommand = this.getRefreshTokenCommand(userName, tokenVersion);
+        String requestRefreshedTokenCommand = this.getRefreshTokenCommand(userName, tokenVersion);
         String uploadCommand =
             " http_code=$(curl --write-out %{http_code} -X PUT --header \"Authorization:Bearer \"$token "
                 + " --data-binary @" + localFilePath + " --silent --output /dev/null "
                 + "$server/remote.php/webdav/" + filePathToUpload + "); ";
 
-        String scpCommand = "server=" + fileDriverHostIp + "; "
+        String commandIO = "server=" + fileDriverHostIp + "; "
             + "token=" + token + "; "
             + uploadCommand
-            + " if [ $http_code == " + HttpStatus.UNAUTHORIZED.toString() + " ] ; then "
+            + " while [ $http_code == " + HttpStatus.UNAUTHORIZED.toString() + " ] ; do "
             + "userId=" + userName + "; " + "tokenVersion=" + tokenVersion.toString() + "; "
-            + "token=$(" + requestTokenCommand + "); "
-            + uploadCommand + " fi";
+            + "token=$(" + requestRefreshedTokenCommand + "); "
+            + uploadCommand
+            + " done";
 
-        return new Command(scpCommand, rawCommand);
+        return new Command(commandIO, rawCommand);
     }
 
     private Command downloadFileCommands(String localFilePath, String filePathToDownload,
-        String userName, String token, Long tokenVersion, String rawCommand) {
+        String userId, String token, Long tokenVersion, String rawCommand) {
         String fileDriverHostIp = this.properties
             .getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_HOST_URL);
-        String requestTokenCommand = this.getRefreshTokenCommand(userName, tokenVersion);
+        String requestRefreshedTokenCommand = this.getRefreshTokenCommand(userId, tokenVersion);
         String downloadCommand =
             " full_response=$(curl --write-out %{http_code} --header \"Authorization:Bearer \"$token"
                 + " $server/remote.php/webdav/" + filePathToDownload
                 + " --silent --output " + localFilePath + " /dev/null); ";
         String extractHttpStatusCode = "http_code=${full_response:0:3}; ";
 
-        String scpCommand = "server=" + fileDriverHostIp + "; "
+        String commandIO = "server=" + fileDriverHostIp + "; "
             + "token=" + token + "; "
             + downloadCommand
             + extractHttpStatusCode
-            + " if [ $http_code == " + HttpStatus.UNAUTHORIZED.toString() + " ] ; then "
-            + "userId=" + userName + "; " + "tokenVersion=" + tokenVersion.toString() + "; "
-            + "token=$(" + requestTokenCommand + "); "
-            + downloadCommand + " fi";
+            + " while [ $http_code == " + HttpStatus.UNAUTHORIZED.toString() + " ] ; do "
+            + "userId=" + userId + "; " + "tokenVersion=" + tokenVersion.toString() + "; "
+            + "token=$(" + requestRefreshedTokenCommand + "); "
+            + downloadCommand
+            + extractHttpStatusCode
+            + " done";
 
-        return new Command(scpCommand, rawCommand);
+        return new Command(commandIO, rawCommand);
     }
 
     private String getRefreshTokenCommand(String userId, Long tokenVersion) {
