@@ -2,6 +2,7 @@ package org.fogbowcloud.app.core;
 
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
@@ -19,6 +20,7 @@ import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.core.exceptions.IguassuException;
 import org.fogbowcloud.app.core.monitor.JobStateMonitor;
+import org.fogbowcloud.app.core.monitor.JobSubmissionMonitor;
 import org.fogbowcloud.app.core.monitor.SessionMonitor;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.external.ExternalOAuthConstants;
@@ -43,7 +45,9 @@ public class IguassuController {
 
     private static ManagerTimer executionMonitorTimer = new ManagerTimer(
         Executors.newScheduledThreadPool(1));
-    private static ManagerTimer sessionMonitorTime = new ManagerTimer(
+    private static ManagerTimer sessionMonitorTimer = new ManagerTimer(
+        Executors.newScheduledThreadPool(1));
+    private static ManagerTimer submissionMonitorTimer = new ManagerTimer(
         Executors.newScheduledThreadPool(1));
 
     private final Properties properties;
@@ -53,6 +57,7 @@ public class IguassuController {
     private JobDataStore jobDataStore;
     private OAuthTokenDataStore oAuthTokenDataStore;
     private JDFJobBuilder jobBuilder;
+    private List<JDFJob> jobsToSubmit;
 
     @Autowired
     private AuthService authService;
@@ -62,6 +67,7 @@ public class IguassuController {
         this.properties = properties;
         this.authenticator = new CommonAuthenticator();
         this.jobExecutionSystem = new ArrebolJobExecutionSystem(this.properties);
+        this.jobsToSubmit = new LinkedList<>();
     }
 
     private static String requiredPropertyMessage(String property) {
@@ -122,13 +128,7 @@ public class IguassuController {
         LOGGER.debug("Submitting job of owner " + owner.getUserIdentification() + " to scheduler.");
 
         JDFJob job = buildJob(jdfFilePath, owner);
-
-        String joIdArrebol = this.jobExecutionSystem.execute(job);
-        job.setJobIdArrebol(joIdArrebol);
-
-        LOGGER.info(
-            "Iguassu Job [" + job.getId() + "] has arrebol id: [" + job.getJobIdArrebol() + "]");
-
+        this.jobsToSubmit.add(job);
         this.jobDataStore.insert(job);
 
         return job.getId();
@@ -157,6 +157,7 @@ public class IguassuController {
     private void initMonitors() {
         initJobStateMonitor();
         initSessionMonitor();
+        initJobSubmissionMonitor();
     }
 
     private void initJobStateMonitor() {
@@ -175,8 +176,19 @@ public class IguassuController {
 
         SessionMonitor sessionMonitor = new SessionMonitor(this.oAuthTokenDataStore,
             this.authenticator);
-        sessionMonitorTime.scheduleAtFixedRate(sessionMonitor, SESSION_MONITOR_INITIAL_DELAY,
+        sessionMonitorTimer.scheduleAtFixedRate(sessionMonitor, SESSION_MONITOR_INITIAL_DELAY,
             SESSION_MONITOR_EXECUTION_PERIOD);
+    }
+
+    private void initJobSubmissionMonitor() {
+        final long SUBMISSION_MONITOR_INITIAL_DELAY = 3000;
+        final long SUBMISSION_MONITOR_EXECUTION_PERIOD = 30000; // 30 seg
+
+        JobSubmissionMonitor jobSubmissionMonitor = new JobSubmissionMonitor(this.jobDataStore,
+            this.jobExecutionSystem, this.jobsToSubmit);
+        submissionMonitorTimer
+            .scheduleAtFixedRate(jobSubmissionMonitor, SUBMISSION_MONITOR_INITIAL_DELAY,
+                SUBMISSION_MONITOR_EXECUTION_PERIOD);
     }
 
     private JobSpecification compile(String jobId, String jdfFilePath) throws CompilerException {

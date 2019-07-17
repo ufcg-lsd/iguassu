@@ -3,6 +3,7 @@ package org.fogbowcloud.app.jes.arrebol;
 import com.google.gson.Gson;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.command.Command;
@@ -34,7 +35,7 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
     public JDFJob synchronizeJob(JDFJob job) {
         try {
             String arrebolJobId = job.getJobIdArrebol();
-            if (arrebolJobId != null) {
+            if (Objects.nonNull(arrebolJobId) && !arrebolJobId.trim().isEmpty()) {
                 String arrebolJobJson = this.requestsHelper.getJobJSON(arrebolJobId);
                 LOGGER.debug("JSON Response [" + arrebolJobJson + "]");
 

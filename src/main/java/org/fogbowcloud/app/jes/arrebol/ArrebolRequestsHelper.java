@@ -9,12 +9,14 @@ import java.util.Objects;
 import java.util.Properties;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
 import org.fogbowcloud.app.core.dto.arrebol.ArrebolJobDTO;
 import org.fogbowcloud.app.core.http.HttpWrapper;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
+import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 import org.fogbowcloud.app.jes.exceptions.GetJobException;
 import org.fogbowcloud.app.jes.exceptions.SubmitJobException;
 
@@ -31,13 +33,13 @@ public class ArrebolRequestsHelper {
         this.gson = new Gson();
     }
 
-    public String submitJobToExecution(JDFJob job) throws Exception, SubmitJobException {
+    public String submitJobToExecution(JDFJob job) throws UnsupportedEncodingException, SubmitJobException, ArrebolConnectException {
         StringEntity requestBody;
 
         try {
             requestBody = makeJSONBody(job);
         } catch (UnsupportedEncodingException e) {
-            throw new Exception(
+            throw new UnsupportedEncodingException(
                 "Job with id [" + job.getId() + "] is not well formed to built JSON.");
         }
 
@@ -55,9 +57,11 @@ public class ArrebolRequestsHelper {
             jobIdArrebol = jobResponse.get(JSON_KEY_JOB_ID_ARREBOL).getAsString();
 
             LOGGER.info("Job [" + job.getId() + "] was submitted with success to Arrebol.");
-
+        } catch (HttpHostConnectException e) {
+            throw new ArrebolConnectException("Failed connect to Arrebol: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new SubmitJobException("Submit Job to Arrebol has status FAILED: " + e.getMessage(), e);
+            throw new SubmitJobException(
+                "Submit Job to Arrebol has status FAILED: " + e.getMessage(), e);
         }
 
         return Objects.requireNonNull(jobIdArrebol);
