@@ -208,11 +208,10 @@ public class AuthService {
                 } else {
                     iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
                     this.iguassuFacade.addUser(oAuthToken.getUserId(), iguassuToken);
-                    this.iguassuFacade.storeOAuthToken(oAuthToken);
                     LOGGER.info(
                         "OAuth2 tokens for the user " + oAuthToken.getUserId() + " was stored.");
                 }
-
+                this.storeNewToken(oAuthToken);
                 return new AuthDTO(oAuthToken.getUserId(), iguassuToken);
             } else {
                 throw new Exception("You can't use the same authorization code twice.");
@@ -224,17 +223,9 @@ public class AuthService {
     }
 
     private void storeNewToken(OAuthToken oAuthToken) {
-        final int maxTokenQntd = 1;
-        final List<OAuthToken> allTokens = this.iguassuFacade.getAllOAuthTokens();
-
-        if (allTokens.size() > maxTokenQntd) {
-            for (OAuthToken token : allTokens) {
-                if (token.getUserId().equalsIgnoreCase(oAuthToken.getUserId())) {
-                    this.iguassuFacade.deleteOAuthToken(token);
-                }
-            }
-        }
-
+        OAuthToken token = this.iguassuFacade.getCurrentTokenByUserId(oAuthToken.getUserId());
+        oAuthToken.setVersion(token.getVersion());
+        this.iguassuFacade.deleteOAuthToken(token);
         this.iguassuFacade.storeOAuthToken(oAuthToken);
     }
 
