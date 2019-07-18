@@ -3,6 +3,7 @@ package org.fogbowcloud.app.jes.arrebol;
 import com.google.gson.Gson;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.command.Command;
@@ -34,15 +35,18 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
     public JDFJob synchronizeJob(JDFJob job) {
         try {
             String arrebolJobId = job.getJobIdArrebol();
-            if (arrebolJobId != null) {
-                String arrebolJobJson = this.requestsHelper.getJobJSON(arrebolJobId);
-                LOGGER.debug("JSON Response [" + arrebolJobJson + "]");
-
-                Gson gson = new Gson();
-                ArrebolJob arrebolJob = gson.fromJson(arrebolJobJson, ArrebolJob.class);
-                this.updateJob(job, arrebolJob);
+            if (Objects.nonNull(arrebolJobId) && !arrebolJobId.trim().isEmpty()) {
+                try {
+                    String arrebolJobJson = this.requestsHelper.getJobJSON(arrebolJobId);
+                    LOGGER.debug("JSON Response [" + arrebolJobJson + "]");
+                    Gson gson = new Gson();
+                    ArrebolJob arrebolJob = gson.fromJson(arrebolJobJson, ArrebolJob.class);
+                    this.updateJob(job, arrebolJob);
+                } catch (Exception e) {
+                    LOGGER.error(e.getMessage());
+                }
             } else {
-                LOGGER.info("ArrebolJobId from Job [" + job.getId() + "] is null.");
+                LOGGER.debug("ArrebolJobId from Job [" + job.getId() + "] is null.");
             }
         } catch (GetJobException e) {
             LOGGER.error(e.getMessage(), e);
