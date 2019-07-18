@@ -7,10 +7,8 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.UUID;
-import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.core.authenticator.CommonAuthenticator;
@@ -29,12 +27,13 @@ import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.external.ExternalOAuthConstants;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJobBuilder;
+import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
-import org.fogbowcloud.app.jes.JobExecutionSystem;
-import org.fogbowcloud.app.jes.arrebol.ArrebolJobExecutionSystem;
+import org.fogbowcloud.app.jes.JobExecutionService;
+import org.fogbowcloud.app.jes.arrebol.ArrebolJobExecutionService;
 import org.fogbowcloud.app.jes.arrebol.ArrebolJobSynchronizer;
 import org.fogbowcloud.app.utils.JDFUtil;
 import org.fogbowcloud.app.utils.ManagerTimer;
@@ -55,7 +54,7 @@ public class IguassuController {
 
     private final Properties properties;
     private final IguassuAuthenticator authenticator;
-    private final JobExecutionSystem jobExecutionSystem;
+    private final JobExecutionService jobExecutionSystem;
     private List<Integer> nonces;
     private JobDataStore jobDataStore;
     private OAuthTokenDataStore oAuthTokenDataStore;
@@ -69,7 +68,7 @@ public class IguassuController {
         validateProperties(properties);
         this.properties = properties;
         this.authenticator = new CommonAuthenticator();
-        this.jobExecutionSystem = new ArrebolJobExecutionSystem(this.properties);
+        this.jobExecutionSystem = new ArrebolJobExecutionService(this.properties);
         this.jobsBuffer = new ConcurrentLinkedQueue<>();  // thread safe structure, capacity 2^31-1
     }
 
@@ -127,11 +126,13 @@ public class IguassuController {
     }
 
     public String submitJob(String jdfFilePath, User user)
-        throws CompilerException, InterruptedException {
+        throws CompilerException {
         LOGGER.debug("Adding job of user " + user.getUserIdentification() + " to buffer.");
 
         JDFJob job = buildJob(jdfFilePath, user);
         this.jobsBuffer.offer(job);
+        job.setState(JDFJobState.WAITING);
+
         this.jobDataStore.insert(job);
 
         return job.getId();

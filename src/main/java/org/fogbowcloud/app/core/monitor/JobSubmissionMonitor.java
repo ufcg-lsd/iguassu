@@ -6,18 +6,18 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
-import org.fogbowcloud.app.jes.JobExecutionSystem;
+import org.fogbowcloud.app.jes.JobExecutionService;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 
 public class JobSubmissionMonitor implements Runnable {
 
     private static final Logger LOGGER = Logger.getLogger(JobSubmissionMonitor.class);
     private JobDataStore jobDataStore;
-    private JobExecutionSystem jobExecutionSystem;
+    private JobExecutionService jobExecutionSystem;
     private Queue<JDFJob> jobsBuffer;
 
     public JobSubmissionMonitor(JobDataStore jobDataStore,
-        JobExecutionSystem jobExecutionSystem,
+        JobExecutionService jobExecutionSystem,
         Queue<JDFJob> jobsBuffer) {
         this.jobDataStore = jobDataStore;
         this.jobExecutionSystem = jobExecutionSystem;
@@ -31,20 +31,21 @@ public class JobSubmissionMonitor implements Runnable {
         if (Objects.nonNull(job)) {
             LOGGER.debug("Job found! Starting job submission with id [" + job.getId() + "]");
             try {
-                final String arrebolId = jobExecutionSystem.execute(job);
+                final String arrebolId = this.jobExecutionSystem.execute(job);
                 job.setJobIdArrebol(arrebolId);
-                jobDataStore.update(job);
-                jobsBuffer.poll();
+                job.setState(JDFJobState.SUBMITTED);
+                this.jobDataStore.update(job);
+                this.jobsBuffer.poll();
                 LOGGER.info(
                     "Iguassu Job [" + job.getId() + "] has arrebol id: [" + job.getJobIdArrebol()
                         + "]");
 
             } catch (ArrebolConnectException ace) {
-                LOGGER.error(ace.getMessage(), ace);
+                LOGGER.error("Job execution service is not available right now.");
             } catch (Exception e) {
                 job.setState(JDFJobState.FAILED);
-                jobDataStore.update(job);
-                jobsBuffer.poll();
+                this.jobDataStore.update(job);
+                this.jobsBuffer.poll();
                 LOGGER.error("Error submitting job with id: [" + job.getId()
                     + "]. Maybe the Job is poorly formed.", e);
             }

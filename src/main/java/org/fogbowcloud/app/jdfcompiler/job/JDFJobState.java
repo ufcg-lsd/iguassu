@@ -6,7 +6,8 @@ public enum JDFJobState {
     FAILED("Failed"),
     CREATED("Created"),
     FINISHED("Finished"),
-    RUNNING("Running");
+    RUNNING("Running"),
+    WAITING("Waiting");
 
     private String desc;
 
