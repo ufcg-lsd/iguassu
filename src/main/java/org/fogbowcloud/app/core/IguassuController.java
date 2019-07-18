@@ -2,12 +2,15 @@ package org.fogbowcloud.app.core;
 
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
+import java.util.Queue;
 import java.util.UUID;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.core.authenticator.CommonAuthenticator;
@@ -57,7 +60,7 @@ public class IguassuController {
     private JobDataStore jobDataStore;
     private OAuthTokenDataStore oAuthTokenDataStore;
     private JDFJobBuilder jobBuilder;
-    private List<JDFJob> jobsToSubmit;
+    private Queue<JDFJob> jobsBuffer;
 
     @Autowired
     private AuthService authService;
@@ -67,7 +70,7 @@ public class IguassuController {
         this.properties = properties;
         this.authenticator = new CommonAuthenticator();
         this.jobExecutionSystem = new ArrebolJobExecutionSystem(this.properties);
-        this.jobsToSubmit = new LinkedList<>();
+        this.jobsBuffer = new ConcurrentLinkedQueue<>();  // thread safe structure, capacity 2^31-1
     }
 
     private static String requiredPropertyMessage(String property) {
@@ -123,21 +126,24 @@ public class IguassuController {
         this.authenticator.updateUser(user);
     }
 
-    public String submitJob(String jdfFilePath, User owner)
-        throws CompilerException {
-        LOGGER.debug("Submitting job of owner " + owner.getUserIdentification() + " to scheduler.");
+    public String submitJob(String jdfFilePath, User user)
+        throws CompilerException, InterruptedException {
+        LOGGER.debug("Adding job of user " + user.getUserIdentification() + " to buffer.");
 
-        JDFJob job = buildJob(jdfFilePath, owner);
-        this.jobsToSubmit.add(job);
+        JDFJob job = buildJob(jdfFilePath, user);
+        this.jobsBuffer.offer(job);
         this.jobDataStore.insert(job);
 
         return job.getId();
     }
 
-    public JDFJob buildJob(String jdfFilePath, User owner) throws CompilerException {
-        String userIdentification = owner.getUserIdentification();
-        JDFJob job = new JDFJob(owner.getUserIdentification(), new ArrayList<>(),
+    public JDFJob buildJob(String jdfFilePath, User user) throws CompilerException {
+
+        String userIdentification = user.getUserIdentification();
+        JDFJob job = new JDFJob(user.getUserIdentification(), new ArrayList<>(),
             userIdentification);
+
+        LOGGER.debug("Building job " + job.getId() + " of user " + user.getUserIdentification());
         JobSpecification jobSpec = compile(job.getId(), jdfFilePath);
         JDFUtil.removeEmptySpaceFromVariables(jobSpec);
         OAuthToken oAuthToken = null;
@@ -152,74 +158,6 @@ public class IguassuController {
 
         return buildJobFromJDFFile(job, jdfFilePath, jobSpec, userIdentification,
             Objects.requireNonNull(oAuthToken).getAccessToken(), oAuthToken.getVersion());
-    }
-
-    private void initMonitors() {
-        initJobStateMonitor();
-        initSessionMonitor();
-        initJobSubmissionMonitor();
-    }
-
-    private void initJobStateMonitor() {
-        final long JOB_MONITOR_INITIAL_DELAY = 3000;
-        final long JOB_MONITOR_EXECUTION_PERIOD = 5000;
-
-        JobStateMonitor jobStateMonitor = new JobStateMonitor(this.jobDataStore,
-            new ArrebolJobSynchronizer(this.properties));
-        executionMonitorTimer.scheduleAtFixedRate(jobStateMonitor, JOB_MONITOR_INITIAL_DELAY,
-            JOB_MONITOR_EXECUTION_PERIOD);
-    }
-
-    private void initSessionMonitor() {
-        final long SESSION_MONITOR_INITIAL_DELAY = 3000;
-        final long SESSION_MONITOR_EXECUTION_PERIOD = 3600000;
-
-        SessionMonitor sessionMonitor = new SessionMonitor(this.oAuthTokenDataStore,
-            this.authenticator);
-        sessionMonitorTimer.scheduleAtFixedRate(sessionMonitor, SESSION_MONITOR_INITIAL_DELAY,
-            SESSION_MONITOR_EXECUTION_PERIOD);
-    }
-
-    private void initJobSubmissionMonitor() {
-        final long SUBMISSION_MONITOR_INITIAL_DELAY = 3000;
-        final long SUBMISSION_MONITOR_EXECUTION_PERIOD = 30000; // 30 seg
-
-        JobSubmissionMonitor jobSubmissionMonitor = new JobSubmissionMonitor(this.jobDataStore,
-            this.jobExecutionSystem, this.jobsToSubmit);
-        submissionMonitorTimer
-            .scheduleAtFixedRate(jobSubmissionMonitor, SUBMISSION_MONITOR_INITIAL_DELAY,
-                SUBMISSION_MONITOR_EXECUTION_PERIOD);
-    }
-
-    private JobSpecification compile(String jobId, String jdfFilePath) throws CompilerException {
-        CommonCompiler commonCompiler = new CommonCompiler();
-        LOGGER
-            .debug("Job " + jobId + " compilation started at time: " + System.currentTimeMillis());
-        commonCompiler.compile(jdfFilePath, FileType.JDF);
-        LOGGER.debug("Job " + jobId + " compilation ended at time: " + System.currentTimeMillis());
-        return (JobSpecification) commonCompiler.getResult().get(0);
-    }
-
-    private JDFJob buildJobFromJDFFile(JDFJob job, String jdfFilePath, JobSpecification jobSpec,
-        String userName,
-        String externalOAuthToken, Long tokenVersion) {
-        try {
-            this.jobBuilder.createJobFromJDFFile(job, jdfFilePath, jobSpec,
-                userName, externalOAuthToken, tokenVersion);
-
-            LOGGER.info("Job [" + job.getId() + "] was built with success at time: " + System
-                .currentTimeMillis());
-
-            job.finishCreation();
-
-        } catch (Exception e) {
-
-            LOGGER.error("Failed to build [" + job.getId() + "] : at time: " +
-                System.currentTimeMillis(), e);
-            job.failCreation();
-        }
-
-        return job;
     }
 
     public ArrayList<JDFJob> getAllJobs(String owner) {
@@ -315,16 +253,8 @@ public class IguassuController {
         this.jobDataStore = dataStore;
     }
 
-    private void validateProperties(Properties properties) throws IguassuException {
-        if (properties == null) {
-            throw new IllegalArgumentException("Properties cannot be null.");
-        } else if (!checkProperties(properties)) {
-            throw new IguassuException("Error while initializing Iguassu Controller.");
-        }
-    }
-
-    public boolean storeOAuthToken(OAuthToken oAuthToken) {
-        return this.oAuthTokenDataStore.insert(oAuthToken);
+    public void storeOAuthToken(OAuthToken oAuthToken) {
+        this.oAuthTokenDataStore.insert(oAuthToken);
     }
 
     public List<OAuthToken> getAllOAuthTokens() {
@@ -343,7 +273,84 @@ public class IguassuController {
         return oAuthToken;
     }
 
-    public boolean deleteOAuthToken(OAuthToken oAuthToken) {
-        return this.oAuthTokenDataStore.deleteByAccessToken(oAuthToken.getAccessToken());
+    public void deleteOAuthToken(OAuthToken oAuthToken) {
+        this.oAuthTokenDataStore.deleteByAccessToken(oAuthToken.getAccessToken());
     }
+
+    private void initMonitors() {
+        initJobStateMonitor();
+        initSessionMonitor();
+        initJobSubmissionMonitor();
+    }
+
+    private void initJobStateMonitor() {
+        final long JOB_MONITOR_INITIAL_DELAY = 3000;
+        final long JOB_MONITOR_EXECUTION_PERIOD = 5000;
+
+        JobStateMonitor jobStateMonitor = new JobStateMonitor(this.jobDataStore,
+            new ArrebolJobSynchronizer(this.properties));
+        executionMonitorTimer.scheduleAtFixedRate(jobStateMonitor, JOB_MONITOR_INITIAL_DELAY,
+            JOB_MONITOR_EXECUTION_PERIOD);
+    }
+
+    private void initSessionMonitor() {
+        final long SESSION_MONITOR_INITIAL_DELAY = 3000;
+        final long SESSION_MONITOR_EXECUTION_PERIOD = 3600000; // 1 hour
+
+        SessionMonitor sessionMonitor = new SessionMonitor(this.oAuthTokenDataStore,
+            this.authenticator);
+        sessionMonitorTimer.scheduleAtFixedRate(sessionMonitor, SESSION_MONITOR_INITIAL_DELAY,
+            SESSION_MONITOR_EXECUTION_PERIOD);
+    }
+
+    private void initJobSubmissionMonitor() {
+        final long SUBMISSION_MONITOR_INITIAL_DELAY = 3000;
+        final long SUBMISSION_MONITOR_EXECUTION_PERIOD = 5000;
+
+        JobSubmissionMonitor jobSubmissionMonitor = new JobSubmissionMonitor(this.jobDataStore,
+            this.jobExecutionSystem, this.jobsBuffer);
+        submissionMonitorTimer
+            .scheduleAtFixedRate(jobSubmissionMonitor, SUBMISSION_MONITOR_INITIAL_DELAY,
+                SUBMISSION_MONITOR_EXECUTION_PERIOD);
+    }
+
+    private JobSpecification compile(String jobId, String jdfFilePath) throws CompilerException {
+        CommonCompiler commonCompiler = new CommonCompiler();
+        LOGGER
+            .debug("Job " + jobId + " compilation started at time: " + System.currentTimeMillis());
+        commonCompiler.compile(jdfFilePath, FileType.JDF);
+        LOGGER.debug("Job " + jobId + " compilation ended at time: " + System.currentTimeMillis());
+        return (JobSpecification) commonCompiler.getResult().get(0);
+    }
+
+    private JDFJob buildJobFromJDFFile(JDFJob job, String jdfFilePath, JobSpecification jobSpec,
+        String userName,
+        String externalOAuthToken, Long tokenVersion) {
+        try {
+            this.jobBuilder.createJobFromJDFFile(job, jdfFilePath, jobSpec,
+                userName, externalOAuthToken, tokenVersion);
+
+            LOGGER.info("Job [" + job.getId() + "] was built with success at time: " + System
+                .currentTimeMillis());
+
+            job.finishCreation();
+
+        } catch (Exception e) {
+
+            LOGGER.error("Failed to build [" + job.getId() + "] : at time: " +
+                System.currentTimeMillis(), e);
+            job.failCreation();
+        }
+
+        return job;
+    }
+
+    private void validateProperties(Properties properties) throws IguassuException {
+        if (properties == null) {
+            throw new IllegalArgumentException("Properties cannot be null.");
+        } else if (!checkProperties(properties)) {
+            throw new IguassuException("Error while initializing Iguassu Controller.");
+        }
+    }
+
 }

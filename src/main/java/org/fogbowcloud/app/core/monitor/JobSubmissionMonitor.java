@@ -1,6 +1,7 @@
 package org.fogbowcloud.app.core.monitor;
 
-import java.util.List;
+import java.util.Objects;
+import java.util.Queue;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
@@ -13,36 +14,42 @@ public class JobSubmissionMonitor implements Runnable {
     private static final Logger LOGGER = Logger.getLogger(JobSubmissionMonitor.class);
     private JobDataStore jobDataStore;
     private JobExecutionSystem jobExecutionSystem;
-    private List<JDFJob> jobsToSubmit;
+    private Queue<JDFJob> jobsBuffer;
 
     public JobSubmissionMonitor(JobDataStore jobDataStore,
         JobExecutionSystem jobExecutionSystem,
-        List<JDFJob> jobsToSubmit) {
+        Queue<JDFJob> jobsBuffer) {
         this.jobDataStore = jobDataStore;
         this.jobExecutionSystem = jobExecutionSystem;
-        this.jobsToSubmit = jobsToSubmit;
+        this.jobsBuffer = jobsBuffer;
     }
 
     @Override
     public void run() {
-        for (JDFJob job : jobsToSubmit) {
+        LOGGER.debug("Checking for jobs to be submitted.");
+        JDFJob job = this.jobsBuffer.peek();
+        if (Objects.nonNull(job)) {
+            LOGGER.debug("Job found! Starting job submission with id [" + job.getId() + "]");
             try {
-                String arrebolId = jobExecutionSystem.execute(job);
+                final String arrebolId = jobExecutionSystem.execute(job);
                 job.setJobIdArrebol(arrebolId);
                 jobDataStore.update(job);
-                jobsToSubmit.remove(job);
+                jobsBuffer.poll();
                 LOGGER.info(
                     "Iguassu Job [" + job.getId() + "] has arrebol id: [" + job.getJobIdArrebol()
                         + "]");
-            } catch (ArrebolConnectException ace){
+
+            } catch (ArrebolConnectException ace) {
                 LOGGER.error(ace.getMessage(), ace);
             } catch (Exception e) {
                 job.setState(JDFJobState.FAILED);
                 jobDataStore.update(job);
-                jobsToSubmit.remove(job);
-                LOGGER.error("Error while submitting job with id: [" + job.getId() + "]", e);
+                jobsBuffer.poll();
+                LOGGER.error("Error submitting job with id: [" + job.getId()
+                    + "]. Maybe the Job is poorly formed.", e);
             }
+        } else {
+            LOGGER.debug("Job submission buffer is empty.");
         }
     }
-
 }
