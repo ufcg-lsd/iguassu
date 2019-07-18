@@ -36,14 +36,17 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
         try {
             String arrebolJobId = job.getJobIdArrebol();
             if (Objects.nonNull(arrebolJobId) && !arrebolJobId.trim().isEmpty()) {
-                String arrebolJobJson = this.requestsHelper.getJobJSON(arrebolJobId);
-                LOGGER.debug("JSON Response [" + arrebolJobJson + "]");
-
-                Gson gson = new Gson();
-                ArrebolJob arrebolJob = gson.fromJson(arrebolJobJson, ArrebolJob.class);
-                this.updateJob(job, arrebolJob);
+                try {
+                    String arrebolJobJson = this.requestsHelper.getJobJSON(arrebolJobId);
+                    LOGGER.debug("JSON Response [" + arrebolJobJson + "]");
+                    Gson gson = new Gson();
+                    ArrebolJob arrebolJob = gson.fromJson(arrebolJobJson, ArrebolJob.class);
+                    this.updateJob(job, arrebolJob);
+                } catch (Exception e){
+                    LOGGER.error(e.getMessage());
+                }
             } else {
-                LOGGER.info("ArrebolJobId from Job [" + job.getId() + "] is null.");
+                LOGGER.debug("ArrebolJobId from Job [" + job.getId() + "] is null.");
             }
         } catch (GetJobException e) {
             LOGGER.error(e.getMessage(), e);

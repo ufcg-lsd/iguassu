@@ -1,8 +1,8 @@
 package org.fogbowcloud.app.jes.exceptions;
 
-public class GetJobException extends Throwable {
+public class GetJobException extends RuntimeException {
 
-    public GetJobException(String s, Exception e) {
-        super(s, e);
+    public GetJobException(String s) {
+        super(s);
     }
 }

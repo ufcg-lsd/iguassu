@@ -78,7 +78,7 @@ public class ArrebolRequestsHelper {
         try {
             jsonResponse = HttpWrapper.doRequest(HttpGet.METHOD_NAME, endpoint, null);
         } catch (Exception e) {
-            throw new GetJobException("Getting Job from Arrebol has FAILED: " + e.getMessage(), e);
+            throw new GetJobException("Getting Job from Arrebol has FAILED: " + e.getMessage());
         }
 
         return jsonResponse;
