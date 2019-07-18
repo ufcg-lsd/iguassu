@@ -24,7 +24,8 @@ public class JobStateMonitor implements Runnable {
         LOGGER.info("Running job state monitor.");
         List<JDFJob> jobs = jobDataStore.getAll()
             .stream()
-            .filter(j -> !(j.getState().equals(JDFJobState.FINISHED) || j.getState().equals(JDFJobState.FAILED)))
+            .filter(j -> !(j.getState().equals(JDFJobState.FINISHED) || j.getState()
+                .equals(JDFJobState.FAILED)))
             .collect(Collectors.toList());
         for (JDFJob job : jobs) {
             JDFJob jobUpdated = jobSynchronizer.synchronizeJob(job);

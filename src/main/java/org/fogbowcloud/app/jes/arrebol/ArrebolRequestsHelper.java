@@ -29,11 +29,13 @@ public class ArrebolRequestsHelper {
 
     public ArrebolRequestsHelper(Properties properties) {
         // TODO review this names
-        ARREBOL_BASE_URL = properties.getProperty(IguassuPropertiesConstants.ARREBOL_SERVICE_HOST_URL);
+        ARREBOL_BASE_URL = properties
+            .getProperty(IguassuPropertiesConstants.ARREBOL_SERVICE_HOST_URL);
         this.gson = new Gson();
     }
 
-    public String submitJobToExecution(JDFJob job) throws UnsupportedEncodingException, SubmitJobException, ArrebolConnectException {
+    public String submitJobToExecution(JDFJob job)
+        throws UnsupportedEncodingException, SubmitJobException, ArrebolConnectException {
         StringEntity requestBody;
 
         try {

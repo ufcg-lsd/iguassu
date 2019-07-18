@@ -42,7 +42,7 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
                     Gson gson = new Gson();
                     ArrebolJob arrebolJob = gson.fromJson(arrebolJobJson, ArrebolJob.class);
                     this.updateJob(job, arrebolJob);
-                } catch (Exception e){
+                } catch (Exception e) {
                     LOGGER.error(e.getMessage());
                 }
             } else {
