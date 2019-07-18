@@ -225,21 +225,24 @@ public class JDFJobBuilder {
 
     private Command uploadFileCommands(String localFilePath, String filePathToUpload,
         String userName, String token, Long tokenVersion, String rawCommand) {
-        String fileDriverHostIp = this.properties
+        final String fileDriverHostIp = this.properties
             .getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_HOST_URL);
-        String requestRefreshedTokenCommand = this.getRefreshTokenCommand(userName, tokenVersion);
-        String uploadCommand =
+        final String requestRefreshedTokenCommand = this.getRefreshTokenCommand(userName, tokenVersion);
+        final String uploadCommand =
             " http_code=$(curl --write-out %{http_code} -X PUT --header \"Authorization:Bearer \"$token "
                 + " --data-binary @" + localFilePath + " --silent --output /dev/null "
                 + "$server/remote.php/webdav/" + filePathToUpload + "); ";
+        final int sleepTime = 5;
+        final String sleepCommand = "sleep " + sleepTime + ";";
 
-        String commandIO = "server=" + fileDriverHostIp + "; "
+        final String commandIO = "server=" + fileDriverHostIp + "; "
             + "token=" + token + "; "
             + uploadCommand
             + " while [ $http_code == " + HttpStatus.UNAUTHORIZED.toString() + " ] ; do "
             + "userId=" + userName + "; " + "tokenVersion=" + tokenVersion.toString() + "; "
             + "token=$(" + requestRefreshedTokenCommand + "); "
             + uploadCommand
+            + sleepCommand
             + " done";
 
         return new Command(commandIO, rawCommand);
@@ -247,16 +250,18 @@ public class JDFJobBuilder {
 
     private Command downloadFileCommands(String localFilePath, String filePathToDownload,
         String userId, String token, Long tokenVersion, String rawCommand) {
-        String fileDriverHostIp = this.properties
+        final String fileDriverHostIp = this.properties
             .getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_HOST_URL);
-        String requestRefreshedTokenCommand = this.getRefreshTokenCommand(userId, tokenVersion);
-        String downloadCommand =
+        final String requestRefreshedTokenCommand = this.getRefreshTokenCommand(userId, tokenVersion);
+        final String downloadCommand =
             " full_response=$(curl --write-out %{http_code} --header \"Authorization:Bearer \"$token"
                 + " $server/remote.php/webdav/" + filePathToDownload
                 + " --silent --output " + localFilePath + " /dev/null); ";
-        String extractHttpStatusCode = "http_code=${full_response:0:3}; ";
+        final String extractHttpStatusCode = "http_code=${full_response:0:3}; ";
+        final int sleepTime = 5;
+        final String sleepCommand = "sleep " + sleepTime + ";";
 
-        String commandIO = "server=" + fileDriverHostIp + "; "
+        final String commandIO = "server=" + fileDriverHostIp + "; "
             + "token=" + token + "; "
             + downloadCommand
             + extractHttpStatusCode
@@ -265,6 +270,7 @@ public class JDFJobBuilder {
             + "token=$(" + requestRefreshedTokenCommand + "); "
             + downloadCommand
             + extractHttpStatusCode
+            + sleepCommand
             + " done";
 
         return new Command(commandIO, rawCommand);
