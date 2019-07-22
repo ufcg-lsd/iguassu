@@ -23,25 +23,25 @@ public class ConfValidator {
     }
 
     private static void validateServicesAddresses(Properties properties) throws IguassuException {
-        validadeKey(properties, ConfProperties.ARREBOL_SERVICE_HOST_URL);
-        validadeKey(properties, ConfProperties.DATABASE_HOST_URL);
-        validadeKey(properties, ConfProperties.IGUASSU_SERVICE_HOST_URL);
-        validadeKey(properties, ConfProperties.STORAGE_SERVICE_HOST_URL);
+        validatePropKey(properties, ConfProperties.ARREBOL_SERVICE_HOST_URL);
+        validatePropKey(properties, ConfProperties.DATABASE_HOST_URL);
+        validatePropKey(properties, ConfProperties.IGUASSU_SERVICE_HOST_URL);
+        validatePropKey(properties, ConfProperties.STORAGE_SERVICE_HOST_URL);
     }
 
     private static void validateMonitorPeriods(Properties properties) throws IguassuException {
-        validadeKey(properties, ConfProperties.JOB_SUBMISSION_MONITOR_PERIOD);
-        validadeKey(properties, ConfProperties.SESSION_MONITOR_PERIOD);
-        validadeKey(properties, ConfProperties.JOB_STATE_MONITOR_PERIOD);
+        validatePropKey(properties, ConfProperties.JOB_SUBMISSION_MONITOR_PERIOD);
+        validatePropKey(properties, ConfProperties.SESSION_MONITOR_PERIOD);
+        validatePropKey(properties, ConfProperties.JOB_STATE_MONITOR_PERIOD);
     }
 
     private static void validateOAuthProps(Properties properties) throws IguassuException {
-        validadeKey(properties, ConfProperties.OAUTH_STORAGE_SERVICE_CLIENT_ID);
-        validadeKey(properties, ConfProperties.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
-        validadeKey(properties, ConfProperties.OAUTH_STORAGE_SERVICE_TOKEN_URL);
+        validatePropKey(properties, ConfProperties.OAUTH_STORAGE_SERVICE_CLIENT_ID);
+        validatePropKey(properties, ConfProperties.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
+        validatePropKey(properties, ConfProperties.OAUTH_STORAGE_SERVICE_TOKEN_URL);
     }
 
-    private static void validadeKey(Properties properties, String propKey) throws IguassuException {
+    private static void validatePropKey(Properties properties, String propKey) throws IguassuException {
         if (!properties.containsKey(propKey)) {
             String errorMsg = requiredPropertyMessage(propKey);
             LOGGER.error(errorMsg);
@@ -49,7 +49,7 @@ public class ConfValidator {
         }
     }
 
-    private static String requiredPropertyMessage(String property) {
-        return "Required property " + property + " was not set";
+    private static String requiredPropertyMessage(String propertyKey) {
+        return "Required property " + propertyKey + " was not set";
     }
 }
