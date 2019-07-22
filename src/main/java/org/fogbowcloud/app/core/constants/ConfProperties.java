@@ -1,6 +1,13 @@
 package org.fogbowcloud.app.core.constants;
 
-public class IguassuPropertiesConstants {
+public class ConfProperties {
+
+    /*
+     * External OAuth props.
+     */
+    public static final String OAUTH_STORAGE_SERVICE_TOKEN_URL = "oauth_storage_service_token_url";
+    public static final String OAUTH_STORAGE_SERVICE_CLIENT_ID = "oauth_storage_service_client_id";
+    public static final String OAUTH_STORAGE_SERVICE_CLIENT_SECRET = "oauth_storage_service_client_secret";
 
     /*
      *  Users datastore location.
@@ -27,4 +34,11 @@ public class IguassuPropertiesConstants {
     public static final String IGUASSU_CONF_FILE = "iguassu.conf";
     public static final String DATABASE_HOST_URL = "database_host_url";
     public static final String JDF_FILE_PATH = "jdffilepath";
+
+    /*
+     * Monitors periods.
+     */
+    public static final String JOB_STATE_MONITOR_PERIOD = "job_state_monitor_period";
+    public static final String JOB_SUBMISSION_MONITOR_PERIOD = "job_submission_monitor_period";
+    public static final String SESSION_MONITOR_PERIOD = "session_monitor_period";
 }

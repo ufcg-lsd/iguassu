@@ -19,11 +19,11 @@ import org.fogbowcloud.app.core.IguassuFacade;
 import org.fogbowcloud.app.core.authenticator.models.OAuthIdentifiers;
 import org.fogbowcloud.app.core.authenticator.models.RandomString;
 import org.fogbowcloud.app.core.authenticator.models.User;
+import org.fogbowcloud.app.core.constants.ConfProperties;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.dto.AuthDTO;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
 import org.fogbowcloud.app.core.http.HttpWrapper;
-import org.fogbowcloud.app.external.ExternalOAuthConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -60,7 +60,7 @@ public class AuthService {
         if (isAReliableApp(applicationIds)) {
 
             final String baseUrl = this.properties
-                .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_TOKEN_URL);
+                .getProperty(ConfProperties.OAUTH_STORAGE_SERVICE_TOKEN_URL);
             final String requestUrl = baseUrl + "?grant_type=authorization_code&code=" + rawCode +
                 "&redirect_uri=" + applicationIds.getRedirectUri();
 
@@ -125,9 +125,9 @@ public class AuthService {
 
     private boolean isAReliableApp(OAuthIdentifiers applicationIds) {
         final String knownAppClientId = this.properties
-            .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID);
+            .getProperty(ConfProperties.OAUTH_STORAGE_SERVICE_CLIENT_ID);
         final String knownSecret = this.properties
-            .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
+            .getProperty(ConfProperties.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
 
         return Objects.nonNull(applicationIds.getClientId()) && Objects
             .nonNull(applicationIds.getSecret()) && applicationIds.getClientId()
@@ -139,7 +139,7 @@ public class AuthService {
         final Gson gson = new Gson();
         String refreshToken = oAuthToken.getRefreshToken();
         final String baseUrl = this.properties
-            .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_TOKEN_URL);
+            .getProperty(ConfProperties.OAUTH_STORAGE_SERVICE_TOKEN_URL);
         final String requestUrl =
             baseUrl + "?grant_type=refresh_token&refresh_token=" + refreshToken;
 
@@ -160,9 +160,9 @@ public class AuthService {
 
     private void mountsAuthorizationHeader(List<Header> headers) {
         String clientId = this.properties
-            .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID);
+            .getProperty(ConfProperties.OAUTH_STORAGE_SERVICE_CLIENT_ID);
         String clientSecret = this.properties
-            .getProperty(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
+            .getProperty(ConfProperties.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
 
         final String authHeadersDecoded = clientId + ":" + clientSecret;
         final String authHeadersEncoded = Base64.getEncoder()

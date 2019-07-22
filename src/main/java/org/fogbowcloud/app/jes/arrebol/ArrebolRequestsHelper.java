@@ -12,7 +12,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
+import org.fogbowcloud.app.core.constants.ConfProperties;
 import org.fogbowcloud.app.core.dto.arrebol.ArrebolJobDTO;
 import org.fogbowcloud.app.core.http.HttpWrapper;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
@@ -30,7 +30,7 @@ public class ArrebolRequestsHelper {
     public ArrebolRequestsHelper(Properties properties) {
         // TODO review this names
         ARREBOL_BASE_URL = properties
-            .getProperty(IguassuPropertiesConstants.ARREBOL_SERVICE_HOST_URL);
+            .getProperty(ConfProperties.ARREBOL_SERVICE_HOST_URL);
         this.gson = new Gson();
     }
 

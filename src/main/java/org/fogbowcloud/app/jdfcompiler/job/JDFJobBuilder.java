@@ -8,7 +8,7 @@ import java.util.UUID;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.command.Command;
 import org.fogbowcloud.app.core.constants.DockerConstants;
-import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
+import org.fogbowcloud.app.core.constants.ConfProperties;
 import org.fogbowcloud.app.core.task.Specification;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.core.task.TaskImpl;
@@ -226,7 +226,7 @@ public class JDFJobBuilder {
     private Command uploadFileCommands(String localFilePath, String filePathToUpload,
         String userName, String token, Long tokenVersion, String rawCommand) {
         final String fileDriverHostIp = this.properties
-            .getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_HOST_URL);
+            .getProperty(ConfProperties.STORAGE_SERVICE_HOST_URL);
         final String requestRefreshedTokenCommand = this.getRefreshTokenCommand(userName, tokenVersion);
         final String uploadCommand =
             " http_code=$(curl --write-out %{http_code} -X PUT --header \"Authorization:Bearer \"$token "
@@ -251,7 +251,7 @@ public class JDFJobBuilder {
     private Command downloadFileCommands(String localFilePath, String filePathToDownload,
         String userId, String token, Long tokenVersion, String rawCommand) {
         final String fileDriverHostIp = this.properties
-            .getProperty(IguassuPropertiesConstants.STORAGE_SERVICE_HOST_URL);
+            .getProperty(ConfProperties.STORAGE_SERVICE_HOST_URL);
         final String requestRefreshedTokenCommand = this.getRefreshTokenCommand(userId, tokenVersion);
         final String downloadCommand =
             " full_response=$(curl --write-out %{http_code} --header \"Authorization:Bearer \"$token"
@@ -278,7 +278,7 @@ public class JDFJobBuilder {
 
     private String getRefreshTokenCommand(String userId, Long tokenVersion) {
         final String iguassuUrl = this.properties
-            .getProperty(IguassuPropertiesConstants.IGUASSU_SERVICE_HOST_URL);
+            .getProperty(ConfProperties.IGUASSU_SERVICE_HOST_URL);
         final String refreshTokenUrl = String
             .format("%s/auth/oauth2/refresh/${userId}/${tokenVersion}", iguassuUrl, userId,
                 tokenVersion);
