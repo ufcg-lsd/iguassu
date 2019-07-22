@@ -5,6 +5,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.IguassuController;
 import org.fogbowcloud.app.core.constants.ConfProperties;
+import org.fogbowcloud.app.utils.ConfValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Lazy;
@@ -13,9 +14,11 @@ public class IguassuMainRunner implements CommandLineRunner {
 
     private static final Logger LOGGER = Logger.getLogger(IguassuMainRunner.class);
     private static String CONF_FILE_PATH = ConfProperties.IGUASSU_CONF_FILE;
+
     @Lazy
     @Autowired
     IguassuController iguassuController;
+
     @Autowired
     private Properties properties;
 
@@ -24,18 +27,19 @@ public class IguassuMainRunner implements CommandLineRunner {
         LOGGER.info("Running " + IguassuMainRunner.class.getName());
         if (args.length > 0) {
             CONF_FILE_PATH = args[0];
-            LOGGER.info("Configurations imported of path " + CONF_FILE_PATH + ".");
+            LOGGER.info("Configuration file found in path " + CONF_FILE_PATH + ".");
 
         } else {
-            LOGGER.info("Configurations of default path " + CONF_FILE_PATH + ".");
+            LOGGER.info("Configuration file found in default path " + CONF_FILE_PATH + ".");
         }
-        loadProperties(CONF_FILE_PATH);
+        loadPropertiesFile(CONF_FILE_PATH);
     }
 
-    private void loadProperties(String iguassuConfPath) {
+    private void loadPropertiesFile(String iguassuConfFilePath) {
         try {
-            properties.load(new FileInputStream(iguassuConfPath));
-            LOGGER.info("Configurations of file " + iguassuConfPath + " was loaded with success.");
+            properties.load(new FileInputStream(iguassuConfFilePath));
+            LOGGER.info("Configuration file " + iguassuConfFilePath + " was loaded with success.");
+            ConfValidator.validate(this.properties);
         } catch (Exception e) {
             LOGGER.info("Configuration file was not founded or not loaded with success.");
             System.exit(1);

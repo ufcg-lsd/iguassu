@@ -19,7 +19,6 @@ import org.fogbowcloud.app.core.constants.ConfProperties;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
-import org.fogbowcloud.app.core.exceptions.IguassuException;
 import org.fogbowcloud.app.core.monitor.JobStateMonitor;
 import org.fogbowcloud.app.core.monitor.JobSubmissionMonitor;
 import org.fogbowcloud.app.core.monitor.SessionMonitor;
@@ -34,7 +33,6 @@ import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jes.JobExecutionService;
 import org.fogbowcloud.app.jes.arrebol.ArrebolJobExecutionService;
 import org.fogbowcloud.app.jes.arrebol.ArrebolJobSynchronizer;
-import org.fogbowcloud.app.utils.ConfValidator;
 import org.fogbowcloud.app.utils.JDFUtil;
 import org.fogbowcloud.app.utils.ManagerTimer;
 import org.json.JSONException;
@@ -65,8 +63,7 @@ public class IguassuController {
     @Autowired
     private AuthService authService;
 
-    public IguassuController(Properties properties) throws IguassuException {
-        ConfValidator.validate(properties);
+    public IguassuController(Properties properties) {
         this.properties = properties;
         this.authenticator = new CommonAuthenticator();
         this.jobExecutionSystem = new ArrebolJobExecutionService(this.properties);
