@@ -32,10 +32,10 @@ public class IguassuMainRunner implements CommandLineRunner {
         } else {
             LOGGER.info("Configuration file found in default path " + CONF_FILE_PATH + ".");
         }
-        loadPropertiesFile(CONF_FILE_PATH);
+        loadProperties(CONF_FILE_PATH);
     }
 
-    private void loadPropertiesFile(String iguassuConfFilePath) {
+    private void loadProperties(String iguassuConfFilePath) {
         try {
             properties.load(new FileInputStream(iguassuConfFilePath));
             LOGGER.info("Configuration file " + iguassuConfFilePath + " was loaded with success.");
