@@ -17,7 +17,7 @@ import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.api.http.services.FileSystemStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
 import org.fogbowcloud.app.core.authenticator.models.User;
-import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
+import org.fogbowcloud.app.core.constants.ConfProperties;
 import org.fogbowcloud.app.core.dto.JobResponseDTO;
 import org.fogbowcloud.app.core.dto.TaskDTO;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
@@ -67,7 +67,7 @@ public class JobController {
     @ApiOperation(value = Job.GET_ALL_OPERATION)
     public ResponseEntity<?> getAllJobs(
         @ApiParam(value = CommonParameters.USER_CREDENTIALS)
-        @RequestHeader(value = IguassuPropertiesConstants.X_AUTH_USER_CREDENTIALS) String userCredentials) {
+        @RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS) String userCredentials) {
         User user;
 
         try {
@@ -95,7 +95,7 @@ public class JobController {
         @ApiParam(value = Job.ID)
         @PathVariable String jobId,
         @ApiParam(value = CommonParameters.USER_CREDENTIALS)
-        @RequestHeader(value = IguassuPropertiesConstants.X_AUTH_USER_CREDENTIALS) String userCredentials)
+        @RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS) String userCredentials)
         throws InvalidParameterException {
 
         JDFJob job;
@@ -117,7 +117,7 @@ public class JobController {
         @ApiParam(value = Job.ID)
         @PathVariable String jobId,
         @ApiParam(value = CommonParameters.USER_CREDENTIALS)
-        @RequestHeader(value = IguassuPropertiesConstants.X_AUTH_USER_CREDENTIALS) String userCredentials)
+        @RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS) String userCredentials)
         throws InvalidParameterException {
         JDFJob job;
         try {
@@ -137,16 +137,16 @@ public class JobController {
     @ApiOperation(value = Job.CREATE_OPERATION)
     public ResponseEntity<String> submitJob(
         @ApiParam(value = Job.CREATE_REQUEST_PARAM)
-        @RequestParam(IguassuPropertiesConstants.JDF_FILE_PATH) MultipartFile file,
+        @RequestParam(ConfProperties.JDF_FILE_PATH) MultipartFile file,
         @ApiParam(value = CommonParameters.USER_CREDENTIALS)
-        @RequestHeader(value = IguassuPropertiesConstants.X_AUTH_USER_CREDENTIALS) String userCredentials) {
+        @RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS) String userCredentials) {
 
         LOGGER.info("Saving new Job.");
         LOGGER.info(file.toString());
 
         Map<String, String> fieldMap = new HashMap<>();
-        fieldMap.put(IguassuPropertiesConstants.JDF_FILE_PATH, null);
-        fieldMap.put(IguassuPropertiesConstants.X_AUTH_USER_CREDENTIALS, null);
+        fieldMap.put(ConfProperties.JDF_FILE_PATH, null);
+        fieldMap.put(ConfProperties.X_AUTH_USER_CREDENTIALS, null);
 
         this.storageService.store(file, fieldMap);
         User user;
@@ -159,7 +159,7 @@ public class JobController {
                     "]", HttpStatus.UNAUTHORIZED);
         }
 
-        final String jdf = fieldMap.get(IguassuPropertiesConstants.JDF_FILE_PATH);
+        final String jdf = fieldMap.get(ConfProperties.JDF_FILE_PATH);
         if (Objects.isNull(jdf)) {
             LOGGER.info("Could not store  new job from user " + user.getUserIdentification());
             throw new StorageException(
@@ -167,7 +167,7 @@ public class JobController {
         }
 
         String jobId;
-        final String jdfAbsolutePath = fieldMap.get(IguassuPropertiesConstants.JDF_FILE_PATH);
+        final String jdfAbsolutePath = fieldMap.get(ConfProperties.JDF_FILE_PATH);
         try {
             LOGGER.info("jdfpath <" + jdfAbsolutePath + ">");
             jobId = this.jobService.submitJob(jdfAbsolutePath, user);
@@ -188,7 +188,7 @@ public class JobController {
         @ApiParam(value = Job.ID)
         @PathVariable String jobId,
         @ApiParam(value = CommonParameters.USER_CREDENTIALS)
-        @RequestHeader(value = IguassuPropertiesConstants.X_AUTH_USER_CREDENTIALS) String userCredentials)
+        @RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS) String userCredentials)
         throws InvalidParameterException {
         LOGGER.info("Deleting job with Id " + jobId + ".");
 

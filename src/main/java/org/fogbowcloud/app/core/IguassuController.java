@@ -15,7 +15,7 @@ import org.fogbowcloud.app.core.authenticator.CommonAuthenticator;
 import org.fogbowcloud.app.core.authenticator.IguassuAuthenticator;
 import org.fogbowcloud.app.core.authenticator.models.Credential;
 import org.fogbowcloud.app.core.authenticator.models.User;
-import org.fogbowcloud.app.core.constants.IguassuPropertiesConstants;
+import org.fogbowcloud.app.core.constants.ConfProperties;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
@@ -24,7 +24,6 @@ import org.fogbowcloud.app.core.monitor.JobStateMonitor;
 import org.fogbowcloud.app.core.monitor.JobSubmissionMonitor;
 import org.fogbowcloud.app.core.monitor.SessionMonitor;
 import org.fogbowcloud.app.core.task.Task;
-import org.fogbowcloud.app.external.ExternalOAuthConstants;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJobBuilder;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
@@ -35,6 +34,7 @@ import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jes.JobExecutionService;
 import org.fogbowcloud.app.jes.arrebol.ArrebolJobExecutionService;
 import org.fogbowcloud.app.jes.arrebol.ArrebolJobSynchronizer;
+import org.fogbowcloud.app.utils.ConfValidator;
 import org.fogbowcloud.app.utils.JDFUtil;
 import org.fogbowcloud.app.utils.ManagerTimer;
 import org.json.JSONException;
@@ -44,6 +44,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class IguassuController {
 
     private static final Logger LOGGER = Logger.getLogger(IguassuController.class);
+    private static final long MONITOR_DEFAULT_INITIAL_DELAY = 3000;
 
     private static ManagerTimer executionMonitorTimer = new ManagerTimer(
         Executors.newScheduledThreadPool(1));
@@ -65,39 +66,11 @@ public class IguassuController {
     private AuthService authService;
 
     public IguassuController(Properties properties) throws IguassuException {
-        validateProperties(properties);
+        ConfValidator.validate(properties);
         this.properties = properties;
         this.authenticator = new CommonAuthenticator();
         this.jobExecutionSystem = new ArrebolJobExecutionService(this.properties);
         this.jobsBuffer = new ConcurrentLinkedQueue<>();  // thread safe structure, capacity 2^31-1
-    }
-
-    private static String requiredPropertyMessage(String property) {
-        return "Required property " + property + " was not set";
-    }
-
-    private static boolean checkProperties(Properties properties) {
-        if (!properties.containsKey(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID)) {
-            LOGGER.error(
-                requiredPropertyMessage(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_ID));
-            return false;
-        }
-
-        if (!properties.containsKey(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET)) {
-            LOGGER.error(
-                requiredPropertyMessage(
-                    ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_CLIENT_SECRET));
-            return false;
-        }
-
-        if (!properties.containsKey(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_TOKEN_URL)) {
-            LOGGER.error(
-                requiredPropertyMessage(ExternalOAuthConstants.OAUTH_STORAGE_SERVICE_TOKEN_URL));
-            return false;
-        }
-
-        LOGGER.debug("All properties are set");
-        return true;
     }
 
     public Properties getProperties() {
@@ -107,10 +80,10 @@ public class IguassuController {
     public void init() {
         this.jobDataStore =
             new JobDataStore(
-                this.properties.getProperty(IguassuPropertiesConstants.DATABASE_HOST_URL));
+                this.properties.getProperty(ConfProperties.DATABASE_HOST_URL));
         this.oAuthTokenDataStore =
             new OAuthTokenDataStore(
-                this.properties.getProperty(IguassuPropertiesConstants.DATABASE_HOST_URL));
+                this.properties.getProperty(ConfProperties.DATABASE_HOST_URL));
         this.jobBuilder = new JDFJobBuilder(this.properties);
         this.nonces = new ArrayList<>();
 
@@ -285,33 +258,33 @@ public class IguassuController {
     }
 
     private void initJobStateMonitor() {
-        final long JOB_MONITOR_INITIAL_DELAY = 3000;
-        final long JOB_MONITOR_EXECUTION_PERIOD = 5000;
+        final long JOB_MONITOR_EXECUTION_PERIOD = Long.getLong(
+            this.properties.getProperty(ConfProperties.JOB_STATE_MONITOR_PERIOD));
 
         JobStateMonitor jobStateMonitor = new JobStateMonitor(this.jobDataStore,
             new ArrebolJobSynchronizer(this.properties));
-        executionMonitorTimer.scheduleAtFixedRate(jobStateMonitor, JOB_MONITOR_INITIAL_DELAY,
+        executionMonitorTimer.scheduleAtFixedRate(jobStateMonitor, MONITOR_DEFAULT_INITIAL_DELAY,
             JOB_MONITOR_EXECUTION_PERIOD);
     }
 
     private void initSessionMonitor() {
-        final long SESSION_MONITOR_INITIAL_DELAY = 3000;
-        final long SESSION_MONITOR_EXECUTION_PERIOD = 3600000; // 1 hour
+        final long SESSION_MONITOR_EXECUTION_PERIOD = Long.getLong(
+            this.properties.getProperty(ConfProperties.SESSION_MONITOR_PERIOD));
 
         SessionMonitor sessionMonitor = new SessionMonitor(this.oAuthTokenDataStore,
             this.authenticator);
-        sessionMonitorTimer.scheduleAtFixedRate(sessionMonitor, SESSION_MONITOR_INITIAL_DELAY,
+        sessionMonitorTimer.scheduleAtFixedRate(sessionMonitor, MONITOR_DEFAULT_INITIAL_DELAY,
             SESSION_MONITOR_EXECUTION_PERIOD);
     }
 
     private void initJobSubmissionMonitor() {
-        final long SUBMISSION_MONITOR_INITIAL_DELAY = 3000;
-        final long SUBMISSION_MONITOR_EXECUTION_PERIOD = 5000;
+        final long SUBMISSION_MONITOR_EXECUTION_PERIOD = Long.getLong(
+            this.properties.getProperty(ConfProperties.JOB_SUBMISSION_MONITOR_PERIOD));
 
         JobSubmissionMonitor jobSubmissionMonitor = new JobSubmissionMonitor(this.jobDataStore,
             this.jobExecutionSystem, this.jobsBuffer);
         submissionMonitorTimer
-            .scheduleAtFixedRate(jobSubmissionMonitor, SUBMISSION_MONITOR_INITIAL_DELAY,
+            .scheduleAtFixedRate(jobSubmissionMonitor, MONITOR_DEFAULT_INITIAL_DELAY,
                 SUBMISSION_MONITOR_EXECUTION_PERIOD);
     }
 
@@ -345,13 +318,4 @@ public class IguassuController {
 
         return job;
     }
-
-    private void validateProperties(Properties properties) throws IguassuException {
-        if (properties == null) {
-            throw new IllegalArgumentException("Properties cannot be null.");
-        } else if (!checkProperties(properties)) {
-            throw new IguassuException("Error while initializing Iguassu Controller.");
-        }
-    }
-
 }
