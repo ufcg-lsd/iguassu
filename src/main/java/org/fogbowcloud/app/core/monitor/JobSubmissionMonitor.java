@@ -14,42 +14,44 @@ public class JobSubmissionMonitor implements Runnable {
     private static final Logger LOGGER = Logger.getLogger(JobSubmissionMonitor.class);
     private JobDataStore jobDataStore;
     private JobExecutionService jobExecutionSystem;
-    private Queue<JDFJob> jobsBuffer;
+    private Queue<JDFJob> jobsToSubmit;
 
     public JobSubmissionMonitor(JobDataStore jobDataStore,
         JobExecutionService jobExecutionSystem,
-        Queue<JDFJob> jobsBuffer) {
+        Queue<JDFJob> jobsToSubmit) {
         this.jobDataStore = jobDataStore;
         this.jobExecutionSystem = jobExecutionSystem;
-        this.jobsBuffer = jobsBuffer;
+        this.jobsToSubmit = jobsToSubmit;
     }
 
     @Override
     public void run() {
         LOGGER.debug("Checking for jobs to be submitted.");
-        JDFJob job = this.jobsBuffer.peek();
-        if (Objects.nonNull(job)) {
+        while (Objects.nonNull(this.jobsToSubmit.peek())) {
+            JDFJob job = this.jobsToSubmit.poll();
             LOGGER.debug("Job found! Starting job submission with id [" + job.getId() + "]");
             try {
                 final String arrebolId = this.jobExecutionSystem.execute(job);
                 job.setJobIdArrebol(arrebolId);
                 job.setState(JDFJobState.SUBMITTED);
                 this.jobDataStore.update(job);
-                this.jobsBuffer.poll();
+
                 LOGGER.info(
                     "Iguassu Job [" + job.getId() + "] has arrebol id: [" + job.getJobIdArrebol()
                         + "]");
 
             } catch (ArrebolConnectException ace) {
                 LOGGER.error("Job execution service is not available right now.");
+                this.jobsToSubmit.offer(job);
+                break;
             } catch (Exception e) {
                 job.setState(JDFJobState.FAILED);
                 this.jobDataStore.update(job);
-                this.jobsBuffer.poll();
                 LOGGER.error("Error submitting job with id: [" + job.getId()
                     + "]. Maybe the Job is poorly formed.", e);
             }
-        } else {
+        }
+        if (Objects.nonNull(this.jobsToSubmit.peek())) {
             LOGGER.debug("Job submission buffer is empty.");
         }
     }
