@@ -5,6 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.ApiDocumentation;
+import org.fogbowcloud.app.api.exceptions.StorageServiceConnectException;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.core.constants.ConfProperties;
 import org.fogbowcloud.app.core.dto.AuthDTO;
@@ -54,6 +55,10 @@ public class AuthController {
                 return new ResponseEntity<>("The authorization code is invalid.",
                     HttpStatus.BAD_REQUEST);
             }
+        } catch (StorageServiceConnectException ssce) {
+            return new ResponseEntity<>(
+                "Storage Service connection failed with error [" + ssce.getMessage() + "]",
+                HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (Exception e) {
             return new ResponseEntity<>("The authentication failed with error [" + e.getMessage() +
 

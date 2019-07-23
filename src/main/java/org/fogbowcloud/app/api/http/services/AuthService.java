@@ -14,7 +14,9 @@ import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.ParseException;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.api.exceptions.StorageServiceConnectException;
 import org.fogbowcloud.app.core.IguassuFacade;
 import org.fogbowcloud.app.core.authenticator.models.OAuthIdentifiers;
 import org.fogbowcloud.app.core.authenticator.models.RandomString;
@@ -184,6 +186,7 @@ public class AuthService {
             final String oAuthTokenRawResponse = HttpWrapper
                 .doRequest(HttpPost.METHOD_NAME, requestUrl,
                     headers, null);
+
             if (oAuthTokenRawResponse != null) {
                 OAuthToken oAuthToken = gson.fromJson(oAuthTokenRawResponse, OAuthToken.class);
                 oAuthToken.updateExpirationDate();
@@ -219,6 +222,9 @@ public class AuthService {
                 throw new Exception("You can't use the same authorization code twice.");
             }
 
+        } catch (HttpHostConnectException e) {
+            throw new StorageServiceConnectException(
+                "Failed connect to Storage Service: " + e.getMessage(), e);
         } catch (Exception e) {
             throw new Exception("OAuth Token request failed with message, " + e.getMessage());
         }
