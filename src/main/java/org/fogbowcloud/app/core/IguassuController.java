@@ -102,7 +102,6 @@ public class IguassuController {
         JDFJob job = buildJob(jdfFilePath, user);
         this.jobsBuffer.offer(job);
         job.setState(JDFJobState.WAITING);
-
         this.jobDataStore.insert(job);
 
         return job.getId();
@@ -255,8 +254,8 @@ public class IguassuController {
     }
 
     private void initJobStateMonitor() {
-        final long JOB_MONITOR_EXECUTION_PERIOD = Long.getLong(
-            this.properties.getProperty(ConfProperties.JOB_STATE_MONITOR_PERIOD));
+        final long JOB_MONITOR_EXECUTION_PERIOD = Objects.requireNonNull(Long.valueOf(
+            this.properties.getProperty(ConfProperties.JOB_STATE_MONITOR_PERIOD)));
 
         JobStateMonitor jobStateMonitor = new JobStateMonitor(this.jobDataStore,
             new ArrebolJobSynchronizer(this.properties));
@@ -265,7 +264,7 @@ public class IguassuController {
     }
 
     private void initSessionMonitor() {
-        final long SESSION_MONITOR_EXECUTION_PERIOD = Long.getLong(
+        final long SESSION_MONITOR_EXECUTION_PERIOD = Long.valueOf(
             this.properties.getProperty(ConfProperties.SESSION_MONITOR_PERIOD));
 
         SessionMonitor sessionMonitor = new SessionMonitor(this.oAuthTokenDataStore,
@@ -275,7 +274,7 @@ public class IguassuController {
     }
 
     private void initJobSubmissionMonitor() {
-        final long SUBMISSION_MONITOR_EXECUTION_PERIOD = Long.getLong(
+        final long SUBMISSION_MONITOR_EXECUTION_PERIOD = Long.valueOf(
             this.properties.getProperty(ConfProperties.JOB_SUBMISSION_MONITOR_PERIOD));
 
         JobSubmissionMonitor jobSubmissionMonitor = new JobSubmissionMonitor(this.jobDataStore,

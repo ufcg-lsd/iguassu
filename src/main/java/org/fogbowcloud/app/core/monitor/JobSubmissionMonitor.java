@@ -27,29 +27,30 @@ public class JobSubmissionMonitor implements Runnable {
     @Override
     public void run() {
         LOGGER.debug("Checking for jobs to be submitted.");
-        JDFJob job = this.jobsBuffer.peek();
-        if (Objects.nonNull(job)) {
+        while (Objects.nonNull(this.jobsBuffer.peek())) {
+            JDFJob job = this.jobsBuffer.poll();;
             LOGGER.debug("Job found! Starting job submission with id [" + job.getId() + "]");
             try {
                 final String arrebolId = this.jobExecutionSystem.execute(job);
                 job.setJobIdArrebol(arrebolId);
                 job.setState(JDFJobState.SUBMITTED);
                 this.jobDataStore.update(job);
-                this.jobsBuffer.poll();
+
                 LOGGER.info(
                     "Iguassu Job [" + job.getId() + "] has arrebol id: [" + job.getJobIdArrebol()
                         + "]");
 
             } catch (ArrebolConnectException ace) {
                 LOGGER.error("Job execution service is not available right now.");
+                break;
             } catch (Exception e) {
                 job.setState(JDFJobState.FAILED);
                 this.jobDataStore.update(job);
-                this.jobsBuffer.poll();
                 LOGGER.error("Error submitting job with id: [" + job.getId()
                     + "]. Maybe the Job is poorly formed.", e);
             }
-        } else {
+        }
+        if (Objects.nonNull(this.jobsBuffer.peek())) {
             LOGGER.debug("Job submission buffer is empty.");
         }
     }
