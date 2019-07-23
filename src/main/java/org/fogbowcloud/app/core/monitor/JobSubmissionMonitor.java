@@ -28,7 +28,7 @@ public class JobSubmissionMonitor implements Runnable {
     public void run() {
         LOGGER.debug("Checking for jobs to be submitted.");
         while (Objects.nonNull(this.jobsBuffer.peek())) {
-            JDFJob job = this.jobsBuffer.poll();;
+            JDFJob job = this.jobsBuffer.poll();
             LOGGER.debug("Job found! Starting job submission with id [" + job.getId() + "]");
             try {
                 final String arrebolId = this.jobExecutionSystem.execute(job);
