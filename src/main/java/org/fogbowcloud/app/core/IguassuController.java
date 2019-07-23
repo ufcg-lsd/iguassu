@@ -58,7 +58,7 @@ public class IguassuController {
     private JobDataStore jobDataStore;
     private OAuthTokenDataStore oAuthTokenDataStore;
     private JDFJobBuilder jobBuilder;
-    private Queue<JDFJob> jobsBuffer;
+    private Queue<JDFJob> jobsToSubmit;
 
     @Autowired
     private AuthService authService;
@@ -67,7 +67,7 @@ public class IguassuController {
         this.properties = properties;
         this.authenticator = new CommonAuthenticator();
         this.jobExecutionSystem = new ArrebolJobExecutionService(this.properties);
-        this.jobsBuffer = new ConcurrentLinkedQueue<>();  // thread safe structure, capacity 2^31-1
+        this.jobsToSubmit = new ConcurrentLinkedQueue<>();
     }
 
     public Properties getProperties() {
@@ -100,7 +100,7 @@ public class IguassuController {
         LOGGER.debug("Adding job of user " + user.getUserIdentification() + " to buffer.");
 
         JDFJob job = buildJob(jdfFilePath, user);
-        this.jobsBuffer.offer(job);
+        this.jobsToSubmit.offer(job);
         job.setState(JDFJobState.WAITING);
         this.jobDataStore.insert(job);
 
@@ -254,8 +254,8 @@ public class IguassuController {
     }
 
     private void initJobStateMonitor() {
-        final long JOB_MONITOR_EXECUTION_PERIOD = Objects.requireNonNull(Long.valueOf(
-            this.properties.getProperty(ConfProperties.JOB_STATE_MONITOR_PERIOD)));
+        final long JOB_MONITOR_EXECUTION_PERIOD = Long.valueOf(
+            this.properties.getProperty(ConfProperties.JOB_STATE_MONITOR_PERIOD));
 
         JobStateMonitor jobStateMonitor = new JobStateMonitor(this.jobDataStore,
             new ArrebolJobSynchronizer(this.properties));
@@ -278,7 +278,7 @@ public class IguassuController {
             this.properties.getProperty(ConfProperties.JOB_SUBMISSION_MONITOR_PERIOD));
 
         JobSubmissionMonitor jobSubmissionMonitor = new JobSubmissionMonitor(this.jobDataStore,
-            this.jobExecutionSystem, this.jobsBuffer);
+            this.jobExecutionSystem, this.jobsToSubmit);
         submissionMonitorTimer
             .scheduleAtFixedRate(jobSubmissionMonitor, MONITOR_DEFAULT_INITIAL_DELAY,
                 SUBMISSION_MONITOR_EXECUTION_PERIOD);

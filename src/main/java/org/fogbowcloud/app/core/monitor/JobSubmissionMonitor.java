@@ -14,21 +14,21 @@ public class JobSubmissionMonitor implements Runnable {
     private static final Logger LOGGER = Logger.getLogger(JobSubmissionMonitor.class);
     private JobDataStore jobDataStore;
     private JobExecutionService jobExecutionSystem;
-    private Queue<JDFJob> jobsBuffer;
+    private Queue<JDFJob> jobsToSubmit;
 
     public JobSubmissionMonitor(JobDataStore jobDataStore,
         JobExecutionService jobExecutionSystem,
-        Queue<JDFJob> jobsBuffer) {
+        Queue<JDFJob> jobsToSubmit) {
         this.jobDataStore = jobDataStore;
         this.jobExecutionSystem = jobExecutionSystem;
-        this.jobsBuffer = jobsBuffer;
+        this.jobsToSubmit = jobsToSubmit;
     }
 
     @Override
     public void run() {
         LOGGER.debug("Checking for jobs to be submitted.");
-        while (Objects.nonNull(this.jobsBuffer.peek())) {
-            JDFJob job = this.jobsBuffer.poll();
+        while (Objects.nonNull(this.jobsToSubmit.peek())) {
+            JDFJob job = this.jobsToSubmit.poll();
             LOGGER.debug("Job found! Starting job submission with id [" + job.getId() + "]");
             try {
                 final String arrebolId = this.jobExecutionSystem.execute(job);
@@ -42,6 +42,7 @@ public class JobSubmissionMonitor implements Runnable {
 
             } catch (ArrebolConnectException ace) {
                 LOGGER.error("Job execution service is not available right now.");
+                this.jobsToSubmit.offer(job);
                 break;
             } catch (Exception e) {
                 job.setState(JDFJobState.FAILED);
@@ -50,7 +51,7 @@ public class JobSubmissionMonitor implements Runnable {
                     + "]. Maybe the Job is poorly formed.", e);
             }
         }
-        if (Objects.nonNull(this.jobsBuffer.peek())) {
+        if (Objects.nonNull(this.jobsToSubmit.peek())) {
             LOGGER.debug("Job submission buffer is empty.");
         }
     }
