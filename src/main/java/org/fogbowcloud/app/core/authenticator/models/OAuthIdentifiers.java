@@ -2,23 +2,45 @@ package org.fogbowcloud.app.core.authenticator.models;
 
 import java.util.Objects;
 
+/**
+ * An instance of this class is used to represent a client application that is authorized to authenticate or made any
+ * other request in Iguassu. If a client application does not have the correct information defined by this structure
+ * then such application client will not be allowed to authenticate to the Iguassu and therefore make future requests.
+ */
 public class OAuthIdentifiers {
-    private String clientId;
+
+    /**
+     * Client Application identifier representation provides by OAuth2.
+     */
+    private String clientAppId;
+
+    /**
+     * Client Application secret key representation provides by OAuth2.
+     */
     private String secret;
+
+    /**
+     * Redirect URI representation provides by OAuth2.
+     */
     private String redirectUri;
 
-    public OAuthIdentifiers(String clientId, String secret, String redirectUri) {
-        this.clientId = clientId;
+    /**
+     * @param clientAppId
+     * @param secret
+     * @param redirectUri
+     */
+    public OAuthIdentifiers(String clientAppId, String secret, String redirectUri) {
+        this.clientAppId = clientAppId;
         this.secret = secret;
         this.redirectUri = redirectUri;
     }
 
-    public String getClientId() {
-        return clientId;
+    public String getClientAppId() {
+        return clientAppId;
     }
 
-    public void setClientId(String clientId) {
-        this.clientId = clientId;
+    public void setClientAppId(String clientAppId) {
+        this.clientAppId = clientAppId;
     }
 
     public String getSecret() {
@@ -39,16 +61,20 @@ public class OAuthIdentifiers {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         OAuthIdentifiers that = (OAuthIdentifiers) o;
-        return clientId.equals(that.clientId) &&
+        return clientAppId.equals(that.clientAppId) &&
                 secret.equals(that.secret) &&
                 Objects.equals(redirectUri, that.redirectUri);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(clientId, secret, redirectUri);
+        return Objects.hash(clientAppId, secret, redirectUri);
     }
 }
