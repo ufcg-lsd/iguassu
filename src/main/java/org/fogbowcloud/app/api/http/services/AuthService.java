@@ -68,7 +68,7 @@ public class AuthService {
 
             List<Header> headers = new LinkedList<>();
             mountsHeaders(headers,
-                encodeHeaders(applicationIds.getClientId(), applicationIds.getSecret()));
+                encodeHeaders(applicationIds.getClientAppId(), applicationIds.getSecret()));
 
             return requestOAuthAccessToken(requestUrl, headers, gson);
 
@@ -131,8 +131,8 @@ public class AuthService {
         final String knownSecret = this.properties
             .getProperty(ConfProperties.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
 
-        return Objects.nonNull(applicationIds.getClientId()) && Objects
-            .nonNull(applicationIds.getSecret()) && applicationIds.getClientId()
+        return Objects.nonNull(applicationIds.getClientAppId()) && Objects
+            .nonNull(applicationIds.getSecret()) && applicationIds.getClientAppId()
             .equals(knownAppClientId)
             && applicationIds.getSecret().equals(knownSecret);
     }
