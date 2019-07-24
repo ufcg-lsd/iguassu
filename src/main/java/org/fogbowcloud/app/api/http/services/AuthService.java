@@ -44,10 +44,6 @@ public class AuthService {
     @Autowired
     private Properties properties;
 
-    public List<OAuthToken> getAll() {
-        return this.iguassuFacade.getAllOAuthTokens();
-    }
-
     public AuthDTO authenticate(String authorizationCode, String applicationIdentifiers)
         throws Exception {
 
