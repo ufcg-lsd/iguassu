@@ -1,7 +1,7 @@
  #!/bin/bash
 
 if [ "$#" -ne 1 ]; then
-  echo "Usage: $0 <dockerImage name>"
+  echo "Usage: $0 <docker name>"
   exit 1
 fi
 

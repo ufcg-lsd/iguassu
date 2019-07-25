@@ -149,7 +149,7 @@ class ColumnExtension(GObject.GObject, Nautilus.MenuProvider):
 		self.getUserCredentials()
 
 		fileCompleteName = str(selectedFile.get_uri())[7:]
-		command = "bash "+str(self.ARREBOL_CLIENT_PATH)+" POST "+str(fileCompleteName)+" --userId "+str(self.userName)
+		command = "bash "+str(self.ARREBOL_CLIENT_PATH)+" POST "+str(fileCompleteName)+" --username "+str(self.userName)
 		out, err = subprocess.Popen("echo '"+str(self.credential)+"' | "+str(command), stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell = True).communicate()
 		
 		try:

@@ -7,17 +7,17 @@ x="dotest"
 print_menu() {
 	echo "Usage: $0 COMMAND"
 	echo "Commands are:"
-	echo "GET [<job_id> | <friendly_name>] (-u | --userId) <userId>"
-	echo "Get a job from <userId>, using either it's <job_id> or it's <friendly_name>,"
-	echo "if neither are defined, returns a list with all jobs the <userId> has registered."
+	echo "GET [<job_id> | <friendly_name>] (-u | --username) <username>"
+	echo "Get a job from <username>, using either it's <job_id> or it's <friendly_name>,"
+	echo "if neither are defined, returns a list with all jobs the <username> has registered."
 	echo
-	echo "POST <jdffilepath> (-u | --userId) <userId>"
-    echo "Posts a job defined by a JDF file at the path <jdffilepath> for <userId>"
+	echo "POST <jdffilepath> (-u | --username) <username>"
+    echo "Posts a job defined by a JDF file at the path <jdffilepath> for <username>"
     echo
-	echo "STOP (<job_id> | <friendly_name>) (-u | --userId) <userId>"
-	echo "Stops and deletes a job from <userId>, identified by it's <job_id> or <friendly name>."
+	echo "STOP (<job_id> | <friendly_name>) (-u | --username) <username>"
+	echo "Stops and deletes a job from <username>, identified by it's <job_id> or <friendly name>."
 	echo
-	echo "CREATEUSER (-u | --userId) user"
+	echo "CREATEUSER (-u | --username) user"
 	echo "Creates a new user."
 	echo "Not all services allow creation of users through this command."
 	exit 1
@@ -26,9 +26,9 @@ print_menu() {
 do_get() {
 	define_parameters $@
 
-    if [ -z ${userId:+x} ]
+    if [ -z ${username:+x} ]
     then
-	    echo "Missing userId"
+	    echo "Missing username"
         print_menu
         exit 1
     fi
@@ -44,11 +44,11 @@ do_get() {
 	${authenticator}
 	if [ $# -eq 2 ]
 	then
-		response=$(curl -G -H "X-auth-credentials: { userId: '${userId}', password: '${password}', nonce: '${nonce}' }" "${host}/arrebol/job" 2> /dev/null)
+		response=$(curl -G -H "X-auth-credentials: { username: '${username}', password: '${password}', nonce: '${nonce}' }" "${host}/arrebol/job" 2> /dev/null)
 		echo ${response}
 	elif [ $# -eq 3 ]
 	then
-        	response=$(curl -G -H "X-auth-credentials: { userId: '${userId}', password: '${password}', nonce: '${nonce}' }" "${host}/arrebol/job/$1" 2> /dev/null)
+        	response=$(curl -G -H "X-auth-credentials: { username: '${username}', password: '${password}', nonce: '${nonce}' }" "${host}/arrebol/job/$1" 2> /dev/null)
         	echo ${response}
 	else
 		print_menu
@@ -69,7 +69,7 @@ inputCertificate() {
 commonauth() {
 	echo -n Path to public key
 	read privateKeyFile
-	password=$(echo -n ${userId}${nonce} | openssl dgst -sha1 -binary -sign ${privateKeyFile} | base64 | awk 'BEGIN{ORS="*";} {print}')
+	password=$(echo -n ${username} ${nonce} | openssl dgst -sha1 -binary -sign ${privateKeyFile} | base64 | awk 'BEGIN{ORS="*";} {print}')
 }
 
 ldapauth() {
@@ -89,9 +89,9 @@ define_parameters() {
 				shift;
 				friendly=$1;
 				;;
-			-u | --userId)
+			-u | --username)
 				shift;
-				userId=$1;
+				username=$1;
 				;;
 		esac
 		shift
@@ -111,9 +111,9 @@ do_post() {
 		shift
         define_parameters $@
 
-        if [ -z ${userId:+x} ]
+        if [ -z ${username:+x} ]
         then
-	        echo "Missing userId"
+	        echo "Missing username"
             print_menu
             exit 1
         fi
@@ -133,7 +133,7 @@ do_post() {
 		    jdffilepath="${PWD}/${jdffilepath}"
 	    fi
 
-	    base_curl_cmd="curl -X POST --form jdffilepath=${jdffilepath} --form X-auth-credentials={userId:'${userId}',password:'${password}',nonce:'${nonce}'}"
+	    base_curl_cmd="curl -X POST --form jdffilepath=${jdffilepath} --form X-auth-credentials={username:'${username}',password:'${password}',nonce:'${nonce}'}"
 	    if [[ ${schedpath} ]]
 	    then
 		    base_curl_cmd="${base_curl_cmd} --form schedpath=${schedpath}"
@@ -161,7 +161,7 @@ do_stop() {
             exit 1
         fi
 
-        response=$(curl -X DELETE -H "X-auth-credentials: { userId: '${userId}', password: '${password}', nonce: '${nonce}' }" "${host}/arrebol/job/$1" 2> /dev/null)
+        response=$(curl -X DELETE -H "X-auth-credentials: { username: '${username}', password: '${password}', nonce: '${nonce}' }" "${host}/arrebol/job/$1" 2> /dev/null)
         echo ${response}
     else
 		print_menu
@@ -173,16 +173,16 @@ create_user() {
 	if [ $# -eq 2 ]
 	then
 		define_parameters $@
-		arrebol_certificates_dir="${HOME}/.arrebol/${userId}"
-		echo "Creating certificates directory for the user ${userId}: ${arrebol_certificates_dir}"
+		arrebol_certificates_dir="${HOME}/.arrebol/${username}"
+		echo "Creating certificates directory for the user ${username}: ${arrebol_certificates_dir}"
 		mkdir -p ${arrebol_certificates_dir}
 		echo "Generating your private key file in RSA format"
 		openssl genrsa -out "${arrebol_certificates_dir}/private.rsa" 2048
 		echo "Generating your public key file in RSA format"
 		openssl rsa -in "${arrebol_certificates_dir}/private.rsa" -outform PEM -pubout -out "${arrebol_certificates_dir}/public.rsa"
 		echo "Your public and private keys are in: ${arrebol_certificates_dir}"
-		echo "Requesting the creation of the user ${userId} with the public key in ${arrebol_certificates_dir}/public.rsa"
-		response=$(curl -X POST --form "userId=${userId}" --form "publicKey=@${arrebol_certificates_dir}/public.rsa" "${host}/arrebol/user" 2> /dev/null)
+		echo "Requesting the creation of the user ${username} with the public key in ${arrebol_certificates_dir}/public.rsa"
+		response=$(curl -X POST --form "username=${username}" --form "publicKey=@${arrebol_certificates_dir}/public.rsa" "${host}/arrebol/user" 2> /dev/null)
 		echo ${response}
 	else
 		print_menu
