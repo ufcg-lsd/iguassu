@@ -10,7 +10,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.core.authenticator.CommonAuthenticator;
 import org.fogbowcloud.app.core.authenticator.IguassuAuthenticator;
 import org.fogbowcloud.app.core.authenticator.models.Credential;
@@ -37,7 +36,6 @@ import org.fogbowcloud.app.utils.JDFUtil;
 import org.fogbowcloud.app.utils.ManagerTimer;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.springframework.beans.factory.annotation.Autowired;
 
 public class IguassuController {
 
@@ -59,9 +57,6 @@ public class IguassuController {
     private OAuthTokenDataStore oAuthTokenDataStore;
     private JDFJobBuilder jobBuilder;
     private Queue<JDFJob> jobsToSubmit;
-
-    @Autowired
-    private AuthService authService;
 
     public IguassuController(Properties properties) {
         this.properties = properties;
@@ -119,9 +114,6 @@ public class IguassuController {
         OAuthToken oAuthToken = null;
         try {
             oAuthToken = getCurrentTokenByUserId(userIdentification);
-            if (oAuthToken.hasExpired()) {
-                oAuthToken = this.authService.refreshAndDelete(oAuthToken);
-            }
         } catch (Exception e) {
             e.printStackTrace();
         }
