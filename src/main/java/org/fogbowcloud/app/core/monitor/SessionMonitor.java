@@ -32,7 +32,7 @@ public class SessionMonitor implements Runnable {
             if ((Math.abs((now - currentUser.getSessionTime())) > oneHourInSeconds) && currentUser
                 .isActive()) {
                 LOGGER.debug(
-                    "User [ " + currentUser.getUserIdentification() + " ] defined as not active.");
+                    "User [ " + currentUser.getIdentifier() + " ] defined as not active.");
                 currentUser.setActive(false);
                 this.authenticator.updateUser(currentUser);
             }

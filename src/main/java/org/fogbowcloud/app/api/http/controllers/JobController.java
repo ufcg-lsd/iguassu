@@ -80,7 +80,7 @@ public class JobController {
         }
 
         List<JDFJob> allJobs = this.jobService.getAllJobs(user);
-        logger.debug("Retrieving all jobs of user [ " + user.getUserIdentification() + " ]");
+        logger.debug("Retrieving all jobs of user [ " + user.getIdentifier() + " ]");
 
         List<JobResponseDTO> jobs = new LinkedList<>();
         for (JDFJob job : allJobs) {
@@ -161,9 +161,9 @@ public class JobController {
 
         final String jdf = fieldMap.get(ConfProperties.JDF_FILE_PATH);
         if (Objects.isNull(jdf)) {
-            logger.info("Could not store  new job from user " + user.getUserIdentification());
+            logger.info("Could not store  new job from user " + user.getIdentifier());
             throw new StorageException(
-                "Could not store new job from user " + user.getUserIdentification());
+                "Could not store new job from user " + user.getIdentifier());
         }
 
         String jobId;
@@ -202,12 +202,12 @@ public class JobController {
                     "]", HttpStatus.UNAUTHORIZED);
         }
 
-        String stoppedJobId = this.jobService.stopJob(jobId, user.getUserIdentification());
+        String stoppedJobId = this.jobService.stopJob(jobId, user.getIdentifier());
 
         if (stoppedJobId == null) {
             logger.info(
                 "Could not find job with id " + jobId + " for user " + user
-                    .getUserIdentification());
+                    .getIdentifier());
             throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
         }
 
@@ -228,11 +228,11 @@ public class JobController {
         JDFJob job = this.jobService.getJobById(jobId, user);
 
         if (job == null) {
-            job = this.jobService.getJobByName(jobId, user.getUserIdentification());
+            job = this.jobService.getJobByName(jobId, user.getIdentifier());
             if (job == null) {
                 logger.info(
                     "Could not find job with id " + jobId + " for user " + user
-                        .getUserIdentification());
+                        .getIdentifier());
                 throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
             }
         }

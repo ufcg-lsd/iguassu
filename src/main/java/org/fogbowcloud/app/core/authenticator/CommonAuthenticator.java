@@ -32,11 +32,11 @@ public class CommonAuthenticator implements IguassuAuthenticator {
     @Override
     public User authorizesUser(Credential credential) throws GeneralSecurityException {
         User user = Objects.requireNonNull(getUserByUsername(credential.getUserId()));
-        LOGGER.debug("Authorizing user with userId: " + user.getUserIdentification());
+        LOGGER.debug("Authorizing user with userId: " + user.getIdentifier());
 
         if (!user.getIguassuToken().equalsIgnoreCase(credential.getIguassuToken())) {
             throw new GeneralSecurityException(
-                "User " + user.getUserIdentification() + " not has a valid Iguassu token.");
+                "User " + user.getIdentifier() + " not has a valid Iguassu token.");
         }
 
         return user;
@@ -58,15 +58,15 @@ public class CommonAuthenticator implements IguassuAuthenticator {
     @Override
     public void updateUser(User currentUser) {
         User outdatedUser = UserImpl
-            .fromJSON(new JSONObject(this.userList.get(currentUser.getUserIdentification())));
+            .fromJSON(new JSONObject(this.userList.get(currentUser.getIdentifier())));
 
         if (!outdatedUser.equals(currentUser)) {
             LOGGER.debug(
-                "Updating user: " + this.userList.remove(currentUser.getUserIdentification()));
+                "Updating user: " + this.userList.remove(currentUser.getIdentifier()));
             this.userList
-                .put(currentUser.getUserIdentification(), UserImpl.toJSON(currentUser).toString());
+                .put(currentUser.getIdentifier(), UserImpl.toJSON(currentUser).toString());
             this.usersDB.commit();
-            LOGGER.debug("User updated: " + this.userList.get(currentUser.getUserIdentification()));
+            LOGGER.debug("User updated: " + this.userList.get(currentUser.getIdentifier()));
         } else {
             LOGGER.debug("User has no changes.");
         }

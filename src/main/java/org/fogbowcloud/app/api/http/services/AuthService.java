@@ -81,7 +81,7 @@ public class AuthService {
             user = this.iguassuFacade.authUser(userCredentials);
             user.resetSession();
             this.iguassuFacade.updateUser(user);
-            LOGGER.info("Retrieving user " + user.getUserIdentification());
+            LOGGER.info("Retrieving user " + user.getIdentifier());
         } catch (GeneralSecurityException e) {
             LOGGER.error("Error while trying authorize", e);
             throw new UnauthorizedRequestException(
@@ -191,17 +191,17 @@ public class AuthService {
 
                 String iguassuToken;
                 if (Objects.nonNull(user)) {
-                    LOGGER.debug("Found user [" + user.getUserIdentification() + "]");
+                    LOGGER.debug("Found user [" + user.getIdentifier() + "]");
                     if (user.isActive()) {
                         iguassuToken = user.getIguassuToken();
-                        LOGGER.debug("User [" + user.getUserIdentification()
+                        LOGGER.debug("User [" + user.getIdentifier()
                             + "] is active and has a valid Iguassu Token.");
                     } else {
                         iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
                         LOGGER.debug("Generating a new Iguassu Token for the user [" + user
-                            .getUserIdentification() + "].");
+                            .getIdentifier() + "].");
                         user.setActive(true);
-                        LOGGER.debug("User [" + user.getUserIdentification()
+                        LOGGER.debug("User [" + user.getIdentifier()
                             + "] setting to active.");
                         user.updateIguassuToken(iguassuToken);
                         this.iguassuFacade.updateUser(user);

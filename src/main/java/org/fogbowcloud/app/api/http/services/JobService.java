@@ -23,17 +23,17 @@ public class JobService {
     private IguassuFacade iguassuFacade;
 
     public List<JDFJob> getAllJobs(User user) {
-        return this.iguassuFacade.getAllJobs(user.getUserIdentification());
+        return this.iguassuFacade.getAllJobs(user.getIdentifier());
     }
 
     public JDFJob getJobById(String jobId, User user) throws InvalidParameterException {
-        JDFJob job = this.iguassuFacade.getJobById(jobId, user.getUserIdentification());
+        JDFJob job = this.iguassuFacade.getJobById(jobId, user.getIdentifier());
         if (job == null) {
-            job = this.iguassuFacade.getJobByName(jobId, user.getUserIdentification());
+            job = this.iguassuFacade.getJobByName(jobId, user.getIdentifier());
             if (job == null) {
                 logger.info(
                     "Could not find job with id " + jobId + " for user " + user
-                        .getUserIdentification());
+                        .getIdentifier());
                 throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
             }
         }

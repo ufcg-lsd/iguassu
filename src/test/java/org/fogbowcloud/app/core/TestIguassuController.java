@@ -96,7 +96,7 @@ public class TestIguassuController {
         String jdfFilePath = "";
         User user = new UserImpl("testuser", "'this is a test user'");
 
-        JDFJob job = new JDFJob(user.getUserIdentification(), new ArrayList<Task>(), user.getUserIdentification());
+        JDFJob job = new JDFJob(user.getIdentifier(), new ArrayList<Task>(), user.getIdentifier());
         Mockito.doReturn(job).when(this.iguassuController).buildJob(
                 Mockito.anyString(),
                 Mockito.any(User.class)
@@ -105,7 +105,7 @@ public class TestIguassuController {
         String id = this.iguassuController.submitJob(jdfFilePath, user);
         Assert.assertEquals(id, job.getId());
         Mockito.verify(this.dataStore).insert(job);
-        Assert.assertTrue(this.dataStore.getByJobId(id, user.getUserIdentification()).equals(job));
+        Assert.assertTrue(this.dataStore.getByJobId(id, user.getIdentifier()).equals(job));
     }
 
     @Test

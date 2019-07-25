@@ -67,10 +67,10 @@ public class Command implements Serializable {
     public JSONObject toJSON() {
         try {
             JSONObject command = new JSONObject();
-            command.put(CommandJsonKey.JSON_KEY_COMMAND.getJsonkey(), this.getCommand());
-            command.put(CommandJsonKey.JSON_KEY_STATE.getJsonkey(), this.getState().toString());
-            command.put(CommandJsonKey.JSON_KEY_RAW_COMMAND.getJsonkey(), this.getRawCommand());
-            command.put(CommandJsonKey.JSON_KEY_EXIT_CODE.getJsonkey(), this.getExitCode());
+            command.put(CommandJsonKey.COMMAND.getJsonKey(), this.getCommand());
+            command.put(CommandJsonKey.STATE.getJsonKey(), this.getState().toString());
+            command.put(CommandJsonKey.RAW_COMMAND.getJsonKey(), this.getRawCommand());
+            command.put(CommandJsonKey.EXIT_CODE.getJsonKey(), this.getExitCode());
             return command;
         } catch (JSONException e) {
             logger.debug("Error while trying to create a JSON from command", e);
@@ -80,11 +80,11 @@ public class Command implements Serializable {
 
     public static Command fromJSON(JSONObject commandJSON) {
         Command command = new Command(
-                commandJSON.optString(CommandJsonKey.JSON_KEY_COMMAND.getJsonkey()),
-                commandJSON.optString(CommandJsonKey.JSON_KEY_RAW_COMMAND.getJsonkey())
+                commandJSON.optString(CommandJsonKey.COMMAND.getJsonKey()),
+                commandJSON.optString(CommandJsonKey.RAW_COMMAND.getJsonKey())
         );
-        command.setState(CommandState.valueOf(commandJSON.optString(CommandJsonKey.JSON_KEY_STATE.getJsonkey())));
-        command.setExitCode(commandJSON.getInt(CommandJsonKey.JSON_KEY_EXIT_CODE.getJsonkey()));
+        command.setState(CommandState.valueOf(commandJSON.optString(CommandJsonKey.STATE.getJsonKey())));
+        command.setExitCode(commandJSON.getInt(CommandJsonKey.EXIT_CODE.getJsonKey()));
         return command;
     }
 

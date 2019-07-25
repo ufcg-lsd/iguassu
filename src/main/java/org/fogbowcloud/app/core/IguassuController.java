@@ -97,7 +97,7 @@ public class IguassuController {
 
     public String submitJob(String jdfFilePath, User user)
         throws CompilerException {
-        LOGGER.debug("Adding job of user " + user.getUserIdentification() + " to buffer.");
+        LOGGER.debug("Adding job of user " + user.getIdentifier() + " to buffer.");
 
         JDFJob job = buildJob(jdfFilePath, user);
         this.jobsToSubmit.offer(job);
@@ -109,11 +109,11 @@ public class IguassuController {
 
     public JDFJob buildJob(String jdfFilePath, User user) throws CompilerException {
 
-        String userIdentification = user.getUserIdentification();
-        JDFJob job = new JDFJob(user.getUserIdentification(), new ArrayList<>(),
+        String userIdentification = user.getIdentifier();
+        JDFJob job = new JDFJob(user.getIdentifier(), new ArrayList<>(),
             userIdentification);
 
-        LOGGER.debug("Building job " + job.getId() + " of user " + user.getUserIdentification());
+        LOGGER.debug("Building job " + job.getId() + " of user " + user.getIdentifier());
         JobSpecification jobSpec = compile(job.getId(), jdfFilePath);
         JDFUtil.removeEmptySpaceFromVariables(jobSpec);
         OAuthToken oAuthToken = null;

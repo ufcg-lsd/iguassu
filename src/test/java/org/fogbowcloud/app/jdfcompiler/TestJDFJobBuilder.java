@@ -33,7 +33,7 @@ public class TestJDFJobBuilder {
 		Properties properties = new Properties();
 
 		User user = new UserImpl("iguassuService", "iguassuService");
-		JDFJob testJob = new JDFJob(user.getUserIdentification(), new ArrayList<>(), user.getUserIdentification());
+		JDFJob testJob = new JDFJob(user.getIdentifier(), new ArrayList<>(), user.getIdentifier());
 		CommonCompiler commonCompiler = new CommonCompiler();
 		commonCompiler.compile(SIMPLE_JOB_EXAMPLE, FileType.JDF);
 		JobSpecification jobSpec = (JobSpecification) commonCompiler.getResult().get(0);
