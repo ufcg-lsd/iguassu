@@ -18,7 +18,7 @@ public class JobResponseDTO {
 
     private void setFields(JDFJob jdfJob) {
         this.id = jdfJob.getId();
-        this.name = jdfJob.getName();
+        this.name = jdfJob.getLabel();
         this.creationDate = timestampToDate(jdfJob.getTimeStamp());
         this.state = jdfJob.getState();
     }

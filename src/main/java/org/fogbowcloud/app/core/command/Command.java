@@ -1,9 +1,8 @@
 package org.fogbowcloud.app.core.command;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import io.swagger.models.auth.In;
 import java.io.Serializable;
 import java.util.Objects;
+
 import org.apache.log4j.Logger;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -11,12 +10,8 @@ import org.json.JSONObject;
 public class Command implements Serializable {
 
     private static final long serialVersionUID = 5281647552435522413L;
-    private static final Logger LOGGER = Logger.getLogger(Command.class);
+    private static final Logger logger = Logger.getLogger(Command.class);
     private static final int UNDETERMINED_RESULT = Integer.MAX_VALUE;
-    private static final String JSON_KEY_COMMAND = "command";
-    private static final String JSON_KEY_STATE = "state";
-    private static final String JSON_KEY_JDF_COMMAND = "jdf_command";
-    private static final String JSON_KEY_EXIT_CODE = "exit_code";
 
     private final String command;
     private final String rawCommand;
@@ -72,24 +67,24 @@ public class Command implements Serializable {
     public JSONObject toJSON() {
         try {
             JSONObject command = new JSONObject();
-            command.put(JSON_KEY_COMMAND, this.getCommand());
-            command.put(JSON_KEY_STATE, this.getState().toString());
-            command.put(JSON_KEY_JDF_COMMAND, this.getRawCommand());
-            command.put(JSON_KEY_EXIT_CODE, this.getExitCode());
+            command.put(CommandJsonKey.JSON_KEY_COMMAND.getJsonkey(), this.getCommand());
+            command.put(CommandJsonKey.JSON_KEY_STATE.getJsonkey(), this.getState().toString());
+            command.put(CommandJsonKey.JSON_KEY_RAW_COMMAND.getJsonkey(), this.getRawCommand());
+            command.put(CommandJsonKey.JSON_KEY_EXIT_CODE.getJsonkey(), this.getExitCode());
             return command;
         } catch (JSONException e) {
-            LOGGER.debug("Error while trying to create a JSON from command", e);
+            logger.debug("Error while trying to create a JSON from command", e);
             return null;
         }
     }
 
     public static Command fromJSON(JSONObject commandJSON) {
         Command command = new Command(
-            commandJSON.optString(JSON_KEY_COMMAND),
-            commandJSON.optString(JSON_KEY_JDF_COMMAND)
+                commandJSON.optString(CommandJsonKey.JSON_KEY_COMMAND.getJsonkey()),
+                commandJSON.optString(CommandJsonKey.JSON_KEY_RAW_COMMAND.getJsonkey())
         );
-        command.setState(CommandState.valueOf(commandJSON.optString(JSON_KEY_STATE)));
-        command.setExitCode(commandJSON.getInt(JSON_KEY_EXIT_CODE));
+        command.setState(CommandState.valueOf(commandJSON.optString(CommandJsonKey.JSON_KEY_STATE.getJsonkey())));
+        command.setExitCode(commandJSON.getInt(CommandJsonKey.JSON_KEY_EXIT_CODE.getJsonkey()));
         return command;
     }
 
@@ -103,7 +98,7 @@ public class Command implements Serializable {
         }
         Command command1 = (Command) o;
         return command.equals(command1.command) &&
-            state == command1.state;
+                state == command1.state;
     }
 
     @Override

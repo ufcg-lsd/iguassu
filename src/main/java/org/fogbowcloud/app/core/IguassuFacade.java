@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.security.GeneralSecurityException;
 import java.util.ArrayList;
 import java.util.List;
+
 import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
@@ -21,25 +22,25 @@ public class IguassuFacade {
         iguassuController.init();
     }
 
-    public JDFJob getJobById(String id, String owner) {
-        return iguassuController.getJobById(id, owner);
+    public JDFJob getJobById(String id, String userId) {
+        return iguassuController.getJobById(id, userId);
     }
 
-    public String submitJob(String jdfFilePath, User owner)
-        throws CompilerException, IOException {
-        return iguassuController.submitJob(jdfFilePath, owner);
+    public String submitJob(String jdfFilePath, User userId)
+            throws CompilerException, IOException {
+        return iguassuController.submitJob(jdfFilePath, userId);
     }
 
-    public ArrayList<JDFJob> getAllJobs(String owner) {
-        return iguassuController.getAllJobs(owner);
+    public ArrayList<JDFJob> getAllJobs(String userId) {
+        return iguassuController.getAllJobs(userId);
     }
 
-    public JDFJob getJobByName(String jobName, String owner) {
-        return iguassuController.getJobByName(jobName, owner);
+    public JDFJob getJobByName(String jobName, String userId) {
+        return iguassuController.getJobByName(jobName, userId);
     }
 
-    public String stopJob(String jobId, String owner) {
-        return iguassuController.stopJob(jobId, owner);
+    public String stopJob(String jobId, String userId) {
+        return iguassuController.stopJob(jobId, userId);
     }
 
     public User authUser(String credentials) throws GeneralSecurityException {

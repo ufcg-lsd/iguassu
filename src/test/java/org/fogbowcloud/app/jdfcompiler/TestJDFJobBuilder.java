@@ -32,8 +32,8 @@ public class TestJDFJobBuilder {
 	public void testJDFCompilation () throws CompilerException, IOException, InterruptedException {
 		Properties properties = new Properties();
 
-		User owner = new UserImpl("iguassuService", "iguassuService");
-		JDFJob testJob = new JDFJob(owner.getUserIdentification(), new ArrayList<>(), owner.getUserIdentification());
+		User user = new UserImpl("iguassuService", "iguassuService");
+		JDFJob testJob = new JDFJob(user.getUserIdentification(), new ArrayList<>(), user.getUserIdentification());
 		CommonCompiler commonCompiler = new CommonCompiler();
 		commonCompiler.compile(SIMPLE_JOB_EXAMPLE, FileType.JDF);
 		JobSpecification jobSpec = (JobSpecification) commonCompiler.getResult().get(0);

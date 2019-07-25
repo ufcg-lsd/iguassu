@@ -23,7 +23,7 @@ public class JDFJobBuilder {
 
     private static final Logger LOGGER = Logger.getLogger(JDFJobBuilder.class);
     private static final String JOB_ID_KEY = "jobID";
-    private static final String OWNER_KEY = "owner";
+    private static final String USER_KEY = "user";
     private static final String REQUIREMENTS_IMAGE_KEY = "image";
     private static final String REQUIREMENTS_SEPARATOR = "and";
     private static final String REQUIREMENTS_CONCAT_STR = " && ";
@@ -76,7 +76,7 @@ public class JDFJobBuilder {
                     String uuid = UUID.randomUUID().toString();
                     Task task = new TaskImpl("TaskNumber" + "-" + taskID + "-" + uuid, spec, uuid);
                     task.putMetadata(JOB_ID_KEY, job.getId());
-                    task.putMetadata(OWNER_KEY, job.getOwner());
+                    task.putMetadata(USER_KEY, job.getUserId());
 
                     parseInitCommands(job.getId(), taskSpec, task, userName, externalOAuthToken,
                         tokenVersion);

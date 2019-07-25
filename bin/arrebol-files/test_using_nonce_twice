@@ -4,7 +4,7 @@ DIRNAME=`dirname $0`
 
 nonce=$(curl -G "${host}/arrebol/nonce" 2> /dev/null)
 echo Nonce ${nonce}
-username=arrebolservice
+userId=arrebolservice
 ldapauth() {
 	echo -n Password:
 	read -s password
@@ -12,7 +12,7 @@ ldapauth() {
 }
 authenticator=$(curl -G "${host}/arrebol/authenticator" 2> /dev/null)
 ${authenticator}
-response=$(curl -G -H "X-auth-credentials: { username: '${username}', password: '${password}', nonce: '${nonce}' }" "${host}/arrebol/job" 2> /dev/null)
+response=$(curl -G -H "X-auth-credentials: { userId: '${userId}', password: '${password}', nonce: '${nonce}' }" "${host}/arrebol/job" 2> /dev/null)
 echo ${response}
-response=$(curl -G -H "X-auth-credentials: { username: '${username}', password: '${password}', nonce: '${nonce}' }" "${host}/arrebol/job" 2> /dev/null)
+response=$(curl -G -H "X-auth-credentials: { userId: '${userId}', password: '${password}', nonce: '${nonce}' }" "${host}/arrebol/job" 2> /dev/null)
 echo ${response}

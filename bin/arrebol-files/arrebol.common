@@ -5,10 +5,10 @@
 print_menu() {
 	echo "Usage: $0 COMMAND [OPTIONS]"
 	echo "Commands are GET, POST, STOP or GETUI"
-	echo "GET | GET [job_id || friendly_name] -u | --username username -p | --privateKeyFile /privateKey/file/path"
-	echo "POST jdffilepath [s | --schedpath path] -u | --username username -p | --privateKeyFile /privateKey/file/path"
-	echo "STOP [job_id || friendly_name] -u | --username username -p | --privateKeyFile /privateKey/file/path"
-	echo "CREATEUSER -u | --username username"
+	echo "GET | GET [job_id || friendly_name] -u | --userId userId -p | --privateKeyFile /privateKey/file/path"
+	echo "POST jdffilepath [s | --schedpath path] -u | --userId userId -p | --privateKeyFile /privateKey/file/path"
+	echo "STOP [job_id || friendly_name] -u | --userId userId -p | --privateKeyFile /privateKey/file/path"
+	echo "CREATEUSER -u | --userId userId"
 	exit 1
 }
 
@@ -16,13 +16,13 @@ do_get() {
 	define_parameters $@
 	if [ $# -eq 4 ]
 	then
-		hash=$(echo -n $username$nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
-		response=$(curl -G -H "X-auth-nonce: $nonce" -H "X-auth-username: $username" -H "X-auth-hash: $hash" "$host/arrebol/job" 2> /dev/null)
+		hash=$(echo -n $userId$nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
+		response=$(curl -G -H "X-auth-nonce: $nonce" -H "X-auth-userId: $userId" -H "X-auth-hash: $hash" "$host/arrebol/job" 2> /dev/null)
 		echo $response
 	elif [ $# -eq 5 ]
 	then
-		hash=$(echo -n $username$nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
-        	response=$(curl -G -H "X-auth-nonce: $nonce" -H "X-auth-username: $username" -H "X-auth-hash: $hash" "$host/arrebol/job/$1" 2> /dev/null)
+		hash=$(echo -n $userId$nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
+        	response=$(curl -G -H "X-auth-nonce: $nonce" -H "X-auth-userId: $userId" -H "X-auth-hash: $hash" "$host/arrebol/job/$1" 2> /dev/null)
         	echo $response
 	else
 		print_menu
@@ -45,9 +45,9 @@ define_parameters() {
 				shift;
 				friendly=$1;
 				;;
-			-u | --username)
+			-u | --userId)
 				shift;
-				username=$1;
+				userId=$1;
 				;;
 			-p | --privateKeyFile)
 				shift;
@@ -64,8 +64,8 @@ do_post() {
 	then
 		shift
         	define_parameters $@
-		hash=$(echo -n $username$nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
-		base_curl_cmd="curl -X POST --form jdffilepath=${jdffilepath} --form X-auth-nonce=$nonce --form X-auth-username=$username --form X-auth-hash=$hash"
+		hash=$(echo -n $userId$nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
+		base_curl_cmd="curl -X POST --form jdffilepath=${jdffilepath} --form X-auth-nonce=$nonce --form X-auth-userId=$userId --form X-auth-hash=$hash"
                 if [[ $schedpath ]]
 		then
 			base_curl_cmd="${base_curl_cmd} --form schedpath=${schedpath}"
@@ -83,8 +83,8 @@ do_stop() {
 	if [ $# -eq 5 ]
 	then
 		define_parameters $@
-		hash=$(echo -n $username$nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
-        	response=$(curl -X DELETE -H "X-auth-nonce: $nonce" -H "X-auth-username: $username" -H "X-auth-hash: $hash" "$host/arrebol/job/$1" 2> /dev/null)
+		hash=$(echo -n $userId$nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
+        	response=$(curl -X DELETE -H "X-auth-nonce: $nonce" -H "X-auth-userId: $userId" -H "X-auth-hash: $hash" "$host/arrebol/job/$1" 2> /dev/null)
                 echo $response
         else
 		print_menu
@@ -96,16 +96,16 @@ create_user() {
 	if [ $# -eq 2 ]
 	then
 		define_parameters $@
-		arrebol_certificates_dir="$HOME/.arrebol/$username"
-		echo "Creating certificates directory for the user $username: $arrebol_certificates_dir"
+		arrebol_certificates_dir="$HOME/.arrebol/$userId"
+		echo "Creating certificates directory for the user $userId: $arrebol_certificates_dir"
 		mkdir -p $arrebol_certificates_dir
 		echo "Generating your private key file in RSA format"
 		openssl genrsa -out "$arrebol_certificates_dir/private.rsa" 2048
 		echo "Generating your public key file in RSA format"
 		openssl rsa -in "$arrebol_certificates_dir/private.rsa" -outform PEM -pubout -out "$arrebol_certificates_dir/public.rsa"
 		echo "Your public and private keys are in: $arrebol_certificates_dir"
-		echo "Requesting the creation of the user $username with the public key in $arrebol_certificates_dir/public.rsa"
-		response=$(curl -X POST --form "username=$username" --form "publicKey=@$arrebol_certificates_dir/public.rsa" "$host/arrebol/user" 2> /dev/null)
+		echo "Requesting the creation of the user $userId with the public key in $arrebol_certificates_dir/public.rsa"
+		response=$(curl -X POST --form "userId=$userId" --form "publicKey=@$arrebol_certificates_dir/public.rsa" "$host/arrebol/user" 2> /dev/null)
 		echo $response
 	else
 		print_menu

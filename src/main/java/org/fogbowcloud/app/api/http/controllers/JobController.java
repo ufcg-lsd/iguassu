@@ -14,7 +14,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.ApiDocumentation.*;
 import org.fogbowcloud.app.api.exceptions.StorageException;
 import org.fogbowcloud.app.api.http.services.AuthService;
-import org.fogbowcloud.app.api.http.services.FileSystemStorageService;
+import org.fogbowcloud.app.api.http.services.FileStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
 import org.fogbowcloud.app.core.authenticator.models.User;
 import org.fogbowcloud.app.core.constants.ConfProperties;
@@ -44,10 +44,10 @@ import org.springframework.web.multipart.MultipartFile;
 @Api(Job.API_DESCRIPTION)
 public class JobController {
 
-    private final Logger LOGGER = Logger.getLogger(JobController.class);
+    private final Logger logger = Logger.getLogger(JobController.class);
 
     @Lazy
-    private final FileSystemStorageService storageService;
+    private final FileStorageService storageService;
 
     @Lazy
     private JobService jobService;
@@ -56,8 +56,8 @@ public class JobController {
     private AuthService authService;
 
     @Autowired
-    public JobController(FileSystemStorageService storageService, JobService jobService,
-        AuthService authService) {
+    public JobController(FileStorageService storageService, JobService jobService,
+                         AuthService authService) {
         this.storageService = storageService;
         this.jobService = jobService;
         this.authService = authService;
@@ -80,7 +80,7 @@ public class JobController {
         }
 
         List<JDFJob> allJobs = this.jobService.getAllJobs(user);
-        LOGGER.debug("Retrieving all jobs of user [ " + user.getUserIdentification() + " ]");
+        logger.debug("Retrieving all jobs of user [ " + user.getUserIdentification() + " ]");
 
         List<JobResponseDTO> jobs = new LinkedList<>();
         for (JDFJob job : allJobs) {
@@ -107,7 +107,7 @@ public class JobController {
                 "The authentication failed with error [" + ure.getMessage() +
                     "]", HttpStatus.UNAUTHORIZED);
         }
-        LOGGER.info("Retrieving job with id [" + jobId + "].");
+        logger.info("Retrieving job with id [" + jobId + "].");
         return new ResponseEntity<>(new JobResponseDTO(job), HttpStatus.OK);
     }
 
@@ -128,7 +128,7 @@ public class JobController {
                 "The authentication failed with error [" + ure.getMessage() +
                     "]", HttpStatus.UNAUTHORIZED);
         }
-        LOGGER.info("Retrieving tasks from job with id [" + jobId + "].");
+        logger.info("Retrieving tasks from job with id [" + jobId + "].");
         List<TaskDTO> taskDTOS = toTasksDTOList(job.getTasks());
         return new ResponseEntity<>(taskDTOS, HttpStatus.OK);
     }
@@ -141,8 +141,8 @@ public class JobController {
         @ApiParam(value = CommonParameters.USER_CREDENTIALS)
         @RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS) String userCredentials) {
 
-        LOGGER.info("Saving new Job.");
-        LOGGER.info(file.toString());
+        logger.info("Saving new Job.");
+        logger.info(file.toString());
 
         Map<String, String> fieldMap = new HashMap<>();
         fieldMap.put(ConfProperties.JDF_FILE_PATH, null);
@@ -161,7 +161,7 @@ public class JobController {
 
         final String jdf = fieldMap.get(ConfProperties.JDF_FILE_PATH);
         if (Objects.isNull(jdf)) {
-            LOGGER.info("Could not store  new job from user " + user.getUserIdentification());
+            logger.info("Could not store  new job from user " + user.getUserIdentification());
             throw new StorageException(
                 "Could not store new job from user " + user.getUserIdentification());
         }
@@ -169,14 +169,14 @@ public class JobController {
         String jobId;
         final String jdfAbsolutePath = fieldMap.get(ConfProperties.JDF_FILE_PATH);
         try {
-            LOGGER.info("jdfpath <" + jdfAbsolutePath + ">");
+            logger.info("jdfpath <" + jdfAbsolutePath + ">");
             jobId = this.jobService.submitJob(jdfAbsolutePath, user);
-            LOGGER.info("Job " + jobId + " created at time: " + System.currentTimeMillis());
+            logger.info("Job " + jobId + " created at time: " + System.currentTimeMillis());
         } catch (CompilerException ce) {
-            LOGGER.error(ce.getMessage(), ce);
+            logger.error(ce.getMessage(), ce);
             throw new StorageException("Could not compile JDF file.", ce);
         } catch (IOException e) {
-            LOGGER.error("Could not read JDF file.", e);
+            logger.error("Could not read JDF file.", e);
             throw new StorageException("Could not read JDF file.");
         }
         return new ResponseEntity<>(jobId, HttpStatus.CREATED);
@@ -190,23 +190,23 @@ public class JobController {
         @ApiParam(value = CommonParameters.USER_CREDENTIALS)
         @RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS) String userCredentials)
         throws InvalidParameterException {
-        LOGGER.info("Deleting job with Id " + jobId + ".");
+        logger.info("Deleting job with Id " + jobId + ".");
 
-        User owner;
+        User user;
 
         try {
-            owner = this.authService.authorizeUser(userCredentials);
+            user = this.authService.authorizeUser(userCredentials);
         } catch (UnauthorizedRequestException ure) {
             return new ResponseEntity<>(
                 "The authentication failed with error [" + ure.getMessage() +
                     "]", HttpStatus.UNAUTHORIZED);
         }
 
-        String stoppedJobId = this.jobService.stopJob(jobId, owner.getUserIdentification());
+        String stoppedJobId = this.jobService.stopJob(jobId, user.getUserIdentification());
 
         if (stoppedJobId == null) {
-            LOGGER.info(
-                "Could not find job with id " + jobId + " for user " + owner
+            logger.info(
+                "Could not find job with id " + jobId + " for user " + user
                     .getUserIdentification());
             throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
         }
@@ -224,14 +224,14 @@ public class JobController {
 
     private JDFJob getJDFJob(String jobId, String userCredentials)
         throws InvalidParameterException, UnauthorizedRequestException {
-        User owner = this.authService.authorizeUser(userCredentials);
-        JDFJob job = this.jobService.getJobById(jobId, owner);
+        User user = this.authService.authorizeUser(userCredentials);
+        JDFJob job = this.jobService.getJobById(jobId, user);
 
         if (job == null) {
-            job = this.jobService.getJobByName(jobId, owner.getUserIdentification());
+            job = this.jobService.getJobByName(jobId, user.getUserIdentification());
             if (job == null) {
-                LOGGER.info(
-                    "Could not find job with id " + jobId + " for user " + owner
+                logger.info(
+                    "Could not find job with id " + jobId + " for user " + user
                         .getUserIdentification());
                 throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
             }

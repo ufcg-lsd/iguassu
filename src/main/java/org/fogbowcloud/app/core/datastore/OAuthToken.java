@@ -59,7 +59,7 @@ public class OAuthToken {
             expirationDate,
             tokenJson.getLong(OAuthPropertiesKeys.TOKEN_VERSION_JSON_KEY));
 
-        LOGGER.debug("Job read from JSON is from owner: " + token.getUserId());
+        LOGGER.debug("Job read from JSON is from user: " + token.getUserId());
         return token;
     }
 

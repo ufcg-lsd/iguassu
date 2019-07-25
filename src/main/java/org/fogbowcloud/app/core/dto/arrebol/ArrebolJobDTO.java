@@ -16,7 +16,7 @@ public class ArrebolJobDTO implements Serializable {
 
     public ArrebolJobDTO(JDFJob job) {
         this.tasksSpecs = new ArrayList<>();
-        this.label = job.getName();
+        this.label = job.getLabel();
         populateTaskSpec(job);
     }
 

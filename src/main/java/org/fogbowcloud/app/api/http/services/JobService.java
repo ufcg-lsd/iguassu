@@ -16,41 +16,42 @@ import org.springframework.stereotype.Service;
 @Service
 public class JobService {
 
-    private final Logger LOGGER = Logger.getLogger(JobService.class);
+    private final Logger logger = Logger.getLogger(JobService.class);
+
     @Lazy
     @Autowired
     private IguassuFacade iguassuFacade;
 
-    public List<JDFJob> getAllJobs(User owner) {
-        return this.iguassuFacade.getAllJobs(owner.getUserIdentification());
+    public List<JDFJob> getAllJobs(User user) {
+        return this.iguassuFacade.getAllJobs(user.getUserIdentification());
     }
 
-    public JDFJob getJobById(String jobId, User owner) throws InvalidParameterException {
-        JDFJob job = this.iguassuFacade.getJobById(jobId, owner.getUserIdentification());
+    public JDFJob getJobById(String jobId, User user) throws InvalidParameterException {
+        JDFJob job = this.iguassuFacade.getJobById(jobId, user.getUserIdentification());
         if (job == null) {
-            job = this.iguassuFacade.getJobByName(jobId, owner.getUserIdentification());
+            job = this.iguassuFacade.getJobByName(jobId, user.getUserIdentification());
             if (job == null) {
-                LOGGER.info(
-                    "Could not find job with id " + jobId + " for user " + owner
+                logger.info(
+                    "Could not find job with id " + jobId + " for user " + user
                         .getUserIdentification());
                 throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
             }
         }
 
-        LOGGER.info("JobID " + jobId + " is of job " + job);
+        logger.info("JobID " + jobId + " is of job " + job);
 
         return job;
     }
 
-    public JDFJob getJobByName(String jobName, String owner) {
-        return this.iguassuFacade.getJobByName(jobName, owner);
+    public JDFJob getJobByName(String jobName, String user) {
+        return this.iguassuFacade.getJobByName(jobName, user);
     }
 
-    public String stopJob(String jobId, String owner) {
-        return this.iguassuFacade.stopJob(jobId, owner);
+    public String stopJob(String jobId, String user) {
+        return this.iguassuFacade.stopJob(jobId, user);
     }
 
-    public String submitJob(String jdfFilePath, User owner) throws CompilerException, IOException {
-        return this.iguassuFacade.submitJob(jdfFilePath, owner);
+    public String submitJob(String jdfFilePath, User user) throws CompilerException, IOException {
+        return this.iguassuFacade.submitJob(jdfFilePath, user);
     }
 }

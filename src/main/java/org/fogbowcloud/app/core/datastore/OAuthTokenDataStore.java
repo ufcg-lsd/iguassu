@@ -22,14 +22,14 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
             + REFRESH_TOKEN + " VARCHAR(255), "
             + USER_ID + " VARCHAR(255), "
             + EXPIRES_IN + " DATE,"
-        + TOKEN_VERSION + " BIGINT)";
+            + TOKEN_VERSION + " BIGINT)";
 
     private static final String INSERT_TOKEN_TABLE_SQL = "INSERT INTO " + TOKENS_TABLE_NAME
             + " VALUES(?, ?, ?, ?, ?)";
 
     private static final String UPDATE_TOKEN_TABLE_SQL = "UPDATE " + TOKENS_TABLE_NAME + " SET "
             + ACCESS_TOKEN + " = ?, " + REFRESH_TOKEN + " = ?, " + USER_ID + " = ?, " + EXPIRES_IN + " = ?, " +
-        TOKEN_VERSION + " = ? WHERE " + ACCESS_TOKEN + " = ?";
+            TOKEN_VERSION + " = ? WHERE " + ACCESS_TOKEN + " = ?";
 
     private static final String GET_ALL_TOKENS = "SELECT * FROM " + TOKENS_TABLE_NAME;
     private static final String GET_TOKEN_BY_ACCESS_TOKEN = GET_ALL_TOKENS + " WHERE " + ACCESS_TOKEN + " = ? ";
@@ -63,11 +63,11 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
     }
 
     public boolean insert(OAuthToken token) {
-        LOGGER.debug("Inserting access token [" + token.getAccessToken() + "] with owner [" + token.getUserId() + "]");
+        LOGGER.debug("Inserting access token [" + token.getAccessToken() + "] with user [" + token.getUserId() + "]");
 
         if (token.getAccessToken() == null || token.getAccessToken().isEmpty()
                 || token.getUserId() == null || token.getUserId().isEmpty()) {
-            LOGGER.warn("Access token and owner must not be null.");
+            LOGGER.warn("Access token and user must not be null.");
             return false;
         }
 
@@ -80,7 +80,7 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
             preparedStatement.setString(1, token.getAccessToken());
             preparedStatement.setString(2, token.getRefreshToken());
             preparedStatement.setString(3, token.getUserId());
-            preparedStatement.setDate (4, token.getExpirationDate());
+            preparedStatement.setDate(4, token.getExpirationDate());
             preparedStatement.setLong(5, token.getVersion());
 
             preparedStatement.execute();
@@ -102,11 +102,11 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
     }
 
     public boolean update(String oldAccessToken, OAuthToken token) {
-        LOGGER.debug("Updating access token [" + token.getAccessToken() + "] from owner [" + token.getUserId() + "]");
+        LOGGER.debug("Updating access token [" + token.getAccessToken() + "] from user [" + token.getUserId() + "]");
 
         if (token.getAccessToken() == null || token.getAccessToken().isEmpty()
                 || token.getUserId() == null || token.getUserId().isEmpty()) {
-            LOGGER.warn("Access token and owner must not be null.");
+            LOGGER.warn("Access token and user must not be null.");
             return false;
         }
 
@@ -154,8 +154,8 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
         return null;
     }
 
-    public List<OAuthToken> getAccessTokenByOwnerUsername(String ownerUsername) {
-        return executeQueryStatement(GET_TOKEN_BY_OWNER_USERNAME, ownerUsername);
+    public List<OAuthToken> getAccessTokenByUserId(String userId) {
+        return executeQueryStatement(GET_TOKEN_BY_OWNER_USERNAME, userId);
     }
 
     public boolean deleteAll() {
@@ -175,7 +175,8 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
             if (conn != null) {
                 try {
                     conn.rollback();
-                } catch(SQLException excep) {}
+                } catch (SQLException excep) {
+                }
             }
             return false;
         } finally {
@@ -205,21 +206,20 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
     }
 
     public OAuthToken getObjFromDataStoreResult(ResultSet rs) throws SQLException {
-        String accessToken = rs.getString(ACCESS_TOKEN);
-        String refreshToken = rs.getString(REFRESH_TOKEN);
-        String ownerUsername = rs.getString(USER_ID);
-        Date expirationTime = rs.getDate(EXPIRES_IN);
-        long expirationTimeInMillisecondes = expirationTime.getTime();
-        long version = rs.getLong(TOKEN_VERSION);
+        final String accessToken = rs.getString(ACCESS_TOKEN);
+        final String refreshToken = rs.getString(REFRESH_TOKEN);
+        final String userId = rs.getString(USER_ID);
+        final Date expirationTime = rs.getDate(EXPIRES_IN);
+        final long expirationTimeInMilliseconds = expirationTime.getTime();
+        final long version = rs.getLong(TOKEN_VERSION);
 
         String strJson = "{" + ACCESS_TOKEN + ":" + accessToken + ","
                 + REFRESH_TOKEN + ":" + refreshToken + ","
-                + USER_ID + ":" + ownerUsername + ","
-                + EXPIRES_IN + ":" + expirationTimeInMillisecondes + ","
+                + USER_ID + ":" + userId + ","
+                + EXPIRES_IN + ":" + expirationTimeInMilliseconds + ","
                 + TOKEN_VERSION + ":" + version + "}";
         JSONObject tokenJson = new JSONObject(strJson);
-        OAuthToken token = OAuthToken.fromJSON(tokenJson);
-        return token;
+        return OAuthToken.fromJSON(tokenJson);
     }
 
 }

@@ -87,8 +87,8 @@ public class IguassuController {
         this.initMonitors();
     }
 
-    public JDFJob getJobById(String jobId, String owner) {
-        return this.jobDataStore.getByJobId(jobId, owner);
+    public JDFJob getJobById(String jobId, String user) {
+        return this.jobDataStore.getByJobId(jobId, user);
     }
 
     public void updateUser(User user) {
@@ -130,17 +130,17 @@ public class IguassuController {
             Objects.requireNonNull(oAuthToken).getAccessToken(), oAuthToken.getVersion());
     }
 
-    public ArrayList<JDFJob> getAllJobs(String owner) {
-        return (ArrayList<JDFJob>) this.jobDataStore.getAllByOwner(owner);
+    public ArrayList<JDFJob> getAllJobs(String userId) {
+        return (ArrayList<JDFJob>) this.jobDataStore.getAllByUserId(userId);
     }
 
     public void updateJob(JDFJob job) {
         this.jobDataStore.update(job);
     }
 
-    public String stopJob(String jobId, String owner) {
+    public String stopJob(String jobId, String userId) {
         // TODO: Stop job at Arrebol
-        final int updateCount = this.jobDataStore.deleteByJobId(jobId, owner);
+        final int updateCount = this.jobDataStore.deleteByJobId(jobId, userId);
 
         if (updateCount >= 1) {
             return jobId;
@@ -150,20 +150,20 @@ public class IguassuController {
         }
     }
 
-    public JDFJob getJobByName(String jobName, String owner) {
+    public JDFJob getJobByName(String jobName, String userId) {
         if (jobName == null) {
             return null;
         }
-        for (JDFJob job : this.jobDataStore.getAllByOwner(owner)) {
-            if (jobName.equals(job.getName())) {
+        for (JDFJob job : this.jobDataStore.getAllByUserId(userId)) {
+            if (jobName.equals(job.getLabel())) {
                 return job;
             }
         }
         return null;
     }
 
-    public Task getTaskById(String taskId, String owner) {
-        for (JDFJob job : getAllJobs(owner)) {
+    public Task getTaskById(String taskId, String userId) {
+        for (JDFJob job : getAllJobs(userId)) {
             Task task = job.getTaskById(taskId);
             if (task != null) {
                 return task;
@@ -234,7 +234,7 @@ public class IguassuController {
     public OAuthToken getCurrentTokenByUserId(String userId) {
         OAuthToken oAuthToken = null;
         List<OAuthToken> oAuthTokens = this.oAuthTokenDataStore
-            .getAccessTokenByOwnerUsername(userId);
+            .getAccessTokenByUserId(userId);
         for (OAuthToken t : oAuthTokens) {
             if (oAuthToken == null || oAuthToken.getVersion() < t.getVersion()) {
                 oAuthToken = t;

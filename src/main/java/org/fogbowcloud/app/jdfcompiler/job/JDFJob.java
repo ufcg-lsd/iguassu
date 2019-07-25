@@ -16,7 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- * It add the job name, and sched path to the {@link Job} abstraction.
+ * It add the job label, and sched path to the {@link Job} abstraction.
  */
 public class JDFJob extends Job implements Serializable {
 
@@ -28,42 +28,40 @@ public class JDFJob extends Job implements Serializable {
     private static final String JSON_HEADER_NAME = "name";
     private static final String JSON_HEADER_UUID = "uuid";
     private static final String JSON_HEADER_STATE = "state";
-    private static final String JSON_HEADER_OWNER = "owner";
+    private static final String JSON_HEADER_USER_ID = "userId";
     private static final String JSON_HEADER_TASKS = "tasks";
     private static final String JSON_HEADER_TIMESTAMP = "timestamp";
 
     private final String jobId;
-    private final String owner;
     private final String userId;
     private long timestamp;
-    private String name;
+    private String label;
     private JDFJobState state;
     private String jobIdArrebol;
 
-    public JDFJob(String jobId, String owner, List<Task> taskList, String userID) {
+    public JDFJob(String jobId, List<Task> taskList, String userID) {
         super(taskList);
-        this.name = userID + "_job";
+        this.label = userID + "_job";
         this.jobId = jobId;
-        this.owner = owner;
         this.userId = userID;
         this.state = JDFJobState.CREATED;
         this.timestamp = Instant.now().getEpochSecond();
     }
 
-    public JDFJob(String jobId, String owner, List<Task> taskList, String userID,
-        String jobIdArrebol) {
-        this(jobId, owner, taskList, userID);
+    public JDFJob(String jobId, List<Task> taskList, String userID,
+                  String jobIdArrebol) {
+        this(jobId, taskList, userID);
         this.jobIdArrebol = jobIdArrebol;
     }
 
-    private JDFJob(String jobId, String owner, List<Task> taskList, String userID,
-        String jobIdArrebol, long timestamp) {
-        this(jobId, owner, taskList, userID, jobIdArrebol);
+    private JDFJob(String jobId, List<Task> taskList, String userID,
+                   String jobIdArrebol, long timestamp) {
+        this(jobId, taskList, userID, jobIdArrebol);
         this.timestamp = timestamp;
     }
 
-    public JDFJob(String owner, List<Task> taskList, String userID) {
-        this(UUID.randomUUID().toString(), owner, taskList, userID);
+    public JDFJob(List<Task> taskList, String userID) {
+        this(UUID.randomUUID().toString(), taskList, userID);
     }
 
     public static JDFJob fromJSON(JSONObject job) {
@@ -79,9 +77,7 @@ public class JDFJob extends Job implements Serializable {
 
         JDFJob jdfJob = new JDFJob(
             job.optString(JSON_HEADER_JOB_ID),
-            job.optString(JSON_HEADER_OWNER),
-            tasks,
-            job.optString(JSON_HEADER_UUID),
+            tasks, job.optString(JSON_HEADER_USER_ID),
             job.optString(JSON_HEADER_JOB_ID_ARREBOL),
             job.optLong(JSON_HEADER_TIMESTAMP)
         );
@@ -92,7 +88,7 @@ public class JDFJob extends Job implements Serializable {
         } catch (Exception e) {
             LOGGER.debug("JSON had bad state", e);
         }
-        LOGGER.debug("Job read from JSON is from owner: " + job.optString(JSON_HEADER_OWNER));
+        LOGGER.debug("Job read from JSON is from userId: " + job.optString(JSON_HEADER_USER_ID));
         return jdfJob;
     }
 
@@ -112,12 +108,8 @@ public class JDFJob extends Job implements Serializable {
         return jobId;
     }
 
-    public String getName() {
-        return this.name;
-    }
-
-    public String getOwner() {
-        return this.owner;
+    public String getLabel() {
+        return this.label;
     }
 
     public Task getTaskById(String taskId) {
@@ -125,7 +117,7 @@ public class JDFJob extends Job implements Serializable {
     }
 
     public void setFriendlyName(String name) {
-        this.name = name;
+        this.label = name;
     }
 
     public JDFJobState getState() {
@@ -157,8 +149,8 @@ public class JDFJob extends Job implements Serializable {
         try {
             JSONObject job = new JSONObject();
             job.put(JSON_HEADER_JOB_ID, this.getId());
-            job.put(JSON_HEADER_NAME, this.getName());
-            job.put(JSON_HEADER_OWNER, this.getOwner());
+            job.put(JSON_HEADER_NAME, this.getLabel());
+            job.put(JSON_HEADER_USER_ID, this.getUserId());
             job.put(JSON_HEADER_UUID, this.getUserId());
             job.put(JSON_HEADER_STATE, this.getState().value());
             job.put(JSON_HEADER_JOB_ID_ARREBOL, this.jobIdArrebol);
@@ -186,21 +178,20 @@ public class JDFJob extends Job implements Serializable {
             return false;
         }
         JDFJob jdfJob = (JDFJob) o;
-        return jobId.equals(jdfJob.jobId) && owner.equals(jdfJob.owner);
+        return jobId.equals(jdfJob.jobId) && userId.equals(jdfJob.userId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(jobId, owner);
+        return Objects.hash(jobId, userId);
     }
 
     @Override
     public String toString() {
         return "JDFJob{" +
             "jobId='" + jobId + '\'' +
-            ", owner='" + owner + '\'' +
             ", userId='" + userId + '\'' +
-            ", name='" + name + '\'' +
+            ", label='" + label + '\'' +
             ", timestamp='" + timestamp + '\'' +
             ", state=" + state + '\'' +
             ", jobIdArrebol='" + jobIdArrebol + '\'' +

@@ -6,6 +6,6 @@ copyFrom : scp $machine:$remotefile $localfile
 copyTo : scp $localfile $machine:$remotefile
 
 worker :
-username : flavio
+userId : flavio
 password : flavio
 servername : barbado.lsd.ufcg.edu.br
