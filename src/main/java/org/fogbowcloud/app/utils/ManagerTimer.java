@@ -8,22 +8,28 @@ import java.util.concurrent.TimeUnit;
 
 public class ManagerTimer {
 
+    private static final Logger LOGGER = Logger.getLogger(ManagerTimer.class);
     private ScheduledExecutorService executor;
     private ScheduledFuture<?> future;
-    private static final Logger LOGGER = Logger.getLogger(ManagerTimer.class);
 
     public ManagerTimer(ScheduledExecutorService executor) {
         this.executor = executor;
     }
 
     public void scheduleAtFixedRate(final Runnable task, long delay, long period) {
-        this.future = executor.scheduleWithFixedDelay(() -> {
-            try {
-                task.run();
-            } catch (Throwable e) {
-                LOGGER.error("Failed while executing timer task: " + e.getMessage(), e);
-            }
-        }, delay, period, TimeUnit.MILLISECONDS);
+        this.future =
+                executor.scheduleWithFixedDelay(
+                        () -> {
+                            try {
+                                task.run();
+                            } catch (Throwable e) {
+                                LOGGER.error(
+                                        "Failed while executing timer task: " + e.getMessage(), e);
+                            }
+                        },
+                        delay,
+                        period,
+                        TimeUnit.MILLISECONDS);
     }
 
     public void cancel() {
@@ -36,5 +42,4 @@ public class ManagerTimer {
     public boolean isScheduled() {
         return future != null && !future.isCancelled();
     }
-
 }

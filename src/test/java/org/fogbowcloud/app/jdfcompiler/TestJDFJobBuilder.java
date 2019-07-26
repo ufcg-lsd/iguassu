@@ -47,7 +47,7 @@ public class TestJDFJobBuilder {
 				FAKE_EXTERNAL_OAUTH_TOKEN,
 				FAKE_TOKEN_VERSION
 		);
-		List<Task> tasks = testJob.getTasks();
+		List<Task> tasks = testJob.getTasksAsList();
 		
 		assertEquals(tasks.size(), 3);
 		for (Command command : tasks.get(0).getAllCommands()) {

@@ -13,7 +13,7 @@ import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.constants.ConfProperties;
-import org.fogbowcloud.app.core.dto.arrebol.ArrebolJobDTO;
+import org.fogbowcloud.app.core.dto.arrebol.ArrebolExecutionDTO;
 import org.fogbowcloud.app.core.http.HttpWrapper;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
@@ -33,7 +33,7 @@ final class ArrebolRequestsHelper {
 		this.jsonUtil = new Gson();
 	}
 
-	String submitJobToExecution(JDFJob job)
+	String submitToExecution(JDFJob job)
 		throws UnsupportedEncodingException, SubmitJobException, ArrebolConnectException {
 		StringEntity requestBody;
 
@@ -72,8 +72,8 @@ final class ArrebolRequestsHelper {
 		return Objects.requireNonNull(jobIdArrebol);
 	}
 
-	ArrebolJobDTO getJob(String jobArrebolId) throws GetJobException {
-		return this.jsonUtil.fromJson(getJobJSON(jobArrebolId), ArrebolJobDTO.class);
+	ArrebolExecutionDTO getJob(String jobArrebolId) throws GetJobException {
+		return this.jsonUtil.fromJson(getJobJSON(jobArrebolId), ArrebolExecutionDTO.class);
 	}
 
 	String getJobJSON(String jobArrebolId) throws GetJobException {
@@ -93,8 +93,8 @@ final class ArrebolRequestsHelper {
 		logger.info("Building JSON body of Job : [" + job.getId() + "]");
 
 		Gson gson = new GsonBuilder().setPrettyPrinting().create();
-		ArrebolJobDTO arrebolJobDTO = new ArrebolJobDTO(job);
-		String json = gson.toJson(arrebolJobDTO);
+		ArrebolExecutionDTO arrebolExecutionDTO = new ArrebolExecutionDTO(job);
+		String json = gson.toJson(arrebolExecutionDTO);
 
 		logger.debug("Job json looks like : \n" + json);
 

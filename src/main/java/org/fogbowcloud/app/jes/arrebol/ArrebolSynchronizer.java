@@ -1,52 +1,48 @@
 package org.fogbowcloud.app.jes.arrebol;
 
 import com.google.gson.Gson;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.command.Command;
 import org.fogbowcloud.app.core.command.CommandState;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.core.task.TaskState;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
-import org.fogbowcloud.app.jes.arrebol.models.ArrebolCommand;
-import org.fogbowcloud.app.jes.arrebol.models.ArrebolCommandState;
-import org.fogbowcloud.app.jes.arrebol.models.ArrebolJob;
-import org.fogbowcloud.app.jes.arrebol.models.ArrebolJobState;
-import org.fogbowcloud.app.jes.arrebol.models.ArrebolTask;
-import org.fogbowcloud.app.jes.arrebol.models.ArrebolTaskState;
+import org.fogbowcloud.app.jdfcompiler.job.JobState;
+import org.fogbowcloud.app.jes.arrebol.models.*;
 import org.fogbowcloud.app.jes.exceptions.GetJobException;
 
-public class ArrebolJobSynchronizer implements JobSynchronizer {
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
 
-    private static final Logger LOGGER = Logger.getLogger(ArrebolJobSynchronizer.class);
+public class ArrebolSynchronizer implements Synchronizer {
+
+    private static final Logger LOGGER = Logger.getLogger(ArrebolSynchronizer.class);
 
     private final ArrebolRequestsHelper requestsHelper;
 
-    public ArrebolJobSynchronizer(Properties properties) {
+    public ArrebolSynchronizer(Properties properties) {
         this.requestsHelper = new ArrebolRequestsHelper(properties);
     }
 
-    //TODO Review method name
+    // TODO Review method name
     @Override
-    public JDFJob synchronizeJob(JDFJob job) {
+    public JDFJob sync(JDFJob job) {
         try {
-            String arrebolJobId = job.getJobIdArrebol();
-            if (Objects.nonNull(arrebolJobId) && !arrebolJobId.trim().isEmpty()) {
+            String executionId = job.getExecutionId();
+            if (Objects.nonNull(executionId) && !executionId.trim().isEmpty()) {
                 try {
-                    String arrebolJobJson = this.requestsHelper.getJobJSON(arrebolJobId);
-                    LOGGER.debug("JSON Response [" + arrebolJobJson + "]");
+                    String jobExecutionJson = this.requestsHelper.getJobJSON(executionId);
+                    LOGGER.debug("JSON Response [" + jobExecutionJson + "]");
                     Gson gson = new Gson();
-                    ArrebolJob arrebolJob = gson.fromJson(arrebolJobJson, ArrebolJob.class);
+                    ArrebolJob arrebolJob = gson.fromJson(jobExecutionJson, ArrebolJob.class);
                     this.updateJob(job, arrebolJob);
                 } catch (Exception e) {
                     LOGGER.error(e.getMessage());
                 }
             } else {
-                LOGGER.debug("ArrebolJobId from Job [" + job.getId() + "] is null.");
+                LOGGER.debug("Execution identifier from Job [" + job.getId() + "] is null.");
             }
         } catch (GetJobException e) {
             LOGGER.error(e.getMessage(), e);
@@ -55,13 +51,12 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
     }
 
     private void updateJob(JDFJob job, ArrebolJob arrebolJob) {
-        updateTasks(job.getTaskList(), arrebolJob.getTasks());
+        updateTasks(job.getTasks(), arrebolJob.getTasks());
         LOGGER.info("Updated tasks state from job [" + job.getId() + "].");
         updateJobState(job, arrebolJob.getJobState());
     }
 
     private void updateTasks(Map<String, Task> iguassuTasks, List<ArrebolTask> arrebolTasks) {
-        // This produce some collateral effect, attempt for this.
         for (ArrebolTask arrebolTask : arrebolTasks) {
             String taskIguassuId = arrebolTask.getTaskSpec().getId();
             Task iguassuTask = iguassuTasks.get(taskIguassuId);
@@ -73,7 +68,10 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
                 TaskState taskState = getTaskState(arrebolTaskState);
                 iguassuTask.setState(taskState);
                 LOGGER.debug(
-                    "Updated task [" + iguassuTask.getId() + "] to state " + taskState.toString());
+                        "Updated task ["
+                                + iguassuTask.getId()
+                                + "] to state "
+                                + taskState.toString());
             }
         }
     }
@@ -89,12 +87,12 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
         }
     }
 
-    private void updateJobState(JDFJob job, ArrebolJobState arrebolJobState) {
-        JDFJobState jdfJobState = this.getJobState(arrebolJobState);
+    private void updateJobState(JDFJob job, ExecutionState executionState) {
+        JobState jobState = this.getJobState(executionState);
 
-        if (jdfJobState != null) {
-            job.setState(jdfJobState);
-            LOGGER.info("Updated job [" + job.getId() + "] to state " + jdfJobState.toString());
+        if (jobState != null) {
+            job.setState(jobState);
+            LOGGER.info("Updated job [" + job.getId() + "] to state " + jobState.toString());
         }
     }
 
@@ -127,18 +125,18 @@ public class ArrebolJobSynchronizer implements JobSynchronizer {
         }
     }
 
-    private JDFJobState getJobState(ArrebolJobState arrebolJobState) {
-        switch (arrebolJobState) {
+    private JobState getJobState(ExecutionState executionState) {
+        switch (executionState) {
             case SUBMITTED:
-                return JDFJobState.SUBMITTED;
+                return JobState.SUBMITTED;
             case QUEUED:
-                return JDFJobState.QUEUED;
+                return JobState.QUEUED;
             case RUNNING:
-                return JDFJobState.RUNNING;
+                return JobState.RUNNING;
             case FAILED:
-                return JDFJobState.FAILED;
+                return JobState.FAILED;
             case FINISHED:
-                return JDFJobState.FINISHED;
+                return JobState.FINISHED;
             default:
                 return null;
         }

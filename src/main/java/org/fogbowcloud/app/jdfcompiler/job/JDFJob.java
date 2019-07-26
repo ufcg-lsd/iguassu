@@ -1,62 +1,52 @@
 package org.fogbowcloud.app.jdfcompiler.job;
 
-import java.io.Serializable;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.UUID;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.core.constants.JsonKey;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.core.task.TaskImpl;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * It add the job label, and sched path to the {@link Job} abstraction.
- */
+import java.io.Serializable;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.UUID;
+
+/** It add the job label and user information path to the {@link Job} abstraction. */
 public class JDFJob extends Job implements Serializable {
 
-    private static final Logger LOGGER = Logger.getLogger(JDFJob.class);
+    /**
+     * Serial identification of the class. It need to be changed only if the class interface is
+     * changed.
+     */
     private static final long serialVersionUID = 7780896231796955706L;
 
-    private static final String JSON_HEADER_JOB_ID = "jobId";
-    private static final String JSON_HEADER_JOB_ID_ARREBOL = "jobIdArrebol";
-    private static final String JSON_HEADER_NAME = "name";
-    private static final String JSON_HEADER_UUID = "uuid";
-    private static final String JSON_HEADER_STATE = "state";
-    private static final String JSON_HEADER_USER_ID = "userId";
-    private static final String JSON_HEADER_TASKS = "tasks";
-    private static final String JSON_HEADER_TIMESTAMP = "timestamp";
+    private static final Logger logger = Logger.getLogger(JDFJob.class);
 
-    private final String jobId;
     private final String userId;
     private long timestamp;
     private String label;
-    private JDFJobState state;
-    private String jobIdArrebol;
+    private String executionId;
 
     public JDFJob(String jobId, List<Task> taskList, String userID) {
-        super(taskList);
+        super(taskList, jobId);
         this.label = userID + "_job";
-        this.jobId = jobId;
         this.userId = userID;
-        this.state = JDFJobState.CREATED;
         this.timestamp = Instant.now().getEpochSecond();
     }
 
-    public JDFJob(String jobId, List<Task> taskList, String userID,
-                  String jobIdArrebol) {
+    public JDFJob(String jobId, List<Task> taskList, String userID, String executionId) {
         this(jobId, taskList, userID);
-        this.jobIdArrebol = jobIdArrebol;
+        this.executionId = executionId;
     }
 
-    private JDFJob(String jobId, List<Task> taskList, String userID,
-                   String jobIdArrebol, long timestamp) {
-        this(jobId, taskList, userID, jobIdArrebol);
+    private JDFJob(
+            String jobId, List<Task> taskList, String userID, String executionId, long timestamp) {
+        this(jobId, taskList, userID, executionId);
         this.timestamp = timestamp;
     }
 
@@ -65,76 +55,53 @@ public class JDFJob extends Job implements Serializable {
     }
 
     public static JDFJob fromJSON(JSONObject job) {
-        LOGGER.info("Reading Job from JSON");
+        logger.info("Reading Job from JSON");
         List<Task> tasks = new ArrayList<>();
 
-        JSONArray tasksJSON = job.optJSONArray(JSON_HEADER_TASKS);
+        JSONArray tasksJSON = job.optJSONArray(JsonKey.TASKS.getKey());
         for (int i = 0; i < tasksJSON.length(); i++) {
             JSONObject taskJSON = tasksJSON.optJSONObject(i);
             Task task = TaskImpl.fromJSON(taskJSON);
             tasks.add(task);
         }
 
-        JDFJob jdfJob = new JDFJob(
-            job.optString(JSON_HEADER_JOB_ID),
-            tasks, job.optString(JSON_HEADER_USER_ID),
-            job.optString(JSON_HEADER_JOB_ID_ARREBOL),
-            job.optLong(JSON_HEADER_TIMESTAMP)
-        );
-        jdfJob.setFriendlyName(job.optString(JSON_HEADER_NAME));
+        JDFJob jdfJob =
+                new JDFJob(
+                        job.optString(JsonKey.JOB_ID.getKey()),
+                        tasks,
+                        job.optString(JsonKey.USER_ID.getKey()),
+                        job.optString(JsonKey.EXECUTION_ID.getKey()),
+                        job.optLong(JsonKey.TIMESTAMP.getKey()));
+        jdfJob.setLabel(job.optString(JsonKey.LABEL.getKey()));
 
         try {
-            jdfJob.state = JDFJobState.create(job.optString(JSON_HEADER_STATE));
+            jdfJob.setState(JobState.valueOf(job.optString(JsonKey.STATE.getKey())));
         } catch (Exception e) {
-            LOGGER.debug("JSON had bad state", e);
+            logger.debug("JSON had bad state", e);
         }
-        LOGGER.debug("Job read from JSON is from userId: " + job.optString(JSON_HEADER_USER_ID));
+        logger.debug(
+                "Job read from JSON is from userId: " + job.optString(JsonKey.USER_ID.getKey()));
         return jdfJob;
     }
 
-    public String getJobId() {
-        return jobId;
+    public String getExecutionId() {
+        return this.executionId;
     }
 
-    public String getJobIdArrebol() {
-        return jobIdArrebol;
-    }
-
-    public void setJobIdArrebol(String jobIdArrebol) {
-        this.jobIdArrebol = jobIdArrebol;
-    }
-
-    public String getId() {
-        return jobId;
+    public void setExecutionId(String executionId) {
+        this.executionId = executionId;
     }
 
     public String getLabel() {
         return this.label;
     }
 
+    public void setLabel(String label) {
+        this.label = label;
+    }
+
     public Task getTaskById(String taskId) {
-        return this.getTaskList().get(taskId);
-    }
-
-    public void setFriendlyName(String name) {
-        this.label = name;
-    }
-
-    public JDFJobState getState() {
-        return this.state;
-    }
-
-    @Override
-    public void setState(JDFJobState state) {
-        this.state = state;
-    }
-
-    public void finishCreation() {
-        this.state = JDFJobState.CREATED;
-    }
-
-    public void failCreation() {
-        this.state = JDFJobState.FAILED;
+        return this.getTasks().get(taskId);
     }
 
     public String getUserId() {
@@ -148,53 +115,24 @@ public class JDFJob extends Job implements Serializable {
     public JSONObject toJSON() {
         try {
             JSONObject job = new JSONObject();
-            job.put(JSON_HEADER_JOB_ID, this.getId());
-            job.put(JSON_HEADER_NAME, this.getLabel());
-            job.put(JSON_HEADER_USER_ID, this.getUserId());
-            job.put(JSON_HEADER_UUID, this.getUserId());
-            job.put(JSON_HEADER_STATE, this.getState().value());
-            job.put(JSON_HEADER_JOB_ID_ARREBOL, this.jobIdArrebol);
-            job.put(JSON_HEADER_TIMESTAMP, this.timestamp);
+
+            job.put(JsonKey.JOB_ID.getKey(), this.getId());
+            job.put(JsonKey.USER_ID.getKey(), this.getUserId());
+            job.put(JsonKey.TIMESTAMP.getKey(), this.timestamp);
+            job.put(JsonKey.LABEL.getKey(), this.getLabel());
+            job.put(JsonKey.STATE.getKey(), this.getState().getState());
+            job.put(JsonKey.EXECUTION_ID.getKey(), this.executionId);
 
             JSONArray tasks = new JSONArray();
-            Map<String, Task> taskList = this.getTaskList();
+            Map<String, Task> taskList = this.getTasks();
             for (Entry<String, Task> entry : taskList.entrySet()) {
                 tasks.put(entry.getValue().toJSON());
             }
-            job.put(JSON_HEADER_TASKS, tasks);
+            job.put(JsonKey.TASKS.getKey(), tasks);
             return job;
         } catch (JSONException e) {
-            LOGGER.debug("Error while trying to create a JSONObject from JDFJob", e);
+            logger.debug("Error while trying to create a JSONObject from JDFJob", e);
             return null;
         }
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
-        JDFJob jdfJob = (JDFJob) o;
-        return jobId.equals(jdfJob.jobId) && userId.equals(jdfJob.userId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(jobId, userId);
-    }
-
-    @Override
-    public String toString() {
-        return "JDFJob{" +
-            "jobId='" + jobId + '\'' +
-            ", userId='" + userId + '\'' +
-            ", label='" + label + '\'' +
-            ", timestamp='" + timestamp + '\'' +
-            ", state=" + state + '\'' +
-            ", jobIdArrebol='" + jobIdArrebol + '\'' +
-            '}';
     }
 }

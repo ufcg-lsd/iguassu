@@ -1,65 +1,62 @@
 package org.fogbowcloud.app.core.auth.models;
 
+import org.fogbowcloud.app.core.constants.JsonKey;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/** This class encapsulates the user security information. */
 public class Credential {
 
-	private static final String USER_ID_JSON_KEY = "userId";
-	private static final String IGUASSU_TOKEN_JSON_KEY = "iguassuToken";
-	private static final String NONCE_KEY = "nonce";
+    private String userId;
+    private String iguassuToken;
+    private Integer nonce;
 
-	private String userId;
-	private String iguassuToken;
-	private Integer nonce;
-	
-	public Credential(String userId, String iguassuToken, Integer nonce) {
-		this.userId = userId;
-		this.iguassuToken = iguassuToken;
-		this.nonce = nonce;
-	}
+    private Credential(String userId, String iguassuToken, Integer nonce) {
+        this.userId = userId;
+        this.iguassuToken = iguassuToken;
+        this.nonce = nonce;
+    }
 
-	public String getUserId() {
-		return userId;
-	}
+    public static Credential fromJSON(JSONObject credential) {
+        return new Credential(
+                credential.optString(JsonKey.USER_ID.getKey()),
+                credential.optString(JsonKey.IGUASSU_TOKEN.getKey()),
+                credential.optInt(JsonKey.NONCE.getKey()));
+    }
 
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
+    public JSONObject toJSON() {
+        JSONObject credential = new JSONObject();
+        try {
+            credential.put(JsonKey.USER_ID.getKey(), this.userId);
+            credential.put(JsonKey.IGUASSU_TOKEN.getKey(), this.iguassuToken);
+            credential.put(JsonKey.NONCE.getKey(), this.nonce);
+        } catch (JSONException e) {
+            return null;
+        }
+        return credential;
+    }
 
-	public String getIguassuToken() {
-		return iguassuToken;
-	}
+    public String getUserId() {
+        return userId;
+    }
 
-	public void setIguassuToken(String iguassuToken) {
-		this.iguassuToken = iguassuToken;
-	}
+    public void setUserId(String userId) {
+        this.userId = userId;
+    }
 
-	public Integer getNonce() {
-		return nonce;
-	}
+    public String getIguassuToken() {
+        return iguassuToken;
+    }
 
-	public void setNonce(Integer nonce) {
-		this.nonce = nonce;
-	}
-	
-	public static Credential fromJSON(JSONObject credential) {
-		return new Credential(
-				credential.optString(USER_ID_JSON_KEY),
-				credential.optString(IGUASSU_TOKEN_JSON_KEY),
-				credential.optInt(NONCE_KEY));
-	}
-	
-	public JSONObject toJSON() {
-		JSONObject credential = new JSONObject();
-		try {
-			credential.put(USER_ID_JSON_KEY, this.userId);
-			credential.put(IGUASSU_TOKEN_JSON_KEY, this.iguassuToken);
-			credential.put(NONCE_KEY, this.nonce);
-		} catch (JSONException e) {
-			return null;
-		}
-		return credential;
-	}
+    public void setIguassuToken(String iguassuToken) {
+        this.iguassuToken = iguassuToken;
+    }
 
+    public Integer getNonce() {
+        return nonce;
+    }
+
+    public void setNonce(Integer nonce) {
+        this.nonce = nonce;
+    }
 }

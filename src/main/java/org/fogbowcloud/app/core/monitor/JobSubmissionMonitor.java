@@ -5,7 +5,7 @@ import java.util.Queue;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
+import org.fogbowcloud.app.jdfcompiler.job.JobState;
 import org.fogbowcloud.app.jes.JobExecutionService;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 
@@ -32,20 +32,20 @@ public class JobSubmissionMonitor implements Runnable {
 			JDFJob job = this.jobsToSubmit.poll();
 			LOGGER.debug("Job found! Starting job submission with id [" + job.getId() + "]");
 			try {
-				final String arrebolId = this.jobExecutionSystem.execute(job);
-				job.setJobIdArrebol(arrebolId);
-				job.setState(JDFJobState.SUBMITTED);
+				final String arrebolId = this.jobExecutionSystem.create(job);
+				job.setExecutionId(arrebolId);
+				job.setState(JobState.SUBMITTED);
 				this.jobDataStore.update(job);
 
 				LOGGER.info(
-					"Iguassu Job [" + job.getId() + "] has arrebol id: [" + job.getJobIdArrebol() + "]");
+					"Iguassu Job [" + job.getId() + "] has arrebol id: [" + job.getExecutionId() + "]");
 
 			} catch (ArrebolConnectException ace) {
 				LOGGER.error("Job execution service is not available right now.");
 				this.jobsToSubmit.offer(job);
 				break;
 			} catch (Exception e) {
-				job.setState(JDFJobState.FAILED);
+				job.setState(JobState.FAILED);
 				this.jobDataStore.update(job);
 				LOGGER.error(
 					"Error submitting job with id: [" + job.getId() + "]. Maybe the Job is poorly formed.",

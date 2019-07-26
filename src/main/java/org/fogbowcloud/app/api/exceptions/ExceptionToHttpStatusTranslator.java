@@ -14,43 +14,43 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 public class ExceptionToHttpStatusTranslator extends ResponseEntityExceptionHandler {
 
-	@ExceptionHandler(UnauthorizedRequestException.class)
-	public final ResponseEntity<ExceptionResponse> handleAuthorizationException(
-		Exception ex, WebRequest request) {
+    @ExceptionHandler(UnauthorizedRequestException.class)
+    public final ResponseEntity<ExceptionResponse> handleAuthorizationException(
+            Exception ex, WebRequest request) {
 
-		ExceptionResponse errorDetails =
-			new ExceptionResponse(ex.getMessage(), request.getDescription(false));
+        ExceptionResponse errorDetails =
+                new ExceptionResponse(ex.getMessage(), request.getDescription(false));
 
-		return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
-	}
+        return new ResponseEntity<>(errorDetails, HttpStatus.UNAUTHORIZED);
+    }
 
-	@ExceptionHandler(InvalidParameterException.class)
-	public final ResponseEntity<ExceptionResponse> handleInvalidParameterException(
-		Exception ex, WebRequest request) {
+    @ExceptionHandler(InvalidParameterException.class)
+    public final ResponseEntity<ExceptionResponse> handleInvalidParameterException(
+            Exception ex, WebRequest request) {
 
-		ExceptionResponse errorDetails =
-			new ExceptionResponse(ex.getMessage(), request.getDescription(false));
+        ExceptionResponse errorDetails =
+                new ExceptionResponse(ex.getMessage(), request.getDescription(false));
 
-		return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
-	}
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
 
-	@ExceptionHandler(StorageException.class)
-	public final ResponseEntity<ExceptionResponse> handleBadJobSubmitted(
-		Exception ex, WebRequest request) {
+    @ExceptionHandler(StorageException.class)
+    public final ResponseEntity<ExceptionResponse> handleBadJobSubmitted(
+            Exception ex, WebRequest request) {
 
-		ExceptionResponse errorDetails =
-			new ExceptionResponse(ex.getMessage(), request.getDescription(false));
+        ExceptionResponse errorDetails =
+                new ExceptionResponse(ex.getMessage(), request.getDescription(false));
 
-		return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
-	}
+        return new ResponseEntity<>(errorDetails, HttpStatus.BAD_REQUEST);
+    }
 
-	@ExceptionHandler(IguassuException.class)
-	public final ResponseEntity<ExceptionResponse> handleAnyException(
-		Exception ex, WebRequest request) {
+    @ExceptionHandler(IguassuException.class)
+    public final ResponseEntity<ExceptionResponse> handleAnyException(
+            Exception ex, WebRequest request) {
 
-		ExceptionResponse errorDetails =
-			new ExceptionResponse(ex.getMessage(), request.getDescription(false));
+        ExceptionResponse errorDetails =
+                new ExceptionResponse(ex.getMessage(), request.getDescription(false));
 
-		return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
-	}
+        return new ResponseEntity<>(errorDetails, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

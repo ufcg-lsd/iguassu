@@ -6,12 +6,12 @@ public class ArrebolJob {
 
     private String id;
 
-    private ArrebolJobState jobState;
+    private ExecutionState jobState;
 
     private List<ArrebolTask> tasks;
 
     public ArrebolJob(String label, Collection<ArrebolTask> tasks){
-        this.jobState = ArrebolJobState.SUBMITTED;
+        this.jobState = ExecutionState.SUBMITTED;
         this.tasks = new LinkedList<>(tasks);
     }
 
@@ -19,11 +19,11 @@ public class ArrebolJob {
         return this.id;
     }
 
-    public ArrebolJobState getJobState(){
+    public ExecutionState getJobState(){
         return this.jobState;
     }
 
-    public void setJobState(ArrebolJobState jobState){
+    public void setJobState(ExecutionState jobState){
         this.jobState = jobState;
     }
 

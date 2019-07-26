@@ -1,15 +1,11 @@
 package org.fogbowcloud.app.core.datastore;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.json.JSONObject;
+
+import java.sql.*;
+import java.util.List;
 
 public class JobDataStore extends DataStore<JDFJob> {
 
@@ -19,32 +15,53 @@ public class JobDataStore extends DataStore<JDFJob> {
     private static final String JOB_USER_ID = "job_user_id";
 
     private static final String CREATE_TABLE_STATEMENT =
-        "CREATE TABLE IF NOT EXISTS " + JOBS_TABLE_NAME + "("
-            + JOB_ID + " VARCHAR(255) PRIMARY KEY, "
-            + JOB_USER_ID + " VARCHAR(255), "
-            + JOB_JSON + " TEXT)";
+            "CREATE TABLE IF NOT EXISTS "
+                    + JOBS_TABLE_NAME
+                    + "("
+                    + JOB_ID
+                    + " VARCHAR(255) PRIMARY KEY, "
+                    + JOB_USER_ID
+                    + " VARCHAR(255), "
+                    + JOB_JSON
+                    + " TEXT)";
 
-    private static final String INSERT_JOB_TABLE_SQL = "INSERT INTO " + JOBS_TABLE_NAME
-        + " VALUES(?, ?, ?)";
+    private static final String INSERT_JOB_TABLE_SQL =
+            "INSERT INTO " + JOBS_TABLE_NAME + " VALUES(?, ?, ?)";
 
-    private static final String UPDATE_JOB_TABLE_SQL = "UPDATE " + JOBS_TABLE_NAME
-        + " SET " + JOB_ID + " = ?, " + JOB_USER_ID + " = ?, " + JOB_JSON + " = ? WHERE " + JOB_ID
-        + " = ?";
+    private static final String UPDATE_JOB_TABLE_SQL =
+            "UPDATE "
+                    + JOBS_TABLE_NAME
+                    + " SET "
+                    + JOB_ID
+                    + " = ?, "
+                    + JOB_USER_ID
+                    + " = ?, "
+                    + JOB_JSON
+                    + " = ? WHERE "
+                    + JOB_ID
+                    + " = ?";
 
     private static final String GET_ALL_JOB = "SELECT * FROM " + JOBS_TABLE_NAME;
-    private static final String GET_JOB_BY_USER_ID = GET_ALL_JOB + " WHERE " + JOB_USER_ID + " = ? ";
+    private static final String GET_JOB_BY_USER_ID =
+            GET_ALL_JOB + " WHERE " + JOB_USER_ID + " = ? ";
     private static final String GET_JOB_BY_JOB_ID =
-        GET_ALL_JOB + " WHERE " + JOB_ID + " = ? AND " + JOB_USER_ID + " = ?";
+            GET_ALL_JOB + " WHERE " + JOB_ID + " = ? AND " + JOB_USER_ID + " = ?";
 
     private static final String DELETE_ALL_JOB_TABLE_SQL = "DELETE FROM " + JOBS_TABLE_NAME;
     private static final String DELETE_BY_USER_ID =
-        "DELETE FROM " + JOBS_TABLE_NAME + " WHERE " + JOB_USER_ID
-            + " = ? ";
-    private static final String DELETE_BY_JOB_ID_SQL = "DELETE FROM " + JOBS_TABLE_NAME + " WHERE "
-        + JOB_ID + " = ? AND " + JOB_USER_ID + " = ?";
+            "DELETE FROM " + JOBS_TABLE_NAME + " WHERE " + JOB_USER_ID + " = ? ";
+    private static final String DELETE_BY_JOB_ID_SQL =
+            "DELETE FROM "
+                    + JOBS_TABLE_NAME
+                    + " WHERE "
+                    + JOB_ID
+                    + " = ? AND "
+                    + JOB_USER_ID
+                    + " = ?";
 
     private static final Logger LOGGER = Logger.getLogger(JobDataStore.class);
-    private static final String ERROR_WHILE_INITIALIZING_THE_DATA_STORE = "Error while initializing the Job DataStore.";
+    private static final String ERROR_WHILE_INITIALIZING_THE_DATA_STORE =
+            "Error while initializing the Job DataStore.";
 
     public JobDataStore(String dataStoreURL) {
         super(dataStoreURL);
@@ -72,8 +89,10 @@ public class JobDataStore extends DataStore<JDFJob> {
     public boolean insert(JDFJob job) {
         LOGGER.debug("Inserting job [" + job.getId() + "] with user id [" + job.getUserId() + "]");
 
-        if (job.getId() == null || job.getId().isEmpty()
-            || job.getUserId() == null || job.getUserId().isEmpty()) {
+        if (job.getId() == null
+                || job.getId().isEmpty()
+                || job.getUserId() == null
+                || job.getUserId().isEmpty()) {
             LOGGER.warn("Job Id and user id must not be null.");
             return false;
         }
@@ -109,8 +128,10 @@ public class JobDataStore extends DataStore<JDFJob> {
     public boolean update(JDFJob job) {
         LOGGER.debug("Updating job [" + job.getId() + "] from user id [" + job.getUserId() + "]");
 
-        if (job.getId() == null || job.getId().isEmpty()
-            || job.getUserId() == null || job.getUserId().isEmpty()) {
+        if (job.getId() == null
+                || job.getId().isEmpty()
+                || job.getUserId() == null
+                || job.getUserId().isEmpty()) {
             LOGGER.warn("Job Id and user id must not be null.");
             return false;
         }
@@ -199,8 +220,8 @@ public class JobDataStore extends DataStore<JDFJob> {
 
         } catch (SQLException e) {
             LOGGER.error(
-                "Couldn't delete all registres from user [" + user + "] on " + JOBS_TABLE_NAME,
-                e);
+                    "Couldn't delete all registres from user [" + user + "] on " + JOBS_TABLE_NAME,
+                    e);
             return false;
         } finally {
             close(statement, conn);
@@ -221,8 +242,13 @@ public class JobDataStore extends DataStore<JDFJob> {
 
             updateCount = statement.executeUpdate();
         } catch (SQLException e) {
-            LOGGER.error("Couldn't delete registres on " + JOBS_TABLE_NAME + " with Job id ["
-                + jobId + "]", e);
+            LOGGER.error(
+                    "Couldn't delete registres on "
+                            + JOBS_TABLE_NAME
+                            + " with Job id ["
+                            + jobId
+                            + "]",
+                    e);
         } finally {
             close(statement, conn);
         }
@@ -233,5 +259,4 @@ public class JobDataStore extends DataStore<JDFJob> {
         JDFJob job = JDFJob.fromJSON(new JSONObject(rs.getString(JOB_JSON)));
         return job;
     }
-
 }

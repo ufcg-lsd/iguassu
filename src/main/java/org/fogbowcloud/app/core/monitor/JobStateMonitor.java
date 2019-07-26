@@ -1,37 +1,49 @@
 package org.fogbowcloud.app.core.monitor;
 
-import java.util.List;
-import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
-import org.fogbowcloud.app.jes.arrebol.JobSynchronizer;
+import org.fogbowcloud.app.jdfcompiler.job.JobState;
+import org.fogbowcloud.app.jes.arrebol.Synchronizer;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class JobStateMonitor implements Runnable {
 
-	private static final Logger logger = Logger.getLogger(JobStateMonitor.class);
-	private JobDataStore jobDataStore;
-	private JobSynchronizer jobSynchronizer;
+    private static final Logger logger = Logger.getLogger(JobStateMonitor.class);
+    private JobDataStore jobDataStore;
+    private Synchronizer synchronizer;
 
-	JobStateMonitor(JobDataStore jobDataStore, JobSynchronizer jobSynchronizer) {
-		this.jobDataStore = jobDataStore;
-		this.jobSynchronizer = jobSynchronizer;
-	}
+    JobStateMonitor(JobDataStore jobDataStore, Synchronizer synchronizer) {
+        this.jobDataStore = jobDataStore;
+        this.synchronizer = synchronizer;
+    }
 
-	@Override
-	public void run() {
-		logger.info("Running job state monitor.");
-		List<JDFJob> jobs =
-			jobDataStore.getAll().stream()
-				.filter(
-					j ->
-						!(j.getState().equals(JDFJobState.FINISHED)
-							|| j.getState().equals(JDFJobState.FAILED)))
-				.collect(Collectors.toList());
-		for (JDFJob job : jobs) {
-			JDFJob jobUpdated = jobSynchronizer.synchronizeJob(job);
-			logger.info("Response from datastore update: " + jobDataStore.update(jobUpdated));
-		}
-	}
+    @Override
+    public void run() {
+        logger.info("Running job state monitor.");
+        List<JDFJob> jobs =
+                jobDataStore.getAll().stream()
+                        .filter(
+                                j ->
+                                        !(j.getState().equals(JobState.FINISHED)
+                                                || j.getState().equals(JobState.FAILED)))
+                        .collect(Collectors.toList());
+        for (JDFJob job : jobs) {
+            JDFJob jobUpdated = synchronizer.sync(job);
+            boolean updateResult = jobDataStore.update(jobUpdated);
+
+            if (updateResult) {
+                logger.debug(
+                        "Job ["
+                                + job.getId()
+                                + "] was successfully synchronized with its execution ["
+                                + job.getExecutionId()
+                                + "].");
+            } else {
+                logger.error("Job [" + job.getId() + "] was not synchronized with its execution.");
+            }
+        }
+    }
 }

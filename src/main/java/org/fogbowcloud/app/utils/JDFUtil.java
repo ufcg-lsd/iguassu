@@ -8,9 +8,9 @@ import org.fogbowcloud.app.jdfcompiler.semantic.RemoteCommand;
 public class JDFUtil {
 
     public static void removeEmptySpaceFromVariables(JobSpecification jobSpec) {
-        for(TaskSpecification taskSpec : jobSpec.getTaskSpecs()){
-            for(JDLCommand command : taskSpec.getTaskBlocks()){
-                if(command instanceof RemoteCommand){
+        for (TaskSpecification taskSpec : jobSpec.getTaskSpecs()) {
+            for (JDLCommand command : taskSpec.getTaskBlocks()) {
+                if (command instanceof RemoteCommand) {
                     String content = ((RemoteCommand) command).getContent().replaceAll(" =", "=");
                     ((RemoteCommand) command).setContent(content);
                 }

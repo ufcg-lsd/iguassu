@@ -10,55 +10,59 @@ import java.util.Objects;
  */
 public class OAuth2Identifiers {
 
-	/** Client Application identifier representation provides by OAuth2. */
-	private String clientAppId;
+    /** This property is provided by the OAuth2 of the Storage Service; must be non-null. */
+    private String clientAppId;
 
-	/** Client Application secret key representation provides by OAuth2. */
-	private String secret;
+    /** This property is provided by the OAuth2 of the Storage Service; must be non-null. */
+    private String secret;
 
-	/** Redirect URI representation provides by OAuth2. */
-	private String redirectUri;
+    /** This property is provided by the OAuth2 of the Storage Service; must be non-null. */
+    private String redirectUri;
 
-	/**
-	 * @param clientAppId A hash that represents an identifier of the application that is authorized
-	 *     to made OAuth2 requests.
-	 * @param secret A hash that represents a secret key of the application authorized.
-	 * @param redirectUri An URI that represents the host address that is authorized to authenticate.
-	 */
-	public OAuth2Identifiers(String clientAppId, String secret, String redirectUri) {
-		this.clientAppId = clientAppId;
-		this.secret = secret;
-		this.redirectUri = redirectUri;
-	}
+    /**
+     * @param clientAppId A hash that represents an identifier of the application that is authorized
+     *     to made requests.
+     * @param secret A hash that represents a secret key of the application authorized.
+     * @param redirectUri An URI that represents the host address that is authorized to
+     *     authenticate.
+     */
+    public OAuth2Identifiers(String clientAppId, String secret, String redirectUri) {
+        this.clientAppId = clientAppId;
+        this.secret = secret;
+        this.redirectUri = redirectUri;
+    }
 
-	public String getClientAppId() {
-		return clientAppId;
-	}
+    /** Returns a raw hash that represents the OAuth2 authorized application. */
+    public String getClientAppId() {
+        return clientAppId;
+    }
 
-	public String getSecret() {
-		return secret;
-	}
+    /** Returns a raw hash that represents the secret of the OAuth2 authorized application. */
+    public String getSecret() {
+        return secret;
+    }
 
-	public String getRedirectUri() {
-		return redirectUri;
-	}
+    /** Returns a redirect URI that represents the OAuth2 authorized application. */
+    public String getRedirectUri() {
+        return redirectUri;
+    }
 
-	@Override
-	public boolean equals(Object o) {
-		if (this == o) {
-			return true;
-		}
-		if (o == null || getClass() != o.getClass()) {
-			return false;
-		}
-		OAuth2Identifiers that = (OAuth2Identifiers) o;
-		return clientAppId.equals(that.clientAppId)
-			&& secret.equals(that.secret)
-			&& Objects.equals(redirectUri, that.redirectUri);
-	}
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        OAuth2Identifiers that = (OAuth2Identifiers) o;
+        return clientAppId.equals(that.clientAppId)
+                && secret.equals(that.secret)
+                && Objects.equals(redirectUri, that.redirectUri);
+    }
 
-	@Override
-	public int hashCode() {
-		return Objects.hash(clientAppId, secret, redirectUri);
-	}
+    @Override
+    public int hashCode() {
+        return Objects.hash(clientAppId, secret, redirectUri);
+    }
 }

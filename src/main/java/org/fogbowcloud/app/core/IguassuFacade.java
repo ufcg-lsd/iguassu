@@ -33,10 +33,6 @@ public class IguassuFacade {
         return iguassuController.getAllJobs(userId);
     }
 
-    public JDFJob getJobByLabel(String jobName, String userId) {
-        return iguassuController.getJobByLabel(jobName, userId);
-    }
-
     public String stopJob(String jobId, String userId) {
         return iguassuController.stopJob(jobId, userId);
     }

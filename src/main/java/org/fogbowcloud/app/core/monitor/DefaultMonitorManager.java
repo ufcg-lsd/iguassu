@@ -12,7 +12,7 @@ import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jes.JobExecutionService;
 import org.fogbowcloud.app.jes.arrebol.ArrebolJobExecutionService;
-import org.fogbowcloud.app.jes.arrebol.ArrebolJobSynchronizer;
+import org.fogbowcloud.app.jes.arrebol.ArrebolSynchronizer;
 import org.fogbowcloud.app.utils.ManagerTimer;
 
 public class DefaultMonitorManager implements MonitorManager {
@@ -70,7 +70,7 @@ public class DefaultMonitorManager implements MonitorManager {
 			Long.valueOf(this.properties.getProperty(ConfProperties.JOB_STATE_MONITOR_PERIOD));
 
 		JobStateMonitor jobStateMonitor =
-			new JobStateMonitor(this.jobDataStore, new ArrebolJobSynchronizer(this.properties));
+			new JobStateMonitor(this.jobDataStore, new ArrebolSynchronizer(this.properties));
 		executionMonitorTimer.scheduleAtFixedRate(
 			jobStateMonitor, DEFAULT_INITIAL_DELAY_MS, JOB_MONITOR_EXECUTION_PERIOD);
 	}

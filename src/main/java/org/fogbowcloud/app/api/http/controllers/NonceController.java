@@ -17,11 +17,11 @@ import org.springframework.web.bind.annotation.RestController;
 @Api(Documentation.Nonce.DESCRIPTION)
 public class NonceController {
 
-	@Lazy @Autowired private IguassuFacade iguassuFacade;
+    @Lazy @Autowired private IguassuFacade iguassuFacade;
 
-	@GetMapping
-	@ApiOperation(value = Documentation.Nonce.GET_OPERATION)
-	public ResponseEntity<String> getNonce() {
-		return new ResponseEntity<>(String.valueOf(this.iguassuFacade.getNonce()), HttpStatus.OK);
-	}
+    @GetMapping
+    @ApiOperation(value = Documentation.Nonce.GET_OPERATION)
+    public ResponseEntity<String> getNonce() {
+        return new ResponseEntity<>(String.valueOf(this.iguassuFacade.getNonce()), HttpStatus.OK);
+    }
 }

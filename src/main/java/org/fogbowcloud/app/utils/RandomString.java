@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.auth.models;
+package org.fogbowcloud.app.utils;
 
 import java.security.SecureRandom;
 import java.util.Locale;

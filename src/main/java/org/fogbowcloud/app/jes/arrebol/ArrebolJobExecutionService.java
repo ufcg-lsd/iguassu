@@ -1,49 +1,35 @@
 package org.fogbowcloud.app.jes.arrebol;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Properties;
-import javax.print.attribute.standard.JobState;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.dto.arrebol.ArrebolJobDTO;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
+import org.fogbowcloud.app.jdfcompiler.job.JobState;
 import org.fogbowcloud.app.jes.JobExecutionService;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
-import org.fogbowcloud.app.jes.exceptions.GetJobException;
 import org.fogbowcloud.app.jes.exceptions.SubmitJobException;
+
+import java.io.UnsupportedEncodingException;
+import java.util.Properties;
 
 public class ArrebolJobExecutionService implements JobExecutionService {
 
-	private static final Logger logger = Logger.getLogger(ArrebolJobExecutionService.class);
+    private static final Logger logger = Logger.getLogger(ArrebolJobExecutionService.class);
 
-	private final ArrebolRequestsHelper requestsHelper;
+    private final ArrebolRequestsHelper requestsHelper;
 
-	public ArrebolJobExecutionService(Properties properties) {
-		this.requestsHelper = new ArrebolRequestsHelper(properties);
-	}
+    public ArrebolJobExecutionService(Properties properties) {
+        this.requestsHelper = new ArrebolRequestsHelper(properties);
+    }
 
-	@Override
-	public String execute(JDFJob job)
-		throws UnsupportedEncodingException, SubmitJobException, ArrebolConnectException {
-		logger.info("Execution for the Job with id :[" + job.getId() + "] was started");
+    @Override
+    public String create(JDFJob job)
+            throws UnsupportedEncodingException, SubmitJobException, ArrebolConnectException {
+        logger.info("Job with id :[" + job.getId() + "] was submitted for execution.");
 
-		return this.requestsHelper.submitJobToExecution(job);
-	}
+        return this.requestsHelper.submitToExecution(job);
+    }
 
-	@Override
-	public ArrebolJobDTO getJob(String jobId) {
-		try {
-			return requestsHelper.getJob(jobId);
-		} catch (GetJobException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
-	@Override
-	public JobState jobState(String executionId) {
-		return null;
-	}
-
-	@Override
-	public void stop(String executionId) {}
+    @Override
+    public JobState status(String executionId) {
+        return null;
+    }
 }

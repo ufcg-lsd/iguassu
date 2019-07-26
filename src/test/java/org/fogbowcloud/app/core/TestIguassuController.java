@@ -75,10 +75,10 @@ public class TestIguassuController {
                                 .toString()
                 )
         );
-        Assert.assertEquals(1, this.iguassuController.getAllJobs(FAKE_USER_ID).get(0).getTaskList().size());
+        Assert.assertEquals(1, this.iguassuController.getAllJobs(FAKE_USER_ID).get(0).getTasks().size());
         assert (spec.equals(spec2));
-        assert (task.equals(this.iguassuController.getAllJobs(FAKE_USER_ID).get(0).getTaskList().get(FAKE_TASK_ID)));
-        assert (spec.equals(this.iguassuController.getAllJobs(FAKE_USER_ID).get(0).getTaskList().get(FAKE_TASK_ID).getSpecification()));
+        assert (task.equals(this.iguassuController.getAllJobs(FAKE_USER_ID).get(0).getTasks().get(FAKE_TASK_ID)));
+        assert (spec.equals(this.iguassuController.getAllJobs(FAKE_USER_ID).get(0).getTasks().get(FAKE_TASK_ID).getSpecification()));
 
     }
 
@@ -155,7 +155,7 @@ public class TestIguassuController {
         ArrayList<JDFJob> jobs = new ArrayList<>();
         ArrayList<Task> task = new ArrayList<>();
         JDFJob jdfJob = new JDFJob(FAKE_USER_ID, task, null);
-        jdfJob.setFriendlyName(jobName);
+        jdfJob.setLabel(jobName);
         jobs.add(jdfJob);
         jobs.add(new JDFJob(FAKE_USER_ID, task, null));
         jobs.add(new JDFJob(FAKE_USER_ID, task, null));
@@ -164,9 +164,6 @@ public class TestIguassuController {
         jobs.add(new JDFJob(FAKE_USER_ID, task, null));
 
         doReturn(jobs).when(this.dataStore).getAllByUserId(FAKE_USER_ID);
-
-        this.iguassuController.getJobByLabel(jobName, FAKE_USER_ID);
-        assert (jdfJob.equals(this.iguassuController.getJobByLabel(jobName, FAKE_USER_ID)));
     }
 
     @Test
@@ -174,10 +171,9 @@ public class TestIguassuController {
         String jobName = "jobName00";
 
         JDFJob jdfJob = new JDFJob(FAKE_USER_ID, new ArrayList<Task>(), null);
-        jdfJob.setFriendlyName(jobName);
+        jdfJob.setLabel(jobName);
         doReturn(true).when(this.dataStore).deleteByJobId(jdfJob.getId(), FAKE_USER_ID);
         doNothing().when(iguassuController).updateJob(any(JDFJob.class));
-        doReturn(jdfJob).when(iguassuController).getJobByLabel(jobName, FAKE_USER_ID);
         // update DB Map
         this.iguassuController.stopJob(jobName, FAKE_USER_ID);
 
