@@ -18,7 +18,7 @@ import org.apache.http.conn.HttpHostConnectException;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.exceptions.StorageServiceConnectException;
 import org.fogbowcloud.app.core.IguassuFacade;
-import org.fogbowcloud.app.core.auth.models.OAuthIdentifiers;
+import org.fogbowcloud.app.core.auth.models.OAuth2Identifiers;
 import org.fogbowcloud.app.core.auth.models.RandomString;
 import org.fogbowcloud.app.core.auth.models.SessionState;
 import org.fogbowcloud.app.core.auth.models.User;
@@ -51,8 +51,8 @@ public class AuthService {
 				.get(AUTHORIZATION_CODE_JSON_KEY)
 				.getAsString();
 
-		final OAuthIdentifiers applicationIds =
-			gson.fromJson(applicationIdentifiers, OAuthIdentifiers.class);
+		final OAuth2Identifiers applicationIds =
+			gson.fromJson(applicationIdentifiers, OAuth2Identifiers.class);
 
 		if (isAReliableApp(applicationIds)) {
 
@@ -120,7 +120,7 @@ public class AuthService {
 		return refreshedToken;
 	}
 
-	private boolean isAReliableApp(OAuthIdentifiers applicationIds) {
+	private boolean isAReliableApp(OAuth2Identifiers applicationIds) {
 		final String knownAppClientId =
 			this.properties.getProperty(ConfProperties.OAUTH_STORAGE_SERVICE_CLIENT_ID);
 		final String knownSecret =

@@ -13,42 +13,37 @@ import org.fogbowcloud.app.jes.exceptions.SubmitJobException;
 
 public class ArrebolJobExecutionService implements JobExecutionService {
 
-    private static final Logger LOGGER = Logger.getLogger(ArrebolJobExecutionService.class);
+	private static final Logger logger = Logger.getLogger(ArrebolJobExecutionService.class);
 
-    private final ArrebolRequestsHelper requestsHelper;
+	private final ArrebolRequestsHelper requestsHelper;
 
-    public ArrebolJobExecutionService(Properties properties) {
-        this.requestsHelper = new ArrebolRequestsHelper(properties);
-    }
+	public ArrebolJobExecutionService(Properties properties) {
+		this.requestsHelper = new ArrebolRequestsHelper(properties);
+	}
 
-    @Override
-    public String execute(JDFJob job)
-        throws UnsupportedEncodingException, SubmitJobException, ArrebolConnectException {
-        LOGGER.info("Execution for the Job with id :[" + job.getId() + "] was started");
+	@Override
+	public String execute(JDFJob job)
+		throws UnsupportedEncodingException, SubmitJobException, ArrebolConnectException {
+		logger.info("Execution for the Job with id :[" + job.getId() + "] was started");
 
-        String jobIdArrebol = null;
-        jobIdArrebol = this.requestsHelper.submitJobToExecution(job);
-        return jobIdArrebol;
+		return this.requestsHelper.submitJobToExecution(job);
+	}
 
-    }
+	@Override
+	public ArrebolJobDTO getJob(String jobId) {
+		try {
+			return requestsHelper.getJob(jobId);
+		} catch (GetJobException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
 
-    @Override
-    public ArrebolJobDTO getJob(String jobId) {
-        try {
-            return requestsHelper.getJob(jobId);
-        } catch (GetJobException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
+	@Override
+	public JobState jobState(String executionId) {
+		return null;
+	}
 
-    @Override
-    public JobState jobState(String executionId) {
-        return null;
-    }
-
-    @Override
-    public void stop(String executionId) {
-
-    }
+	@Override
+	public void stop(String executionId) {}
 }

@@ -2,18 +2,19 @@ package org.fogbowcloud.app.core.auth.models;
 
 import java.time.Instant;
 import java.util.Objects;
+import org.fogbowcloud.app.core.constants.JsonKey;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 public class DefaultUser implements User {
 
-	private String userId;
+	private String identifier;
 	private String iguassuToken;
 	private SessionState sessionState;
 	private long sessionTime;
 
-	public DefaultUser(String userId, String iguassuToken) {
-		this.userId = userId;
+	public DefaultUser(String identifier, String iguassuToken) {
+		this.identifier = identifier;
 		this.iguassuToken = iguassuToken;
 		this.resetSession();
 		this.sessionState = SessionState.ACTIVE;
@@ -21,30 +22,29 @@ public class DefaultUser implements User {
 
 	public static JSONObject toJSON(User user) throws JSONException {
 		JSONObject userJson = new JSONObject();
-		userJson.put(UserJsonKey.USER_ID.getJsonKey(), user.getIdentifier());
-		userJson.put(UserJsonKey.IGUASSU_TOKEN.getJsonKey(), user.retrieveToken());
-		userJson.put(UserJsonKey.SESSION_STATE.getJsonKey(), user.isActive());
-		userJson.put(UserJsonKey.SESSION_TIME.getJsonKey(), user.getSessionTime());
+		userJson.put(JsonKey.USER_ID.getKey(), user.getIdentifier());
+		userJson.put(JsonKey.IGUASSU_TOKEN.getKey(), user.retrieveToken());
+		userJson.put(JsonKey.SESSION_STATE.getKey(), user.isActive());
+		userJson.put(JsonKey.SESSION_TIME.getKey(), user.getSessionTime());
 		return userJson;
 	}
 
 	public static User fromJSON(JSONObject userJSON) {
 		DefaultUser user =
 			new DefaultUser(
-				userJSON.optString(UserJsonKey.USER_ID.getJsonKey()),
-				userJSON.optString(UserJsonKey.IGUASSU_TOKEN.getJsonKey())
-			);
+				userJSON.optString(JsonKey.USER_ID.getKey()),
+				userJSON.optString(JsonKey.IGUASSU_TOKEN.getKey()));
 
-		final String sessionState = userJSON.optString(UserJsonKey.IGUASSU_TOKEN.getJsonKey());
+		final String sessionState = userJSON.optString(JsonKey.IGUASSU_TOKEN.getKey());
 
 		user.changeSessionState(SessionState.valueOf(sessionState));
-		user.setSessionTime(userJSON.optLong(UserJsonKey.SESSION_TIME.getJsonKey()));
+		user.setSessionTime(userJSON.optLong(JsonKey.SESSION_TIME.getKey()));
 		return user;
 	}
 
 	@Override
 	public String getIdentifier() {
-		return this.userId;
+		return this.identifier;
 	}
 
 	@Override
@@ -67,7 +67,7 @@ public class DefaultUser implements User {
 		return this.sessionTime;
 	}
 
-	public void setSessionTime(long sessionTime) {
+	private void setSessionTime(long sessionTime) {
 		this.sessionTime = sessionTime;
 	}
 
@@ -84,10 +84,10 @@ public class DefaultUser implements User {
 
 	public JSONObject toJSON() throws JSONException {
 		JSONObject user = new JSONObject();
-		user.put(UserJsonKey.USER_ID.getJsonKey(), this.userId);
-		user.put(UserJsonKey.IGUASSU_TOKEN.getJsonKey(), this.iguassuToken);
-		user.put(UserJsonKey.SESSION_STATE.getJsonKey(), this.sessionState.getState());
-		user.put(UserJsonKey.SESSION_TIME.getJsonKey(), this.sessionTime);
+		user.put(JsonKey.USER_ID.getKey(), this.identifier);
+		user.put(JsonKey.IGUASSU_TOKEN.getKey(), this.iguassuToken);
+		user.put(JsonKey.SESSION_STATE.getKey(), this.sessionState.getState());
+		user.put(JsonKey.SESSION_TIME.getKey(), this.sessionTime);
 		return user;
 	}
 
@@ -102,12 +102,12 @@ public class DefaultUser implements User {
 		DefaultUser user = (DefaultUser) o;
 		return sessionState == user.sessionState
 			&& sessionTime == user.sessionTime
-			&& userId.equals(user.userId)
+			&& identifier.equals(user.identifier)
 			&& iguassuToken.equals(user.iguassuToken);
 	}
 
 	@Override
 	public int hashCode() {
-		return Objects.hash(userId, iguassuToken, sessionState, sessionTime);
+		return Objects.hash(identifier, iguassuToken, sessionState, sessionTime);
 	}
 }
