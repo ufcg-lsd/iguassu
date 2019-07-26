@@ -10,26 +10,28 @@ import org.fogbowcloud.app.jes.arrebol.JobSynchronizer;
 
 public class JobStateMonitor implements Runnable {
 
-    private static final Logger LOGGER = Logger.getLogger(JobStateMonitor.class);
-    private JobDataStore jobDataStore;
-    private JobSynchronizer jobSynchronizer;
+	private static final Logger logger = Logger.getLogger(JobStateMonitor.class);
+	private JobDataStore jobDataStore;
+	private JobSynchronizer jobSynchronizer;
 
-    public JobStateMonitor(JobDataStore jobDataStore, JobSynchronizer jobSynchronizer) {
-        this.jobDataStore = jobDataStore;
-        this.jobSynchronizer = jobSynchronizer;
-    }
+	JobStateMonitor(JobDataStore jobDataStore, JobSynchronizer jobSynchronizer) {
+		this.jobDataStore = jobDataStore;
+		this.jobSynchronizer = jobSynchronizer;
+	}
 
-    @Override
-    public void run() {
-        LOGGER.info("Running job state monitor.");
-        List<JDFJob> jobs = jobDataStore.getAll()
-            .stream()
-            .filter(j -> !(j.getState().equals(JDFJobState.FINISHED) || j.getState()
-                .equals(JDFJobState.FAILED)))
-            .collect(Collectors.toList());
-        for (JDFJob job : jobs) {
-            JDFJob jobUpdated = jobSynchronizer.synchronizeJob(job);
-            LOGGER.info("Response from datastore update: " + jobDataStore.update(jobUpdated));
-        }
-    }
+	@Override
+	public void run() {
+		logger.info("Running job state monitor.");
+		List<JDFJob> jobs =
+			jobDataStore.getAll().stream()
+				.filter(
+					j ->
+						!(j.getState().equals(JDFJobState.FINISHED)
+							|| j.getState().equals(JDFJobState.FAILED)))
+				.collect(Collectors.toList());
+		for (JDFJob job : jobs) {
+			JDFJob jobUpdated = jobSynchronizer.synchronizeJob(job);
+			logger.info("Response from datastore update: " + jobDataStore.update(jobUpdated));
+		}
+	}
 }

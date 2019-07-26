@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.authenticator.models;
+package org.fogbowcloud.app.core.auth.models;
 
 import java.security.SecureRandom;
 import java.util.Locale;

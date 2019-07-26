@@ -1,10 +1,10 @@
-package org.fogbowcloud.app.core.authenticator.models;
+package org.fogbowcloud.app.core.auth.models;
 
 public enum UserJsonKey {
 
     USER_ID("userId"),
     IGUASSU_TOKEN("iguassuToken"),
-    ACTIVE("active"),
+    SESSION_STATE("sessionState"),
     SESSION_TIME("sessionTime");
 
     private final String jsonKey;

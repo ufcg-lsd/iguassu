@@ -11,12 +11,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.api.constants.ApiDocumentation.*;
+import org.fogbowcloud.app.api.constants.Documentation;
 import org.fogbowcloud.app.api.exceptions.StorageException;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.api.http.services.FileStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
-import org.fogbowcloud.app.core.authenticator.models.User;
+import org.fogbowcloud.app.core.auth.models.User;
 import org.fogbowcloud.app.core.constants.ConfProperties;
 import org.fogbowcloud.app.core.dto.JobResponseDTO;
 import org.fogbowcloud.app.core.dto.TaskDTO;
@@ -40,219 +40,218 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping(value = Endpoint.JOB)
-@Api(Job.API_DESCRIPTION)
+@RequestMapping(value = Documentation.Endpoint.JOB)
+@Api(Documentation.Job.DESCRIPTION)
 public class JobController {
 
-    private final Logger logger = Logger.getLogger(JobController.class);
+	private final Logger logger = Logger.getLogger(JobController.class);
 
-    @Lazy
-    private final FileStorageService storageService;
+	@Lazy private final FileStorageService storageService;
 
-    @Lazy
-    private JobService jobService;
+	@Lazy private JobService jobService;
 
-    @Lazy
-    private AuthService authService;
+	@Lazy private AuthService authService;
 
-    @Autowired
-    public JobController(FileStorageService storageService, JobService jobService,
-                         AuthService authService) {
-        this.storageService = storageService;
-        this.jobService = jobService;
-        this.authService = authService;
-    }
+	@Autowired
+	public JobController(
+		FileStorageService storageService, JobService jobService, AuthService authService) {
+		this.storageService = storageService;
+		this.jobService = jobService;
+		this.authService = authService;
+	}
 
-    @GetMapping(value = Endpoint.STATUS)
-    @ApiOperation(value = Job.GET_ALL_OPERATION)
-    public ResponseEntity<?> getAllJobs(
-        @ApiParam(value = CommonParameters.USER_CREDENTIALS)
-        @RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS) String userCredentials) {
-        User user;
+	@GetMapping(value = Documentation.Endpoint.STATUS)
+	@ApiOperation(value = Documentation.Job.GET_ALL_OPERATION)
+	public ResponseEntity<?> getAllJobs(
+		@ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
+		@RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS)
+			String userCredentials) {
+		User user;
 
-        try {
-            user = this.authService.authorizeUser(userCredentials);
+		try {
+			user = this.authService.authorizeUser(userCredentials);
 
-        } catch (UnauthorizedRequestException ure) {
-            return new ResponseEntity<>(
-                "The authentication failed with error [" + ure.getMessage() +
-                    "]", HttpStatus.UNAUTHORIZED);
-        }
+		} catch (UnauthorizedRequestException ure) {
+			return new ResponseEntity<>(
+				"The authentication failed with error [" + ure.getMessage() + "]",
+				HttpStatus.UNAUTHORIZED);
+		}
 
-        List<JDFJob> allJobs = this.jobService.getAllJobs(user);
-        logger.debug("Retrieving all jobs of user [ " + user.getIdentifier() + " ]");
+		List<JDFJob> allJobs = this.jobService.getAllJobs(user);
+		logger.debug("Retrieving all jobs of user [ " + user.getIdentifier() + " ]");
 
-        List<JobResponseDTO> jobs = new LinkedList<>();
-        for (JDFJob job : allJobs) {
-            jobs.add(new JobResponseDTO(job));
-        }
-        return new ResponseEntity<>(jobs, HttpStatus.OK);
-    }
+		List<JobResponseDTO> jobs = new LinkedList<>();
+		for (JDFJob job : allJobs) {
+			jobs.add(new JobResponseDTO(job));
+		}
+		return new ResponseEntity<>(jobs, HttpStatus.OK);
+	}
 
-    @GetMapping(value = Endpoint.JOB_ID)
-    @ApiOperation(value = Job.GET_BY_ID_OPERATION)
-    public ResponseEntity<?> getJobById(
-        @ApiParam(value = Job.ID)
-        @PathVariable String jobId,
-        @ApiParam(value = CommonParameters.USER_CREDENTIALS)
-        @RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS) String userCredentials)
-        throws InvalidParameterException {
+	@GetMapping(value = Documentation.Endpoint.JOB_ID)
+	@ApiOperation(value = Documentation.Job.GET_BY_ID_OPERATION)
+	public ResponseEntity<?> getJobById(
+		@ApiParam(value = Documentation.Job.ID) @PathVariable String jobId,
+		@ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
+		@RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS)
+			String userCredentials)
+		throws InvalidParameterException {
 
-        JDFJob job;
-        try {
-            job = getJDFJob(jobId, userCredentials);
+		JDFJob job;
+		try {
+			job = getJDFJob(jobId, userCredentials);
 
-        } catch (UnauthorizedRequestException ure) {
-            return new ResponseEntity<>(
-                "The authentication failed with error [" + ure.getMessage() +
-                    "]", HttpStatus.UNAUTHORIZED);
-        }
-        logger.info("Retrieving job with id [" + jobId + "].");
-        return new ResponseEntity<>(new JobResponseDTO(job), HttpStatus.OK);
-    }
+		} catch (UnauthorizedRequestException ure) {
+			return new ResponseEntity<>(
+				"The authentication failed with error [" + ure.getMessage() + "]",
+				HttpStatus.UNAUTHORIZED);
+		}
+		logger.info("Retrieving job with id [" + jobId + "].");
+		return new ResponseEntity<>(new JobResponseDTO(job), HttpStatus.OK);
+	}
 
-    @GetMapping(value = Endpoint.JOB_ID + Endpoint.TASK + Endpoint.STATUS)
-    @ApiOperation(value = Job.GET_TASKS_OPERATION)
-    public ResponseEntity<?> getJobTasks(
-        @ApiParam(value = Job.ID)
-        @PathVariable String jobId,
-        @ApiParam(value = CommonParameters.USER_CREDENTIALS)
-        @RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS) String userCredentials)
-        throws InvalidParameterException {
-        JDFJob job;
-        try {
-            job = getJDFJob(jobId, userCredentials);
+	@GetMapping(
+		value =
+			Documentation.Endpoint.JOB_ID
+				+ Documentation.Endpoint.TASK
+				+ Documentation.Endpoint.STATUS)
+	@ApiOperation(value = Documentation.Job.GET_TASKS_OPERATION)
+	public ResponseEntity<?> getJobTasks(
+		@ApiParam(value = Documentation.Job.ID) @PathVariable String jobId,
+		@ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
+		@RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS)
+			String userCredentials)
+		throws InvalidParameterException {
+		JDFJob job;
+		try {
+			job = getJDFJob(jobId, userCredentials);
 
-        } catch (UnauthorizedRequestException ure) {
-            return new ResponseEntity<>(
-                "The authentication failed with error [" + ure.getMessage() +
-                    "]", HttpStatus.UNAUTHORIZED);
-        }
-        logger.info("Retrieving tasks from job with id [" + jobId + "].");
-        List<TaskDTO> taskDTOS = toTasksDTOList(job.getTasks());
-        return new ResponseEntity<>(taskDTOS, HttpStatus.OK);
-    }
+		} catch (UnauthorizedRequestException ure) {
+			return new ResponseEntity<>(
+				"The authentication failed with error [" + ure.getMessage() + "]",
+				HttpStatus.UNAUTHORIZED);
+		}
+		logger.info("Retrieving tasks from job with id [" + jobId + "].");
+		List<TaskDTO> taskDTOS = toTasksDTOList(job.getTasks());
+		return new ResponseEntity<>(taskDTOS, HttpStatus.OK);
+	}
 
-    @PostMapping
-    @ApiOperation(value = Job.CREATE_OPERATION)
-    public ResponseEntity<String> submitJob(
-        @ApiParam(value = Job.CREATE_REQUEST_PARAM)
-        @RequestParam(ConfProperties.JDF_FILE_PATH) MultipartFile file,
-        @ApiParam(value = CommonParameters.USER_CREDENTIALS)
-        @RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS) String userCredentials) {
+	@PostMapping
+	@ApiOperation(value = Documentation.Job.CREATE_OPERATION)
+	public ResponseEntity<String> submitJob(
+		@ApiParam(value = Documentation.Job.CREATE_REQUEST_PARAM)
+		@RequestParam(ConfProperties.JDF_FILE_PATH)
+			MultipartFile file,
+		@ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
+		@RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS)
+			String userCredentials) {
 
-        logger.info("Saving new Job.");
-        logger.info(file.toString());
+		logger.info("Saving new Job.");
+		logger.info(file.toString());
 
-        Map<String, String> fieldMap = new HashMap<>();
-        fieldMap.put(ConfProperties.JDF_FILE_PATH, null);
-        fieldMap.put(ConfProperties.X_AUTH_USER_CREDENTIALS, null);
+		Map<String, String> fieldMap = new HashMap<>();
+		fieldMap.put(ConfProperties.JDF_FILE_PATH, null);
+		fieldMap.put(ConfProperties.X_AUTH_USER_CREDENTIALS, null);
 
-        this.storageService.store(file, fieldMap);
-        User user;
+		this.storageService.store(file, fieldMap);
+		User user;
 
-        try {
-            user = this.authService.authorizeUser(userCredentials);
-        } catch (UnauthorizedRequestException ure) {
-            return new ResponseEntity<>(
-                "The authentication failed with error [" + ure.getMessage() +
-                    "]", HttpStatus.UNAUTHORIZED);
-        }
+		try {
+			user = this.authService.authorizeUser(userCredentials);
+		} catch (UnauthorizedRequestException ure) {
+			return new ResponseEntity<>(
+				"The authentication failed with error [" + ure.getMessage() + "]",
+				HttpStatus.UNAUTHORIZED);
+		}
 
-        final String jdf = fieldMap.get(ConfProperties.JDF_FILE_PATH);
-        if (Objects.isNull(jdf)) {
-            logger.info("Could not store  new job from user " + user.getIdentifier());
-            throw new StorageException(
-                "Could not store new job from user " + user.getIdentifier());
-        }
+		final String jdf = fieldMap.get(ConfProperties.JDF_FILE_PATH);
+		if (Objects.isNull(jdf)) {
+			logger.info("Could not store  new job from user " + user.getIdentifier());
+			throw new StorageException("Could not store new job from user " + user.getIdentifier());
+		}
 
-        String jobId;
-        final String jdfAbsolutePath = fieldMap.get(ConfProperties.JDF_FILE_PATH);
-        try {
-            logger.info("jdfpath <" + jdfAbsolutePath + ">");
-            jobId = this.jobService.submitJob(jdfAbsolutePath, user);
-            logger.info("Job " + jobId + " created at time: " + System.currentTimeMillis());
-        } catch (CompilerException ce) {
-            logger.error(ce.getMessage(), ce);
-            throw new StorageException("Could not compile JDF file.", ce);
-        } catch (IOException e) {
-            logger.error("Could not read JDF file.", e);
-            throw new StorageException("Could not read JDF file.");
-        }
-        return new ResponseEntity<>(jobId, HttpStatus.CREATED);
-    }
+		String jobId;
+		final String jdfAbsolutePath = fieldMap.get(ConfProperties.JDF_FILE_PATH);
+		try {
+			logger.info("jdfpath <" + jdfAbsolutePath + ">");
+			jobId = this.jobService.submitJob(jdfAbsolutePath, user);
+			logger.info("Job " + jobId + " created at time: " + System.currentTimeMillis());
+		} catch (CompilerException ce) {
+			logger.error(ce.getMessage(), ce);
+			throw new StorageException("Could not compile JDF file.", ce);
+		} catch (IOException e) {
+			logger.error("Could not read JDF file.", e);
+			throw new StorageException("Could not read JDF file.");
+		}
+		return new ResponseEntity<>(jobId, HttpStatus.CREATED);
+	}
 
-    @DeleteMapping(value = Endpoint.JOB_ID)
-    @ApiOperation(value = Job.DELETE_OPERATION)
-    public ResponseEntity<?> stopJob(
-        @ApiParam(value = Job.ID)
-        @PathVariable String jobId,
-        @ApiParam(value = CommonParameters.USER_CREDENTIALS)
-        @RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS) String userCredentials)
-        throws InvalidParameterException {
-        logger.info("Deleting job with Id " + jobId + ".");
+	@DeleteMapping(value = Documentation.Endpoint.JOB_ID)
+	@ApiOperation(value = Documentation.Job.DELETE_OPERATION)
+	public ResponseEntity<?> stopJob(
+		@ApiParam(value = Documentation.Job.ID) @PathVariable String jobId,
+		@ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
+		@RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS)
+			String userCredentials)
+		throws InvalidParameterException {
+		logger.info("Deleting job with Id " + jobId + ".");
 
-        User user;
+		User user;
 
-        try {
-            user = this.authService.authorizeUser(userCredentials);
-        } catch (UnauthorizedRequestException ure) {
-            return new ResponseEntity<>(
-                "The authentication failed with error [" + ure.getMessage() +
-                    "]", HttpStatus.UNAUTHORIZED);
-        }
+		try {
+			user = this.authService.authorizeUser(userCredentials);
+		} catch (UnauthorizedRequestException ure) {
+			return new ResponseEntity<>(
+				"The authentication failed with error [" + ure.getMessage() + "]",
+				HttpStatus.UNAUTHORIZED);
+		}
 
-        String stoppedJobId = this.jobService.stopJob(jobId, user.getIdentifier());
+		String stoppedJobId = this.jobService.stopJob(jobId, user.getIdentifier());
 
-        if (stoppedJobId == null) {
-            logger.info(
-                "Could not find job with id " + jobId + " for user " + user
-                    .getIdentifier());
-            throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
-        }
+		if (stoppedJobId == null) {
+			logger.info("Could not find job with id " + jobId + " for user " + user.getIdentifier());
+			throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
+		}
 
-        return new ResponseEntity<>(new SimpleJobResponse(stoppedJobId), HttpStatus.ACCEPTED);
-    }
+		return new ResponseEntity<>(new SimpleJobResponse(stoppedJobId), HttpStatus.ACCEPTED);
+	}
 
-    private List<TaskDTO> toTasksDTOList(List<Task> tasks) {
-        List<TaskDTO> l = new ArrayList<>();
-        for (Task t : tasks) {
-            l.add(new TaskDTO(t));
-        }
-        return l;
-    }
+	private List<TaskDTO> toTasksDTOList(List<Task> tasks) {
+		List<TaskDTO> l = new ArrayList<>();
+		for (Task t : tasks) {
+			l.add(new TaskDTO(t));
+		}
+		return l;
+	}
 
-    private JDFJob getJDFJob(String jobId, String userCredentials)
-        throws InvalidParameterException, UnauthorizedRequestException {
-        User user = this.authService.authorizeUser(userCredentials);
-        JDFJob job = this.jobService.getJobById(jobId, user);
+	private JDFJob getJDFJob(String jobId, String userCredentials)
+		throws InvalidParameterException, UnauthorizedRequestException {
+		User user = this.authService.authorizeUser(userCredentials);
+		JDFJob job = this.jobService.getJobById(jobId, user);
 
-        if (job == null) {
-            job = this.jobService.getJobByName(jobId, user.getIdentifier());
-            if (job == null) {
-                logger.info(
-                    "Could not find job with id " + jobId + " for user " + user
-                        .getIdentifier());
-                throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
-            }
-        }
-        return job;
-    }
+		if (job == null) {
+			job = this.jobService.getJobByName(jobId, user.getIdentifier());
+			if (job == null) {
+				logger.info("Could not find job with id " + jobId + " for user " + user.getIdentifier());
+				throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
+			}
+		}
+		return job;
+	}
 
-    public class SimpleJobResponse {
+	public class SimpleJobResponse {
 
-        private String id;
+		private String id;
 
-        SimpleJobResponse(String id) {
-            this.id = id;
-        }
+		SimpleJobResponse(String id) {
+			this.id = id;
+		}
 
-        public String getId() {
-            return this.id;
-        }
+		public String getId() {
+			return this.id;
+		}
 
-        public void setIt(String id) {
-            this.id = id;
-        }
-    }
+		public void setIt(String id) {
+			this.id = id;
+		}
+	}
 }

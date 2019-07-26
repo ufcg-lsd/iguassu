@@ -4,7 +4,7 @@ import java.io.IOException;
 import java.util.List;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.IguassuFacade;
-import org.fogbowcloud.app.core.authenticator.models.User;
+import org.fogbowcloud.app.core.auth.models.User;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
@@ -29,7 +29,7 @@ public class JobService {
     public JDFJob getJobById(String jobId, User user) throws InvalidParameterException {
         JDFJob job = this.iguassuFacade.getJobById(jobId, user.getIdentifier());
         if (job == null) {
-            job = this.iguassuFacade.getJobByName(jobId, user.getIdentifier());
+            job = this.iguassuFacade.getJobByLabel(jobId, user.getIdentifier());
             if (job == null) {
                 logger.info(
                     "Could not find job with id " + jobId + " for user " + user
@@ -44,7 +44,7 @@ public class JobService {
     }
 
     public JDFJob getJobByName(String jobName, String user) {
-        return this.iguassuFacade.getJobByName(jobName, user);
+        return this.iguassuFacade.getJobByLabel(jobName, user);
     }
 
     public String stopJob(String jobId, String user) {

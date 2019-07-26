@@ -5,14 +5,14 @@ import static org.mockito.Mockito.*;
 
 import java.util.*;
 
-import org.fogbowcloud.app.core.authenticator.models.UserImpl;
+import org.fogbowcloud.app.core.auth.models.DefaultUser;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.task.Specification;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.core.task.TaskImpl;
 import org.fogbowcloud.app.core.task.TaskState;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.app.core.authenticator.models.User;
+import org.fogbowcloud.app.core.auth.models.User;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
@@ -94,7 +94,7 @@ public class TestIguassuController {
     @Test
     public void testAddJob() throws Exception {
         String jdfFilePath = "";
-        User user = new UserImpl("testuser", "'this is a test user'");
+        User user = new DefaultUser("testuser", "'this is a test user'");
 
         JDFJob job = new JDFJob(user.getIdentifier(), new ArrayList<Task>(), user.getIdentifier());
         Mockito.doReturn(job).when(this.iguassuController).buildJob(
@@ -165,8 +165,8 @@ public class TestIguassuController {
 
         doReturn(jobs).when(this.dataStore).getAllByUserId(FAKE_USER_ID);
 
-        this.iguassuController.getJobByName(jobName, FAKE_USER_ID);
-        assert (jdfJob.equals(this.iguassuController.getJobByName(jobName, FAKE_USER_ID)));
+        this.iguassuController.getJobByLabel(jobName, FAKE_USER_ID);
+        assert (jdfJob.equals(this.iguassuController.getJobByLabel(jobName, FAKE_USER_ID)));
     }
 
     @Test
@@ -177,7 +177,7 @@ public class TestIguassuController {
         jdfJob.setFriendlyName(jobName);
         doReturn(true).when(this.dataStore).deleteByJobId(jdfJob.getId(), FAKE_USER_ID);
         doNothing().when(iguassuController).updateJob(any(JDFJob.class));
-        doReturn(jdfJob).when(iguassuController).getJobByName(jobName, FAKE_USER_ID);
+        doReturn(jdfJob).when(iguassuController).getJobByLabel(jobName, FAKE_USER_ID);
         // update DB Map
         this.iguassuController.stopJob(jobName, FAKE_USER_ID);
 
