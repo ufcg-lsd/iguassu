@@ -1,14 +1,13 @@
 package org.fogbowcloud.app.jes.arrebol;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.job.JobState;
 import org.fogbowcloud.app.jes.JobExecutionService;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 import org.fogbowcloud.app.jes.exceptions.SubmitJobException;
-
-import java.io.UnsupportedEncodingException;
-import java.util.Properties;
 
 public class ArrebolJobExecutionService implements JobExecutionService {
 
@@ -21,7 +20,7 @@ public class ArrebolJobExecutionService implements JobExecutionService {
     }
 
     @Override
-    public String create(JDFJob job)
+    public String submit(JDFJob job)
             throws UnsupportedEncodingException, SubmitJobException, ArrebolConnectException {
         logger.info("Job with id :[" + job.getId() + "] was submitted for execution.");
 

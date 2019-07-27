@@ -6,7 +6,8 @@ import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.auth.DefaultAuthManager;
 import org.fogbowcloud.app.core.auth.models.Credential;
 import org.fogbowcloud.app.core.auth.models.User;
-import org.fogbowcloud.app.core.constants.ConfProperties;
+import org.fogbowcloud.app.core.constants.ConfProperty;
+import org.fogbowcloud.app.core.constants.GeneralConstants;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
@@ -23,6 +24,7 @@ import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.utils.JDFUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.jvnet.hk2.config.ConfigParser;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.security.GeneralSecurityException;
@@ -51,10 +53,10 @@ public class IguassuController {
 
     public void init() {
         this.jobDataStore =
-                new JobDataStore(this.properties.getProperty(ConfProperties.DATABASE_HOST_URL));
+                new JobDataStore(this.properties.getProperty(ConfProperty.DATABASE_HOST_URL.getProp()));
         this.oAuthTokenDataStore =
                 new OAuthTokenDataStore(
-                        this.properties.getProperty(ConfProperties.DATABASE_HOST_URL));
+                        this.properties.getProperty(ConfProperty.DATABASE_HOST_URL.getProp()));
         this.jobBuilder = new JDFJobBuilder(this.properties);
         this.nonceList = new ArrayList<>();
 

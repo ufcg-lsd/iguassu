@@ -11,49 +11,55 @@ import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 
 public class JobSubmissionMonitor implements Runnable {
 
-	private static final Logger LOGGER = Logger.getLogger(JobSubmissionMonitor.class);
-	private JobDataStore jobDataStore;
-	private JobExecutionService jobExecutionSystem;
-	private Queue<JDFJob> jobsToSubmit;
+    private static final Logger logger = Logger.getLogger(JobSubmissionMonitor.class);
+    private JobDataStore jobDataStore;
+    private JobExecutionService jobExecutionSystem;
+    private Queue<JDFJob> jobsToSubmit;
 
-	JobSubmissionMonitor(
-		JobDataStore jobDataStore,
-		JobExecutionService jobExecutionSystem,
-		Queue<JDFJob> jobsToSubmit) {
-		this.jobDataStore = jobDataStore;
-		this.jobExecutionSystem = jobExecutionSystem;
-		this.jobsToSubmit = jobsToSubmit;
-	}
+    JobSubmissionMonitor(
+            JobDataStore jobDataStore,
+            JobExecutionService jobExecutionSystem,
+            Queue<JDFJob> jobsToSubmit) {
+        this.jobDataStore = jobDataStore;
+        this.jobExecutionSystem = jobExecutionSystem;
+        this.jobsToSubmit = jobsToSubmit;
+    }
 
-	@Override
-	public void run() {
-		LOGGER.debug("Checking for jobs to be submitted.");
-		while (Objects.nonNull(this.jobsToSubmit.peek())) {
-			JDFJob job = this.jobsToSubmit.poll();
-			LOGGER.debug("Job found! Starting job submission with id [" + job.getId() + "]");
-			try {
-				final String arrebolId = this.jobExecutionSystem.create(job);
-				job.setExecutionId(arrebolId);
-				job.setState(JobState.SUBMITTED);
-				this.jobDataStore.update(job);
+    @Override
+    public void run() {
+        logger.debug("Checking for jobs to be submitted.");
+        while (Objects.nonNull(this.jobsToSubmit.peek())) {
+            JDFJob job = this.jobsToSubmit.poll();
+            logger.debug("Job found! Starting job submission with id [" + job.getId() + "]");
+            try {
+                final String arrebolId = this.jobExecutionSystem.submit(job);
+                job.setExecutionId(arrebolId);
+                job.setState(JobState.SUBMITTED);
+                this.jobDataStore.update(job);
 
-				LOGGER.info(
-					"Iguassu Job [" + job.getId() + "] has arrebol id: [" + job.getExecutionId() + "]");
+                logger.info(
+                        "Iguassu Job ["
+                                + job.getId()
+                                + "] has arrebol id: ["
+                                + job.getExecutionId()
+                                + "]");
 
-			} catch (ArrebolConnectException ace) {
-				LOGGER.error("Job execution service is not available right now.");
-				this.jobsToSubmit.offer(job);
-				break;
-			} catch (Exception e) {
-				job.setState(JobState.FAILED);
-				this.jobDataStore.update(job);
-				LOGGER.error(
-					"Error submitting job with id: [" + job.getId() + "]. Maybe the Job is poorly formed.",
-					e);
-			}
-		}
-		if (Objects.nonNull(this.jobsToSubmit.peek())) {
-			LOGGER.debug("Job submission buffer is empty.");
-		}
-	}
+            } catch (ArrebolConnectException ace) {
+                logger.error("Job execution service is not available right now.");
+                this.jobsToSubmit.offer(job);
+                break;
+            } catch (Exception e) {
+                job.setState(JobState.FAILED);
+                this.jobDataStore.update(job);
+                logger.error(
+                        "Error submitting job with id: ["
+                                + job.getId()
+                                + "]. Maybe the Job is poorly formed.",
+                        e);
+            }
+        }
+        if (Objects.nonNull(this.jobsToSubmit.peek())) {
+            logger.debug("Job submission buffer is empty.");
+        }
+    }
 }

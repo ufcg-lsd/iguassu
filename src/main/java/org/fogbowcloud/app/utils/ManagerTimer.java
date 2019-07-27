@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ManagerTimer {
 
-    private static final Logger LOGGER = Logger.getLogger(ManagerTimer.class);
+    private static final Logger logger = Logger.getLogger(ManagerTimer.class);
     private ScheduledExecutorService executor;
     private ScheduledFuture<?> future;
 
@@ -23,7 +23,7 @@ public class ManagerTimer {
                             try {
                                 task.run();
                             } catch (Throwable e) {
-                                LOGGER.error(
+                                logger.error(
                                         "Failed while executing timer task: " + e.getMessage(), e);
                             }
                         },

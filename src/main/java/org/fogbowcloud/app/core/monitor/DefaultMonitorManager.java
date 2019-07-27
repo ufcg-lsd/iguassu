@@ -6,7 +6,8 @@ import java.util.Queue;
 import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.AuthManager;
-import org.fogbowcloud.app.core.constants.ConfProperties;
+import org.fogbowcloud.app.core.constants.ConfProperty;
+import org.fogbowcloud.app.core.constants.GeneralConstants;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
@@ -67,7 +68,7 @@ public class DefaultMonitorManager implements MonitorManager {
 
 	private void initJobStateMonitor() {
 		final long JOB_MONITOR_EXECUTION_PERIOD =
-			Long.valueOf(this.properties.getProperty(ConfProperties.JOB_STATE_MONITOR_PERIOD));
+			Long.valueOf(this.properties.getProperty(ConfProperty.JOB_STATE_MONITOR_PERIOD.getProp()));
 
 		JobStateMonitor jobStateMonitor =
 			new JobStateMonitor(this.jobDataStore, new ArrebolSynchronizer(this.properties));
@@ -77,7 +78,7 @@ public class DefaultMonitorManager implements MonitorManager {
 
 	private void initSessionMonitor() {
 		final long SESSION_MONITOR_EXECUTION_PERIOD =
-			Long.valueOf(this.properties.getProperty(ConfProperties.SESSION_MONITOR_PERIOD));
+			Long.valueOf(this.properties.getProperty(ConfProperty.SESSION_MONITOR_PERIOD.getProp()));
 
 		SessionMonitor sessionMonitor = new SessionMonitor(this.oAuthTokenDataStore, this.authManager);
 		sessionMonitorTimer.scheduleAtFixedRate(
@@ -86,7 +87,7 @@ public class DefaultMonitorManager implements MonitorManager {
 
 	private void initJobSubmissionMonitor() {
 		final long SUBMISSION_MONITOR_EXECUTION_PERIOD =
-			Long.valueOf(this.properties.getProperty(ConfProperties.JOB_SUBMISSION_MONITOR_PERIOD));
+			Long.valueOf(this.properties.getProperty(ConfProperty.JOB_SUBMISSION_MONITOR_PERIOD.getProp()));
 
 		JobSubmissionMonitor jobSubmissionMonitor =
 			new JobSubmissionMonitor(this.jobDataStore, this.jobExecutionSystem, this.jobsToSubmit);

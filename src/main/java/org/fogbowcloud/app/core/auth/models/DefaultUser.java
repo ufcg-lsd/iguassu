@@ -1,11 +1,10 @@
 package org.fogbowcloud.app.core.auth.models;
 
+import java.time.Instant;
+import java.util.Objects;
 import org.fogbowcloud.app.core.constants.JsonKey;
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.time.Instant;
-import java.util.Objects;
 
 public class DefaultUser implements User {
 
@@ -25,7 +24,9 @@ public class DefaultUser implements User {
         JSONObject userJson = new JSONObject();
         userJson.put(JsonKey.USER_ID.getKey(), user.getIdentifier());
         userJson.put(JsonKey.IGUASSU_TOKEN.getKey(), user.retrieveToken());
-        userJson.put(JsonKey.SESSION_STATE.getKey(), user.isActive());
+        userJson.put(
+                JsonKey.SESSION_STATE.getKey(),
+                user.isActive() ? SessionState.ACTIVE.getState() : SessionState.EXPIRED.getState());
         userJson.put(JsonKey.SESSION_TIME.getKey(), user.getSessionTime());
         return userJson;
     }

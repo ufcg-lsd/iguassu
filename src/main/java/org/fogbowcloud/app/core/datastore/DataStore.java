@@ -1,46 +1,53 @@
 package org.fogbowcloud.app.core.datastore;
 
-import org.fogbowcloud.app.utils.DataStoreUtils;
-import org.apache.log4j.Logger;
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.log4j.Logger;
+import org.fogbowcloud.app.utils.DataStoreUtils;
 
-public abstract class DataStore<T> {
+abstract class DataStore<T> {
 
-    private static final Logger LOGGER = Logger.getLogger(DataStore.class);
+    static final String DATASTORE_DRIVER = "org.sqlite.JDBC";
+    static final String ERROR_WHILE_INITIALIZING_THE_DATA_STORE =
+            "Error while initializing the Job DataStore.";
+    private static final Logger logger = Logger.getLogger(DataStore.class);
+    private static final String DEFAULT_DATASTORE_NAME = "datastore.sqlite";
 
-    protected static final String DATASTORE_DRIVER = "org.sqlite.JDBC";
-    protected static final String ERROR_WHILE_INITIALIZING_THE_DATA_STORE = "Error while initializing the Job DataStore.";
-    protected static final String DEFAULT_DATASTORE_NAME = "datastore.sqlite";
+    String tokenDataStoreURL;
 
-    protected String tokenDataStoreURL;
-
-    public DataStore(String tokenDataStoreURL) {
-        this.tokenDataStoreURL = DataStoreUtils.getDataStoreUrl(tokenDataStoreURL, DEFAULT_DATASTORE_NAME);
+    DataStore(String tokenDataStoreURL) {
+        this.tokenDataStoreURL =
+                DataStoreUtils.getDataStoreUrl(tokenDataStoreURL, DEFAULT_DATASTORE_NAME);
     }
 
     /**
      * @return the connection
      * @throws SQLException
      */
-    public Connection getConnection() throws SQLException {
+    Connection getConnection() throws SQLException {
+
         try {
             return DriverManager.getConnection(this.tokenDataStoreURL);
         } catch (SQLException e) {
-            LOGGER.error("Error while getting a new connection from the connection pool.", e);
+            logger.error("Error while getting a new connection from the connection pool.", e);
             throw e;
         }
     }
 
-    protected void close(Statement statement, Connection conn) {
+    void close(Statement statement, Connection conn) {
         if (statement != null) {
             try {
                 if (!statement.isClosed()) {
                     statement.close();
                 }
             } catch (SQLException e) {
-                LOGGER.error("Couldn't close statement");
+                logger.error("Couldn't close statement");
             }
         }
 
@@ -50,14 +57,14 @@ public abstract class DataStore<T> {
                     conn.close();
                 }
             } catch (SQLException e) {
-                LOGGER.error("Couldn't close connection");
+                logger.error("Couldn't close connection");
             }
         }
     }
 
     abstract T getObjFromDataStoreResult(ResultSet resultSet) throws SQLException;
 
-    protected List<T> executeQueryStatement(String queryStatement, String... params) {
+    List<T> executeQueryStatement(String queryStatement, String... params) {
         PreparedStatement preparedStatement = null;
         Connection conn = null;
         List<T> dataList = new ArrayList<>();
@@ -81,17 +88,22 @@ public abstract class DataStore<T> {
                         dataList.add(data);
                     }
                 } catch (Exception e) {
-                    LOGGER.error("Error while mounting token from DB.", e);
+                    logger.error("Error while mounting token from DB.", e);
                 }
             }
 
         } catch (SQLException e) {
-            LOGGER.error("Couldn't get data from DB.", e);
+            logger.error("Couldn't get data from DB.", e);
             return new ArrayList<>();
         } finally {
             close(preparedStatement, conn);
         }
-        LOGGER.debug("There are " + dataList.size() + " rows at DB to this query (" + preparedStatement.toString() + ").");
+        logger.debug(
+                "There are "
+                        + dataList.size()
+                        + " rows at DB to this query ("
+                        + preparedStatement.toString()
+                        + ").");
         return dataList;
     }
 }

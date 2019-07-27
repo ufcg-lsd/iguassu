@@ -1,20 +1,19 @@
 package org.fogbowcloud.app.core.datastore;
 
 import com.google.gson.annotations.SerializedName;
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.Objects;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.constants.JsonKey;
 import org.json.JSONObject;
 
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.util.Objects;
-
 public class OAuthToken {
 
-    private static final Logger LOGGER = Logger.getLogger(OAuthToken.class);
+    private static final Logger logger = Logger.getLogger(OAuthToken.class);
 
     private static final long INITIAL_VERSION = 0L;
-    private static final String USER_ID = "refresh_token";
+    private static final String USER_ID = "user_id";
     private static final String ACCESS_TOKEN = "access_token";
     private static final String REFRESH_TOKEN = "refresh_token";
     private static final String EXPIRES_IN = "expires_in";
@@ -36,7 +35,7 @@ public class OAuthToken {
 
     public OAuthToken() {}
 
-    public OAuthToken(String accessToken, String refreshToken, String userId, Date expirationDate) {
+    OAuthToken(String accessToken, String refreshToken, String userId, Date expirationDate) {
         this.version = INITIAL_VERSION;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
@@ -45,7 +44,7 @@ public class OAuthToken {
         this.expirationTime = 3600;
     }
 
-    public OAuthToken(
+    private OAuthToken(
             String accessToken,
             String refreshToken,
             String userId,
@@ -60,7 +59,7 @@ public class OAuthToken {
     }
 
     public static OAuthToken fromJSON(JSONObject tokenJson) {
-        LOGGER.info("Reading Token from JSON");
+        logger.info("Reading Token from JSON");
 
         long dateStr = tokenJson.getLong(EXPIRES_IN);
         Date expirationDate = new Date(dateStr);
@@ -73,7 +72,7 @@ public class OAuthToken {
                         expirationDate,
                         tokenJson.getLong(JsonKey.TOKEN_VERSION.getKey()));
 
-        LOGGER.debug("Job read from JSON is from user: " + token.getUserId());
+        logger.debug("Job read from JSON is from user: " + token.getUserId());
         return token;
     }
 
@@ -87,7 +86,7 @@ public class OAuthToken {
         return accessToken;
     }
 
-    public void setAccessToken(String accessToken) {
+    void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
     }
 

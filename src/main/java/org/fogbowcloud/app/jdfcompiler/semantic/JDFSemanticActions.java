@@ -57,14 +57,14 @@ public class JDFSemanticActions implements SemanticActions {
 
     private IOCommand transferEntries = null;
 
-    private List<TaskSpecification> tasksSpecs = new ArrayList<TaskSpecification>();
+    private List<TaskSpecification> tasksSpecs = new ArrayList<>();
 
     // Job (default) attributes
     private String jobRemoteScript = null;
 
-    private List<JDLCommand> initBlocks = new ArrayList<JDLCommand>();
-    private List<JDLCommand> finalBlocks = new ArrayList<JDLCommand>();
-    private List<JDLCommand> taskBlocks = new ArrayList<JDLCommand>();
+    private List<JDLCommand> initBlocks = new ArrayList<>();
+    private List<JDLCommand> finalBlocks = new ArrayList<>();
+    private List<JDLCommand> taskBlocks = new ArrayList<>();
 
     private IOCommand jobInputEntries, jobOutputEntries = null;
 

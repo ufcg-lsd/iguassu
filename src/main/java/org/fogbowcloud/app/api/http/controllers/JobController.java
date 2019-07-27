@@ -10,7 +10,7 @@ import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.api.http.services.FileStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
 import org.fogbowcloud.app.core.auth.models.User;
-import org.fogbowcloud.app.core.constants.ConfProperties;
+import org.fogbowcloud.app.core.constants.GeneralConstants;
 import org.fogbowcloud.app.core.dto.JobResponseDTO;
 import org.fogbowcloud.app.core.dto.TaskDTO;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
@@ -53,7 +53,7 @@ public class JobController {
     @ApiOperation(value = Documentation.Job.GET_ALL_OPERATION)
     public ResponseEntity<?> getAllJobs(
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
-                    @RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS)
+                    @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
                     String userCredentials) {
         User user;
 
@@ -81,7 +81,7 @@ public class JobController {
     public ResponseEntity<?> getJobById(
             @ApiParam(value = Documentation.Job.ID) @PathVariable String jobId,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
-                    @RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS)
+                    @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
                     String userCredentials)
             throws InvalidParameterException {
 
@@ -107,7 +107,7 @@ public class JobController {
     public ResponseEntity<?> getJobTasks(
             @ApiParam(value = Documentation.Job.ID) @PathVariable String jobId,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
-                    @RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS)
+                    @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
                     String userCredentials)
             throws InvalidParameterException {
         JDFJob job;
@@ -128,18 +128,18 @@ public class JobController {
     @ApiOperation(value = Documentation.Job.CREATE_OPERATION)
     public ResponseEntity<String> submitJob(
             @ApiParam(value = Documentation.Job.CREATE_REQUEST_PARAM)
-                    @RequestParam(ConfProperties.JDF_FILE_PATH)
+                    @RequestParam(GeneralConstants.JDF_FILE_PATH)
                     MultipartFile file,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
-                    @RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS)
+                    @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
                     String userCredentials) {
 
         logger.info("Saving new Job.");
         logger.info(file.toString());
 
         Map<String, String> fieldMap = new HashMap<>();
-        fieldMap.put(ConfProperties.JDF_FILE_PATH, null);
-        fieldMap.put(ConfProperties.X_AUTH_USER_CREDENTIALS, null);
+        fieldMap.put(GeneralConstants.JDF_FILE_PATH, null);
+        fieldMap.put(GeneralConstants.X_AUTH_USER_CREDENTIALS, null);
 
         this.storageService.store(file, fieldMap);
         User user;
@@ -152,14 +152,14 @@ public class JobController {
                     HttpStatus.UNAUTHORIZED);
         }
 
-        final String jdf = fieldMap.get(ConfProperties.JDF_FILE_PATH);
+        final String jdf = fieldMap.get(GeneralConstants.JDF_FILE_PATH);
         if (Objects.isNull(jdf)) {
             logger.info("Could not store  new job from user " + user.getIdentifier());
             throw new StorageException("Could not store new job from user " + user.getIdentifier());
         }
 
         String jobId;
-        final String jdfAbsolutePath = fieldMap.get(ConfProperties.JDF_FILE_PATH);
+        final String jdfAbsolutePath = fieldMap.get(GeneralConstants.JDF_FILE_PATH);
         try {
             logger.info("jdfpath <" + jdfAbsolutePath + ">");
             jobId = this.jobService.submitJob(jdfAbsolutePath, user);
@@ -179,7 +179,7 @@ public class JobController {
     public ResponseEntity<?> stopJob(
             @ApiParam(value = Documentation.Job.ID) @PathVariable String jobId,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
-                    @RequestHeader(value = ConfProperties.X_AUTH_USER_CREDENTIALS)
+                    @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
                     String userCredentials)
             throws InvalidParameterException {
         logger.info("Deleting job with Id " + jobId + ".");

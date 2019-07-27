@@ -4,7 +4,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.models.Credential;
 import org.fogbowcloud.app.core.auth.models.DefaultUser;
 import org.fogbowcloud.app.core.auth.models.User;
-import org.fogbowcloud.app.core.constants.ConfProperties;
+import org.fogbowcloud.app.core.constants.GeneralConstants;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mapdb.DB;
@@ -23,10 +23,10 @@ public class DefaultAuthManager implements AuthManager {
     private ConcurrentMap<String, String> userList;
 
     public DefaultAuthManager() {
-        final File usersFile = new File(ConfProperties.DATASTORES_USERS_DB_FILE_PATH);
+        final File usersFile = new File(GeneralConstants.DATASTORES_USERS_DB_FILE_PATH);
         this.usersDB = DBMaker.newFileDB(usersFile).make();
-        this.usersDB.checkShouldCreate(ConfProperties.DATASTORES_USERS_FILE_PATH);
-        this.userList = this.usersDB.getHashMap(ConfProperties.DATASTORES_USERS_FILE_PATH);
+        this.usersDB.checkShouldCreate(GeneralConstants.DATASTORES_USERS_FILE_PATH);
+        this.userList = this.usersDB.getHashMap(GeneralConstants.DATASTORES_USERS_FILE_PATH);
     }
 
     @Override

@@ -18,7 +18,7 @@ import java.util.Properties;
 
 public class ArrebolSynchronizer implements Synchronizer {
 
-    private static final Logger LOGGER = Logger.getLogger(ArrebolSynchronizer.class);
+    private static final Logger logger = Logger.getLogger(ArrebolSynchronizer.class);
 
     private final ArrebolRequestsHelper requestsHelper;
 
@@ -34,26 +34,26 @@ public class ArrebolSynchronizer implements Synchronizer {
             if (Objects.nonNull(executionId) && !executionId.trim().isEmpty()) {
                 try {
                     String jobExecutionJson = this.requestsHelper.getJobJSON(executionId);
-                    LOGGER.debug("JSON Response [" + jobExecutionJson + "]");
+                    logger.debug("JSON Response [" + jobExecutionJson + "]");
                     Gson gson = new Gson();
                     ArrebolJob arrebolJob = gson.fromJson(jobExecutionJson, ArrebolJob.class);
                     this.updateJob(job, arrebolJob);
                 } catch (Exception e) {
-                    LOGGER.error(e.getMessage());
+                    logger.error(e.getMessage());
                 }
             } else {
-                LOGGER.debug("Execution identifier from Job [" + job.getId() + "] is null.");
+                logger.debug("Execution identifier from Job [" + job.getId() + "] is null.");
             }
         } catch (GetJobException e) {
-            LOGGER.error(e.getMessage(), e);
+            logger.error(e.getMessage(), e);
         }
         return job;
     }
 
     private void updateJob(JDFJob job, ArrebolJob arrebolJob) {
         updateTasks(job.getTasks(), arrebolJob.getTasks());
-        LOGGER.info("Updated tasks state from job [" + job.getId() + "].");
-        updateJobState(job, arrebolJob.getJobState());
+        logger.info("Updated tasks state from job [" + job.getId() + "].");
+        updateJobState(job, arrebolJob.getExecutionState());
     }
 
     private void updateTasks(Map<String, Task> iguassuTasks, List<ArrebolTask> arrebolTasks) {
@@ -67,7 +67,7 @@ public class ArrebolSynchronizer implements Synchronizer {
                 ArrebolTaskState arrebolTaskState = arrebolTask.getState();
                 TaskState taskState = getTaskState(arrebolTaskState);
                 iguassuTask.setState(taskState);
-                LOGGER.debug(
+                logger.debug(
                         "Updated task ["
                                 + iguassuTask.getId()
                                 + "] to state "
@@ -92,7 +92,7 @@ public class ArrebolSynchronizer implements Synchronizer {
 
         if (jobState != null) {
             job.setState(jobState);
-            LOGGER.info("Updated job [" + job.getId() + "] to state " + jobState.toString());
+            logger.info("Updated job [" + job.getId() + "] to state " + jobState.toString());
         }
     }
 

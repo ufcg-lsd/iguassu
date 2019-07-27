@@ -1,5 +1,6 @@
 package org.fogbowcloud.app.core.auth.models;
 
+import com.google.gson.annotations.SerializedName;
 import java.util.Objects;
 
 /**
@@ -11,12 +12,14 @@ import java.util.Objects;
 public class OAuth2Identifiers {
 
     /** This property is provided by the OAuth2 of the Storage Service; must be non-null. */
+    @SerializedName("client_id")
     private String clientAppId;
 
     /** This property is provided by the OAuth2 of the Storage Service; must be non-null. */
     private String secret;
 
     /** This property is provided by the OAuth2 of the Storage Service; must be non-null. */
+    @SerializedName("redirect_uri")
     private String redirectUri;
 
     /**

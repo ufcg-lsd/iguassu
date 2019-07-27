@@ -1,15 +1,14 @@
 package org.fogbowcloud.app.utils;
 
-import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.constants.ConfProperties;
-import org.fogbowcloud.app.core.constants.ExitCode;
-
 import java.util.Objects;
 import java.util.Properties;
+import org.apache.log4j.Logger;
+import org.fogbowcloud.app.core.constants.ConfProperty;
+import org.fogbowcloud.app.core.constants.ExitCode;
 
 public class ConfValidator {
 
-    private static final Logger LOGGER = Logger.getLogger(ConfValidator.class);
+    private static final Logger logger = Logger.getLogger(ConfValidator.class);
 
     public static void validate(Properties properties) {
         if (Objects.isNull(properties)) {
@@ -20,32 +19,32 @@ public class ConfValidator {
         validateServicesAddresses(properties);
         validateMonitorPeriods(properties);
 
-        LOGGER.debug("All properties are set.");
+        logger.debug("All properties are set.");
     }
 
     private static void validateServicesAddresses(Properties properties) {
-        validatePropKey(properties, ConfProperties.ARREBOL_SERVICE_HOST_URL);
-        validatePropKey(properties, ConfProperties.DATABASE_HOST_URL);
-        validatePropKey(properties, ConfProperties.IGUASSU_SERVICE_HOST_URL);
-        validatePropKey(properties, ConfProperties.STORAGE_SERVICE_HOST_URL);
+        validatePropKey(properties, ConfProperty.ARREBOL_SERVICE_HOST_URL.getProp());
+        validatePropKey(properties, ConfProperty.DATABASE_HOST_URL.getProp());
+        validatePropKey(properties, ConfProperty.IGUASSU_SERVICE_HOST_URL.getProp());
+        validatePropKey(properties, ConfProperty.STORAGE_SERVICE_HOST_URL.getProp());
     }
 
     private static void validateMonitorPeriods(Properties properties) {
-        validatePropKey(properties, ConfProperties.JOB_SUBMISSION_MONITOR_PERIOD);
-        validatePropKey(properties, ConfProperties.SESSION_MONITOR_PERIOD);
-        validatePropKey(properties, ConfProperties.JOB_STATE_MONITOR_PERIOD);
+        validatePropKey(properties, ConfProperty.JOB_SUBMISSION_MONITOR_PERIOD.getProp());
+        validatePropKey(properties, ConfProperty.SESSION_MONITOR_PERIOD.getProp());
+        validatePropKey(properties, ConfProperty.JOB_STATE_MONITOR_PERIOD.getProp());
     }
 
     private static void validateOAuthProps(Properties properties) {
-        validatePropKey(properties, ConfProperties.OAUTH_STORAGE_SERVICE_CLIENT_ID);
-        validatePropKey(properties, ConfProperties.OAUTH_STORAGE_SERVICE_CLIENT_SECRET);
-        validatePropKey(properties, ConfProperties.OAUTH_STORAGE_SERVICE_TOKEN_URL);
+        validatePropKey(properties, ConfProperty.OAUTH_STORAGE_SERVICE_CLIENT_ID.getProp());
+        validatePropKey(properties, ConfProperty.OAUTH_STORAGE_SERVICE_CLIENT_SECRET.getProp());
+        validatePropKey(properties, ConfProperty.OAUTH_STORAGE_SERVICE_TOKEN_URL.getProp());
     }
 
     private static void validatePropKey(Properties properties, String propKey) {
         if (!properties.containsKey(propKey)) {
             String errorMsg = requiredPropertyMessage(propKey);
-            LOGGER.error(errorMsg);
+            logger.error(errorMsg);
 
             System.exit(ExitCode.FAIL.getCode());
         }
