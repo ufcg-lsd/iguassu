@@ -9,13 +9,13 @@ import org.fogbowcloud.app.core.auth.models.User;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 
-public class SessionMonitor implements Runnable {
+public class SessionVerificationRoutine implements Runnable {
 
-    private static final Logger logger = Logger.getLogger(SessionMonitor.class);
+    private static final Logger logger = Logger.getLogger(SessionVerificationRoutine.class);
     private final OAuthTokenDataStore oAuthTokenDataStore;
     private final AuthManager authManager;
 
-    SessionMonitor(OAuthTokenDataStore oAuthTokenDataStore, AuthManager authManager) {
+    SessionVerificationRoutine(OAuthTokenDataStore oAuthTokenDataStore, AuthManager authManager) {
         this.oAuthTokenDataStore = oAuthTokenDataStore;
         this.authManager = authManager;
     }
@@ -23,7 +23,6 @@ public class SessionMonitor implements Runnable {
     @Override
     public void run() {
         final long now = Instant.now().getEpochSecond();
-        logger.debug("Starting verification of user sessions at time: " + now);
         final long oneHourInSeconds = 3600;
         for (final OAuthToken token : this.oAuthTokenDataStore.getAll()) {
             final User currentUser = this.authManager.retrieve(token.getUserId());

@@ -1,5 +1,13 @@
 package org.fogbowcloud.app.core;
 
+import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Queue;
+import java.util.UUID;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.core.auth.AuthManager;
@@ -7,12 +15,11 @@ import org.fogbowcloud.app.core.auth.DefaultAuthManager;
 import org.fogbowcloud.app.core.auth.models.Credential;
 import org.fogbowcloud.app.core.auth.models.User;
 import org.fogbowcloud.app.core.constants.ConfProperty;
-import org.fogbowcloud.app.core.constants.GeneralConstants;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
-import org.fogbowcloud.app.core.monitor.DefaultMonitorManager;
-import org.fogbowcloud.app.core.monitor.MonitorManager;
+import org.fogbowcloud.app.core.monitor.DefaultRoutineManager;
+import org.fogbowcloud.app.core.monitor.RoutineManager;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJobBuilder;
@@ -24,12 +31,7 @@ import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.utils.JDFUtil;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.jvnet.hk2.config.ConfigParser;
 import org.springframework.beans.factory.annotation.Autowired;
-
-import java.security.GeneralSecurityException;
-import java.util.*;
-import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class IguassuController {
 
@@ -53,21 +55,22 @@ public class IguassuController {
 
     public void init() {
         this.jobDataStore =
-                new JobDataStore(this.properties.getProperty(ConfProperty.DATABASE_HOST_URL.getProp()));
+                new JobDataStore(
+                        this.properties.getProperty(ConfProperty.DATABASE_HOST_URL.getProp()));
         this.oAuthTokenDataStore =
                 new OAuthTokenDataStore(
                         this.properties.getProperty(ConfProperty.DATABASE_HOST_URL.getProp()));
         this.jobBuilder = new JDFJobBuilder(this.properties);
         this.nonceList = new ArrayList<>();
 
-        final MonitorManager monitorManager =
-                new DefaultMonitorManager(
+        final RoutineManager routineManager =
+                new DefaultRoutineManager(
                         this.properties,
                         this.oAuthTokenDataStore,
                         this.jobDataStore,
                         this.authManager,
                         this.jobsToSubmit);
-        monitorManager.start();
+        routineManager.start();
     }
 
     JDFJob getJobById(String jobId, String user) {
@@ -147,7 +150,7 @@ public class IguassuController {
 
     User authorizeUser(String credentials) throws GeneralSecurityException {
         if (Objects.isNull(credentials)) {
-            logger.error("Invalid credentials. Some of the fields are null.");
+            logger.error("Invalid credentials. The fields are null.");
             return null;
         }
 

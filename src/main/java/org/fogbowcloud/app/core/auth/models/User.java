@@ -10,7 +10,7 @@ public interface User {
     void updateToken(String token);
 
     /** Retrieves the current secret token if the user already has one; must be non-null. */
-    String retrieveToken();
+    String getIguassuToken();
 
     /** True if the user session is not expired. */
     boolean isActive();

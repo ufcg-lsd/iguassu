@@ -11,7 +11,7 @@ public class Credential {
     private String iguassuToken;
     private Integer nonce;
 
-    private Credential(String userId, String iguassuToken, Integer nonce) {
+    public Credential(String userId, String iguassuToken, Integer nonce) {
         this.userId = userId;
         this.iguassuToken = iguassuToken;
         this.nonce = nonce;

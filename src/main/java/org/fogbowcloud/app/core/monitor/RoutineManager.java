@@ -1,6 +1,6 @@
 package org.fogbowcloud.app.core.monitor;
 
-public interface MonitorManager {
+public interface RoutineManager {
 
     void start();
 }

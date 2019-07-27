@@ -9,20 +9,19 @@ import org.fogbowcloud.app.jes.arrebol.Synchronizer;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class JobStateMonitor implements Runnable {
+public class SyncJobStateRoutine implements Runnable {
 
-    private static final Logger logger = Logger.getLogger(JobStateMonitor.class);
+    private static final Logger logger = Logger.getLogger(SyncJobStateRoutine.class);
     private JobDataStore jobDataStore;
     private Synchronizer synchronizer;
 
-    JobStateMonitor(JobDataStore jobDataStore, Synchronizer synchronizer) {
+    SyncJobStateRoutine(JobDataStore jobDataStore, Synchronizer synchronizer) {
         this.jobDataStore = jobDataStore;
         this.synchronizer = synchronizer;
     }
 
     @Override
     public void run() {
-        logger.info("Running job state monitor.");
         List<JDFJob> jobs =
                 jobDataStore.getAll().stream()
                         .filter(

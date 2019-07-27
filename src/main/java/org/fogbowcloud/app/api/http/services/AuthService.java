@@ -193,7 +193,7 @@ public class AuthService {
                 if (Objects.nonNull(user)) {
                     logger.debug("Found user [" + user.getIdentifier() + "]");
                     if (user.isActive()) {
-                        iguassuToken = user.retrieveToken();
+                        iguassuToken = user.getIguassuToken();
                         logger.debug(
                                 "User ["
                                         + user.getIdentifier()

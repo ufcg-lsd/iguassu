@@ -75,7 +75,7 @@ public class JDFJob extends Job implements Serializable {
         jdfJob.setLabel(job.optString(JsonKey.LABEL.getKey()));
 
         try {
-            jdfJob.setState(JobState.valueOf(job.optString(JsonKey.STATE.getKey())));
+            jdfJob.setState(JobState.valueOf(job.optString(JsonKey.STATE.getKey()).toUpperCase()));
         } catch (Exception e) {
             logger.debug("JSON had bad state", e);
         }

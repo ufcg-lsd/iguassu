@@ -1,5 +1,9 @@
 package org.fogbowcloud.app.core.auth;
 
+import java.io.File;
+import java.security.GeneralSecurityException;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentMap;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.models.Credential;
 import org.fogbowcloud.app.core.auth.models.DefaultUser;
@@ -9,11 +13,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.mapdb.DB;
 import org.mapdb.DBMaker;
-
-import java.io.File;
-import java.security.GeneralSecurityException;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentMap;
 
 public class DefaultAuthManager implements AuthManager {
 
@@ -40,7 +39,7 @@ public class DefaultAuthManager implements AuthManager {
 
         logger.debug("Authorizing user with identifier: " + user.getIdentifier());
 
-        if (!user.retrieveToken().equalsIgnoreCase(credentials.getIguassuToken())) {
+        if (!user.getIguassuToken().equalsIgnoreCase(credentials.getIguassuToken())) {
             throw new GeneralSecurityException(
                     "User " + user.getIdentifier() + " not has a valid Iguassu token.");
         }

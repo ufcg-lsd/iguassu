@@ -23,7 +23,7 @@ public class DefaultUser implements User {
     public static JSONObject toJSON(User user) throws JSONException {
         JSONObject userJson = new JSONObject();
         userJson.put(JsonKey.USER_ID.getKey(), user.getIdentifier());
-        userJson.put(JsonKey.IGUASSU_TOKEN.getKey(), user.retrieveToken());
+        userJson.put(JsonKey.IGUASSU_TOKEN.getKey(), user.getIguassuToken());
         userJson.put(
                 JsonKey.SESSION_STATE.getKey(),
                 user.isActive() ? SessionState.ACTIVE.getState() : SessionState.EXPIRED.getState());
@@ -32,16 +32,16 @@ public class DefaultUser implements User {
     }
 
     public static User fromJSON(JSONObject userJSON) {
-        DefaultUser user =
+        final DefaultUser newUser =
                 new DefaultUser(
                         userJSON.optString(JsonKey.USER_ID.getKey()),
                         userJSON.optString(JsonKey.IGUASSU_TOKEN.getKey()));
 
-        final String sessionState = userJSON.optString(JsonKey.IGUASSU_TOKEN.getKey());
+        final String newSessionState = userJSON.optString(JsonKey.SESSION_STATE.getKey());
 
-        user.changeSessionState(SessionState.valueOf(sessionState));
-        user.setSessionTime(userJSON.optLong(JsonKey.SESSION_TIME.getKey()));
-        return user;
+        newUser.changeSessionState(SessionState.valueOf(newSessionState.toUpperCase()));
+        newUser.setSessionTime(userJSON.optLong(JsonKey.SESSION_TIME.getKey()));
+        return newUser;
     }
 
     @Override
@@ -60,7 +60,7 @@ public class DefaultUser implements User {
     }
 
     @Override
-    public String retrieveToken() {
+    public String getIguassuToken() {
         return this.iguassuToken;
     }
 

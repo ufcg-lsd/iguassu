@@ -9,14 +9,14 @@ import org.fogbowcloud.app.jdfcompiler.job.JobState;
 import org.fogbowcloud.app.jes.JobExecutionService;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 
-public class JobSubmissionMonitor implements Runnable {
+public class JobSubmissionRoutine implements Runnable {
 
-    private static final Logger logger = Logger.getLogger(JobSubmissionMonitor.class);
+    private static final Logger logger = Logger.getLogger(JobSubmissionRoutine.class);
     private JobDataStore jobDataStore;
     private JobExecutionService jobExecutionSystem;
     private Queue<JDFJob> jobsToSubmit;
 
-    JobSubmissionMonitor(
+    JobSubmissionRoutine(
             JobDataStore jobDataStore,
             JobExecutionService jobExecutionSystem,
             Queue<JDFJob> jobsToSubmit) {
@@ -27,7 +27,6 @@ public class JobSubmissionMonitor implements Runnable {
 
     @Override
     public void run() {
-        logger.debug("Checking for jobs to be submitted.");
         while (Objects.nonNull(this.jobsToSubmit.peek())) {
             JDFJob job = this.jobsToSubmit.poll();
             logger.debug("Job found! Starting job submission with id [" + job.getId() + "]");
