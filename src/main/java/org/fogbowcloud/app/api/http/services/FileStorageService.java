@@ -1,39 +1,39 @@
 package org.fogbowcloud.app.api.http.services;
 
+import org.apache.commons.io.IOUtils;
+import org.apache.log4j.Logger;
+import org.fogbowcloud.app.api.exceptions.StorageException;
+import org.fogbowcloud.app.core.constants.GeneralConstants;
+import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
-import org.apache.commons.io.IOUtils;
-import org.apache.log4j.Logger;
-import org.fogbowcloud.app.api.exceptions.StorageException;
-import org.fogbowcloud.app.core.constants.ConfProperties;
-import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 @Service
-public class FileSystemStorageService {
+public class FileStorageService {
 
-    private final Logger LOGGER = Logger.getLogger(FileSystemStorageService.class);
+    private final Logger logger = Logger.getLogger(FileStorageService.class);
 
     public void store(MultipartFile file, Map<String, String> formFieldsToLoad) {
         final String fileName = file.getOriginalFilename();
 
-        LOGGER.info("Storing file of name [" + fileName + "];");
+        logger.info("Storing file of name [" + fileName + "];");
 
         try {
             if (file.isEmpty()) {
                 final String errorMsg = "Failed to store empty file " + fileName;
-                LOGGER.error(errorMsg);
+                logger.error(errorMsg);
                 throw new StorageException(errorMsg);
             }
             try (InputStream inputStream = file.getInputStream()) {
-                if (formFieldsToLoad.containsKey(ConfProperties.JDF_FILE_PATH)) {
+                if (formFieldsToLoad.containsKey(GeneralConstants.JDF_FILE_PATH)) {
                     final String fileContent = IOUtils.toString(inputStream);
                     final File tempFile = createTmpFile(fileContent, fileName);
-                    formFieldsToLoad
-                        .put(ConfProperties.JDF_FILE_PATH, tempFile.getAbsolutePath());
+                    formFieldsToLoad.put(GeneralConstants.JDF_FILE_PATH, tempFile.getAbsolutePath());
                 }
             }
         } catch (IOException e) {
@@ -45,7 +45,7 @@ public class FileSystemStorageService {
         final File tempFile = File.createTempFile(fileName, null);
         IOUtils.write(content, new FileOutputStream(tempFile));
 
-        LOGGER.info("Writing file of name [" + fileName + "] in " + tempFile.getAbsolutePath());
+        logger.info("Writing file named [" + fileName + "] in path" + tempFile.getAbsolutePath());
         return tempFile;
     }
 }

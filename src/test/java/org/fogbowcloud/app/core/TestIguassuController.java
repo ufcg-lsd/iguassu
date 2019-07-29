@@ -5,14 +5,14 @@ import static org.mockito.Mockito.*;
 
 import java.util.*;
 
-import org.fogbowcloud.app.core.authenticator.models.UserImpl;
+import org.fogbowcloud.app.core.auth.models.DefaultUser;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.task.Specification;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.core.task.TaskImpl;
 import org.fogbowcloud.app.core.task.TaskState;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.app.core.authenticator.models.User;
+import org.fogbowcloud.app.core.auth.models.User;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;
@@ -24,9 +24,9 @@ import org.mockito.Mockito;
 public class TestIguassuController {
 
     private static final String FAKE_UUID = "1234";
-    private static final String FAKE_OWNER = "testowner";
-    private static final String FAKE_TASK_ID = "testtaskId";
-    private static final String FAKE_IMAGE_FLAVOR_NAME = "testimage";
+    private static final String FAKE_USER_ID = "fake-user-id";
+    private static final String FAKE_TASK_ID = "fake-task-id";
+    private static final String FAKE_IMAGE_FLAVOR_NAME = "fake-docker-image";
 
     private IguassuController iguassuController;
     private JobDataStore dataStore;
@@ -36,8 +36,6 @@ public class TestIguassuController {
         Properties properties = new Properties();
         this.iguassuController = Mockito.spy(new IguassuController(properties));
         this.dataStore = Mockito.mock(JobDataStore.class);
-
-        this.iguassuController.setDataStore(dataStore);
     }
 
     @After
@@ -50,24 +48,24 @@ public class TestIguassuController {
         ArrayList<Task> taskList = new ArrayList<>();
         Specification spec = new Specification(
                 FAKE_IMAGE_FLAVOR_NAME,
-                FAKE_OWNER
+                FAKE_USER_ID
         );
         Task task = new TaskImpl(FAKE_TASK_ID, spec, FAKE_UUID);
         taskList.add(task);
 
-        JDFJob job = new JDFJob(FAKE_OWNER, taskList, "");
+        JDFJob job = new JDFJob(FAKE_USER_ID, taskList, "");
         job.finishCreation();
         this.iguassuController.getJobDataStore().insert(job);
 
-        Assert.assertEquals(1, this.iguassuController.getAllJobs(FAKE_OWNER).size());
-        JDFJob job1 = this.iguassuController.getAllJobs(FAKE_OWNER).get(0);
+        Assert.assertEquals(1, this.iguassuController.getAllJobs(FAKE_USER_ID).size());
+        JDFJob job1 = this.iguassuController.getAllJobs(FAKE_USER_ID).get(0);
         assert (job1.equals(job));
-        System.out.println(this.iguassuController.getAllJobs(FAKE_OWNER).get(0).getTaskById(FAKE_TASK_ID).getSpecification().toJSON().toString());
+        System.out.println(this.iguassuController.getAllJobs(FAKE_USER_ID).get(0).getTaskById(FAKE_TASK_ID).getSpecification().toJSON().toString());
 
         Specification spec2 = Specification.fromJSON(
                 new JSONObject(
                         this.iguassuController
-                                .getAllJobs(FAKE_OWNER)
+                                .getAllJobs(FAKE_USER_ID)
                                 .get(0)
                                 .getTaskById(FAKE_TASK_ID)
                                 .getSpecification()
@@ -75,28 +73,28 @@ public class TestIguassuController {
                                 .toString()
                 )
         );
-        Assert.assertEquals(1, this.iguassuController.getAllJobs(FAKE_OWNER).get(0).getTaskList().size());
+        Assert.assertEquals(1, this.iguassuController.getAllJobs(FAKE_USER_ID).get(0).getTasks().size());
         assert (spec.equals(spec2));
-        assert (task.equals(this.iguassuController.getAllJobs(FAKE_OWNER).get(0).getTaskList().get(FAKE_TASK_ID)));
-        assert (spec.equals(this.iguassuController.getAllJobs(FAKE_OWNER).get(0).getTaskList().get(FAKE_TASK_ID).getSpecification()));
+        assert (task.equals(this.iguassuController.getAllJobs(FAKE_USER_ID).get(0).getTasks().get(FAKE_TASK_ID)));
+        assert (spec.equals(this.iguassuController.getAllJobs(FAKE_USER_ID).get(0).getTasks().get(FAKE_TASK_ID).getSpecification()));
 
     }
 
     @Test
     public void testGetJobById() {
         String jobId = "jobId00";
-        JDFJob job = new JDFJob(jobId, FAKE_OWNER, new ArrayList<Task>(), null);
-        doReturn(job).when(dataStore).getByJobId(jobId, FAKE_OWNER);
-        assert (job.equals(this.iguassuController.getJobById(jobId, FAKE_OWNER)));
+        JDFJob job = new JDFJob(jobId, new ArrayList<>(), FAKE_USER_ID);
+        doReturn(job).when(dataStore).getByJobId(jobId, FAKE_USER_ID);
+        assert (job.equals(this.iguassuController.getJobById(jobId, FAKE_USER_ID)));
 
     }
 
     @Test
     public void testAddJob() throws Exception {
         String jdfFilePath = "";
-        User user = new UserImpl("testuser", "'this is a test user'");
+        User user = new DefaultUser("testuser", "'this is a test user'");
 
-        JDFJob job = new JDFJob(user.getUserIdentification(), new ArrayList<Task>(), user.getUserIdentification());
+        JDFJob job = new JDFJob(user.getIdentifier(), new ArrayList<Task>(), user.getIdentifier());
         Mockito.doReturn(job).when(this.iguassuController).buildJob(
                 Mockito.anyString(),
                 Mockito.any(User.class)
@@ -105,24 +103,24 @@ public class TestIguassuController {
         String id = this.iguassuController.submitJob(jdfFilePath, user);
         Assert.assertEquals(id, job.getId());
         Mockito.verify(this.dataStore).insert(job);
-        Assert.assertTrue(this.dataStore.getByJobId(id, user.getUserIdentification()).equals(job));
+        Assert.assertTrue(this.dataStore.getByJobId(id, user.getIdentifier()).equals(job));
     }
 
     @Test
     public void testGetAllJobs() {
         ArrayList<JDFJob> jobs = new ArrayList<>();
         ArrayList<Task> task = new ArrayList<>();
-        jobs.add(new JDFJob("job1", FAKE_OWNER, task, null));
-        jobs.add(new JDFJob("job2", FAKE_OWNER, task, null));
-        jobs.add(new JDFJob("job3", FAKE_OWNER, task, null));
-        jobs.add(new JDFJob("job4", FAKE_OWNER, task, null));
+        jobs.add(new JDFJob("job1", task, FAKE_USER_ID));
+        jobs.add(new JDFJob("job2", task, FAKE_USER_ID));
+        jobs.add(new JDFJob("job3", task, FAKE_USER_ID));
+        jobs.add(new JDFJob("job4", task, FAKE_USER_ID));
 
-        doReturn(jobs).when(this.dataStore).getAllByOwner(FAKE_OWNER);
+        doReturn(jobs).when(this.dataStore).getAllByUserId(FAKE_USER_ID);
         doNothing().when(this.iguassuController).updateJob(any(JDFJob.class));
 
-        this.iguassuController.getAllJobs(FAKE_OWNER);
+        this.iguassuController.getAllJobs(FAKE_USER_ID);
 
-        Assert.assertEquals(jobs.size(), this.iguassuController.getAllJobs(FAKE_OWNER).size());
+        Assert.assertEquals(jobs.size(), this.iguassuController.getAllJobs(FAKE_USER_ID).size());
     }
 
     @Test
@@ -130,23 +128,23 @@ public class TestIguassuController {
         ArrayList<JDFJob> jobs = new ArrayList<>();
         ArrayList<Task> task = new ArrayList<>();
 
-        jobs.add(new JDFJob(FAKE_OWNER, task, null));
-        jobs.add(new JDFJob(FAKE_OWNER, task, null));
-        jobs.add(new JDFJob(FAKE_OWNER, task, null));
-        jobs.add(new JDFJob(FAKE_OWNER, task, null));
-        doReturn(jobs).when(this.dataStore).getAllByOwner(FAKE_OWNER);
+        jobs.add(new JDFJob(FAKE_USER_ID, task, null));
+        jobs.add(new JDFJob(FAKE_USER_ID, task, null));
+        jobs.add(new JDFJob(FAKE_USER_ID, task, null));
+        jobs.add(new JDFJob(FAKE_USER_ID, task, null));
+        doReturn(jobs).when(this.dataStore).getAllByUserId(FAKE_USER_ID);
 
-        Assert.assertEquals(0, this.iguassuController.getAllJobs("wrong user owner").size());
+        Assert.assertEquals(0, this.iguassuController.getAllJobs("wrong user").size());
 
-        jobs.add(new JDFJob(FAKE_OWNER, task, null));
-        jobs.add(new JDFJob(FAKE_OWNER, task, null));
-        jobs.add(new JDFJob(FAKE_OWNER, task, null));
-        jobs.add(new JDFJob(FAKE_OWNER, task, null));
+        jobs.add(new JDFJob(FAKE_USER_ID, task, null));
+        jobs.add(new JDFJob(FAKE_USER_ID, task, null));
+        jobs.add(new JDFJob(FAKE_USER_ID, task, null));
+        jobs.add(new JDFJob(FAKE_USER_ID, task, null));
 
-        Assert.assertEquals(0, this.iguassuController.getAllJobs("wrong user owner").size());
+        Assert.assertEquals(0, this.iguassuController.getAllJobs("wrong user").size());
 
         JobDataStore jobDataStore = this.iguassuController.getJobDataStore();
-        Assert.assertEquals(0, jobDataStore.getAllByOwner("wrong user owner").size());
+        Assert.assertEquals(0, jobDataStore.getAllByUserId("wrong user").size());
     }
 
     @Test
@@ -154,34 +152,30 @@ public class TestIguassuController {
         String jobName = "jobName00";
         ArrayList<JDFJob> jobs = new ArrayList<>();
         ArrayList<Task> task = new ArrayList<>();
-        JDFJob jdfJob = new JDFJob(FAKE_OWNER, task, null);
-        jdfJob.setFriendlyName(jobName);
+        JDFJob jdfJob = new JDFJob(FAKE_USER_ID, task, null);
+        jdfJob.setLabel(jobName);
         jobs.add(jdfJob);
-        jobs.add(new JDFJob(FAKE_OWNER, task, null));
-        jobs.add(new JDFJob(FAKE_OWNER, task, null));
+        jobs.add(new JDFJob(FAKE_USER_ID, task, null));
+        jobs.add(new JDFJob(FAKE_USER_ID, task, null));
 
-        jobs.add(new JDFJob(FAKE_OWNER, task, null));
-        jobs.add(new JDFJob(FAKE_OWNER, task, null));
+        jobs.add(new JDFJob(FAKE_USER_ID, task, null));
+        jobs.add(new JDFJob(FAKE_USER_ID, task, null));
 
-        doReturn(jobs).when(this.dataStore).getAllByOwner(FAKE_OWNER);
-
-        this.iguassuController.getJobByName(jobName, FAKE_OWNER);
-        assert (jdfJob.equals(this.iguassuController.getJobByName(jobName, FAKE_OWNER)));
+        doReturn(jobs).when(this.dataStore).getAllByUserId(FAKE_USER_ID);
     }
 
     @Test
     public void testStopJob() {
         String jobName = "jobName00";
 
-        JDFJob jdfJob = new JDFJob(FAKE_OWNER, new ArrayList<Task>(), null);
-        jdfJob.setFriendlyName(jobName);
-        doReturn(true).when(this.dataStore).deleteByJobId(jdfJob.getId(), FAKE_OWNER);
+        JDFJob jdfJob = new JDFJob(FAKE_USER_ID, new ArrayList<Task>(), null);
+        jdfJob.setLabel(jobName);
+        doReturn(true).when(this.dataStore).deleteByJobId(jdfJob.getId(), FAKE_USER_ID);
         doNothing().when(iguassuController).updateJob(any(JDFJob.class));
-        doReturn(jdfJob).when(iguassuController).getJobByName(jobName, FAKE_OWNER);
         // update DB Map
-        this.iguassuController.stopJob(jobName, FAKE_OWNER);
+        this.iguassuController.stopJob(jobName, FAKE_USER_ID);
 
-        Mockito.verify(this.dataStore).deleteByJobId(jdfJob.getId(), FAKE_OWNER);
+        Mockito.verify(this.dataStore).deleteByJobId(jdfJob.getId(), FAKE_USER_ID);
     }
 
     @Test
@@ -189,19 +183,19 @@ public class TestIguassuController {
         ArrayList<JDFJob> jobs = new ArrayList<>();
         ArrayList<Task> task = new ArrayList<>();
 
-        JDFJob jdfJob = new JDFJob(FAKE_OWNER, task, null);
+        JDFJob jdfJob = new JDFJob(FAKE_USER_ID, task, null);
         jobs.add(jdfJob);
-        jobs.add(new JDFJob("job1", FAKE_OWNER, task, null));
-        jobs.add(new JDFJob("job2", FAKE_OWNER, task, null));
+        jobs.add(new JDFJob("job1", task, FAKE_USER_ID));
+        jobs.add(new JDFJob("job2",task,FAKE_USER_ID));
 
-        doReturn(jobs).when(this.dataStore).getAllByOwner(FAKE_OWNER);
-        doReturn(true).when(this.dataStore).deleteByJobId(jdfJob.getId(), FAKE_OWNER);
+        doReturn(jobs).when(this.dataStore).getAllByUserId(FAKE_USER_ID);
+        doReturn(true).when(this.dataStore).deleteByJobId(jdfJob.getId(), FAKE_USER_ID);
         doNothing().when(iguassuController).updateJob(any(JDFJob.class));
-        doReturn(jdfJob).when(this.dataStore).getByJobId(jdfJob.getId(), FAKE_OWNER);
+        doReturn(jdfJob).when(this.dataStore).getByJobId(jdfJob.getId(), FAKE_USER_ID);
         // update DB Map
-        this.iguassuController.stopJob(jdfJob.getId(), FAKE_OWNER);
+        this.iguassuController.stopJob(jdfJob.getId(), FAKE_USER_ID);
 
-        Mockito.verify(this.dataStore).deleteByJobId(jdfJob.getId(), FAKE_OWNER);
+        Mockito.verify(this.dataStore).deleteByJobId(jdfJob.getId(), FAKE_USER_ID);
     }
 
     @Test
@@ -209,18 +203,18 @@ public class TestIguassuController {
 
         Task task = new TaskImpl(FAKE_TASK_ID, new Specification(
                 FAKE_IMAGE_FLAVOR_NAME,
-                FAKE_OWNER
+                FAKE_USER_ID
         ), FAKE_UUID);
         List<Task> tasks = new ArrayList<>();
         tasks.add(task);
 
         ArrayList<JDFJob> jobs = new ArrayList<>();
-        JDFJob jdfJob = new JDFJob(FAKE_OWNER, tasks, null);
+        JDFJob jdfJob = new JDFJob(FAKE_USER_ID, tasks, null);
         jobs.add(jdfJob);
 
-        doReturn(jobs).when(this.dataStore).getAllByOwner(FAKE_OWNER);
-        assert (jobs.get(0).equals(this.iguassuController.getAllJobs(FAKE_OWNER).get(0)));
-        Assert.assertEquals(task, this.iguassuController.getTaskById(FAKE_TASK_ID, FAKE_OWNER));
+        doReturn(jobs).when(this.dataStore).getAllByUserId(FAKE_USER_ID);
+        assert (jobs.get(0).equals(this.iguassuController.getAllJobs(FAKE_USER_ID).get(0)));
+        Assert.assertEquals(task, this.iguassuController.getTaskById(FAKE_TASK_ID, FAKE_USER_ID));
 
         jdfJob.addTask(task);
         // jdfJob.run(task);
@@ -229,15 +223,15 @@ public class TestIguassuController {
         doNothing().when(iguassuController).updateJob(any(JDFJob.class));
         // update DB Map
 
-        Assert.assertEquals(jobs, this.iguassuController.getAllJobs(FAKE_OWNER));
-        Assert.assertEquals(task, this.iguassuController.getTaskById(FAKE_TASK_ID, FAKE_OWNER));
+        Assert.assertEquals(jobs, this.iguassuController.getAllJobs(FAKE_USER_ID));
+        Assert.assertEquals(task, this.iguassuController.getTaskById(FAKE_TASK_ID, FAKE_USER_ID));
     }
 
     @Test
     public void testTaskStateAfterControllerRestart() {
         Specification spec = new Specification(
                 FAKE_IMAGE_FLAVOR_NAME,
-                FAKE_OWNER
+                FAKE_USER_ID
         );
         List<String> taskIds = new ArrayList<>();
         JDFJob job = new JDFJob("testuser", new ArrayList<Task>(), "'this is a test user");

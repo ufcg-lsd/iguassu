@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.fogbowcloud.app.core.authenticator.models.User;
-import org.fogbowcloud.app.core.authenticator.models.UserImpl;
+import org.fogbowcloud.app.core.auth.models.User;
+import org.fogbowcloud.app.core.auth.models.DefaultUser;
 import org.fogbowcloud.app.core.command.Command;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
@@ -32,8 +32,8 @@ public class TestJDFJobBuilder {
 	public void testJDFCompilation () throws CompilerException, IOException, InterruptedException {
 		Properties properties = new Properties();
 
-		User owner = new UserImpl("iguassuService", "iguassuService");
-		JDFJob testJob = new JDFJob(owner.getUserIdentification(), new ArrayList<>(), owner.getUserIdentification());
+		User user = new DefaultUser("iguassuService", "iguassuService");
+		JDFJob testJob = new JDFJob(user.getIdentifier(), new ArrayList<>(), user.getIdentifier());
 		CommonCompiler commonCompiler = new CommonCompiler();
 		commonCompiler.compile(SIMPLE_JOB_EXAMPLE, FileType.JDF);
 		JobSpecification jobSpec = (JobSpecification) commonCompiler.getResult().get(0);
@@ -47,7 +47,7 @@ public class TestJDFJobBuilder {
 				FAKE_EXTERNAL_OAUTH_TOKEN,
 				FAKE_TOKEN_VERSION
 		);
-		List<Task> tasks = testJob.getTasks();
+		List<Task> tasks = testJob.getTasksAsList();
 		
 		assertEquals(tasks.size(), 3);
 		for (Command command : tasks.get(0).getAllCommands()) {

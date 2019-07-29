@@ -16,13 +16,13 @@ do_get() {
 	define_parameters $@
 	if [ $# -eq 4 ]
 	then
-		hash=$(echo -n $username$nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
-		response=$(curl -G -H "X-auth-nonce: $nonce" -H "X-auth-username: $username" -H "X-auth-hash: $hash" "$host/arrebol/job" 2> /dev/null)
+		hash=$(echo -n $username $nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
+		response=$(curl -G -H "X-auth-nonce: $nonce" -H "X-auth-username: username" -H "X-auth-hash: $hash" "$host/arrebol/job" 2> /dev/null)
 		echo $response
 	elif [ $# -eq 5 ]
 	then
-		hash=$(echo -n $username$nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
-        	response=$(curl -G -H "X-auth-nonce: $nonce" -H "X-auth-username: $username" -H "X-auth-hash: $hash" "$host/arrebol/job/$1" 2> /dev/null)
+		hash=$(echo -n username $nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
+        	response=$(curl -G -H "X-auth-nonce: $nonce" -H "X-auth-username: username" -H "X-auth-hash: $hash" "$host/arrebol/job/$1" 2> /dev/null)
         	echo $response
 	else
 		print_menu
@@ -64,7 +64,7 @@ do_post() {
 	then
 		shift
         	define_parameters $@
-		hash=$(echo -n $username$nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
+		hash=$(echo -n $username $nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
 		base_curl_cmd="curl -X POST --form jdffilepath=${jdffilepath} --form X-auth-nonce=$nonce --form X-auth-username=$username --form X-auth-hash=$hash"
                 if [[ $schedpath ]]
 		then
@@ -83,7 +83,7 @@ do_stop() {
 	if [ $# -eq 5 ]
 	then
 		define_parameters $@
-		hash=$(echo -n $username$nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
+		hash=$(echo -n $username $nonce | openssl dgst -sha1 -binary -sign $privateKeyFile | base64 | awk 'BEGIN{ORS="*";} {print}')
         	response=$(curl -X DELETE -H "X-auth-nonce: $nonce" -H "X-auth-username: $username" -H "X-auth-hash: $hash" "$host/arrebol/job/$1" 2> /dev/null)
                 echo $response
         else

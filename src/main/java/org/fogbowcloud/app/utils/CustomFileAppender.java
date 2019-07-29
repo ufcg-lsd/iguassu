@@ -7,9 +7,8 @@ import java.util.Date;
 
 public class CustomFileAppender extends FileAppender {
     @Override
-    public void setFile(String fileName)
-    {
-        if (fileName.indexOf("%timestamp") >= 0) {
+    public void setFile(String fileName) {
+        if (fileName.contains("%timestamp")) {
             Date d = new Date();
             SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmssSS");
             fileName = fileName.replaceAll("%timestamp", format.format(d));
