@@ -1,15 +1,12 @@
 package org.fogbowcloud.app.core.datastore;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.Date;
-import java.util.List;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.models.OAuthToken;
 import org.json.JSONObject;
+
+import java.sql.*;
+import java.util.Date;
+import java.util.List;
 
 public class OAuthTokenDataStore extends DataStore<OAuthToken> {
 
@@ -36,7 +33,7 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
                     + " DATE,"
                     + TOKEN_VERSION
                     + " BIGINT"
-	                + ")";
+                    + ")";
 
     private static final String INSERT_TOKEN_TABLE_SQL =
             "INSERT INTO " + TOKENS_TABLE_NAME + " VALUES(?, ?, ?, ?, ?)";
@@ -193,7 +190,7 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
         return null;
     }
 
-    public List<OAuthToken> getAccessTokenByUserId(String userId) {
+    private List<OAuthToken> getAccessTokenByUserId(String userId) {
         return executeQueryStatement(GET_TOKEN_BY_OWNER_USER_ID, userId);
     }
 
@@ -250,13 +247,38 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
 
         String strJson =
                 "{"
-                    + ACCESS_TOKEN + ":" + accessToken + ","
-                    + REFRESH_TOKEN + ":" + refreshToken + ","
-                    + USER_ID + ":" + userId + ","
-                    + EXPIRES_IN + ":" + expirationTimeInMilliseconds + ","
-                    + TOKEN_VERSION + ":" + version
-                    + "}";
+                        + ACCESS_TOKEN
+                        + ":"
+                        + accessToken
+                        + ","
+                        + REFRESH_TOKEN
+                        + ":"
+                        + refreshToken
+                        + ","
+                        + USER_ID
+                        + ":"
+                        + userId
+                        + ","
+                        + EXPIRES_IN
+                        + ":"
+                        + expirationTimeInMilliseconds
+                        + ","
+                        + TOKEN_VERSION
+                        + ":"
+                        + version
+                        + "}";
         JSONObject tokenJson = new JSONObject(strJson);
         return OAuthToken.fromJSON(tokenJson);
+    }
+
+    public OAuthToken getCurrentTokenByUserId(String userIdentification) {
+        OAuthToken oAuthToken = null;
+        List<OAuthToken> oAuthTokens = this.getAccessTokenByUserId(userIdentification);
+        for (OAuthToken t : oAuthTokens) {
+            if (oAuthToken == null || oAuthToken.getVersion() < t.getVersion()) {
+                oAuthToken = t;
+            }
+        }
+        return oAuthToken;
     }
 }

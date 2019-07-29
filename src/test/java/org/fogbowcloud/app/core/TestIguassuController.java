@@ -36,8 +36,6 @@ public class TestIguassuController {
         Properties properties = new Properties();
         this.iguassuController = Mockito.spy(new IguassuController(properties));
         this.dataStore = Mockito.mock(JobDataStore.class);
-
-        this.iguassuController.setDataStore(dataStore);
     }
 
     @After

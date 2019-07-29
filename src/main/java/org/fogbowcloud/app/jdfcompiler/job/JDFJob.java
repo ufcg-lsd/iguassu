@@ -80,7 +80,7 @@ public class JDFJob extends Job implements Serializable {
             logger.debug("JSON had bad state", e);
         }
         logger.debug(
-                "Job read from JSON is from userId: " + job.optString(JsonKey.USER_ID.getKey()));
+                "Job read from JSON is from user id: [" + job.optString(JsonKey.USER_ID.getKey()) + "].");
         return jdfJob;
     }
 

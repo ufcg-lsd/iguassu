@@ -1,7 +1,8 @@
 package org.fogbowcloud.app.core;
 
-import org.fogbowcloud.app.core.auth.models.User;
+import org.fogbowcloud.app.core.auth.models.OAuth2Identifiers;
 import org.fogbowcloud.app.core.auth.models.OAuthToken;
+import org.fogbowcloud.app.core.auth.models.User;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 
@@ -10,55 +11,55 @@ import java.util.ArrayList;
 
 public class IguassuFacade {
 
-    private IguassuController iguassuController;
+    private final IguassuController iguassuController;
 
     public IguassuFacade(IguassuController iguassuController) {
         this.iguassuController = iguassuController;
     }
 
     public void init() {
-        iguassuController.init();
+        this.iguassuController.init();
     }
 
-    public JDFJob getJobById(String id, String userId) {
-        return iguassuController.getJobById(id, userId);
+    public JDFJob getJobById(String jobId, String userId) {
+        return this.iguassuController.getJobById(jobId, userId);
     }
 
-    public String submitJob(String jdfFilePath, User userId)
-            throws CompilerException {
-        return iguassuController.submitJob(jdfFilePath, userId);
+    public String submitJob(String jdfFilePath, User user) throws CompilerException {
+        return this.iguassuController.submitJob(jdfFilePath, user);
     }
 
     public ArrayList<JDFJob> getAllJobs(String userId) {
-        return iguassuController.getAllJobs(userId);
+        return this.iguassuController.getAllJobs(userId);
     }
 
     public String stopJob(String jobId, String userId) {
-        return iguassuController.stopJob(jobId, userId);
+        return this.iguassuController.stopJob(jobId, userId);
+    }
+
+    public User authenticateUser(OAuth2Identifiers oAuth2Identifiers, String authorizationCode)
+            throws GeneralSecurityException {
+        return this.iguassuController.authenticateUser(oAuth2Identifiers, authorizationCode);
     }
 
     public User authorizeUser(String credentials) throws GeneralSecurityException {
-        return iguassuController.authorizeUser(credentials);
+        return this.iguassuController.authorizeUser(credentials);
     }
 
     public int getNonce() {
-        return iguassuController.getNonce();
-    }
-
-    public User retrieveUser(String userId) {
-        return iguassuController.retrieveUser(userId);
-    }
-
-    public void storeUser(String userId, String iguassuToken) {
-        iguassuController.storeUser(userId, iguassuToken);
+        return this.iguassuController.getNonce();
     }
 
     public void updateUser(User user) {
-        iguassuController.updateUser(user);
+        this.iguassuController.updateUser(user);
+    }
+
+    public OAuthToken refreshToken(OAuthToken oAuthToken) throws GeneralSecurityException {
+        return this.iguassuController.refreshToken(oAuthToken);
     }
 
     public void storeOAuthToken(OAuthToken oAuthToken) {
-        iguassuController.storeOAuthToken(oAuthToken);
+        this.iguassuController.storeOAuthToken(oAuthToken);
     }
 
     public OAuthToken getCurrentTokenByUserId(String userId) {

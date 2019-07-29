@@ -15,6 +15,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.GeneralSecurityException;
+
 @RestController
 @RequestMapping(value = Documentation.Endpoint.AUTH)
 @Api(Documentation.Auth.DESCRIPTION)
@@ -40,14 +42,21 @@ public class AuthController {
 
         try {
             if (authorizationCode != null && !authorizationCode.trim().isEmpty()) {
-                final AuthDTO userAuthenticatedInfo =
-                        this.authService.authenticate(authorizationCode, applicationIdentifiers);
-                logger.info(
-                        "User "
-                                + userAuthenticatedInfo.getUserId()
-                                + " authenticated successfully.");
+                try {
+                    final AuthDTO userAuthenticatedInfo =
+                            this.authService.authenticate(
+                                    authorizationCode, applicationIdentifiers);
+                    logger.info(
+                            "User "
+                                    + userAuthenticatedInfo.getUserId()
+                                    + " authenticated successfully.");
 
-                return new ResponseEntity<>(userAuthenticatedInfo, HttpStatus.CREATED);
+                    return new ResponseEntity<>(userAuthenticatedInfo, HttpStatus.CREATED);
+                } catch (GeneralSecurityException gse) {
+                    return new ResponseEntity<>(
+                            "The authentication failed with error [" + gse.getMessage() + "]",
+                            HttpStatus.UNAUTHORIZED);
+                }
             } else {
                 return new ResponseEntity<>(
                         "The authorization code is invalid.", HttpStatus.BAD_REQUEST);
@@ -70,7 +79,6 @@ public class AuthController {
             String refreshedAccessToken = this.authService.refreshToken(userId, tokenVersion);
             return new ResponseEntity<>(refreshedAccessToken, HttpStatus.CREATED);
         } catch (Exception e) {
-            e.printStackTrace();
             return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
         }
     }

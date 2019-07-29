@@ -1,18 +1,11 @@
 package org.fogbowcloud.app.core;
 
-import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.Queue;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.auth.DefaultAuthManager;
 import org.fogbowcloud.app.core.auth.models.Credential;
+import org.fogbowcloud.app.core.auth.models.OAuth2Identifiers;
 import org.fogbowcloud.app.core.auth.models.OAuthToken;
 import org.fogbowcloud.app.core.auth.models.User;
 import org.fogbowcloud.app.core.constants.ConfProperty;
@@ -32,36 +25,39 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.security.GeneralSecurityException;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+
 public class IguassuController {
 
     private static final Logger logger = Logger.getLogger(IguassuController.class);
 
     private final Properties properties;
     private final AuthManager authManager;
-    private List<Integer> nonceList;
-    private JobDataStore jobDataStore;
-    private OAuthTokenDataStore oAuthTokenDataStore;
-    private JDFJobBuilder jobBuilder;
-    private Queue<JDFJob> jobsToSubmit;
+    private final List<Integer> nonceList;
+    private final JobDataStore jobDataStore;
+    private final OAuthTokenDataStore oAuthTokenDataStore;
+    private final JDFJobBuilder jobBuilder;
+    private final Queue<JDFJob> jobsToSubmit;
 
     @Autowired private AuthService authService;
 
     public IguassuController(Properties properties) {
         this.properties = properties;
-        this.authManager = new DefaultAuthManager();
         this.jobsToSubmit = new ConcurrentLinkedQueue<>();
-    }
-
-    public void init() {
         this.jobDataStore =
                 new JobDataStore(
                         this.properties.getProperty(ConfProperty.DATABASE_HOST_URL.getProp()));
         this.oAuthTokenDataStore =
                 new OAuthTokenDataStore(
                         this.properties.getProperty(ConfProperty.DATABASE_HOST_URL.getProp()));
+        this.authManager = new DefaultAuthManager(this.properties, this.oAuthTokenDataStore);
         this.jobBuilder = new JDFJobBuilder(this.properties);
         this.nonceList = new ArrayList<>();
+    }
 
+    public void init() {
         final RoutineManager routineManager =
                 new DefaultRoutineManager(
                         this.properties,
@@ -101,10 +97,7 @@ public class IguassuController {
         JDFUtil.removeEmptySpaceFromVariables(jobSpec);
         OAuthToken oAuthToken = null;
         try {
-            oAuthToken = getCurrentTokenByUserId(userIdentification);
-            if (oAuthToken.hasExpired()) {
-                oAuthToken = this.authService.refreshAndDelete(oAuthToken);
-            }
+            oAuthToken = this.oAuthTokenDataStore.getCurrentTokenByUserId(userIdentification);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -172,30 +165,13 @@ public class IguassuController {
     }
 
     int getNonce() {
-        int nonce = UUID.randomUUID().hashCode();
+        final int nonce = UUID.randomUUID().hashCode();
         this.nonceList.add(nonce);
         return nonce;
     }
 
-    User retrieveUser(String userId) {
-        return this.authManager.retrieve(userId);
-    }
-
-    void storeUser(String userId, String iguassuToken) {
-
-        try {
-            Objects.requireNonNull(this.authManager.store(userId, iguassuToken));
-        } catch (Exception e) {
-            throw new RuntimeException("Could not add user", e);
-        }
-    }
-
     JobDataStore getJobDataStore() {
         return this.jobDataStore;
-    }
-
-    void setDataStore(JobDataStore dataStore) {
-        this.jobDataStore = dataStore;
     }
 
     void storeOAuthToken(OAuthToken oAuthToken) {
@@ -203,14 +179,7 @@ public class IguassuController {
     }
 
     OAuthToken getCurrentTokenByUserId(String userId) {
-        OAuthToken oAuthToken = null;
-        List<OAuthToken> oAuthTokens = this.oAuthTokenDataStore.getAccessTokenByUserId(userId);
-        for (OAuthToken t : oAuthTokens) {
-            if (oAuthToken == null || oAuthToken.getVersion() < t.getVersion()) {
-                oAuthToken = t;
-            }
-        }
-        return oAuthToken;
+        return this.oAuthTokenDataStore.getCurrentTokenByUserId(userId);
     }
 
     void deleteOAuthToken(OAuthToken oAuthToken) {
@@ -257,5 +226,22 @@ public class IguassuController {
         }
 
         return job;
+    }
+
+    User authenticateUser(OAuth2Identifiers oAuth2Identifiers, String authorizationCode)
+            throws GeneralSecurityException {
+        try {
+            return this.authManager.authenticate(oAuth2Identifiers, authorizationCode);
+        } catch (Exception gse) {
+            throw new GeneralSecurityException(gse.getMessage());
+        }
+    }
+
+    OAuthToken refreshToken(OAuthToken oAuthToken) throws GeneralSecurityException {
+        try {
+            return this.authManager.refreshOAuth2Token(oAuthToken);
+        } catch (Exception e) {
+            throw new GeneralSecurityException(e.getMessage());
+        }
     }
 }

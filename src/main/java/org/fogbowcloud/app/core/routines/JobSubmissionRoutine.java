@@ -28,8 +28,8 @@ public class JobSubmissionRoutine implements Runnable {
     @Override
     public void run() {
         logger.debug(
-                "----> Running Job Submission Routine in thread "
-                        + Thread.currentThread().getId());
+                "----> Running Job Submission Routine in thread with id ["
+                        + Thread.currentThread().getId() + "]");
         while (Objects.nonNull(this.jobsToSubmit.peek())) {
             JDFJob job = this.jobsToSubmit.poll();
             logger.debug("Job found! Starting job submission with id [" + job.getId() + "]");

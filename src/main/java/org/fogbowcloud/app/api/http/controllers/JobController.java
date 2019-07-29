@@ -67,9 +67,9 @@ public class JobController {
         }
 
         final List<JDFJob> allJobsOfUser = this.jobService.getAllJobs(user);
-        logger.debug("Retrieving all jobs of user [ " + user.getIdentifier() + " ]");
+        logger.debug("Retrieving all jobs of user [" + user.getIdentifier() + "]");
 
-	    final List<JobResponseDTO> jobsResponse = new LinkedList<>();
+        final List<JobResponseDTO> jobsResponse = new LinkedList<>();
 
         allJobsOfUser.forEach(job -> jobsResponse.add(new JobResponseDTO(job)));
 
@@ -196,10 +196,10 @@ public class JobController {
 
         final String stoppedJobId = this.jobService.stopJob(jobId, user.getIdentifier());
 
-        if (stoppedJobId == null) {
+        if (Objects.isNull(stoppedJobId)) {
             logger.info(
-                    "Could not find job with id " + jobId + " for user " + user.getIdentifier());
-            throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
+                    "Could not find job with id " + jobId + " for user [" + user.getIdentifier() + "].");
+            throw new InvalidParameterException("Could not find job with id [" + jobId + "].");
         }
 
         return new ResponseEntity<>(new SimpleJobResponse(stoppedJobId), HttpStatus.ACCEPTED);
