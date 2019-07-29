@@ -6,8 +6,7 @@ public enum JobState {
     FAILED("Failed"),
     CREATED("Created"),
     FINISHED("Finished"),
-    RUNNING("Running"),
-    WAITING("Waiting");
+    RUNNING("Running");
 
     private String state;
 

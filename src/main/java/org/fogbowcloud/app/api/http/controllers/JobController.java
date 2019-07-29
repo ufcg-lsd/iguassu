@@ -66,12 +66,12 @@ public class JobController {
                     HttpStatus.UNAUTHORIZED);
         }
 
-        final List<JDFJob> allJobs = this.jobService.getAllJobs(user);
+        final List<JDFJob> allJobsOfUser = this.jobService.getAllJobs(user);
         logger.debug("Retrieving all jobs of user [ " + user.getIdentifier() + " ]");
 
-        List<JobResponseDTO> jobsResponse = new LinkedList<>();
+	    final List<JobResponseDTO> jobsResponse = new LinkedList<>();
 
-        allJobs.forEach(job -> jobsResponse.add(new JobResponseDTO(job)));
+        allJobsOfUser.forEach(job -> jobsResponse.add(new JobResponseDTO(job)));
 
         return new ResponseEntity<>(jobsResponse, HttpStatus.OK);
     }
@@ -137,7 +137,7 @@ public class JobController {
         logger.info("Saving new Job.");
         logger.info(file.toString());
 
-        Map<String, String> fieldMap = new HashMap<>();
+        final Map<String, String> fieldMap = new HashMap<>();
         fieldMap.put(GeneralConstants.JDF_FILE_PATH, null);
         fieldMap.put(GeneralConstants.X_AUTH_USER_CREDENTIALS, null);
 
@@ -194,7 +194,7 @@ public class JobController {
                     HttpStatus.UNAUTHORIZED);
         }
 
-        String stoppedJobId = this.jobService.stopJob(jobId, user.getIdentifier());
+        final String stoppedJobId = this.jobService.stopJob(jobId, user.getIdentifier());
 
         if (stoppedJobId == null) {
             logger.info(
@@ -206,7 +206,7 @@ public class JobController {
     }
 
     private List<TaskDTO> toTasksDTOList(List<Task> tasks) {
-        List<TaskDTO> l = new ArrayList<>();
+        final List<TaskDTO> l = new ArrayList<>();
         for (Task t : tasks) {
             l.add(new TaskDTO(t));
         }
@@ -215,7 +215,7 @@ public class JobController {
 
     private JDFJob getJDFJob(String jobId, String userCredentials)
             throws InvalidParameterException, UnauthorizedRequestException {
-        User user = this.authService.authorizeUser(userCredentials);
+        final User user = this.authService.authorizeUser(userCredentials);
 
         return this.jobService.getJobById(jobId, user);
     }
@@ -230,10 +230,6 @@ public class JobController {
 
         public String getId() {
             return this.id;
-        }
-
-        public void setIt(String id) {
-            this.id = id;
         }
     }
 }

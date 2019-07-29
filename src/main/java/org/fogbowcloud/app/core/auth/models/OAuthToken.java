@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.datastore;
+package org.fogbowcloud.app.core.auth.models;
 
 import com.google.gson.annotations.SerializedName;
 import java.sql.Date;
@@ -35,7 +35,7 @@ public class OAuthToken {
 
     public OAuthToken() {}
 
-    OAuthToken(String accessToken, String refreshToken, String userId, Date expirationDate) {
+    public OAuthToken(String accessToken, String refreshToken, String userId, Date expirationDate) {
         this.version = INITIAL_VERSION;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
@@ -86,7 +86,7 @@ public class OAuthToken {
         return accessToken;
     }
 
-    void setAccessToken(String accessToken) {
+    public void setAccessToken(String accessToken) {
         this.accessToken = accessToken;
     }
 
@@ -94,7 +94,7 @@ public class OAuthToken {
         return refreshToken;
     }
 
-    void setRefreshToken(String refreshToken) {
+    public void setRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
     }
 
@@ -106,7 +106,7 @@ public class OAuthToken {
         this.userId = userId;
     }
 
-    Date getExpirationDate() {
+    public Date getExpirationDate() {
         return expirationDate;
     }
 
@@ -116,7 +116,7 @@ public class OAuthToken {
         this.expirationDate = new Date(stamp.getTime() + expiresInMillisecond);
     }
 
-    void setExpirationDate(Date expirationDate) {
+    public void setExpirationDate(Date expirationDate) {
 
         this.expirationDate = expirationDate;
     }

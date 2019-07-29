@@ -45,7 +45,7 @@ public class JDFJobBuilder {
             JDFJob job,
             String jdfFilePath,
             JobSpecification jobSpec,
-            String userName,
+            String userId,
             String externalOAuthToken,
             Long tokenVersion)
             throws IOException, InterruptedException {
@@ -67,7 +67,7 @@ public class JDFJobBuilder {
                 jobRequirements = jobRequirements.replace("(", "").replace(")", "");
 
                 String image = getImageFromJobRequirements(jobRequirements);
-                Specification spec = new Specification(image, userName);
+                Specification spec = new Specification(image, userId);
 
                 addAllRequirements(jobRequirements, spec);
 
@@ -86,21 +86,21 @@ public class JDFJobBuilder {
                             job.getId(),
                             taskSpec,
                             task,
-                            userName,
+                            userId,
                             externalOAuthToken,
                             tokenVersion);
                     parseTaskCommands(
                             job.getId(),
                             taskSpec,
                             task,
-                            userName,
+                            userId,
                             externalOAuthToken,
                             tokenVersion);
                     parseFinalCommands(
                             job.getId(),
                             taskSpec,
                             task,
-                            userName,
+                            userId,
                             externalOAuthToken,
                             tokenVersion);
 
@@ -161,11 +161,11 @@ public class JDFJobBuilder {
             String jobId,
             TaskSpecification taskSpec,
             Task task,
-            String userName,
+            String userId,
             String externalOAuthToken,
             Long tokenVersion) {
         List<JDLCommand> initBlocks = taskSpec.getTaskBlocks();
-        addCommands(initBlocks, jobId, task, userName, externalOAuthToken, tokenVersion);
+        addCommands(initBlocks, jobId, task, userId, externalOAuthToken, tokenVersion);
     }
 
     /**
@@ -179,18 +179,18 @@ public class JDFJobBuilder {
             String jobId,
             TaskSpecification taskSpec,
             Task task,
-            String userName,
+            String userId,
             String externalOAuthToken,
             Long tokenVersion) {
         List<JDLCommand> initBlocks = taskSpec.getInitBlocks();
-        addCommands(initBlocks, jobId, task, userName, externalOAuthToken, tokenVersion);
+        addCommands(initBlocks, jobId, task, userId, externalOAuthToken, tokenVersion);
     }
 
     private void addCommands(
             List<JDLCommand> initBlocks,
             String jobId,
             Task task,
-            String userName,
+            String userId,
             String externalOAuthToken,
             Long tokenVersion) {
         if (initBlocks == null) {
@@ -202,7 +202,7 @@ public class JDFJobBuilder {
                         jobId,
                         task,
                         (IOCommand) jdlCommand,
-                        userName,
+                        userId,
                         externalOAuthToken,
                         tokenVersion);
             } else {
@@ -215,7 +215,7 @@ public class JDFJobBuilder {
             String jobId,
             Task task,
             IOCommand command,
-            String userName,
+            String userId,
             String externalOAuthToken,
             Long tokenVersion) {
         String sourceFile = command.getEntry().getSourceFile();
@@ -229,7 +229,7 @@ public class JDFJobBuilder {
                         uploadFileCommands(
                                 sourceFile,
                                 destination,
-                                userName,
+                                userId,
                                 externalOAuthToken,
                                 tokenVersion,
                                 rawCommand);
@@ -249,7 +249,7 @@ public class JDFJobBuilder {
                         downloadFileCommands(
                                 sourceFile,
                                 destination,
-                                userName,
+                                userId,
                                 externalOAuthToken,
                                 tokenVersion,
                                 rawCommand);
@@ -290,24 +290,24 @@ public class JDFJobBuilder {
             String jobId,
             TaskSpecification taskSpec,
             Task task,
-            String userName,
+            String userId,
             String externalOAuthToken,
             Long tokenVersion) {
         List<JDLCommand> initBlocks = taskSpec.getFinalBlocks();
-        addCommands(initBlocks, jobId, task, userName, externalOAuthToken, tokenVersion);
+        addCommands(initBlocks, jobId, task, userId, externalOAuthToken, tokenVersion);
     }
 
     private Command uploadFileCommands(
             String localFilePath,
             String filePathToUpload,
-            String userName,
+            String userId,
             String token,
             Long tokenVersion,
             String rawCommand) {
         final String fileDriverHostIp =
                 this.properties.getProperty(ConfProperty.STORAGE_SERVICE_HOST_URL.getProp());
         final String requestRefreshedTokenCommand =
-                this.getRefreshTokenCommand(userName, tokenVersion);
+                this.getRefreshTokenCommand(userId, tokenVersion);
         final String uploadCommand =
                 " http_code=$(curl --write-out %{http_code} -X PUT --header \"Authorization:Bearer \"$token "
                         + " --data-binary @"
@@ -331,7 +331,7 @@ public class JDFJobBuilder {
                         + HttpStatus.UNAUTHORIZED.toString()
                         + " ] ; do "
                         + "userId="
-                        + userName
+                        + userId
                         + "; "
                         + "tokenVersion="
                         + tokenVersion.toString()
@@ -404,7 +404,6 @@ public class JDFJobBuilder {
                 String.format(
                         "%s/auth/oauth2/refresh/${userId}/${tokenVersion}",
                         iguassuUrl, userId, tokenVersion);
-        final String refreshTokenCommand = String.format("curl -X POST %s", refreshTokenUrl);
-        return refreshTokenCommand;
+        return String.format("curl -X POST %s", refreshTokenUrl);
     }
 }

@@ -8,6 +8,7 @@ import java.sql.Statement;
 import java.util.Date;
 import java.util.List;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.core.auth.models.OAuthToken;
 import org.json.JSONObject;
 
 public class OAuthTokenDataStore extends DataStore<OAuthToken> {
@@ -60,7 +61,7 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
     private static final String GET_ALL_TOKENS = "SELECT * FROM " + TOKENS_TABLE_NAME;
     private static final String GET_TOKEN_BY_ACCESS_TOKEN =
             GET_ALL_TOKENS + " WHERE " + ACCESS_TOKEN + " = ? ";
-    private static final String GET_TOKEN_BY_OWNER_USERNAME =
+    private static final String GET_TOKEN_BY_OWNER_USER_ID =
             GET_ALL_TOKENS + " WHERE " + USER_ID + " = ? ";
 
     private static final String DELETE_ALL_TOKENS_TABLE_SQL = "DELETE FROM " + TOKENS_TABLE_NAME;
@@ -193,7 +194,7 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
     }
 
     public List<OAuthToken> getAccessTokenByUserId(String userId) {
-        return executeQueryStatement(GET_TOKEN_BY_OWNER_USERNAME, userId);
+        return executeQueryStatement(GET_TOKEN_BY_OWNER_USER_ID, userId);
     }
 
     void deleteAll() {

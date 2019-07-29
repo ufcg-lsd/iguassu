@@ -1,6 +1,10 @@
 package org.fogbowcloud.app.jes.arrebol;
 
 import com.google.gson.Gson;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.command.Command;
 import org.fogbowcloud.app.core.command.CommandState;
@@ -8,15 +12,15 @@ import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.core.task.TaskState;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.job.JobState;
-import org.fogbowcloud.app.jes.arrebol.models.*;
-import org.fogbowcloud.app.jes.exceptions.GetJobException;
+import org.fogbowcloud.app.jes.arrebol.models.ArrebolCommand;
+import org.fogbowcloud.app.jes.arrebol.models.ArrebolCommandState;
+import org.fogbowcloud.app.jes.arrebol.models.ArrebolJob;
+import org.fogbowcloud.app.jes.arrebol.models.ArrebolTask;
+import org.fogbowcloud.app.jes.arrebol.models.ArrebolTaskState;
+import org.fogbowcloud.app.jes.arrebol.models.ExecutionState;
+import org.fogbowcloud.app.jes.exceptions.JobStatusException;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
-
-public class ArrebolSynchronizer implements Synchronizer {
+public class ArrebolSynchronizer implements Synchronizer<JDFJob> {
 
     private static final Logger logger = Logger.getLogger(ArrebolSynchronizer.class);
 
@@ -26,27 +30,24 @@ public class ArrebolSynchronizer implements Synchronizer {
         this.requestsHelper = new ArrebolRequestsHelper(properties);
     }
 
-    // TODO Review method name
     @Override
     public JDFJob sync(JDFJob job) {
-        try {
-            String executionId = job.getExecutionId();
-            if (Objects.nonNull(executionId) && !executionId.trim().isEmpty()) {
-                try {
-                    String jobExecutionJson = this.requestsHelper.getJobJSON(executionId);
-                    logger.debug("JSON Response [" + jobExecutionJson + "]");
-                    Gson gson = new Gson();
-                    ArrebolJob arrebolJob = gson.fromJson(jobExecutionJson, ArrebolJob.class);
-                    this.updateJob(job, arrebolJob);
-                } catch (Exception e) {
-                    logger.error(e.getMessage());
-                }
-            } else {
-                logger.debug("Execution identifier from Job [" + job.getId() + "] is null.");
+
+        final String executionId = job.getExecutionId();
+        if (Objects.nonNull(executionId) && !executionId.trim().isEmpty()) {
+            try {
+                String jobExecutionJson = this.requestsHelper.statusArrebolJob(executionId);
+                logger.debug("JSON Response [" + jobExecutionJson + "]");
+                Gson gson = new Gson();
+                ArrebolJob arrebolJob = gson.fromJson(jobExecutionJson, ArrebolJob.class);
+                this.updateJob(job, arrebolJob);
+            } catch (Exception e) {
+                throw new JobStatusException(e.getMessage());
             }
-        } catch (GetJobException e) {
-            logger.error(e.getMessage(), e);
+        } else {
+            logger.debug("Execution identifier from Job [" + job.getId() + "] is null.");
         }
+
         return job;
     }
 
@@ -58,20 +59,22 @@ public class ArrebolSynchronizer implements Synchronizer {
 
     private void updateTasks(Map<String, Task> iguassuTasks, List<ArrebolTask> arrebolTasks) {
         for (ArrebolTask arrebolTask : arrebolTasks) {
-            String taskIguassuId = arrebolTask.getTaskSpec().getId();
-            Task iguassuTask = iguassuTasks.get(taskIguassuId);
+            final String iguassuTaskId = arrebolTask.getTaskSpec().getId();
+            final Task iguassuTask = iguassuTasks.get(iguassuTaskId);
 
             if (iguassuTask != null) {
                 updateTaskCommands(arrebolTask, iguassuTask);
 
-                ArrebolTaskState arrebolTaskState = arrebolTask.getState();
-                TaskState taskState = getTaskState(arrebolTaskState);
-                iguassuTask.setState(taskState);
-                logger.debug(
-                        "Updated task ["
-                                + iguassuTask.getId()
-                                + "] to state "
-                                + taskState.toString());
+                final ArrebolTaskState arrebolTaskState = arrebolTask.getState();
+                final TaskState taskState = getTaskState(arrebolTaskState);
+                if (Objects.nonNull(taskState)) {
+                    iguassuTask.setState(taskState);
+                    logger.debug(
+                            "Updated task ["
+                                    + iguassuTask.getId()
+                                    + "] to state "
+                                    + taskState.toString());
+                }
             }
         }
     }

@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.http;
+package org.fogbowcloud.app.utils;
 
 import java.util.List;
 import org.apache.http.Header;
@@ -68,7 +68,7 @@ public class HttpWrapper {
 
         } catch (Exception e) {
             e.printStackTrace();
-			// TODO add some treatment
+            // TODO add some treatment
         }
         return entity.toString();
     }

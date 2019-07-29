@@ -14,13 +14,12 @@ import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.constants.ConfProperty;
 import org.fogbowcloud.app.core.dto.arrebol.ArrebolExecutionDTO;
-import org.fogbowcloud.app.core.http.HttpWrapper;
+import org.fogbowcloud.app.utils.HttpWrapper;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
-import org.fogbowcloud.app.jes.exceptions.GetJobException;
+import org.fogbowcloud.app.jes.exceptions.JobStatusException;
 import org.fogbowcloud.app.jes.exceptions.SubmitJobException;
 
-// TODO implement tests
 final class ArrebolRequestsHelper {
 
     private static final Logger logger = Logger.getLogger(ArrebolRequestsHelper.class);
@@ -68,18 +67,14 @@ final class ArrebolRequestsHelper {
         return Objects.requireNonNull(jobIdArrebol);
     }
 
-    ArrebolExecutionDTO getJob(String jobArrebolId) throws GetJobException {
-        return this.jsonUtil.fromJson(getJobJSON(jobArrebolId), ArrebolExecutionDTO.class);
-    }
-
-    String getJobJSON(String jobArrebolId) throws GetJobException {
+    String statusArrebolJob(String jobArrebolId) throws JobStatusException {
         final String endpoint = serviceBaseUrl + "/job/" + jobArrebolId;
 
         String jsonResponse;
         try {
             jsonResponse = HttpWrapper.doRequest(HttpGet.METHOD_NAME, endpoint, null);
         } catch (Exception e) {
-            throw new GetJobException("Getting Job from Arrebol has FAILED: " + e.getMessage());
+            throw new JobStatusException("Getting Job from Arrebol has FAILED: " + e.getMessage());
         }
 
         return jsonResponse;

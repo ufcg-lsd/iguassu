@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.monitor;
+package org.fogbowcloud.app.core.routines;
 
 import java.time.Instant;
 import java.util.Objects;
@@ -6,7 +6,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.auth.models.SessionState;
 import org.fogbowcloud.app.core.auth.models.User;
-import org.fogbowcloud.app.core.datastore.OAuthToken;
+import org.fogbowcloud.app.core.auth.models.OAuthToken;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 
 public class SessionVerificationRoutine implements Runnable {
@@ -22,6 +22,9 @@ public class SessionVerificationRoutine implements Runnable {
 
     @Override
     public void run() {
+        logger.debug(
+                "----> Running Session Verification Routine in thread "
+                        + Thread.currentThread().getId());
         final long now = Instant.now().getEpochSecond();
         final long oneHourInSeconds = 3600;
         for (final OAuthToken token : this.oAuthTokenDataStore.getAll()) {

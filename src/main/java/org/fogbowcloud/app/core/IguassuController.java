@@ -13,18 +13,17 @@ import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.auth.DefaultAuthManager;
 import org.fogbowcloud.app.core.auth.models.Credential;
+import org.fogbowcloud.app.core.auth.models.OAuthToken;
 import org.fogbowcloud.app.core.auth.models.User;
 import org.fogbowcloud.app.core.constants.ConfProperty;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
-import org.fogbowcloud.app.core.datastore.OAuthToken;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
-import org.fogbowcloud.app.core.monitor.DefaultRoutineManager;
-import org.fogbowcloud.app.core.monitor.RoutineManager;
+import org.fogbowcloud.app.core.routines.DefaultRoutineManager;
+import org.fogbowcloud.app.core.routines.RoutineManager;
 import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJobBuilder;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
-import org.fogbowcloud.app.jdfcompiler.job.JobState;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
@@ -70,7 +69,7 @@ public class IguassuController {
                         this.jobDataStore,
                         this.authManager,
                         this.jobsToSubmit);
-        routineManager.start();
+        routineManager.startAll();
     }
 
     JDFJob getJobById(String jobId, String user) {
@@ -84,9 +83,8 @@ public class IguassuController {
     String submitJob(String jdfFilePath, User user) throws CompilerException {
         logger.debug("Adding job of user " + user.getIdentifier() + " to buffer.");
 
-        JDFJob job = buildJob(jdfFilePath, user);
+        final JDFJob job = buildJob(jdfFilePath, user);
         this.jobsToSubmit.offer(job);
-        job.setState(JobState.WAITING);
         this.jobDataStore.insert(job);
 
         return job.getId();
@@ -94,8 +92,9 @@ public class IguassuController {
 
     JDFJob buildJob(String jdfFilePath, User user) throws CompilerException {
 
-        String userIdentification = user.getIdentifier();
-        JDFJob job = new JDFJob(user.getIdentifier(), new ArrayList<>(), userIdentification);
+        final String userIdentification = user.getIdentifier();
+        final String jobId = UUID.randomUUID().toString();
+        JDFJob job = new JDFJob(jobId, new ArrayList<>(), userIdentification);
 
         logger.debug("Building job " + job.getId() + " of user " + user.getIdentifier());
         JobSpecification jobSpec = compile(job.getId(), jdfFilePath);
@@ -178,14 +177,14 @@ public class IguassuController {
         return nonce;
     }
 
-    User retrieveUser(String username) {
-        return this.authManager.retrieve(username);
+    User retrieveUser(String userId) {
+        return this.authManager.retrieve(userId);
     }
 
-    void storeUser(String username, String iguassuToken) {
+    void storeUser(String userId, String iguassuToken) {
 
         try {
-            Objects.requireNonNull(this.authManager.store(username, iguassuToken));
+            Objects.requireNonNull(this.authManager.store(userId, iguassuToken));
         } catch (Exception e) {
             throw new RuntimeException("Could not add user", e);
         }
@@ -231,12 +230,12 @@ public class IguassuController {
             JDFJob job,
             String jdfFilePath,
             JobSpecification jobSpec,
-            String userName,
+            String userId,
             String externalOAuthToken,
             Long tokenVersion) {
         try {
             this.jobBuilder.createJobFromJDFFile(
-                    job, jdfFilePath, jobSpec, userName, externalOAuthToken, tokenVersion);
+                    job, jdfFilePath, jobSpec, userId, externalOAuthToken, tokenVersion);
 
             logger.info(
                     "Job ["

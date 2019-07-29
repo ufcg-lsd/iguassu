@@ -1,7 +1,7 @@
 package org.fogbowcloud.app.core;
 
 import org.fogbowcloud.app.core.auth.models.User;
-import org.fogbowcloud.app.core.datastore.OAuthToken;
+import org.fogbowcloud.app.core.auth.models.OAuthToken;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 

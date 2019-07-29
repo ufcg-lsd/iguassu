@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.monitor;
+package org.fogbowcloud.app.core.routines;
 
 import java.util.Objects;
 import java.util.Queue;
@@ -27,6 +27,9 @@ public class JobSubmissionRoutine implements Runnable {
 
     @Override
     public void run() {
+        logger.debug(
+                "----> Running Job Submission Routine in thread "
+                        + Thread.currentThread().getId());
         while (Objects.nonNull(this.jobsToSubmit.peek())) {
             JDFJob job = this.jobsToSubmit.poll();
             logger.debug("Job found! Starting job submission with id [" + job.getId() + "]");

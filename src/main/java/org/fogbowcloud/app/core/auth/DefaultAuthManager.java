@@ -48,12 +48,12 @@ public class DefaultAuthManager implements AuthManager {
     }
 
     @Override
-    public User store(String username, String token) {
+    public User store(String userId, String token) {
         try {
-            DefaultUser user = new DefaultUser(username, token);
-            this.userList.put(username, user.toJSON().toString());
+            DefaultUser user = new DefaultUser(userId, token);
+            this.userList.put(userId, user.toJSON().toString());
             this.usersDB.commit();
-            logger.info("User with userId " + username + " stored.");
+            logger.info("User " + userId + " stored.");
             return user;
         } catch (Exception e) {
             throw new RuntimeException("Could not store user, caused by error: ", e);
@@ -83,7 +83,7 @@ public class DefaultAuthManager implements AuthManager {
         String userJSONString = this.userList.get(userId);
 
         if (userJSONString == null || userJSONString.isEmpty()) {
-            logger.info("There is no user with username " + userId);
+            logger.info("There is no user with identifier [" + userId + "].");
             return null;
         }
         try {
