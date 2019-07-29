@@ -42,7 +42,9 @@ public class ConfValidator {
     }
 
     private static void validatePropKey(Properties properties, String propKey) {
-        if (!properties.containsKey(propKey)) {
+        if (!properties.containsKey(propKey)
+                || Objects.isNull(properties.getProperty(propKey))
+                || properties.getProperty(propKey).trim().isEmpty()) {
             String errorMsg = requiredPropertyMessage(propKey);
             logger.error(errorMsg);
 
