@@ -1,5 +1,7 @@
 package org.fogbowcloud.app.api.configuration;
 
+import static org.fogbowcloud.app.api.constants.Documentation.ApiInfo;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
@@ -12,8 +14,7 @@ import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
-import static org.fogbowcloud.app.api.constants.Documentation.ApiInfo;
-
+/** Swagger Documentation Configuration. */
 @EnableSwagger2
 @Configuration
 public class SwaggerConfiguration extends WebMvcConfigurationSupport {
