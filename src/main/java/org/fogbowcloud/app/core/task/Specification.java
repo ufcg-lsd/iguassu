@@ -38,7 +38,7 @@ public class Specification implements Serializable {
         return specification;
     }
 
-    public static Map<String, String> toMap(String jsonStr) {
+    private static Map<String, String> toMap(String jsonStr) {
         return JSONUtils.toMap(jsonStr);
     }
 
