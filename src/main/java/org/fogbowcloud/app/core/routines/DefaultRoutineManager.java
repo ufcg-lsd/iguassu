@@ -1,9 +1,5 @@
 package org.fogbowcloud.app.core.routines;
 
-import java.util.Arrays;
-import java.util.Properties;
-import java.util.Queue;
-import java.util.concurrent.Executors;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.constants.ConfProperty;
@@ -15,6 +11,12 @@ import org.fogbowcloud.app.jes.arrebol.ArrebolJobExecutionService;
 import org.fogbowcloud.app.jes.arrebol.ArrebolSynchronizer;
 import org.fogbowcloud.app.utils.ManagerTimer;
 
+import java.util.Arrays;
+import java.util.Properties;
+import java.util.Queue;
+import java.util.concurrent.Executors;
+
+/** Default implementation of the RoutineManager */
 public class DefaultRoutineManager implements RoutineManager {
     private static final long DEFAULT_INITIAL_DELAY_MS = 3000;
     private static final int DEFAULT_POOL_THREAD_NUMBER = 1;

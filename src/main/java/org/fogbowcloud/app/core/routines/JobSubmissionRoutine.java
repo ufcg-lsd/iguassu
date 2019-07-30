@@ -1,7 +1,5 @@
 package org.fogbowcloud.app.core.routines;
 
-import java.util.Objects;
-import java.util.Queue;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
@@ -9,6 +7,13 @@ import org.fogbowcloud.app.jdfcompiler.job.JobState;
 import org.fogbowcloud.app.jes.JobExecutionService;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 
+import java.util.Objects;
+import java.util.Queue;
+
+/**
+ * This routine checks from time to time if there are any jobs in the buffer to be submitted to the
+ * execution system.
+ */
 public class JobSubmissionRoutine implements Runnable {
 
     private static final Logger logger = Logger.getLogger(JobSubmissionRoutine.class);
@@ -29,7 +34,8 @@ public class JobSubmissionRoutine implements Runnable {
     public void run() {
         logger.debug(
                 "----> Running Job Submission Routine in thread with id ["
-                        + Thread.currentThread().getId() + "]");
+                        + Thread.currentThread().getId()
+                        + "]");
         while (Objects.nonNull(this.jobsToSubmit.peek())) {
             JDFJob job = this.jobsToSubmit.poll();
             logger.debug("Job found! Starting job submission with id [" + job.getId() + "]");

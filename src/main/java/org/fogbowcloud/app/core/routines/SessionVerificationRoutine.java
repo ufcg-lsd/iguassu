@@ -1,14 +1,19 @@
 package org.fogbowcloud.app.core.routines;
 
-import java.time.Instant;
-import java.util.Objects;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.AuthManager;
+import org.fogbowcloud.app.core.auth.models.OAuthToken;
 import org.fogbowcloud.app.core.auth.models.SessionState;
 import org.fogbowcloud.app.core.auth.models.User;
-import org.fogbowcloud.app.core.auth.models.OAuthToken;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 
+import java.time.Instant;
+import java.util.Objects;
+
+/**
+ * This routine checks from time to time if the user has been inactive for a long time. If so, your
+ * session is expired and new user authentication is required.
+ */
 public class SessionVerificationRoutine implements Runnable {
 
     private static final Logger logger = Logger.getLogger(SessionVerificationRoutine.class);

@@ -9,6 +9,10 @@ import org.fogbowcloud.app.jes.arrebol.Synchronizer;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * This routine is responsible for synchronizing the state of jobs with the state of their
+ * execution.
+ */
 public class SyncJobStateRoutine implements Runnable {
 
     private static final Logger logger = Logger.getLogger(SyncJobStateRoutine.class);
