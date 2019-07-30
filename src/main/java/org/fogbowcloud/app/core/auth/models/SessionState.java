@@ -1,16 +1,20 @@
 package org.fogbowcloud.app.core.auth.models;
 
+/**
+ * Possible states of a User Session. A Session is a valid time that the user can make requests to
+ * the Iguassu.
+ */
 public enum SessionState {
-	ACTIVE("active"),
-	EXPIRED("expired");
+    ACTIVE("active"),
+    EXPIRED("expired");
 
-	private String state;
+    private String state;
 
-	SessionState(String state) {
-		this.state = state;
-	}
+    SessionState(String state) {
+        this.state = state;
+    }
 
-	public String getState() {
-		return this.state;
-	}
+    public String getState() {
+        return this.state;
+    }
 }

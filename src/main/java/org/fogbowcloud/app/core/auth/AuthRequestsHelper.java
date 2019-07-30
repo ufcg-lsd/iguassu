@@ -10,21 +10,32 @@ import org.fogbowcloud.app.api.exceptions.StorageServiceConnectException;
 import org.fogbowcloud.app.core.auth.models.OAuth2Identifiers;
 import org.fogbowcloud.app.core.auth.models.OAuthToken;
 import org.fogbowcloud.app.core.constants.ConfProperty;
+import org.fogbowcloud.app.core.exceptions.InvalidAuthorizationCodeException;
 import org.fogbowcloud.app.utils.HttpWrapper;
 
-import java.security.GeneralSecurityException;
 import java.util.*;
 
+/**
+ * A utility class that encapsulates communication logic, that is, requests, with the Storage
+ * Service.
+ */
 class AuthRequestsHelper {
 
     private Properties properties;
 
+    /** Default constructor. */
     AuthRequestsHelper(Properties properties) {
         this.properties = properties;
     }
 
-    OAuthToken getToken(OAuth2Identifiers oAuth2Identifiers, String authorizationCode)
-            throws Exception {
+    /**
+     * Requests a new {@link OAuthToken#getAccessToken()}. This is the authentication operation.
+     *
+     * @param oAuth2Identifiers is the client application information.
+     * @param authorizationCode the code
+     * @return an {@link OAuthToken} with your information updated.
+     */
+    OAuthToken getToken(OAuth2Identifiers oAuth2Identifiers, String authorizationCode) {
         final String baseUrl =
                 this.properties.getProperty(ConfProperty.OAUTH_STORAGE_SERVICE_TOKEN_URL.getProp());
         final String requestUrl =
@@ -42,29 +53,15 @@ class AuthRequestsHelper {
         return requestAccessToken(requestUrl, headers, new Gson());
     }
 
-    private OAuthToken requestAccessToken(String requestUrl, List<Header> headers, Gson gson)
-            throws Exception {
-        try {
-            final String oAuthTokenRawResponse =
-                    HttpWrapper.doRequest(HttpPost.METHOD_NAME, requestUrl, headers, null);
-
-            if (oAuthTokenRawResponse != null) {
-                OAuthToken oAuthToken = gson.fromJson(oAuthTokenRawResponse, OAuthToken.class);
-                oAuthToken.updateExpirationDate();
-                return oAuthToken;
-            } else {
-                throw new Exception("You can't use the same authorization code twice.");
-            }
-
-        } catch (HttpHostConnectException e) {
-            throw new StorageServiceConnectException(
-                    "Failed connect to Storage Service: " + e.getMessage(), e);
-        } catch (Exception e) {
-            throw new Exception("OAuth Token request failed with message, " + e.getMessage());
-        }
-    }
-
-    OAuthToken refreshToken(OAuthToken oAuthToken) throws GeneralSecurityException {
+    /**
+     * Requests a new {@link OAuthToken#getAccessToken()} using the old {@link
+     * OAuthToken#getRefreshToken()}.
+     *
+     * @param oAuthToken an old {@link OAuthToken#getAccessToken()} that will be used to update it
+     *     current tokens.
+     * @return a new {@link OAuthToken#getAccessToken()}. *
+     */
+    OAuthToken refreshToken(OAuthToken oAuthToken) {
         final Gson gson = new Gson();
         String refreshToken = oAuthToken.getRefreshToken();
         final String baseUrl =
@@ -88,9 +85,33 @@ class AuthRequestsHelper {
             refreshOAuthToken.updateExpirationDate();
             refreshOAuthToken.setVersion(oAuthToken.getVersion() + 1);
             return refreshOAuthToken;
+        } catch (HttpHostConnectException e) {
+            throw new StorageServiceConnectException(
+                    "Failed connect to Storage Service: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new GeneralSecurityException(
+            throw new RuntimeException(
                     "Error while trying to refresh OAuth2 tokens with cause: " + e.getMessage());
+        }
+    }
+
+    private OAuthToken requestAccessToken(String requestUrl, List<Header> headers, Gson gson) {
+        try {
+            final String oAuthTokenRawResponse =
+                    HttpWrapper.doRequest(HttpPost.METHOD_NAME, requestUrl, headers, null);
+
+            if (oAuthTokenRawResponse != null) {
+                OAuthToken oAuthToken = gson.fromJson(oAuthTokenRawResponse, OAuthToken.class);
+                oAuthToken.updateExpirationDate();
+                return oAuthToken;
+            } else {
+                throw new InvalidAuthorizationCodeException();
+            }
+
+        } catch (HttpHostConnectException e) {
+            throw new StorageServiceConnectException(
+                    "Failed connect to Storage Service: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException("OAuthToken request failed with message, " + e.getMessage());
         }
     }
 

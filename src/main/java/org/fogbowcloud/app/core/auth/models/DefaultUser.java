@@ -1,14 +1,16 @@
 package org.fogbowcloud.app.core.auth.models;
 
-import java.time.Instant;
-import java.util.Objects;
 import org.fogbowcloud.app.core.constants.JsonKey;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.time.Instant;
+import java.util.Objects;
+
+/** Default user implementation. */
 public class DefaultUser implements User {
 
-    private String identifier;
+    private final String identifier;
     private String iguassuToken;
     private SessionState sessionState;
     private long sessionTime;

@@ -1,19 +1,12 @@
 package org.fogbowcloud.app.core.exceptions;
 
+/**
+ * Appropriate exception when an unauthorized request is made, for example, requests with invalid
+ * Token Iguassu.
+ */
 public class UnauthorizedRequestException extends IguassuException {
-
-    private static final String DEFAULT_MESSAGE = "Unauthorized Error";
-
-    public UnauthorizedRequestException() {
-        super(DEFAULT_MESSAGE);
-    }
 
     public UnauthorizedRequestException(String message) {
         super(message);
     }
-
-    public UnauthorizedRequestException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
 }

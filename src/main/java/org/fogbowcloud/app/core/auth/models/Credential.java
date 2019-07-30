@@ -7,7 +7,7 @@ import org.json.JSONObject;
 /** This class encapsulates the user security information. */
 public class Credential {
 
-    private String userId;
+    private final String userId;
     private String iguassuToken;
     private Integer nonce;
 
@@ -38,10 +38,6 @@ public class Credential {
 
     public String getUserId() {
         return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
     }
 
     public String getIguassuToken() {
