@@ -7,6 +7,7 @@ import org.fogbowcloud.app.jdfcompiler.job.JobState;
 import org.fogbowcloud.app.jes.arrebol.Synchronizer;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -27,25 +28,31 @@ public class SyncJobStateRoutine implements Runnable {
     @Override
     public void run() {
         logger.debug(
-                "----> Running Sync Job State Routine in thread " + Thread.currentThread().getId());
+                "----> Running Sync Job State Routine in thread with id ["
+                        + Thread.currentThread().getId()
+                        + "]");
         final List<JDFJob> jobs = filterUsefulJobs();
 
         for (JDFJob job : jobs) {
-            JDFJob jobUpdated = this.synchronizer.sync(job);
-            boolean updateResult = this.jobDataStore.update(jobUpdated);
+            if (Objects.nonNull(job.getExecutionId()) && !job.getExecutionId().trim().isEmpty()) {
+                JDFJob jobUpdated = this.synchronizer.sync(job);
+                boolean updateResult = this.jobDataStore.update(jobUpdated);
 
-            if (updateResult) {
-                logger.debug(
-                        "Job ["
-                                + job.getId()
-                                + "] was successfully synchronized with its execution ["
-                                + job.getExecutionId()
-                                + "].");
+                if (updateResult) {
+                    logger.debug(
+                            "Job ["
+                                    + job.getId()
+                                    + "] was successfully synchronized with its execution ["
+                                    + job.getExecutionId()
+                                    + "].");
+                } else {
+                    logger.error(
+                            "The state of the job ["
+                                    + job.getId()
+                                    + "] was not synchronized with its execution.");
+                }
             } else {
-                logger.error(
-                        "The state of the job ["
-                                + job.getId()
-                                + "] was not synchronized with its execution.");
+                logger.debug("Job with id [" + job.getId() + "] has no associated execution.");
             }
         }
     }

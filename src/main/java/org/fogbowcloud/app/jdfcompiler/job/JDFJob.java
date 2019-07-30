@@ -65,7 +65,7 @@ public class JDFJob extends Job implements Serializable {
             tasks.add(task);
         }
 
-        JDFJob jdfJob =
+        final JDFJob jdfJob =
                 new JDFJob(
                         job.optString(JsonKey.JOB_ID.getKey()),
                         tasks,
@@ -75,7 +75,8 @@ public class JDFJob extends Job implements Serializable {
         jdfJob.setLabel(job.optString(JsonKey.LABEL.getKey()));
 
         try {
-            jdfJob.setState(JobState.valueOf(job.optString(JsonKey.STATE.getKey()).toUpperCase()));
+            final String currentState = job.optString(JsonKey.STATE.getKey()).toUpperCase();
+            jdfJob.setState(JobState.valueOf(currentState));
         } catch (Exception e) {
             logger.debug("JSON had bad state", e);
         }
@@ -120,7 +121,7 @@ public class JDFJob extends Job implements Serializable {
             job.put(JsonKey.USER_ID.getKey(), this.getUserId());
             job.put(JsonKey.TIMESTAMP.getKey(), this.timestamp);
             job.put(JsonKey.LABEL.getKey(), this.getLabel());
-            job.put(JsonKey.STATE.getKey(), this.getState().getState());
+            job.put(JsonKey.STATE.getKey(), this.getState().getValue());
             job.put(JsonKey.EXECUTION_ID.getKey(), this.executionId);
 
             JSONArray tasks = new JSONArray();

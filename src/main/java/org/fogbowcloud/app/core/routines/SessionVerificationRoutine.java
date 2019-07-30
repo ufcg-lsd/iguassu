@@ -28,8 +28,9 @@ public class SessionVerificationRoutine implements Runnable {
     @Override
     public void run() {
         logger.debug(
-                "----> Running Session Verification Routine in thread "
-                        + Thread.currentThread().getId());
+                "----> Running Session Verification Routine in thread with id ["
+                        + Thread.currentThread().getId()
+                        + "]");
         final long now = Instant.now().getEpochSecond();
         final long oneHourInSeconds = 3600;
         for (final OAuthToken token : this.oAuthTokenDataStore.getAll()) {

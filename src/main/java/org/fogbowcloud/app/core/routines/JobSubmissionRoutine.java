@@ -40,15 +40,15 @@ public class JobSubmissionRoutine implements Runnable {
             JDFJob job = this.jobsToSubmit.poll();
             logger.debug("Job found! Starting job submission with id [" + job.getId() + "]");
             try {
-                final String arrebolId = this.jobExecutionSystem.submit(job);
-                job.setExecutionId(arrebolId);
+                final String executionId = this.jobExecutionSystem.submit(job);
+                job.setExecutionId(executionId);
                 job.setState(JobState.SUBMITTED);
                 this.jobDataStore.update(job);
 
                 logger.info(
                         "Iguassu Job ["
                                 + job.getId()
-                                + "] has arrebol id: ["
+                                + "] has execution id: ["
                                 + job.getExecutionId()
                                 + "]");
 
@@ -65,8 +65,11 @@ public class JobSubmissionRoutine implements Runnable {
                                 + "]. Maybe the Job is poorly formed.",
                         e);
             }
+            JDFJob resultJob = this.jobDataStore.getByJobId(job.getId(), job.getUserId());
         }
-        if (Objects.nonNull(this.jobsToSubmit.peek())) {
+
+
+        if (Objects.isNull(this.jobsToSubmit.peek())) {
             logger.debug("Job submission buffer is empty.");
         }
     }

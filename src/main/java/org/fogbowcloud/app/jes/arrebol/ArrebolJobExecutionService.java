@@ -1,14 +1,16 @@
 package org.fogbowcloud.app.jes.arrebol;
 
-import java.io.UnsupportedEncodingException;
-import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.app.jdfcompiler.job.JobState;
 import org.fogbowcloud.app.jes.JobExecutionService;
+import org.fogbowcloud.app.jes.arrebol.models.JobExecArrebol;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
-import org.fogbowcloud.app.jes.exceptions.SubmitJobException;
+import org.fogbowcloud.app.jes.exceptions.JobSubmissionException;
 
+import java.io.UnsupportedEncodingException;
+import java.util.Properties;
+
+/** Implementation of the Arrebol Job Execution Service API communication. */
 public class ArrebolJobExecutionService implements JobExecutionService {
 
     private static final Logger logger = Logger.getLogger(ArrebolJobExecutionService.class);
@@ -21,14 +23,16 @@ public class ArrebolJobExecutionService implements JobExecutionService {
 
     @Override
     public String submit(JDFJob job)
-            throws UnsupportedEncodingException, SubmitJobException, ArrebolConnectException {
+            throws UnsupportedEncodingException, JobSubmissionException, ArrebolConnectException {
         logger.info("Job with id :[" + job.getId() + "] was submitted for execution.");
 
         return this.requestsHelper.submitToExecution(job);
     }
 
     @Override
-    public JobState status(String executionId) {
-        return null;
+    public JobExecArrebol status(String executionId) {
+        logger.info("Getting the status of execution with id [" + executionId + "]");
+
+        return this.requestsHelper.getExecutionStatus(executionId);
     }
 }

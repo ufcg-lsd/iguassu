@@ -1,10 +1,5 @@
 package org.fogbowcloud.app.jes.arrebol;
 
-import com.google.gson.Gson;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.command.Command;
 import org.fogbowcloud.app.core.command.CommandState;
@@ -12,22 +7,26 @@ import org.fogbowcloud.app.core.task.Task;
 import org.fogbowcloud.app.core.task.TaskState;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jdfcompiler.job.JobState;
-import org.fogbowcloud.app.jes.arrebol.models.ArrebolCommand;
-import org.fogbowcloud.app.jes.arrebol.models.ArrebolCommandState;
-import org.fogbowcloud.app.jes.arrebol.models.ArrebolJob;
-import org.fogbowcloud.app.jes.arrebol.models.ArrebolTask;
-import org.fogbowcloud.app.jes.arrebol.models.ArrebolTaskState;
-import org.fogbowcloud.app.jes.arrebol.models.ExecutionState;
-import org.fogbowcloud.app.jes.exceptions.JobStatusException;
+import org.fogbowcloud.app.jes.JobExecutionService;
+import org.fogbowcloud.app.jes.arrebol.models.*;
+import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
+import org.fogbowcloud.app.jes.exceptions.JobExecStatusException;
 
-public class ArrebolSynchronizer implements Synchronizer<JDFJob> {
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 
-    private static final Logger logger = Logger.getLogger(ArrebolSynchronizer.class);
+import static java.lang.Thread.sleep;
 
-    private final ArrebolRequestsHelper requestsHelper;
+/** Sync local job state with it execution. */
+public class JobSynchronizer implements Synchronizer<JDFJob> {
 
-    public ArrebolSynchronizer(Properties properties) {
-        this.requestsHelper = new ArrebolRequestsHelper(properties);
+    private static final Logger logger = Logger.getLogger(JobSynchronizer.class);
+
+    private final JobExecutionService jobExecutionService;
+
+    public JobSynchronizer(JobExecutionService jobExecutionService) {
+        this.jobExecutionService = jobExecutionService;
     }
 
     @Override
@@ -35,15 +34,29 @@ public class ArrebolSynchronizer implements Synchronizer<JDFJob> {
 
         final String executionId = job.getExecutionId();
         if (Objects.nonNull(executionId) && !executionId.trim().isEmpty()) {
-            try {
-                String jobExecutionJson = this.requestsHelper.statusArrebolJob(executionId);
-                logger.debug("JSON Response [" + jobExecutionJson + "]");
-                Gson gson = new Gson();
-                ArrebolJob arrebolJob = gson.fromJson(jobExecutionJson, ArrebolJob.class);
-                this.updateJob(job, arrebolJob);
-            } catch (Exception e) {
-                throw new JobStatusException(e.getMessage());
+            JobExecArrebol jobExecArrebol = null;
+            while (Objects.isNull(jobExecArrebol)) {
+                try {
+                    jobExecArrebol = this.jobExecutionService.status(executionId);
+                } catch (ArrebolConnectException ace) {
+                    logger.debug(
+                            "Error to get status for execution ["
+                                    + executionId
+                                    + "] with message + "
+                                    + ace.getMessage());
+                    try {
+                        final long waitTime = 2000;
+                        sleep(waitTime);
+                    } catch (InterruptedException e) {
+                        logger.debug("Thread can't sleep cause by: " + e.getMessage());
+                    }
+
+                    jobExecArrebol = null;
+                } catch (RuntimeException e) {
+                    throw new JobExecStatusException(e.getMessage());
+                }
             }
+            this.updateJob(job, jobExecArrebol);
         } else {
             logger.debug("Execution identifier from Job [" + job.getId() + "] is null.");
         }
@@ -51,10 +64,10 @@ public class ArrebolSynchronizer implements Synchronizer<JDFJob> {
         return job;
     }
 
-    private void updateJob(JDFJob job, ArrebolJob arrebolJob) {
-        updateTasks(job.getTasks(), arrebolJob.getTasks());
+    private void updateJob(JDFJob job, JobExecArrebol jobExecArrebol) {
+        updateTasks(job.getTasks(), jobExecArrebol.getTasks());
         logger.info("Updated tasks state from job [" + job.getId() + "].");
-        updateJobState(job, arrebolJob.getExecutionState());
+        updateJobState(job, jobExecArrebol.getState());
     }
 
     private void updateTasks(Map<String, Task> iguassuTasks, List<ArrebolTask> arrebolTasks) {

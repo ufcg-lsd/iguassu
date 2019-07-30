@@ -1,7 +1,7 @@
 package org.fogbowcloud.app.jes;
 
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.app.jdfcompiler.job.JobState;
+import org.fogbowcloud.app.jes.arrebol.models.JobExecArrebol;
 
 /** Interface that defines job execution operations. */
 public interface JobExecutionService {
@@ -20,7 +20,7 @@ public interface JobExecutionService {
      * Queries the state of the execution and represent as a JobState.
      *
      * @param executionId to be queried in the Execution Service.
-     * @return the current JobState for the refer execution.
+     * @return the current {@link JobExecArrebol} state for the refer execution.
      */
-    JobState status(String executionId);
+    JobExecArrebol status(String executionId);
 }

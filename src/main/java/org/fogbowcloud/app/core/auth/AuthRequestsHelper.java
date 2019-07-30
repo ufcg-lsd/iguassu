@@ -19,7 +19,7 @@ import java.util.*;
  * A utility class that encapsulates communication logic, that is, requests, with the Storage
  * Service.
  */
-class AuthRequestsHelper {
+final class AuthRequestsHelper {
 
     private Properties properties;
 

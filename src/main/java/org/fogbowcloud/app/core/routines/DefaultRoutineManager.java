@@ -8,7 +8,7 @@ import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.fogbowcloud.app.jes.JobExecutionService;
 import org.fogbowcloud.app.jes.arrebol.ArrebolJobExecutionService;
-import org.fogbowcloud.app.jes.arrebol.ArrebolSynchronizer;
+import org.fogbowcloud.app.jes.arrebol.JobSynchronizer;
 import org.fogbowcloud.app.utils.ManagerTimer;
 
 import java.util.Arrays;
@@ -23,7 +23,7 @@ public class DefaultRoutineManager implements RoutineManager {
 
     private static final Logger logger = Logger.getLogger(DefaultRoutineManager.class);
 
-    private final JobExecutionService jobExecutionSystem;
+    private final JobExecutionService jobExecutionService;
     private final Properties properties;
     private final OAuthTokenDataStore oAuthTokenDataStore;
     private final JobDataStore jobDataStore;
@@ -38,7 +38,7 @@ public class DefaultRoutineManager implements RoutineManager {
             Queue<JDFJob> jobsToSubmit) {
 
         this.properties = properties;
-        this.jobExecutionSystem = new ArrebolJobExecutionService(this.properties);
+        this.jobExecutionService = new ArrebolJobExecutionService(this.properties);
         this.oAuthTokenDataStore = oAuthTokenDataStore;
         this.jobDataStore = jobDataStore;
         this.authManager = authManager;
@@ -69,7 +69,7 @@ public class DefaultRoutineManager implements RoutineManager {
                 new ManagerTimer(Executors.newScheduledThreadPool(DEFAULT_POOL_THREAD_NUMBER));
         SyncJobStateRoutine syncJobStateRoutine =
                 new SyncJobStateRoutine(
-                        this.jobDataStore, new ArrebolSynchronizer(this.properties));
+                        this.jobDataStore, new JobSynchronizer(this.jobExecutionService));
         syncJobTimer.scheduleAtFixedRate(
                 syncJobStateRoutine, DEFAULT_INITIAL_DELAY_MS, SYNC_PERIOD);
     }
@@ -98,7 +98,7 @@ public class DefaultRoutineManager implements RoutineManager {
                 new ManagerTimer(Executors.newScheduledThreadPool(DEFAULT_POOL_THREAD_NUMBER));
         JobSubmissionRoutine jobSubmissionRoutine =
                 new JobSubmissionRoutine(
-                        this.jobDataStore, this.jobExecutionSystem, this.jobsToSubmit);
+                        this.jobDataStore, this.jobExecutionService, this.jobsToSubmit);
         submissionJobTimer.scheduleAtFixedRate(
                 jobSubmissionRoutine, DEFAULT_INITIAL_DELAY_MS, SUBMISSION_PERIOD);
     }

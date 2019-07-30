@@ -68,7 +68,7 @@ public class DefaultAuthManager implements AuthManager {
                 iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
                 user = this.store(oAuthToken.getUserId(), iguassuToken);
                 logger.info(
-                        "OAuth2 tokens for the user " + oAuthToken.getUserId() + " was stored.");
+                        "OAuth2 tokens for the user [" + oAuthToken.getUserId() + "] was stored.");
             }
             this.storeNewToken(oAuthToken);
             return user;
