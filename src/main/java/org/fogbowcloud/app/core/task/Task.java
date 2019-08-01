@@ -6,6 +6,10 @@ import org.json.JSONObject;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * A task is a unit of a Job. A job is composed of an unordered set and allowing repetition of tasks
+ * (bag). A task is composed of a set of {@link Command}.
+ */
 public interface Task {
 
     Specification getSpecification();

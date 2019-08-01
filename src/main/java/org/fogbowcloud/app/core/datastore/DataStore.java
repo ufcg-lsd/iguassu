@@ -1,16 +1,17 @@
 package org.fogbowcloud.app.core.datastore;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.List;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.utils.DataStoreUtils;
 
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Class responsible for the abstraction of database management.
+ *
+ * @param <T> is the type of object that will be manipulated.
+ */
 abstract class DataStore<T> {
 
     static final String DATASTORE_DRIVER = "org.sqlite.JDBC";
@@ -28,7 +29,7 @@ abstract class DataStore<T> {
 
     /**
      * @return the connection
-     * @throws SQLException
+     * @throws SQLException if some sql operation failed for communication problems.
      */
     Connection getConnection() throws SQLException {
 

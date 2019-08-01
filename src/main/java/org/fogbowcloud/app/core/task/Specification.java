@@ -1,14 +1,16 @@
 package org.fogbowcloud.app.core.task;
 
-import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.constants.JsonKey;
 import org.fogbowcloud.app.utils.JSONUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.Map;
+
+/** Sets meta information about Jobs. */
 public class Specification implements Serializable {
 
     private static final long serialVersionUID = 5255295548723927267L;
