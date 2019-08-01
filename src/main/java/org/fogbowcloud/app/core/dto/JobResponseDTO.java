@@ -3,14 +3,14 @@ package org.fogbowcloud.app.core.dto;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJobState;
+import org.fogbowcloud.app.jdfcompiler.job.JobState;
 
 public class JobResponseDTO {
 
     private String id;
-    private String name;
+    private String label;
     private String creationDate;
-    private JDFJobState state;
+    private JobState state;
 
     public JobResponseDTO(JDFJob job) {
         setFields(job);
@@ -18,17 +18,17 @@ public class JobResponseDTO {
 
     private void setFields(JDFJob jdfJob) {
         this.id = jdfJob.getId();
-        this.name = jdfJob.getName();
+        this.label = jdfJob.getLabel();
         this.creationDate = timestampToDate(jdfJob.getTimeStamp());
         this.state = jdfJob.getState();
     }
 
-    public String getName() {
-        return name;
+    public String getLabel() {
+        return label;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setLabel(String label) {
+        this.label = label;
     }
 
     public String getId() {
@@ -39,11 +39,11 @@ public class JobResponseDTO {
         this.id = id;
     }
 
-    public JDFJobState getState() {
+    public JobState getState() {
         return state;
     }
 
-    public void setState(JDFJobState state) {
+    public void setState(JobState state) {
         this.state = state;
     }
 

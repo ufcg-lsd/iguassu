@@ -11,9 +11,13 @@ public class CORSProperties {
     public static final String ALLOWED_METHODS_HEADER_VALUE = "POST, PUT, GET, OPTIONS, DELETE";
     public static final String ALLOWED_HEADERS_HEADER = "Access-Control-Allow-Headers";
     public static final String ALLOWED_HEADERS_HEADER_VALUES =
-        "Content-Type, Access-Control-Allow-Headers, " +
-            " Authorization, X-Requested-With, X-Auth-App-Identifiers, X-Auth-User-Credentials";
-    public static final String ALLOWED_CLIENT_FRONT_LOCAL = "http://localhost:8080";
+            "Content-Type, "
+                    + "Access-Control-Allow-Headers, "
+                    + "Authorization, "
+                    + "X-Requested-With, "
+                    + "X-Auth-App-Identifiers, "
+                    + "X-Auth-User-Credentials";
+    public static final String ALLOWED_CLIENT_FRONT_LOCAL = "http://localhost:8082";
     public static final String VARY_HEADER = "Vary";
     public static final String VARY_HEADER_VALUE = "Origin";
 }

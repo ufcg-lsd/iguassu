@@ -6,45 +6,64 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.List;
-
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
 import org.json.JSONObject;
 
 public class JobDataStore extends DataStore<JDFJob> {
+    private static final Logger logger = Logger.getLogger(JobDataStore.class);
+    private static final String ERROR_WHILE_INITIALIZING_THE_DATA_STORE =
+            "Error while initializing the Job DataStore.";
 
     private static final String JOBS_TABLE_NAME = "iguassu_jobs";
     private static final String JOB_ID = "job_id";
     private static final String JOB_JSON = "job_json";
-    private static final String JOB_OWNER = "job_owner";
+    private static final String JOB_USER_ID = "job_user_id";
 
     private static final String CREATE_TABLE_STATEMENT =
-        "CREATE TABLE IF NOT EXISTS " + JOBS_TABLE_NAME + "("
-            + JOB_ID + " VARCHAR(255) PRIMARY KEY, "
-            + JOB_OWNER + " VARCHAR(255), "
-            + JOB_JSON + " TEXT)";
+            "CREATE TABLE IF NOT EXISTS "
+                    + JOBS_TABLE_NAME
+                    + "("
+                    + JOB_ID
+                    + " VARCHAR(255) PRIMARY KEY, "
+                    + JOB_USER_ID
+                    + " VARCHAR(255), "
+                    + JOB_JSON
+                    + " TEXT)";
 
-    private static final String INSERT_JOB_TABLE_SQL = "INSERT INTO " + JOBS_TABLE_NAME
-        + " VALUES(?, ?, ?)";
+    private static final String INSERT_JOB_TABLE_SQL =
+            "INSERT INTO " + JOBS_TABLE_NAME + " VALUES(?, ?, ?)";
 
-    private static final String UPDATE_JOB_TABLE_SQL = "UPDATE " + JOBS_TABLE_NAME
-        + " SET " + JOB_ID + " = ?, " + JOB_OWNER + " = ?, " + JOB_JSON + " = ? WHERE " + JOB_ID
-        + " = ?";
+    private static final String UPDATE_JOB_TABLE_SQL =
+            "UPDATE "
+                    + JOBS_TABLE_NAME
+                    + " SET "
+                    + JOB_ID
+                    + " = ?, "
+                    + JOB_USER_ID
+                    + " = ?, "
+                    + JOB_JSON
+                    + " = ? WHERE "
+                    + JOB_ID
+                    + " = ?";
 
     private static final String GET_ALL_JOB = "SELECT * FROM " + JOBS_TABLE_NAME;
-    private static final String GET_JOB_BY_OWNER = GET_ALL_JOB + " WHERE " + JOB_OWNER + " = ? ";
+    private static final String GET_JOB_BY_USER_ID =
+            GET_ALL_JOB + " WHERE " + JOB_USER_ID + " = ? ";
     private static final String GET_JOB_BY_JOB_ID =
-        GET_ALL_JOB + " WHERE " + JOB_ID + " = ? AND " + JOB_OWNER + " = ?";
+            GET_ALL_JOB + " WHERE " + JOB_ID + " = ? AND " + JOB_USER_ID + " = ?";
 
     private static final String DELETE_ALL_JOB_TABLE_SQL = "DELETE FROM " + JOBS_TABLE_NAME;
-    private static final String DELETE_BY_OWNER =
-        "DELETE FROM " + JOBS_TABLE_NAME + " WHERE " + JOB_OWNER
-            + " = ? ";
-    private static final String DELETE_BY_JOB_ID_SQL = "DELETE FROM " + JOBS_TABLE_NAME + " WHERE "
-        + JOB_ID + " = ? AND " + JOB_OWNER + " = ?";
-
-    private static final Logger LOGGER = Logger.getLogger(JobDataStore.class);
-    private static final String ERROR_WHILE_INITIALIZING_THE_DATA_STORE = "Error while initializing the Job DataStore.";
+    private static final String DELETE_BY_USER_ID =
+            "DELETE FROM " + JOBS_TABLE_NAME + " WHERE " + JOB_USER_ID + " = ? ";
+    private static final String DELETE_BY_JOB_ID_SQL =
+            "DELETE FROM "
+                    + JOBS_TABLE_NAME
+                    + " WHERE "
+                    + JOB_ID
+                    + " = ? AND "
+                    + JOB_USER_ID
+                    + " = ?";
 
     public JobDataStore(String dataStoreURL) {
         super(dataStoreURL);
@@ -52,7 +71,7 @@ public class JobDataStore extends DataStore<JDFJob> {
         Connection connection = null;
 
         try {
-            LOGGER.debug("jobDataStoreURL: " + super.tokenDataStoreURL);
+            logger.debug("jobDataStoreURL: " + super.tokenDataStoreURL);
 
             Class.forName(DATASTORE_DRIVER);
 
@@ -62,20 +81,22 @@ public class JobDataStore extends DataStore<JDFJob> {
             statement.execute(CREATE_TABLE_STATEMENT);
             statement.close();
         } catch (Exception e) {
-            LOGGER.error(ERROR_WHILE_INITIALIZING_THE_DATA_STORE, e);
+            logger.error(ERROR_WHILE_INITIALIZING_THE_DATA_STORE, e);
             throw new Error(ERROR_WHILE_INITIALIZING_THE_DATA_STORE, e);
         } finally {
             close(statement, connection);
         }
     }
 
-    public boolean insert(JDFJob job) {
-        LOGGER.debug("Inserting job [" + job.getId() + "] with owner [" + job.getOwner() + "]");
+    public void insert(JDFJob job) {
+        logger.debug("Inserting job [" + job.getId() + "] with user id [" + job.getUserId() + "]");
 
-        if (job.getId() == null || job.getId().isEmpty()
-            || job.getOwner() == null || job.getOwner().isEmpty()) {
-            LOGGER.warn("Job Id and owner must not be null.");
-            return false;
+        if (job.getId() == null
+                || job.getId().isEmpty()
+                || job.getUserId() == null
+                || job.getUserId().isEmpty()) {
+            logger.warn("Job Id and user id must not be null.");
+            return;
         }
 
         PreparedStatement preparedStatement = null;
@@ -85,33 +106,33 @@ public class JobDataStore extends DataStore<JDFJob> {
             connection.setAutoCommit(false);
             preparedStatement = connection.prepareStatement(INSERT_JOB_TABLE_SQL);
             preparedStatement.setString(1, job.getId());
-            preparedStatement.setString(2, job.getOwner());
+            preparedStatement.setString(2, job.getUserId());
             preparedStatement.setString(3, job.toJSON().toString());
 
             preparedStatement.execute();
             connection.commit();
-            return true;
         } catch (SQLException e) {
-            LOGGER.error("Couldn't execute statement : " + INSERT_JOB_TABLE_SQL, e);
+            logger.error("Couldn't execute statement : " + INSERT_JOB_TABLE_SQL, e);
             try {
                 if (connection != null) {
                     connection.rollback();
                 }
             } catch (SQLException e1) {
-                LOGGER.error("Couldn't rollback transaction.", e1);
+                logger.error("Couldn't rollback transaction.", e1);
             }
-            return false;
         } finally {
             close(preparedStatement, connection);
         }
     }
 
     public boolean update(JDFJob job) {
-        LOGGER.debug("Updating job [" + job.getId() + "] from owner [" + job.getOwner() + "]");
+        logger.debug("Updating job [" + job.getId() + "] from user id [" + job.getUserId() + "]");
 
-        if (job.getId() == null || job.getId().isEmpty()
-            || job.getOwner() == null || job.getOwner().isEmpty()) {
-            LOGGER.warn("Job Id and owner must not be null.");
+        if (job.getId() == null
+                || job.getId().isEmpty()
+                || job.getUserId() == null
+                || job.getUserId().isEmpty()) {
+            logger.warn("Job Id and user id must not be null.");
             return false;
         }
 
@@ -122,7 +143,7 @@ public class JobDataStore extends DataStore<JDFJob> {
             connection.setAutoCommit(false);
             preparedStatement = connection.prepareStatement(UPDATE_JOB_TABLE_SQL);
             preparedStatement.setString(1, job.getId());
-            preparedStatement.setString(2, job.getOwner());
+            preparedStatement.setString(2, job.getUserId());
             preparedStatement.setString(3, job.toJSON().toString());
             preparedStatement.setString(4, job.getId());
 
@@ -130,13 +151,13 @@ public class JobDataStore extends DataStore<JDFJob> {
             connection.commit();
             return true;
         } catch (SQLException e) {
-            LOGGER.error("Couldn't execute statement : " + UPDATE_JOB_TABLE_SQL, e);
+            logger.error("Couldn't execute statement : " + UPDATE_JOB_TABLE_SQL, e);
             try {
                 if (connection != null) {
                     connection.rollback();
                 }
             } catch (SQLException e1) {
-                LOGGER.error("Couldn't rollback transaction.", e1);
+                logger.error("Couldn't rollback transaction.", e1);
             }
             return false;
         } finally {
@@ -145,27 +166,27 @@ public class JobDataStore extends DataStore<JDFJob> {
     }
 
     public List<JDFJob> getAll() {
-        LOGGER.debug("Getting all instances id with related orders.");
+        logger.debug("Getting all instances id with related orders.");
         return executeQueryStatement(GET_ALL_JOB);
     }
 
-    public List<JDFJob> getAllByOwner(String owner) {
-        LOGGER.debug("Getting all jobs to owner [" + owner + "]");
-        return executeQueryStatement(GET_JOB_BY_OWNER, owner);
+    public List<JDFJob> getAllByUserId(String user) {
+        logger.debug("Getting all jobs to user [" + user + "]");
+        return executeQueryStatement(GET_JOB_BY_USER_ID, user);
     }
 
-    public JDFJob getByJobId(String jobId, String owner) {
-        LOGGER.debug("Getting jobs by job ID [" + jobId + "]");
+    public JDFJob getByJobId(String jobId, String userId) {
+        logger.debug("Getting jobs by job ID [" + jobId + "]");
 
-        List<JDFJob> jdfJobList = executeQueryStatement(GET_JOB_BY_JOB_ID, jobId, owner);
+        List<JDFJob> jdfJobList = executeQueryStatement(GET_JOB_BY_JOB_ID, jobId, userId);
         if (jdfJobList != null && !jdfJobList.isEmpty()) {
             return jdfJobList.get(0);
         }
         return null;
     }
 
-    public boolean deleteAll() {
-        LOGGER.debug("Deleting all jobs.");
+    public void deleteAll() {
+        logger.debug("Deleting all jobs.");
 
         Statement statement = null;
         Connection conn = null;
@@ -175,40 +196,38 @@ public class JobDataStore extends DataStore<JDFJob> {
 
             boolean result = statement.execute(DELETE_ALL_JOB_TABLE_SQL);
             conn.commit();
-            return result;
         } catch (SQLException e) {
-            LOGGER.error("Couldn't delete all registres on " + JOBS_TABLE_NAME, e);
-            return false;
+            logger.error("Couldn't delete all registers on " + JOBS_TABLE_NAME, e);
         } finally {
             close(statement, conn);
         }
     }
 
-    public boolean deleteAllFromOwner(String owner) {
-        LOGGER.debug("Deleting all job from owner [" + owner + "].");
+    public boolean deleteAllFromUser(String user) {
+        logger.debug("Deleting all job from user [" + user + "].");
 
         PreparedStatement statement = null;
         Connection conn = null;
         try {
             conn = getConnection();
-            statement = conn.prepareStatement(DELETE_BY_OWNER);
-            statement.setString(1, owner);
+            statement = conn.prepareStatement(DELETE_BY_USER_ID);
+            statement.setString(1, user);
             boolean result = statement.execute();
             conn.commit();
             return result;
 
         } catch (SQLException e) {
-            LOGGER.error(
-                "Couldn't delete all registres from owner [" + owner + "] on " + JOBS_TABLE_NAME,
-                e);
+            logger.error(
+                    "Couldn't delete all registres from user [" + user + "] on " + JOBS_TABLE_NAME,
+                    e);
             return false;
         } finally {
             close(statement, conn);
         }
     }
 
-    public int deleteByJobId(String jobId, String owner) {
-        LOGGER.debug("Deleting all jobs with id [" + jobId + "]");
+    public int deleteByJobId(String jobId, String user) {
+        logger.debug("Deleting all jobs with id [" + jobId + "]");
 
         PreparedStatement statement = null;
         Connection conn = null;
@@ -217,12 +236,17 @@ public class JobDataStore extends DataStore<JDFJob> {
             conn = getConnection();
             statement = conn.prepareStatement(DELETE_BY_JOB_ID_SQL);
             statement.setString(1, jobId);
-            statement.setString(2, owner);
+            statement.setString(2, user);
 
             updateCount = statement.executeUpdate();
         } catch (SQLException e) {
-            LOGGER.error("Couldn't delete registres on " + JOBS_TABLE_NAME + " with Job id ["
-                + jobId + "]", e);
+            logger.error(
+                    "Couldn't delete registres on "
+                            + JOBS_TABLE_NAME
+                            + " with Job id ["
+                            + jobId
+                            + "]",
+                    e);
         } finally {
             close(statement, conn);
         }
@@ -230,8 +254,6 @@ public class JobDataStore extends DataStore<JDFJob> {
     }
 
     public JDFJob getObjFromDataStoreResult(ResultSet rs) throws SQLException {
-        JDFJob job = JDFJob.fromJSON(new JSONObject(rs.getString(JOB_JSON)));
-        return job;
+	    return JDFJob.fromJSON(new JSONObject(rs.getString(JOB_JSON)));
     }
-
 }

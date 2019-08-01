@@ -1,31 +1,39 @@
-package org.fogbowcloud.app.core.datastore;
+package org.fogbowcloud.app.core.auth.models;
 
 import com.google.gson.annotations.SerializedName;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Objects;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.api.constants.OAuthPropertiesKeys;
+import org.fogbowcloud.app.core.constants.JsonKey;
 import org.json.JSONObject;
 
 public class OAuthToken {
 
+    private static final Logger logger = Logger.getLogger(OAuthToken.class);
+
     private static final long INITIAL_VERSION = 0L;
-    private static final Logger LOGGER = Logger.getLogger(OAuthToken.class);
-    @SerializedName(OAuthPropertiesKeys.TOKEN_VERSION_JSON_KEY)
-    private long version;
-    @SerializedName(OAuthPropertiesKeys.ACCESS_TOKEN_JSON_KEY)
+    private static final String USER_ID = "user_id";
+    private static final String ACCESS_TOKEN = "access_token";
+    private static final String REFRESH_TOKEN = "refresh_token";
+    private static final String EXPIRES_IN = "expires_in";
+
+    @SerializedName(ACCESS_TOKEN)
     private String accessToken;
-    @SerializedName(OAuthPropertiesKeys.REFRESH_TOKEN_JSON_KEY)
+
+    @SerializedName(REFRESH_TOKEN)
     private String refreshToken;
-    @SerializedName(OAuthPropertiesKeys.USER_ID_JSON_KEY)
+
+    @SerializedName(USER_ID)
     private String userId;
-    @SerializedName(OAuthPropertiesKeys.EXPIRES_IN_JSON_KEY)
+
+    @SerializedName(EXPIRES_IN)
     private int expirationTime;
+
+    private long version;
     private Date expirationDate;
 
-    public OAuthToken() {
-    }
+    public OAuthToken() {}
 
     public OAuthToken(String accessToken, String refreshToken, String userId, Date expirationDate) {
         this.version = INITIAL_VERSION;
@@ -36,8 +44,12 @@ public class OAuthToken {
         this.expirationTime = 3600;
     }
 
-    public OAuthToken(String accessToken, String refreshToken, String userId, Date expirationDate,
-        long version) {
+    private OAuthToken(
+            String accessToken,
+            String refreshToken,
+            String userId,
+            Date expirationDate,
+            long version) {
         this.version = version;
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
@@ -47,19 +59,20 @@ public class OAuthToken {
     }
 
     public static OAuthToken fromJSON(JSONObject tokenJson) {
-        LOGGER.info("Reading Token from JSON");
+        logger.info("Reading Token from JSON");
 
-        long dateStr = tokenJson.getLong(OAuthPropertiesKeys.EXPIRES_IN_JSON_KEY);
+        long dateStr = tokenJson.getLong(EXPIRES_IN);
         Date expirationDate = new Date(dateStr);
 
-        OAuthToken token = new OAuthToken(
-            tokenJson.optString(OAuthPropertiesKeys.ACCESS_TOKEN_JSON_KEY),
-            tokenJson.optString(OAuthPropertiesKeys.REFRESH_TOKEN_JSON_KEY),
-            tokenJson.optString(OAuthPropertiesKeys.USER_ID_JSON_KEY),
-            expirationDate,
-            tokenJson.getLong(OAuthPropertiesKeys.TOKEN_VERSION_JSON_KEY));
+        OAuthToken token =
+                new OAuthToken(
+                        tokenJson.optString(ACCESS_TOKEN),
+                        tokenJson.optString(REFRESH_TOKEN),
+                        tokenJson.optString(USER_ID),
+                        expirationDate,
+                        tokenJson.getLong(JsonKey.TOKEN_VERSION.getKey()));
 
-        LOGGER.debug("Job read from JSON is from owner: " + token.getUserId());
+        logger.debug("Job read from JSON is from user: " + token.getUserId());
         return token;
     }
 
@@ -138,17 +151,17 @@ public class OAuthToken {
             return false;
         }
         OAuthToken that = (OAuthToken) o;
-        return version == that.version &&
-            expirationTime == that.expirationTime &&
-            accessToken.equals(that.accessToken) &&
-            refreshToken.equals(that.refreshToken) &&
-            userId.equals(that.userId) &&
-            expirationDate.equals(that.expirationDate);
+        return version == that.version
+                && expirationTime == that.expirationTime
+                && accessToken.equals(that.accessToken)
+                && refreshToken.equals(that.refreshToken)
+                && userId.equals(that.userId)
+                && expirationDate.equals(that.expirationDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects
-            .hash(version, accessToken, refreshToken, userId, expirationTime, expirationDate);
+        return Objects.hash(
+                version, accessToken, refreshToken, userId, expirationTime, expirationDate);
     }
 }
