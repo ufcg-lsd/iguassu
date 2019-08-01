@@ -1,8 +1,13 @@
 package org.fogbowcloud.app.core.dto;
 
+import com.google.gson.annotations.SerializedName;
+
 public class AuthDTO {
 
+    @SerializedName("iguassu_token")
     private String iguassuToken;
+
+    @SerializedName("user_id")
     private String userId;
 
     public AuthDTO(String userId, String iguassuToken) {
@@ -35,7 +40,6 @@ public class AuthDTO {
 
         if (!iguassuToken.equals(that.iguassuToken)) return false;
         return userId.equals(that.userId);
-
     }
 
     @Override
