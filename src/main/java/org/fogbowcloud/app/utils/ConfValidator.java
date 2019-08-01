@@ -22,7 +22,10 @@ public class ConfValidator {
         validateServicesAddresses(properties);
         validateMonitorPeriods(properties);
 
-        logger.debug("All properties are set at time <" + Instant.now().getNano() + ">.");
+        logger.debug(
+                "All properties of the configuration file were loaded successfully at time <"
+                        + Instant.now().getNano()
+                        + ">.");
     }
 
     private static void validateServicesAddresses(Properties properties) {
