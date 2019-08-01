@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+/** Utility class for JSON manipulation. */
 public class JSONUtils {
 
     public static Map<String, String> toMap(String jsonStr) {

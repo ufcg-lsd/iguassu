@@ -5,6 +5,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.Random;
 
+/** Utility class for security random string (token) generation. */
 public class RandomString {
 
     private static final String upper = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";

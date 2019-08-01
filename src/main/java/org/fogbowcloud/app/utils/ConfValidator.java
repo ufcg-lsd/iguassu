@@ -1,11 +1,14 @@
 package org.fogbowcloud.app.utils;
 
-import java.util.Objects;
-import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.constants.ConfProperty;
 import org.fogbowcloud.app.core.constants.ExitCode;
 
+import java.time.Instant;
+import java.util.Objects;
+import java.util.Properties;
+
+/** Utility class for configuration file validation. */
 public class ConfValidator {
 
     private static final Logger logger = Logger.getLogger(ConfValidator.class);
@@ -19,7 +22,7 @@ public class ConfValidator {
         validateServicesAddresses(properties);
         validateMonitorPeriods(properties);
 
-        logger.debug("All properties are set.");
+        logger.debug("All properties are set at time <" + Instant.now().getNano() + ">.");
     }
 
     private static void validateServicesAddresses(Properties properties) {
@@ -45,14 +48,13 @@ public class ConfValidator {
         if (!properties.containsKey(propKey)
                 || Objects.isNull(properties.getProperty(propKey))
                 || properties.getProperty(propKey).trim().isEmpty()) {
-            String errorMsg = requiredPropertyMessage(propKey);
-            logger.error(errorMsg);
+            logger.error(requiredPropertyMessage(propKey));
 
             System.exit(ExitCode.FAIL.getCode());
         }
     }
 
     private static String requiredPropertyMessage(String propertyKey) {
-        return "Required property " + propertyKey + " not found.";
+        return "Required property <" + propertyKey + "> not found.";
     }
 }

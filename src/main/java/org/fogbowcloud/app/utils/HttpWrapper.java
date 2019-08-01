@@ -1,6 +1,5 @@
 package org.fogbowcloud.app.utils;
 
-import java.util.List;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -14,6 +13,9 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.apache.log4j.Logger;
 
+import java.util.List;
+
+/** Generic wrapper class for http requests. */
 public class HttpWrapper {
 
     private static final Logger logger = Logger.getLogger(HttpWrapper.class);

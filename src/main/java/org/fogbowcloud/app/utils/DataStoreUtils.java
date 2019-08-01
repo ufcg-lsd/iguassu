@@ -3,6 +3,7 @@ package org.fogbowcloud.app.utils;
 import java.io.File;
 import java.util.Objects;
 
+/** Utility class for database manipulation. */
 public class DataStoreUtils {
 
     private static final String DATASTORES_FOLDER = "datastores";
