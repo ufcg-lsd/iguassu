@@ -65,7 +65,6 @@ public class JobSubmissionRoutine implements Runnable {
                                 + "]. Maybe the Job is poorly formed.",
                         e);
             }
-            JDFJob resultJob = this.jobDataStore.getByJobId(job.getId(), job.getUserId());
         }
 
 

@@ -16,8 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static java.lang.Thread.sleep;
-
 /** Sync local job state with it execution. */
 public class JobSynchronizer implements Synchronizer<JDFJob> {
 
@@ -35,28 +33,25 @@ public class JobSynchronizer implements Synchronizer<JDFJob> {
         final String executionId = job.getExecutionId();
         if (Objects.nonNull(executionId) && !executionId.trim().isEmpty()) {
             JobExecArrebol jobExecArrebol = null;
-            while (Objects.isNull(jobExecArrebol)) {
-                try {
-                    jobExecArrebol = this.jobExecutionService.status(executionId);
-                } catch (ArrebolConnectException ace) {
-                    logger.debug(
-                            "Error to get status for execution ["
-                                    + executionId
-                                    + "] with message + "
-                                    + ace.getMessage());
-                    try {
-                        final long waitTime = 2000;
-                        sleep(waitTime);
-                    } catch (InterruptedException e) {
-                        logger.debug("Thread can't sleep cause by: " + e.getMessage());
-                    }
-
-                    jobExecArrebol = null;
-                } catch (RuntimeException e) {
-                    throw new JobExecStatusException(e.getMessage());
-                }
+            try {
+                jobExecArrebol = this.jobExecutionService.status(executionId);
+            } catch (ArrebolConnectException ace) {
+                logger.debug(
+                        "Error to get status for execution ["
+                                + executionId
+                                + "] with message + "
+                                + ace.getMessage());
+            } catch (RuntimeException e) {
+                throw new JobExecStatusException(e.getMessage());
             }
-            this.updateJob(job, jobExecArrebol);
+            if (Objects.nonNull(jobExecArrebol)) {
+                this.updateJob(job, jobExecArrebol);
+            } else {
+                logger.error(
+                        "Could not get job execution status with job id [" + job.getId() + "] and execution id " +
+                                "[" + job.getExecutionId() + "]");
+            }
+
         } else {
             logger.debug("Execution identifier from Job [" + job.getId() + "] is null.");
         }
