@@ -1,5 +1,6 @@
 package org.fogbowcloud.app.api.http.controllers;
 
+import com.google.gson.Gson;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -54,8 +55,10 @@ public class AuthController {
                             "User "
                                     + userAuthenticatedInfo.getUserId()
                                     + " authenticated successfully.");
+                    Gson gson = new Gson();
+                    String response = gson.toJson(userAuthenticatedInfo, AuthDTO.class);
 
-                    return new ResponseEntity<>(userAuthenticatedInfo, HttpStatus.CREATED);
+                    return new ResponseEntity<>(response, HttpStatus.CREATED);
                 } catch (GeneralSecurityException gse) {
                     return new ResponseEntity<>(
                             "The authentication failed with error [" + gse.getMessage() + "]",

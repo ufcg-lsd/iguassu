@@ -1,8 +1,13 @@
 package org.fogbowcloud.app.core.dto;
 
+import com.google.gson.annotations.SerializedName;
+
 public class AuthDTO {
 
+    @SerializedName("iguassu_token")
     private String iguassuToken;
+
+    @SerializedName("user_id")
     private String userId;
 
     public AuthDTO(String userId, String iguassuToken) {
