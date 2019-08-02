@@ -250,23 +250,8 @@ public class TestIguassuController {
         taskIds.add(task.getId());
         job.addTask(task);
 
-        task = new TaskImpl("TaskNumber-" + 3 + "-" + UUID.randomUUID(), spec, "0000");
-        task.setState(TaskState.COMPLETED);
-        taskIds.add(task.getId());
-        job.addTask(task);
-
-        task = new TaskImpl("TaskNumber-" + 4 + "-" + UUID.randomUUID(), spec, "0000");
-        task.setState(TaskState.NOT_CREATED);
-        taskIds.add(task.getId());
-        job.addTask(task);
-
         task = new TaskImpl("TaskNumber-" + 5 + "-" + UUID.randomUUID(), spec, "0000");
         task.setState(TaskState.FAILED);
-        taskIds.add(task.getId());
-        job.addTask(task);
-
-        task = new TaskImpl("TaskNumber-" + 6 + "-" + UUID.randomUUID(), spec, "0000");
-        task.setState(TaskState.TIMEDOUT);
         taskIds.add(task.getId());
         job.addTask(task);
 

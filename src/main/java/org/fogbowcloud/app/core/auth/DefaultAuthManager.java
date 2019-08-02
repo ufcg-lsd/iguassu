@@ -4,7 +4,6 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.models.*;
 import org.fogbowcloud.app.core.constants.GeneralConstants;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
-import org.fogbowcloud.app.core.dto.AuthDTO;
 import org.fogbowcloud.app.utils.RandomString;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,6 +17,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentMap;
 
+/** Default AuthManager implementation */
 public class DefaultAuthManager implements AuthManager {
 
     private static final Logger logger = Logger.getLogger(DefaultAuthManager.class);
@@ -68,7 +68,7 @@ public class DefaultAuthManager implements AuthManager {
                 iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
                 user = this.store(oAuthToken.getUserId(), iguassuToken);
                 logger.info(
-                        "OAuth2 tokens for the user " + oAuthToken.getUserId() + " was stored.");
+                        "OAuth2 tokens for the user [" + oAuthToken.getUserId() + "] was stored.");
             }
             this.storeNewToken(oAuthToken);
             return user;

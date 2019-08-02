@@ -1,5 +1,6 @@
 package org.fogbowcloud.app.api.constants;
 
+/** API swagger documentation constants. */
 public class Documentation {
 
     public static class Endpoint {

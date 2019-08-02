@@ -156,13 +156,13 @@ public class IguassuController {
             return null;
         }
 
-        User user = null;
+        User authenticatedUser = null;
         logger.debug("Checking nonce.");
         if (this.nonceList.contains(credential.getNonce())) {
             this.nonceList.remove(credential.getNonce());
-            user = this.authManager.authorize(credential);
+            authenticatedUser = this.authManager.authorize(credential);
         }
-        return user;
+        return authenticatedUser;
     }
 
     int getNonce() {
