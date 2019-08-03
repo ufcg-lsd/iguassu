@@ -1,5 +1,6 @@
 package org.fogbowcloud.app.api.constants;
 
+/** Cross-Origin Resource Sharing constants. */
 public class CORSProperties {
 
     public static final String ALLOWED_ORIGINS_HEADER = "Access-Control-Allow-Origin";

@@ -219,7 +219,7 @@ public class OAuthTokenDataStore extends DataStore<OAuthToken> {
     }
 
     public void deleteByAccessToken(String accessToken) {
-        logger.debug("Deleting token with accessToken [" + accessToken + "]");
+        logger.debug("Deleting OAuthToken [" + accessToken + "]");
 
         PreparedStatement preparedStatement = null;
         Connection conn = null;

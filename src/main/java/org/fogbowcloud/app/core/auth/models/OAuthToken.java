@@ -1,36 +1,53 @@
 package org.fogbowcloud.app.core.auth.models;
 
 import com.google.gson.annotations.SerializedName;
-import java.sql.Date;
-import java.sql.Timestamp;
-import java.util.Objects;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.constants.JsonKey;
 import org.json.JSONObject;
 
+import java.sql.Date;
+import java.sql.Timestamp;
+import java.util.Objects;
+
+/**
+ * An instance of this class is used to represent the OAuth2 authentication response and the
+ * security information user to communicate with the Storage Service.
+ */
 public class OAuthToken {
 
     private static final Logger logger = Logger.getLogger(OAuthToken.class);
 
+    /** Ordinary constants */
     private static final long INITIAL_VERSION = 0L;
+
     private static final String USER_ID = "user_id";
     private static final String ACCESS_TOKEN = "access_token";
     private static final String REFRESH_TOKEN = "refresh_token";
     private static final String EXPIRES_IN = "expires_in";
 
+    /** An Access Token is used to make requests that can manipulate data in the Storage Service. */
     @SerializedName(ACCESS_TOKEN)
     private String accessToken;
 
+    /** A Refresh Token is used to update the expired access token. */
     @SerializedName(REFRESH_TOKEN)
     private String refreshToken;
 
+    /** The OAuth2 user identifier. */
     @SerializedName(USER_ID)
     private String userId;
 
+    /** The time of expiration of the Access Token in milliseconds. */
     @SerializedName(EXPIRES_IN)
     private int expirationTime;
 
+    /**
+     * All OAuthTokens have an associated version. This is useful because access token usage is
+     * distributed, so some control over them is required.
+     */
     private long version;
+
+    /** The time of expiration encapsulated in a Date object. */
     private Date expirationDate;
 
     public OAuthToken() {}

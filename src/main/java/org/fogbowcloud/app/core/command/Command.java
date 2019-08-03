@@ -7,6 +7,9 @@ import org.fogbowcloud.app.core.constants.JsonKey;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * A command is a unit of a task. Each line of a task is a command.
+ */
 public class Command implements Serializable {
 
 	private static final long serialVersionUID = 5281647552435522413L;

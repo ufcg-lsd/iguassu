@@ -1,16 +1,14 @@
 package org.fogbowcloud.app.core.task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.command.Command;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.*;
+
+/** Default implementation of a {@link org.fogbowcloud.app.core.task.Task}. */
 public class TaskImpl implements Task {
 
     private static final Logger logger = Logger.getLogger(TaskImpl.class);
@@ -99,8 +97,8 @@ public class TaskImpl implements Task {
 
     public List<String> getAllCommandsInStr() {
         List<String> commandsStr = new ArrayList<>();
-        for (int i = 0; i < this.commands.size(); i++) {
-            commandsStr.add(this.commands.get(i).getCommand());
+        for (Command command : this.commands) {
+            commandsStr.add(command.getCommand());
         }
         return commandsStr;
     }

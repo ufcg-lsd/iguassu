@@ -1,19 +1,22 @@
 package org.fogbowcloud.app.jes.arrebol.models;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ArrebolJob {
+public class JobExecArrebol {
 
     private String id;
 
-    private ExecutionState executionState;
+    @SerializedName("jobState")
+    private ExecutionState state;
 
     private List<ArrebolTask> tasks;
 
-    public ArrebolJob(String label, Collection<ArrebolTask> tasks) {
-        this.executionState = ExecutionState.SUBMITTED;
+    public JobExecArrebol(String label, Collection<ArrebolTask> tasks) {
+        this.state = ExecutionState.SUBMITTED;
         this.tasks = new LinkedList<>(tasks);
     }
 
@@ -21,8 +24,8 @@ public class ArrebolJob {
         return this.id;
     }
 
-    public ExecutionState getExecutionState() {
-        return this.executionState;
+    public ExecutionState getState() {
+        return this.state;
     }
 
     public List<ArrebolTask> getTasks() {

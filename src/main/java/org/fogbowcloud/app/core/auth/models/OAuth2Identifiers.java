@@ -1,12 +1,13 @@
 package org.fogbowcloud.app.core.auth.models;
 
 import com.google.gson.annotations.SerializedName;
+
 import java.util.Objects;
 
 /**
  * An instance of this class is used to represent a client application that is authorized to
- * authenticate or made any other request in Iguassu. If a client application does not have the
- * correct information defined by this structure then such application client will not be allowed to
+ * authenticate or made any other request to Iguassu. If a client application does not have the
+ * correct information defined by this structure then such application will not be allowed to
  * authenticate to the Iguassu and therefore make future requests.
  */
 public class OAuth2Identifiers {
