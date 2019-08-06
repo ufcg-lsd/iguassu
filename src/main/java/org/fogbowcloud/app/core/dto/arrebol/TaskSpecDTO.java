@@ -1,6 +1,6 @@
 package org.fogbowcloud.app.core.dto.arrebol;
 
-import org.fogbowcloud.app.core.task.Specification;
+import org.fogbowcloud.app.core.models.task.Specification;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;

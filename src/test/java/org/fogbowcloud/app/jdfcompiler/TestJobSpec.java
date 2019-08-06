@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import java.io.File;
 
 import org.apache.log4j.BasicConfigurator;
-import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
+import org.fogbowcloud.app.core.models.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.DescriptionFileCompile;
 import org.junit.After;
 import org.junit.Before;

@@ -21,7 +21,7 @@ package org.fogbowcloud.app.jdfcompiler.semantic;
 
 import java.io.Serializable;
 
-import org.fogbowcloud.app.jdfcompiler.job.IOEntry;
+import org.fogbowcloud.app.jdfcompiler.io.IOEntry;
 
 /**
  * This entity handles the input and output entries for a task.

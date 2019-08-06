@@ -28,9 +28,9 @@ import java.util.Stack;
 
 import org.fogbowcloud.app.jdfcompiler.CompilerMessages;
 import org.fogbowcloud.app.jdfcompiler.exceptions.JobSpecificationException;
-import org.fogbowcloud.app.jdfcompiler.job.IOEntry;
-import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
-import org.fogbowcloud.app.jdfcompiler.job.TaskSpecification;
+import org.fogbowcloud.app.jdfcompiler.io.IOEntry;
+import org.fogbowcloud.app.core.models.job.JobSpecification;
+import org.fogbowcloud.app.core.models.job.TaskSpecification;
 import org.fogbowcloud.app.jdfcompiler.semantic.exception.SemanticException;
 import org.fogbowcloud.app.jdfcompiler.syntactical.CommonSyntacticalAnalyzer;
 import org.fogbowcloud.app.jdfcompiler.token.Token;
@@ -342,13 +342,6 @@ public class JDFSemanticActions implements SemanticActions {
         mode = CommonSyntacticalAnalyzer.MODE_READLINE;
     }
 
-    /** This action: sets the schedpath on the JobSpecification */
-    public void action29() {
-        LOG.debug("Calling 29");
-        theJob.setSchedPath(this.actualToken.getSymbol());
-        mode = CommonSyntacticalAnalyzer.MODE_NORMAL;
-    }
-
     /**
      * This action: Puts the value string for a attribute at the top of the stack.
      *
@@ -393,11 +386,6 @@ public class JDFSemanticActions implements SemanticActions {
     public void action33() {
         LOG.debug("Calling 33");
         this.blockCounter++;
-    }
-
-    public void action34() {
-        LOG.debug("Calling 34");
-        this.theJob.setSchedPath("");
     }
 
     // /////////// AUXILIAR METHODS /////////////////////

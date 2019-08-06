@@ -9,14 +9,14 @@ import org.fogbowcloud.app.api.exceptions.StorageException;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.api.http.services.FileStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
-import org.fogbowcloud.app.core.auth.models.User;
 import org.fogbowcloud.app.core.constants.GeneralConstants;
 import org.fogbowcloud.app.core.dto.JobResponseDTO;
 import org.fogbowcloud.app.core.dto.TaskDTO;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
-import org.fogbowcloud.app.core.task.Task;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
+import org.fogbowcloud.app.core.models.auth.User;
+import org.fogbowcloud.app.core.models.job.Job;
+import org.fogbowcloud.app.core.models.task.Task;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -66,7 +66,7 @@ public class JobController {
                     HttpStatus.UNAUTHORIZED);
         }
 
-        final List<JDFJob> allJobsOfUser = this.jobService.getAllJobs(user);
+        final Collection<Job> allJobsOfUser = this.jobService.getAllJobs(user);
         logger.debug("Retrieving all jobs of user [" + user.getIdentifier() + "]");
 
         final List<JobResponseDTO> jobsResponse = new LinkedList<>();
@@ -85,7 +85,7 @@ public class JobController {
                     String userCredentials)
             throws InvalidParameterException {
 
-        JDFJob job;
+        Job job;
         try {
             job = getJDFJob(jobId, userCredentials);
 
@@ -110,7 +110,7 @@ public class JobController {
                     @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
                     String userCredentials)
             throws InvalidParameterException {
-        JDFJob job;
+        Job job;
         try {
             job = getJDFJob(jobId, userCredentials);
 
@@ -120,7 +120,7 @@ public class JobController {
                     HttpStatus.UNAUTHORIZED);
         }
         logger.info("Retrieving tasks from job with id [" + jobId + "].");
-        List<TaskDTO> taskDTOS = toTasksDTOList(job.getTasksAsList());
+        Collection<TaskDTO> taskDTOS = toTasksDTOList(job.getTasks());
         return new ResponseEntity<>(taskDTOS, HttpStatus.OK);
     }
 
@@ -198,22 +198,26 @@ public class JobController {
 
         if (Objects.isNull(stoppedJobId)) {
             logger.info(
-                    "Could not find job with id " + jobId + " for user [" + user.getIdentifier() + "].");
+                    "Could not find job with id "
+                            + jobId
+                            + " for user ["
+                            + user.getIdentifier()
+                            + "].");
             throw new InvalidParameterException("Could not find job with id [" + jobId + "].");
         }
 
         return new ResponseEntity<>(new SimpleJobResponse(stoppedJobId), HttpStatus.ACCEPTED);
     }
 
-    private List<TaskDTO> toTasksDTOList(List<Task> tasks) {
-        final List<TaskDTO> l = new ArrayList<>();
+    private Collection<TaskDTO> toTasksDTOList(Collection<Task> tasks) {
+        final Collection<TaskDTO> l = new ArrayList<>();
         for (Task t : tasks) {
             l.add(new TaskDTO(t));
         }
         return l;
     }
 
-    private JDFJob getJDFJob(String jobId, String userCredentials)
+    private Job getJDFJob(String jobId, String userCredentials)
             throws InvalidParameterException, UnauthorizedRequestException {
         final User user = this.authService.authorizeUser(userCredentials);
 

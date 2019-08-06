@@ -1,9 +1,9 @@
 package org.fogbowcloud.app.jes.arrebol;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
+import org.fogbowcloud.app.core.models.job.JDFJob;
 import org.fogbowcloud.app.jes.JobExecutionService;
-import org.fogbowcloud.app.jes.arrebol.models.JobExecArrebol;
+import org.fogbowcloud.app.core.models.arrebol.JobExecArrebol;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 import org.fogbowcloud.app.jes.exceptions.JobSubmissionException;
 

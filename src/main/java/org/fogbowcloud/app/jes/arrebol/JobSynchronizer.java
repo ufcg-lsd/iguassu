@@ -1,14 +1,14 @@
 package org.fogbowcloud.app.jes.arrebol;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.command.Command;
-import org.fogbowcloud.app.core.command.CommandState;
-import org.fogbowcloud.app.core.task.Task;
-import org.fogbowcloud.app.core.task.TaskState;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.app.jdfcompiler.job.JobState;
+import org.fogbowcloud.app.core.models.command.Command;
+import org.fogbowcloud.app.core.models.command.CommandState;
+import org.fogbowcloud.app.core.models.task.Task;
+import org.fogbowcloud.app.core.models.task.TaskState;
+import org.fogbowcloud.app.core.models.job.JDFJob;
+import org.fogbowcloud.app.core.models.job.JobState;
 import org.fogbowcloud.app.jes.JobExecutionService;
-import org.fogbowcloud.app.jes.arrebol.models.*;
+import org.fogbowcloud.app.core.models.arrebol.*;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 import org.fogbowcloud.app.jes.exceptions.JobExecStatusException;
 

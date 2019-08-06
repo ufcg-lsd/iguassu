@@ -1,7 +1,7 @@
 package org.fogbowcloud.app.utils;
 
-import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
-import org.fogbowcloud.app.jdfcompiler.job.TaskSpecification;
+import org.fogbowcloud.app.core.models.job.JobSpecification;
+import org.fogbowcloud.app.core.models.job.TaskSpecification;
 import org.fogbowcloud.app.jdfcompiler.semantic.JDLCommand;
 import org.fogbowcloud.app.jdfcompiler.semantic.RemoteCommand;
 

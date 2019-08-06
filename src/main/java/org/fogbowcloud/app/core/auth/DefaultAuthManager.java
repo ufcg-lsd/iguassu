@@ -1,7 +1,7 @@
 package org.fogbowcloud.app.core.auth;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.auth.models.*;
+import org.fogbowcloud.app.core.models.auth.*;
 import org.fogbowcloud.app.core.constants.GeneralConstants;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 import org.fogbowcloud.app.utils.RandomString;

@@ -2,9 +2,9 @@ package org.fogbowcloud.app.core.routines;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.AuthManager;
-import org.fogbowcloud.app.core.auth.models.OAuthToken;
-import org.fogbowcloud.app.core.auth.models.SessionState;
-import org.fogbowcloud.app.core.auth.models.User;
+import org.fogbowcloud.app.core.models.auth.OAuthToken;
+import org.fogbowcloud.app.core.models.auth.SessionState;
+import org.fogbowcloud.app.core.models.auth.User;
 import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
 
 import java.time.Instant;

@@ -3,9 +3,7 @@ package org.fogbowcloud.app.core.routines;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.constants.ConfProperty;
-import org.fogbowcloud.app.core.datastore.JobDataStore;
-import org.fogbowcloud.app.core.datastore.OAuthTokenDataStore;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
+import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.jes.JobExecutionService;
 import org.fogbowcloud.app.jes.arrebol.ArrebolJobExecutionService;
 import org.fogbowcloud.app.jes.arrebol.JobSynchronizer;
@@ -25,22 +23,16 @@ public class DefaultRoutineManager implements RoutineManager {
 
     private final JobExecutionService jobExecutionService;
     private final Properties properties;
-    private final OAuthTokenDataStore oAuthTokenDataStore;
-    private final JobDataStore jobDataStore;
     private final AuthManager authManager;
-    private final Queue<JDFJob> jobsToSubmit;
+    private final Queue<Job> jobsToSubmit;
 
     public DefaultRoutineManager(
             Properties properties,
-            OAuthTokenDataStore oAuthTokenDataStore,
-            JobDataStore jobDataStore,
             AuthManager authManager,
-            Queue<JDFJob> jobsToSubmit) {
+            Queue<Job> jobsToSubmit) {
 
         this.properties = properties;
         this.jobExecutionService = new ArrebolJobExecutionService(this.properties);
-        this.oAuthTokenDataStore = oAuthTokenDataStore;
-        this.jobDataStore = jobDataStore;
         this.authManager = authManager;
         this.jobsToSubmit = jobsToSubmit;
     }

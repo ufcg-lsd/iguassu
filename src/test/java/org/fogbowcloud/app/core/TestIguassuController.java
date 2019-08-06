@@ -5,14 +5,14 @@ import static org.mockito.Mockito.*;
 
 import java.util.*;
 
-import org.fogbowcloud.app.core.auth.models.DefaultUser;
+import org.fogbowcloud.app.core.models.auth.DefaultUser;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
-import org.fogbowcloud.app.core.task.Specification;
-import org.fogbowcloud.app.core.task.Task;
-import org.fogbowcloud.app.core.task.TaskImpl;
-import org.fogbowcloud.app.core.task.TaskState;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.app.core.auth.models.User;
+import org.fogbowcloud.app.core.models.task.Specification;
+import org.fogbowcloud.app.core.models.task.Task;
+import org.fogbowcloud.app.core.models.task.TaskImpl;
+import org.fogbowcloud.app.core.models.task.TaskState;
+import org.fogbowcloud.app.core.models.job.JDFJob;
+import org.fogbowcloud.app.core.models.auth.User;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.After;

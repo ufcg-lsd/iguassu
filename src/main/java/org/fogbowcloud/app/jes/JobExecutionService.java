@@ -1,7 +1,7 @@
 package org.fogbowcloud.app.jes;
 
-import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.app.jes.arrebol.models.JobExecArrebol;
+import org.fogbowcloud.app.core.models.job.JDFJob;
+import org.fogbowcloud.app.core.models.arrebol.JobExecArrebol;
 
 /** Interface that defines job execution operations. */
 public interface JobExecutionService {

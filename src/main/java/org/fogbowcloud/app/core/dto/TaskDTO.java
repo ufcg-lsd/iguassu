@@ -2,10 +2,10 @@ package org.fogbowcloud.app.core.dto;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.fogbowcloud.app.core.command.Command;
-import org.fogbowcloud.app.core.task.Specification;
-import org.fogbowcloud.app.core.task.Task;
-import org.fogbowcloud.app.core.task.TaskState;
+import org.fogbowcloud.app.core.models.command.Command;
+import org.fogbowcloud.app.core.models.task.Specification;
+import org.fogbowcloud.app.core.models.task.Task;
+import org.fogbowcloud.app.core.models.task.TaskState;
 
 public class TaskDTO {
 

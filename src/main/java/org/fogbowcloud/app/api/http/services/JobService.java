@@ -2,9 +2,9 @@ package org.fogbowcloud.app.api.http.services;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.IguassuFacade;
-import org.fogbowcloud.app.core.auth.models.User;
+import org.fogbowcloud.app.core.models.auth.User;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
+import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -22,12 +22,12 @@ public class JobService {
 
     @Lazy @Autowired private IguassuFacade iguassuFacade;
 
-    public List<JDFJob> getAllJobs(User user) {
+    public List<Job> getAllJobs(User user) {
         return this.iguassuFacade.getAllJobs(user.getIdentifier());
     }
 
-    public JDFJob getJobById(String jobId, User user) throws InvalidParameterException {
-        JDFJob job = this.iguassuFacade.getJobById(jobId, user.getIdentifier());
+    public Job getJobById(String jobId, User user) throws InvalidParameterException {
+        Job job = this.iguassuFacade.getJobById(jobId, user.getIdentifier());
         if (Objects.isNull(job)) {
             logger.info(
                     "Could not find job with id " + jobId + " for user " + user.getIdentifier());

@@ -1,10 +1,11 @@
 package org.fogbowcloud.app.core.dto.arrebol;
 
-import org.fogbowcloud.app.core.task.Task;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
+import org.fogbowcloud.app.core.models.job.Job;
+import org.fogbowcloud.app.core.models.task.Task;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 /**
@@ -21,14 +22,14 @@ public class ArrebolExecutionDTO implements Serializable {
     private String label;
     private List<TaskSpecDTO> tasksSpecs;
 
-    public ArrebolExecutionDTO(JDFJob job) {
+    public ArrebolExecutionDTO(Job job) {
         this.tasksSpecs = new ArrayList<>();
         this.label = job.getLabel();
         populateTaskSpec(job);
     }
 
-    private void populateTaskSpec(JDFJob job) {
-        List<Task> taskList = job.getTasksAsList();
+    private void populateTaskSpec(Job job) {
+        Collection<Task> taskList = job.getTasks();
         for (Task task : taskList) {
             this.tasksSpecs.add(
                     new TaskSpecDTO(

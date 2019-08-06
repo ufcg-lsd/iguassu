@@ -1,9 +1,10 @@
 package org.fogbowcloud.app.core.dto;
 
+import org.fogbowcloud.app.core.models.job.Job;
+import org.fogbowcloud.app.core.models.job.JobState;
+
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
-import org.fogbowcloud.app.jdfcompiler.job.JobState;
 
 public class JobResponseDTO {
 
@@ -12,15 +13,15 @@ public class JobResponseDTO {
     private String creationDate;
     private JobState state;
 
-    public JobResponseDTO(JDFJob job) {
+    public JobResponseDTO(Job job) {
         setFields(job);
     }
 
-    private void setFields(JDFJob jdfJob) {
-        this.id = jdfJob.getId();
-        this.label = jdfJob.getLabel();
-        this.creationDate = timestampToDate(jdfJob.getTimeStamp());
-        this.state = jdfJob.getState();
+    private void setFields(Job job) {
+        this.id = job.getId();
+        this.label = job.getLabel();
+        this.creationDate = timestampToDate(job.getTimestamp());
+        this.state = job.getState();
     }
 
     public String getLabel() {
@@ -47,12 +48,12 @@ public class JobResponseDTO {
         this.state = state;
     }
 
-    public String getCreationDate(){
+    public String getCreationDate() {
         return this.creationDate;
     }
 
-    private String timestampToDate(long timestamp){
-        Date date = new java.util.Date(timestamp*1000L);
+    private String timestampToDate(long timestamp) {
+        Date date = new java.util.Date(timestamp * 1000L);
         SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         sdf.setTimeZone(java.util.TimeZone.getTimeZone("GMT-3"));
         return sdf.format(date);

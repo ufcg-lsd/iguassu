@@ -1,7 +1,7 @@
 package org.fogbowcloud.app.core.dto;
 
-import org.fogbowcloud.app.core.command.Command;
-import org.fogbowcloud.app.core.command.CommandState;
+import org.fogbowcloud.app.core.models.command.Command;
+import org.fogbowcloud.app.core.models.command.CommandState;
 
 public class CommandDTO {
 

@@ -1,9 +1,9 @@
 package org.fogbowcloud.app.core;
 
-import org.fogbowcloud.app.core.auth.models.OAuth2Identifiers;
-import org.fogbowcloud.app.core.auth.models.OAuthToken;
-import org.fogbowcloud.app.core.auth.models.User;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
+import org.fogbowcloud.app.core.models.auth.OAuth2Identifiers;
+import org.fogbowcloud.app.core.models.auth.OAuthToken;
+import org.fogbowcloud.app.core.models.auth.User;
+import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 
 import java.security.GeneralSecurityException;
@@ -21,7 +21,7 @@ public class IguassuFacade {
         this.iguassuController.init();
     }
 
-    public JDFJob getJobById(String jobId, String userId) {
+    public Job getJobById(String jobId, String userId) {
         return this.iguassuController.getJobById(jobId, userId);
     }
 
@@ -29,7 +29,7 @@ public class IguassuFacade {
         return this.iguassuController.submitJob(jdfFilePath, user);
     }
 
-    public ArrayList<JDFJob> getAllJobs(String userId) {
+    public ArrayList<Job> getAllJobs(String userId) {
         return this.iguassuController.getAllJobs(userId);
     }
 

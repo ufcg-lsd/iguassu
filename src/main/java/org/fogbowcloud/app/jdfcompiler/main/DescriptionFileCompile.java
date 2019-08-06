@@ -22,7 +22,7 @@ package org.fogbowcloud.app.jdfcompiler.main;
 import java.util.List;
 
 import org.fogbowcloud.app.jdfcompiler.CompilerMessages;
-import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
+import org.fogbowcloud.app.core.models.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
 
 /**

@@ -1,10 +1,10 @@
 package org.fogbowcloud.app.core.auth;
 
 import java.security.GeneralSecurityException;
-import org.fogbowcloud.app.core.auth.models.Credential;
-import org.fogbowcloud.app.core.auth.models.OAuth2Identifiers;
-import org.fogbowcloud.app.core.auth.models.OAuthToken;
-import org.fogbowcloud.app.core.auth.models.User;
+import org.fogbowcloud.app.core.models.auth.Credential;
+import org.fogbowcloud.app.core.models.auth.OAuth2Identifiers;
+import org.fogbowcloud.app.core.models.auth.OAuthToken;
+import org.fogbowcloud.app.core.models.auth.User;
 
 /**
  * This interface defines the operations that an authentication and authorization manager must have.
