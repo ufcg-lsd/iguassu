@@ -1,9 +1,9 @@
 package org.fogbowcloud.app.core.auth;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.models.auth.*;
-import org.fogbowcloud.app.datastore.OAuthTokenDBManager;
-import org.fogbowcloud.app.datastore.UserDBManager;
+import org.fogbowcloud.app.core.models.user.*;
+import org.fogbowcloud.app.datastore.managers.OAuthTokenDBManager;
+import org.fogbowcloud.app.datastore.managers.UserDBManager;
 import org.fogbowcloud.app.utils.RandomString;
 
 import java.security.GeneralSecurityException;
@@ -35,14 +35,14 @@ public class DefaultAuthManager implements AuthManager {
 
             String iguassuToken;
             if (Objects.nonNull(user)) {
-                logger.debug("Found user [" + user.getName() + "]");
+                logger.debug("Found user [" + user.getAlias() + "]");
                 if (user.isActive()) {
-                    logger.debug("User [" + user.getName() + "] is active and has a valid Iguassu Token.");
+                    logger.debug("User [" + user.getAlias() + "] is active and has a valid Iguassu Token.");
                 } else {
                     iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
-                    logger.debug("Generating a new Iguassu Token for the user [" + user.getName() + "].");
+                    logger.debug("Generating a new Iguassu Token for the user [" + user.getAlias() + "].");
                     user.changeSessionState(SessionState.ACTIVE);
-                    logger.debug("User [" + user.getName() + "] setting to active.");
+                    logger.debug("User [" + user.getAlias() + "] setting to active.");
                     user.updateToken(iguassuToken);
                     UserDBManager.getInstance().update(user);
                 }
@@ -70,11 +70,11 @@ public class DefaultAuthManager implements AuthManager {
             throw new GeneralSecurityException("The user couldn't be retrieved.");
         }
 
-        logger.debug("Authorizing user with identifier: [" + user.getName() + "]");
+        logger.debug("Authorizing user with identifier: [" + user.getAlias() + "]");
 
         if (!user.getIguassuToken().equalsIgnoreCase(credentials.getIguassuToken())) {
             throw new GeneralSecurityException(
-                    "User " + user.getName() + " not has a valid Iguassu token.");
+                    "User " + user.getAlias() + " not has a valid Iguassu token.");
         }
 
         return user;

@@ -1,7 +1,8 @@
-package org.fogbowcloud.app.datastore;
+package org.fogbowcloud.app.datastore.managers;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.models.job.Job;
+import org.fogbowcloud.app.datastore.DBManager;
 import org.fogbowcloud.app.datastore.repositories.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 

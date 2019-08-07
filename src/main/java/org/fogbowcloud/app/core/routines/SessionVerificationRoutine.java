@@ -2,11 +2,11 @@ package org.fogbowcloud.app.core.routines;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.AuthManager;
-import org.fogbowcloud.app.core.models.auth.OAuthToken;
-import org.fogbowcloud.app.core.models.auth.SessionState;
-import org.fogbowcloud.app.core.models.auth.User;
-import org.fogbowcloud.app.datastore.OAuthTokenDBManager;
-import org.fogbowcloud.app.datastore.UserDBManager;
+import org.fogbowcloud.app.core.models.user.OAuthToken;
+import org.fogbowcloud.app.core.models.user.SessionState;
+import org.fogbowcloud.app.core.models.user.User;
+import org.fogbowcloud.app.datastore.managers.OAuthTokenDBManager;
+import org.fogbowcloud.app.datastore.managers.UserDBManager;
 
 import java.time.Instant;
 import java.util.List;
@@ -44,7 +44,7 @@ public class SessionVerificationRoutine implements Runnable {
                 if ((Math.abs((now - currentUser.getSessionTime())) > oneHourInSeconds)
                         && currentUser.isActive()) {
                     logger.debug(
-                            "User [ " + currentUser.getName() + " ] defined as not active.");
+                            "User [ " + currentUser.getAlias() + " ] defined as not active.");
                     currentUser.changeSessionState(SessionState.EXPIRED);
                     UserDBManager.getInstance().update(currentUser);
                 }

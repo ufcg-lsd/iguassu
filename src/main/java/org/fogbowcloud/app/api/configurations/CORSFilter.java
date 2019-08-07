@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.api.configuration;
+package org.fogbowcloud.app.api.configurations;
 
 import static org.fogbowcloud.app.api.constants.CORSProperties.ALLOWED_CLIENT_FRONT_LOCAL;
 import static org.fogbowcloud.app.api.constants.CORSProperties.ALLOWED_CREDENTIALS_HEADER;

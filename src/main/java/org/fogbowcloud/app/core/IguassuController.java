@@ -3,15 +3,15 @@ package org.fogbowcloud.app.core;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.auth.DefaultAuthManager;
-import org.fogbowcloud.app.core.models.auth.Credential;
-import org.fogbowcloud.app.core.models.auth.OAuth2Identifiers;
-import org.fogbowcloud.app.core.models.auth.OAuthToken;
-import org.fogbowcloud.app.core.models.auth.User;
+import org.fogbowcloud.app.core.models.user.Credential;
+import org.fogbowcloud.app.core.models.user.OAuth2Identifiers;
+import org.fogbowcloud.app.core.models.user.OAuthToken;
+import org.fogbowcloud.app.core.models.user.User;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.job.JobSpecification;
 import org.fogbowcloud.app.core.routines.DefaultRoutineManager;
 import org.fogbowcloud.app.core.routines.RoutineManager;
-import org.fogbowcloud.app.datastore.UserDBManager;
+import org.fogbowcloud.app.datastore.managers.UserDBManager;
 import org.fogbowcloud.app.jdfcompiler.JobBuilder;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
@@ -58,7 +58,7 @@ public class IguassuController {
     }
 
     long submitJob(String jdfFilePath, User user) throws CompilerException {
-        logger.debug("Adding job of user " + user.getName() + " to buffer.");
+        logger.debug("Adding job of user " + user.getAlias() + " to buffer.");
 
         final Job job = buildJob(jdfFilePath, user);
         this.jobsToSubmit.offer(job);
@@ -67,12 +67,12 @@ public class IguassuController {
         return job.getId();
     }
 
-    Job buildJob(String jdfFilePath, User user) throws CompilerException {
+    private Job buildJob(String jdfFilePath, User user) throws CompilerException {
 
-        final String userIdentification = user.getName();
+        final String userIdentification = user.getAlias();
         Job job = new Job(new HashMap<>(), userIdentification, "");
 
-        logger.debug("Building job " + job.getId() + " of user " + user.getName() + " of jdf " + jdfFilePath);
+        logger.debug("Building job " + job.getId() + " of user " + user.getAlias() + " of jdf " + jdfFilePath);
         JobSpecification jobSpec = compile(jdfFilePath);
         JDFUtil.removeEmptySpaceFromVariables(jobSpec);
         OAuthToken oAuthToken = null;
@@ -170,13 +170,8 @@ public class IguassuController {
         return (JobSpecification) commonCompiler.getResult().get(0);
     }
 
-    private Job buildJobFromJDFFile(
-            Job job,
-            String jdfFilePath,
-            JobSpecification jobSpec,
-            String userId,
-            String externalOAuthToken,
-            Long tokenVersion) {
+    private Job buildJobFromJDFFile(Job job, String jdfFilePath, JobSpecification jobSpec, String userId,
+                                    String externalOAuthToken, Long tokenVersion) {
         try {
             this.jobBuilder.createJobFromJDFFile(
                     job, jdfFilePath, jobSpec, userId, externalOAuthToken, tokenVersion);
@@ -218,5 +213,9 @@ public class IguassuController {
         } catch (Exception e) {
             throw new GeneralSecurityException(e.getMessage());
         }
+    }
+
+    OAuthToken findUserOAuthTokenByAlias(String userAlias) {
+        return null;
     }
 }

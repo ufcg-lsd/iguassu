@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.models.arrebol;
+package org.fogbowcloud.app.jes.arrebol.models;
 
 import java.util.List;
 

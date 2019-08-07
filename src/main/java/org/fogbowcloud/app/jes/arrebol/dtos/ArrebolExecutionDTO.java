@@ -1,11 +1,10 @@
-package org.fogbowcloud.app.core.dto.arrebol;
+package org.fogbowcloud.app.jes.arrebol.dtos;
 
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.task.Task;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**

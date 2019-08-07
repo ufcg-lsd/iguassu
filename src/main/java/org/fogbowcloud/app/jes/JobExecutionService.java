@@ -1,6 +1,6 @@
 package org.fogbowcloud.app.jes;
 
-import org.fogbowcloud.app.core.models.arrebol.JobExecArrebol;
+import org.fogbowcloud.app.jes.arrebol.models.JobExecArrebol;
 import org.fogbowcloud.app.core.models.job.Job;
 
 /**

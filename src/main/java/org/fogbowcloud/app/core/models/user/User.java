@@ -1,5 +1,7 @@
-package org.fogbowcloud.app.core.models.auth;
+package org.fogbowcloud.app.core.models.user;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.annotations.SerializedName;
 import org.fogbowcloud.app.utils.TokenEncrypt;
 
 import javax.persistence.*;
@@ -11,32 +13,35 @@ import java.util.Objects;
 @Table(name = "user")
 public class User implements Serializable {
 
-    private static final String NAME_COLUMN_NAME = "name";
-    private static final String IGUASSU_TOKEN_COLUMN_NAME = "iguassu_token";
-    private static final String STATE_COLUMN_NAME = "state";
+    private static final String SESSION_STATE_COLUMN_NAME = "session_state";
     private static final String SESSION_TIME_COLUMN_NAME = "session_time";
-
-    @Column(name = NAME_COLUMN_NAME)
-    private final String name;
+    private static final String CREDENTIALS_ID_COLUMN_NAME = "credentials_id";
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Column(name = IGUASSU_TOKEN_COLUMN_NAME)
-    @Convert(converter = TokenEncrypt.class)
-    private String iguassuToken;
+    @Column
+    private final String alias;
 
-    @Column(name = STATE_COLUMN_NAME)
+    @Column
+    @OneToOne
+    @JoinColumn(name = CREDENTIALS_ID_COLUMN_NAME)
+    @Convert(converter = TokenEncrypt.class)
+    private Credential credentials;
+
+    @JsonIgnore
+    @Column(name = SESSION_STATE_COLUMN_NAME)
     @Enumerated(EnumType.STRING)
     private SessionState sessionState;
 
+    @JsonIgnore
     @Column(name = SESSION_TIME_COLUMN_NAME)
     private long sessionTime;
 
-    public User(String name, String iguassuToken) {
-        this.name = name;
-        this.iguassuToken = iguassuToken;
+    public User(String alias, Credential credentials) {
+        this.alias = alias;
+        this.credentials = credentials;
         this.resetSession();
         this.sessionState = SessionState.ACTIVE;
     }
@@ -44,8 +49,8 @@ public class User implements Serializable {
     /**
      * Retrieves the user identifier; must be non-null. It's unique and should not be mutated.
      */
-    public String getName() {
-        return this.name;
+    public String getAlias() {
+        return this.alias;
     }
 
     /**
@@ -60,13 +65,6 @@ public class User implements Serializable {
      */
     public void changeSessionState(SessionState state) {
         this.sessionState = state;
-    }
-
-    /**
-     * Retrieves the current secret token if the user already has one; must be non-null.
-     */
-    public String getIguassuToken() {
-        return this.iguassuToken;
     }
 
     /**
@@ -92,11 +90,19 @@ public class User implements Serializable {
      * Replaces the current secret token by a new.
      */
     public void updateToken(String token) {
-        this.iguassuToken = token;
+        this.credentials.setIguassuToken(token);
     }
 
     public long getId() {
         return id;
+    }
+
+    public Credential getCredentials() {
+        return credentials;
+    }
+
+    public void setCredentials(Credential credentials) {
+        this.credentials = credentials;
     }
 
     @Override
@@ -105,11 +111,11 @@ public class User implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
         return id == user.id &&
-                name.equals(user.name);
+                alias.equals(user.alias);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, id);
+        return Objects.hash(alias, id);
     }
 }

@@ -3,7 +3,7 @@ package org.fogbowcloud.app.core.routines;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.job.JobState;
-import org.fogbowcloud.app.datastore.JobDBManager;
+import org.fogbowcloud.app.datastore.managers.JobDBManager;
 import org.fogbowcloud.app.jes.JobExecutionService;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 
@@ -29,9 +29,7 @@ public class JobSubmissionRoutine implements Runnable {
     @Override
     public void run() {
         logger.debug(
-                "----> Running Job Submission Routine in thread with id ["
-                        + Thread.currentThread().getId()
-                        + "]");
+                "----> Running Job Submission Routine in thread with id [" + Thread.currentThread().getId() + "]");
         while (Objects.nonNull(this.jobsToSubmit.peek())) {
             Job job = this.jobsToSubmit.poll();
             logger.debug("Job found! Starting job submission with id [" + job.getId() + "]");
@@ -50,8 +48,8 @@ public class JobSubmissionRoutine implements Runnable {
             } catch (Exception e) {
                 job.setState(JobState.FAILED);
                 JobDBManager.getInstance().update(job);
-                logger.error("Error submitting job with id: [" + job.getId() + "]. Maybe the Job is poorly formed.",
-                        e);
+                logger.error("Error submitting job with id: [" + job.getId() + "]. " +
+                                "Maybe the Job is poorly formed.", e);
             }
         }
 

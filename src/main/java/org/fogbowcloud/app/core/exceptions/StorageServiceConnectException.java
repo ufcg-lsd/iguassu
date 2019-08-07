@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.api.exceptions;
+package org.fogbowcloud.app.core.exceptions;
 
 import org.apache.http.conn.HttpHostConnectException;
 

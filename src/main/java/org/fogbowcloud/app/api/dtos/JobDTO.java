@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.dto;
+package org.fogbowcloud.app.api.dtos;
 
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.job.JobState;
@@ -6,14 +6,14 @@ import org.fogbowcloud.app.core.models.job.JobState;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class JobResponseDTO {
+public class JobDTO {
 
     private long id;
     private String label;
     private String creationDate;
     private JobState state;
 
-    public JobResponseDTO(Job job) {
+    public JobDTO(Job job) {
         setFields(job);
     }
 

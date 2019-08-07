@@ -1,7 +1,8 @@
-package org.fogbowcloud.app.datastore;
+package org.fogbowcloud.app.datastore.managers;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.models.auth.OAuthToken;
+import org.fogbowcloud.app.core.models.user.OAuthToken;
+import org.fogbowcloud.app.datastore.DBManager;
 import org.fogbowcloud.app.datastore.repositories.OAuthTokenRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 

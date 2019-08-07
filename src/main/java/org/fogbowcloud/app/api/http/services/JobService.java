@@ -3,7 +3,7 @@ package org.fogbowcloud.app.api.http.services;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.IguassuFacade;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
-import org.fogbowcloud.app.core.models.auth.User;
+import org.fogbowcloud.app.core.models.user.User;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.datastore.repositories.JobRepository;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
@@ -33,7 +33,7 @@ public class JobService {
     }
 
     public Collection<Job> getJobsByUser(User user) {
-        return this.jobRepository.findByUserId(user.getName());
+        return this.jobRepository.findByUserId(user.getAlias());
     }
 
     public Job getJobById(String jobId, User user) throws InvalidParameterException {
@@ -41,7 +41,7 @@ public class JobService {
 //        this.iguassuFacade.getJobById(jobId, user.getIdentifier());
         if (Objects.isNull(job)) {
             logger.info(
-                    "Could not find job with id " + jobId + " for user " + user.getName());
+                    "Could not find job with id " + jobId + " for user " + user.getAlias());
             throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
         }
         return job;

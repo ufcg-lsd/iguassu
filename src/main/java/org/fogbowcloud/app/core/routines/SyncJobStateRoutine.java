@@ -3,7 +3,7 @@ package org.fogbowcloud.app.core.routines;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.job.JobState;
-import org.fogbowcloud.app.datastore.JobDBManager;
+import org.fogbowcloud.app.datastore.managers.JobDBManager;
 import org.fogbowcloud.app.jes.arrebol.Synchronizer;
 
 import java.util.List;

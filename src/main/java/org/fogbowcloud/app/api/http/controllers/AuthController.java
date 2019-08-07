@@ -4,23 +4,20 @@ import com.google.gson.Gson;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import java.security.GeneralSecurityException;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.Documentation;
-import org.fogbowcloud.app.api.exceptions.StorageServiceConnectException;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.core.constants.GeneralConstants;
-import org.fogbowcloud.app.core.dto.AuthDTO;
+import org.fogbowcloud.app.core.exceptions.StorageServiceConnectException;
+import org.fogbowcloud.app.core.models.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.security.GeneralSecurityException;
+import java.util.Objects;
 
 @RestController
 @RequestMapping(value = Documentation.Endpoint.AUTH)
@@ -42,23 +39,21 @@ public class AuthController {
             @ApiParam(value = Documentation.Auth.AUTHORIZATION_CODE) @RequestBody
                     String authorizationCode,
             @ApiParam(value = Documentation.CommonParameters.OAUTH_CREDENTIALS)
-                    @RequestHeader(value = GeneralConstants.X_AUTH_APP_IDENTIFIERS)
+            @RequestHeader(value = GeneralConstants.X_AUTH_APP_IDENTIFIERS)
                     String applicationIdentifiers) {
 
         try {
-            if (authorizationCode != null && !authorizationCode.trim().isEmpty()) {
+            if (Objects.nonNull(authorizationCode) && !authorizationCode.trim().isEmpty()) {
                 try {
-                    final AuthDTO userAuthenticatedInfo =
+                    final User userAuthenticated =
                             this.authService.authenticate(
                                     authorizationCode, applicationIdentifiers);
-                    logger.info(
-                            "User "
-                                    + userAuthenticatedInfo.getUserId()
-                                    + " authenticated successfully.");
+                    logger.info("User " + userAuthenticated.getAlias() + " authenticated successfully.");
                     Gson gson = new Gson();
-                    String response = gson.toJson(userAuthenticatedInfo, AuthDTO.class);
 
-                    return new ResponseEntity<>(response, HttpStatus.CREATED);
+                    final String response = gson.toJson(userAuthenticated, User.class);
+
+                    return new ResponseEntity<>(response, HttpStatus.OK);
                 } catch (GeneralSecurityException gse) {
                     return new ResponseEntity<>(
                             "The authentication failed with error [" + gse.getMessage() + "]",

@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.dto.arrebol;
+package org.fogbowcloud.app.jes.arrebol.dtos;
 
 import java.io.Serializable;
 import java.util.List;

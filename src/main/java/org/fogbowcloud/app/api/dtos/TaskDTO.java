@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.dto;
+package org.fogbowcloud.app.api.dtos;
 
 import org.fogbowcloud.app.core.models.command.Command;
 import org.fogbowcloud.app.core.models.task.Task;

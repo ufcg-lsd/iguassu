@@ -2,7 +2,7 @@ package org.fogbowcloud.app.api.http.services;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.api.exceptions.StorageException;
+import org.fogbowcloud.app.core.exceptions.StorageException;
 import org.fogbowcloud.app.core.constants.GeneralConstants;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

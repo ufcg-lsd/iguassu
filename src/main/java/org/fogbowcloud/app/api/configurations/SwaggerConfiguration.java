@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.api.configuration;
+package org.fogbowcloud.app.api.configurations;
 
 import static org.fogbowcloud.app.api.constants.Documentation.ApiInfo;
 

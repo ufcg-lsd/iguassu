@@ -1,7 +1,8 @@
-package org.fogbowcloud.app.datastore;
+package org.fogbowcloud.app.datastore.managers;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.models.auth.User;
+import org.fogbowcloud.app.core.models.user.User;
+import org.fogbowcloud.app.datastore.DBManager;
 import org.fogbowcloud.app.datastore.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -27,7 +28,7 @@ public class UserDBManager implements DBManager<User> {
     @Override
     public void save(User user) {
         this.userRepository.save(user);
-        logger.info("User " + user.getName() + " was saved.");
+        logger.info("User " + user.getAlias() + " was saved.");
     }
 
     @Override
@@ -43,7 +44,7 @@ public class UserDBManager implements DBManager<User> {
     public void update(User user) {
         this.userRepository.delete(user);
         this.userRepository.save(user);
-        logger.info("User " + user.getName() + " was updated.");
+        logger.info("User " + user.getAlias() + " was updated.");
     }
 
     @Override

@@ -1,7 +1,7 @@
 package org.fogbowcloud.app.jes.arrebol;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.models.arrebol.*;
+import org.fogbowcloud.app.jes.arrebol.models.*;
 import org.fogbowcloud.app.core.models.command.Command;
 import org.fogbowcloud.app.core.models.command.CommandState;
 import org.fogbowcloud.app.core.models.job.Job;

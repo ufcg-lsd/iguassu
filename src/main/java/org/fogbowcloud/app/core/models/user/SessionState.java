@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.models.auth;
+package org.fogbowcloud.app.core.models.user;
 
 /**
  * Possible states of a User Session. A Session is a valid time that the user can make requests to

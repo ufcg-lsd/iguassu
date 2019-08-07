@@ -5,16 +5,16 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.Documentation;
-import org.fogbowcloud.app.api.exceptions.StorageException;
+import org.fogbowcloud.app.core.exceptions.StorageException;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.api.http.services.FileStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
 import org.fogbowcloud.app.core.constants.GeneralConstants;
-import org.fogbowcloud.app.core.dto.JobResponseDTO;
-import org.fogbowcloud.app.core.dto.TaskDTO;
+import org.fogbowcloud.app.api.dtos.JobDTO;
+import org.fogbowcloud.app.api.dtos.TaskDTO;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
-import org.fogbowcloud.app.core.models.auth.User;
+import org.fogbowcloud.app.core.models.user.User;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.task.Task;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
@@ -68,11 +68,11 @@ public class JobController {
 
         final Collection<Job> allJobsOfUser = this.jobService.getJobsByUser(user);;
 //
-        logger.debug("Retrieving all jobs of user [" + user.getName() + "]");
+        logger.debug("Retrieving all jobs of user [" + user.getAlias() + "]");
 
-        final List<JobResponseDTO> jobsResponse = new LinkedList<>();
+        final List<JobDTO> jobsResponse = new LinkedList<>();
 
-        allJobsOfUser.forEach(job -> jobsResponse.add(new JobResponseDTO(job)));
+        allJobsOfUser.forEach(job -> jobsResponse.add(new JobDTO(job)));
 
         return new ResponseEntity<>(jobsResponse, HttpStatus.OK);
     }
@@ -96,7 +96,7 @@ public class JobController {
                     HttpStatus.UNAUTHORIZED);
         }
         logger.info("Retrieving job with id [" + jobId + "].");
-        return new ResponseEntity<>(new JobResponseDTO(job), HttpStatus.OK);
+        return new ResponseEntity<>(new JobDTO(job), HttpStatus.OK);
     }
 
     @GetMapping(
@@ -121,8 +121,8 @@ public class JobController {
                     HttpStatus.UNAUTHORIZED);
         }
         logger.info("Retrieving tasks from job with id [" + jobId + "].");
-        Collection<TaskDTO> taskDTOS = toTasksDTOList(job.getTasksAsList());
-        return new ResponseEntity<>(taskDTOS, HttpStatus.OK);
+        Collection<TaskDTO> taskRespons = toTasksDTOList(job.getTasksAsList());
+        return new ResponseEntity<>(taskRespons, HttpStatus.OK);
     }
 
     @PostMapping
@@ -155,8 +155,8 @@ public class JobController {
 
         final String jdf = fieldMap.get(GeneralConstants.JDF_FILE_PATH);
         if (Objects.isNull(jdf)) {
-            logger.info("Could not store  new job from user " + user.getName());
-            throw new StorageException("Could not store new job from user " + user.getName());
+            logger.info("Could not store  new job from user " + user.getAlias());
+            throw new StorageException("Could not store new job from user " + user.getAlias());
         }
 
         long jobId;

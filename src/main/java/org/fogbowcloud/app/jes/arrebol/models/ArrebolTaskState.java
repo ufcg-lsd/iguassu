@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.core.models.arrebol;
+package org.fogbowcloud.app.jes.arrebol.models;
 
 public enum ArrebolTaskState {
     PENDING, FAILED, FINISHED, RUNNING
