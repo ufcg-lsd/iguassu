@@ -4,14 +4,17 @@ import com.google.gson.annotations.SerializedName;
 
 import javax.persistence.*;
 import java.io.Serializable;
-import java.sql.Date;
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.Objects;
 
 /**
  * An instance of this class is used to represent the OAuth2 authentication response and the
  * security information user to communicate with the Storage Service.
  */
+
+@Entity
+@Table(name = "oauth_token")
 public class OAuthToken implements Serializable {
     private static final long INITIAL_VERSION = 0L;
     private static final String USER_ID = "user_id";

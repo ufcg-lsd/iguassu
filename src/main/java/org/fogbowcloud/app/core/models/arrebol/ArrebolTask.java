@@ -1,7 +1,7 @@
 package org.fogbowcloud.app.core.models.arrebol;
 
-
 public class ArrebolTask {
+
     private String id;
 
     private ArrebolTaskState state;
@@ -17,10 +17,18 @@ public class ArrebolTask {
     }
 
     public ArrebolTaskState getState() {
-        return state;
+        return this.state;
     }
 
-    public ArrebolTaskSpec getTaskSpec(){
+    public void setState(ArrebolTaskState state) {
+        this.state = state;
+    }
+
+    public ArrebolTaskSpec getTaskSpec() {
         return this.taskSpec;
+    }
+
+    public void setTaskSpec(ArrebolTaskSpec taskSpec) {
+        this.taskSpec = taskSpec;
     }
 }

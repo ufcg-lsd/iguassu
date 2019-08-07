@@ -34,7 +34,7 @@ public class ArrebolExecutionDTO implements Serializable {
             this.tasksSpecs.add(
                     new TaskSpecDTO(
                             task.getId(),
-                            task.getSpecification(),
+                            task.getRequirements(),
                             task.getAllCommandsInStr(),
                             task.getMetadata()));
         }

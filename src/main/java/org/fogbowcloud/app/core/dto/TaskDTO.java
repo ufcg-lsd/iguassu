@@ -1,33 +1,32 @@
 package org.fogbowcloud.app.core.dto;
 
+import org.fogbowcloud.app.core.models.command.Command;
+import org.fogbowcloud.app.core.models.task.Task;
+import org.fogbowcloud.app.core.models.task.TaskState;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
-import org.fogbowcloud.app.core.models.command.Command;
-import org.fogbowcloud.app.core.models.task.Specification;
-import org.fogbowcloud.app.core.models.task.Task;
-import org.fogbowcloud.app.core.models.task.TaskState;
 
 public class TaskDTO {
 
     private String id;
     private List<CommandDTO> commands;
-    private Specification specification;
+    private Map<String, String> requirements;
     private TaskState state;
     private Map<String, String> metadata;
 
-    public TaskDTO(Task task){
+    public TaskDTO(Task task) {
         this.id = task.getId();
         this.commands = toCommandDTOList(task.getCommands());
-        this.specification = task.getSpecification();
+        this.requirements = task.getRequirements();
         this.state = task.getState();
         this.metadata = task.getMetadata();
     }
 
-    private List<CommandDTO> toCommandDTOList(List<Command> commands){
+    private List<CommandDTO> toCommandDTOList(List<Command> commands) {
         List<CommandDTO> l = new ArrayList<>();
-        for(Command c : commands){
+        for (Command c : commands) {
             l.add(new CommandDTO(c));
         }
         return l;
@@ -41,10 +40,6 @@ public class TaskDTO {
         return commands;
     }
 
-    public Specification getSpecification() {
-        return specification;
-    }
-
     public TaskState getState() {
         return state;
     }
@@ -55,5 +50,13 @@ public class TaskDTO {
 
     public void setMetadata(Map<String, String> metadata) {
         this.metadata = metadata;
+    }
+
+    public Map<String, String> getRequirements() {
+        return requirements;
+    }
+
+    public void setRequirements(Map<String, String> requirements) {
+        this.requirements = requirements;
     }
 }

@@ -11,21 +11,23 @@ import java.util.Objects;
 @Table(name = "command")
 public class Command implements Serializable {
 
-    private static final long serialVersionUID = 5281647552435522413L;
+    private static final transient long serialVersionUID = 5281647552435522413L;
 
     private static final int UNDETERMINED_RESULT = Integer.MAX_VALUE;
-    private static final String COMMAND_COLUMN_NAME = "command";
+
     private static final String RAW_COMMAND_COLUMN_NAME = "raw_command";
-    private static final String STATE_COLUMN_NAME = "state_command";
-    private static final String EXIT_CODE_COLUMN_NAME = "state_command";
-    @Column(name = COMMAND_COLUMN_NAME)
-    private final String command;
-    @Column(name = RAW_COMMAND_COLUMN_NAME)
-    private final String rawCommand;
+    private static final String EXIT_CODE_COLUMN_NAME = "exit_code";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
-    @Column(name = STATE_COLUMN_NAME)
+
+    @Column
+    private final String command;
+
+    @Column(name = RAW_COMMAND_COLUMN_NAME)
+    private final String rawCommand;
+
     @Enumerated(EnumType.STRING)
     private CommandState state;
 

@@ -8,7 +8,6 @@ import org.fogbowcloud.app.core.models.command.Command;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.job.JobSpecification;
 import org.fogbowcloud.app.core.models.job.TaskSpecification;
-import org.fogbowcloud.app.core.models.task.Specification;
 import org.fogbowcloud.app.core.models.task.Task;
 import org.fogbowcloud.app.jdfcompiler.semantic.IOCommand;
 import org.fogbowcloud.app.jdfcompiler.semantic.JDLCommand;
@@ -60,18 +59,19 @@ public class JobBuilder {
                 jobRequirements = jobRequirements.replace("(", "").replace(")", "");
 
                 String image = getImageFromJobRequirements(jobRequirements);
-                Specification spec = new Specification(image, userId);
 
-                addAllRequirements(jobRequirements, spec);
+                Map<String, String> requirements = new HashMap<>();
+                requirements.put("image", image);
+                addAllRequirements(jobRequirements, requirements);
 
                 Map<String, Task> tasks = new HashMap<>();
                 for (TaskSpecification taskSpec : jobSpec.getTaskSpecs()) {
                     if (Thread.interrupted()) {
                         throw new InterruptedException();
                     }
-                    Task task = new Task(spec);
-                    task.getMetadata().put(JsonKey.JOB_ID.getKey(), String.valueOf(job.getId()));
-                    task.getMetadata().put(USER_KEY, job.getUserId());
+                    Task task = new Task(requirements);
+                    task.putMetadata(JsonKey.JOB_ID.getKey(), String.valueOf(job.getId()));
+                    task.putMetadata(USER_KEY, job.getUserId());
 
                     parseInitCommands(
                             taskSpec, task, userId, externalOAuthToken, tokenVersion);
@@ -81,7 +81,6 @@ public class JobBuilder {
                             taskSpec, task, userId, externalOAuthToken, tokenVersion);
 
                     tasks.put(task.getId(), task);
-                    logger.debug("Task spec:\n" + task.getSpecification().toString());
                 }
                 job.setTasks(tasks);
             } else {
@@ -95,18 +94,17 @@ public class JobBuilder {
         }
     }
 
-    private void addAllRequirements(String jobRequirements, Specification spec) {
-        for (String req : jobRequirements.split(REQUIREMENTS_SEPARATOR)) {
-            if (req != null && !req.isEmpty()) {
-                if (req.startsWith(DockerConstants.PREFIX_DOCKER_REQUIREMENTS)) {
-                    String requirements =
-                            spec.getRequirementValue(DockerConstants.METADATA_DOCKER_REQUIREMENTS);
-                    if (requirements == null) {
-                        spec.addRequirement(DockerConstants.METADATA_DOCKER_REQUIREMENTS, req);
+    private void addAllRequirements(String jobRequirements, Map<String, String> requirements) {
+        for (String jobRequirement : jobRequirements.split(REQUIREMENTS_SEPARATOR)) {
+            if (jobRequirement != null && !jobRequirement.isEmpty()) {
+                if (jobRequirement.startsWith(DockerConstants.PREFIX_DOCKER_REQUIREMENTS)) {
+                    String dockerValue = requirements.get(DockerConstants.METADATA_DOCKER_REQUIREMENTS);
+
+                    if (Objects.nonNull(dockerValue)) {
+                        requirements.put(DockerConstants.METADATA_DOCKER_REQUIREMENTS,
+                                requirements + REQUIREMENTS_CONCAT_STR + jobRequirement);
                     } else {
-                        spec.addRequirement(
-                                DockerConstants.METADATA_DOCKER_REQUIREMENTS,
-                                requirements + REQUIREMENTS_CONCAT_STR + req);
+                        requirements.put(DockerConstants.METADATA_DOCKER_REQUIREMENTS, jobRequirement);
                     }
                 }
             }
