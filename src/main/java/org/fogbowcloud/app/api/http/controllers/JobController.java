@@ -66,8 +66,9 @@ public class JobController {
                     HttpStatus.UNAUTHORIZED);
         }
 
-        final Collection<Job> allJobsOfUser = this.jobService.getAllJobs(user);
-        logger.debug("Retrieving all jobs of user [" + user.getIdentifier() + "]");
+        final Collection<Job> allJobsOfUser = this.jobService.getJobsByUser(user);;
+//
+        logger.debug("Retrieving all jobs of user [" + user.getName() + "]");
 
         final List<JobResponseDTO> jobsResponse = new LinkedList<>();
 
@@ -120,7 +121,7 @@ public class JobController {
                     HttpStatus.UNAUTHORIZED);
         }
         logger.info("Retrieving tasks from job with id [" + jobId + "].");
-        Collection<TaskDTO> taskDTOS = toTasksDTOList(job.getTasks());
+        Collection<TaskDTO> taskDTOS = toTasksDTOList(job.getTasksAsList());
         return new ResponseEntity<>(taskDTOS, HttpStatus.OK);
     }
 
@@ -154,8 +155,8 @@ public class JobController {
 
         final String jdf = fieldMap.get(GeneralConstants.JDF_FILE_PATH);
         if (Objects.isNull(jdf)) {
-            logger.info("Could not store  new job from user " + user.getIdentifier());
-            throw new StorageException("Could not store new job from user " + user.getIdentifier());
+            logger.info("Could not store  new job from user " + user.getName());
+            throw new StorageException("Could not store new job from user " + user.getName());
         }
 
         String jobId;
@@ -194,14 +195,15 @@ public class JobController {
                     HttpStatus.UNAUTHORIZED);
         }
 
-        final String stoppedJobId = this.jobService.stopJob(jobId, user.getIdentifier());
+        final String stoppedJobId = "";
+//        this.jobService.stopJob(jobId, user.getIdentifier());
 
         if (Objects.isNull(stoppedJobId)) {
             logger.info(
                     "Could not find job with id "
                             + jobId
                             + " for user ["
-                            + user.getIdentifier()
+                            + user.getName()
                             + "].");
             throw new InvalidParameterException("Could not find job with id [" + jobId + "].");
         }

@@ -39,22 +39,4 @@ public interface AuthManager {
      * @throws GeneralSecurityException if any information has a wrong shape or is expired.
      */
     User authorize(Credential credentials) throws GeneralSecurityException;
-
-    /**
-     * Stores a new user on the database.
-     *
-     * @param userId is the identifier of the user. Must be unique.
-     * @param token is the public token used to clients communicate with the Iguassu.
-     * @return an authorized user instance; May be null depending on the if the
-     */
-    User store(String userId, String token);
-
-    /**
-     * Returns the user if they have already authenticated before. May be null depending on the if
-     * the {@link User doesn't exist}.
-     */
-    User retrieve(String userId);
-
-    /** Replaces the state by the user state received in params. */
-    void update(User currentUser);
 }

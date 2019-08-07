@@ -1,20 +1,13 @@
 package org.fogbowcloud.app.core.models.task;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.models.command.Command;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * A task is a unit of a Job. A job is composed of an unordered set and allowing repetition of tasks
@@ -25,26 +18,48 @@ import org.json.JSONObject;
 public class Task {
 
     private static final Logger logger = Logger.getLogger(Task.class);
+    private static final String ID_COLUMN_NAME = "id";
+    private static final String SPECIFICATION_COLUMN_NAME = "specification";
+    private static final String STATE_COLUMN_NAME = "state";
+    private static final String COMMANDS_COLUMN_NAME = "commands";
+    private static final String METADATA_COLUMN_NAME = "metadata";
 
-    @Id @GeneratedValue private String id;
+    @Id
+    @GeneratedValue
+    @Column(name = ID_COLUMN_NAME)
+    private String id;
 
+    @OneToOne(cascade = CascadeType.ALL)
+    @Column(name = SPECIFICATION_COLUMN_NAME)
     private Specification specification;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = STATE_COLUMN_NAME)
     private TaskState state;
 
+    @Column(name = COMMANDS_COLUMN_NAME)
     private List<Command> commands;
+
+    @Column(name = METADATA_COLUMN_NAME)
     private Map<String, String> metadata;
 
-    public Task(String id, Specification specification, String uuid) {
-        this.commands = new ArrayList<>();
-        this.metadata = new HashMap<>();
-        this.id = id;
-        this.specification = specification;
-        this.state = TaskState.READY;
-        this.uuid = uuid;
+    public Task() {
     }
 
+    public Task(Specification specification) {
+        this.commands = new ArrayList<>();
+        this.metadata = new HashMap<>();
+        this.specification = specification;
+        this.state = TaskState.READY;
+    }
+
+    public List<Command> getCommands() {
+        return commands;
+    }
+
+    public void setCommands(List<Command> commands) {
+        this.commands = commands;
+    }
 
     public List<String> getAllCommandsInStr() {
         List<String> commandsStr = new ArrayList<>();
@@ -52,6 +67,46 @@ public class Task {
             commandsStr.add(command.getCommand());
         }
         return commandsStr;
+    }
+
+    public void putMetadata(String key, String value) {
+        this.metadata.put(key, value);
+    }
+
+    public void addCommand(Command command) {
+        this.commands.add(command);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    public Specification getSpecification() {
+        return specification;
+    }
+
+    public void setSpecification(Specification specification) {
+        this.specification = specification;
+    }
+
+    public TaskState getState() {
+        return state;
+    }
+
+    public void setState(TaskState state) {
+        this.state = state;
+    }
+
+    public Map<String, String> getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Map<String, String> metadata) {
+        this.metadata = metadata;
     }
 
     @Override

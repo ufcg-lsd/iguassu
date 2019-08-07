@@ -4,7 +4,9 @@ import com.google.gson.annotations.SerializedName;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.constants.JsonKey;
 import org.json.JSONObject;
+import org.springframework.data.annotation.Id;
 
+import javax.persistence.GeneratedValue;
 import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.Objects;
@@ -24,6 +26,10 @@ public class OAuthToken {
     private static final String ACCESS_TOKEN = "access_token";
     private static final String REFRESH_TOKEN = "refresh_token";
     private static final String EXPIRES_IN = "expires_in";
+
+    @Id
+    @GeneratedValue
+    private String id;
 
     /** An Access Token is used to make requests that can manipulate data in the Storage Service. */
     @SerializedName(ACCESS_TOKEN)
@@ -180,5 +186,13 @@ public class OAuthToken {
     public int hashCode() {
         return Objects.hash(
                 version, accessToken, refreshToken, userId, expirationTime, expirationDate);
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }

@@ -9,7 +9,6 @@ import org.fogbowcloud.app.core.models.auth.OAuthToken;
 import org.fogbowcloud.app.core.models.auth.User;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.job.JobSpecification;
-import org.fogbowcloud.app.core.models.task.Task;
 import org.fogbowcloud.app.core.routines.DefaultRoutineManager;
 import org.fogbowcloud.app.core.routines.RoutineManager;
 import org.fogbowcloud.app.jdfcompiler.JobBuilder;
@@ -37,7 +36,7 @@ public class IguassuController {
     public IguassuController(Properties properties) {
         this.properties = properties;
         this.jobsToSubmit = new ConcurrentLinkedQueue<>();
-        this.authManager = new DefaultAuthManager(this.properties, this.oAuthTokenDataStore);
+        this.authManager = new DefaultAuthManager(this.properties);
         this.jobBuilder = new JobBuilder(this.properties);
         this.nonceList = new ArrayList<>();
     }
@@ -51,36 +50,35 @@ public class IguassuController {
         routineManager.startAll();
     }
 
-    Job getJobById(String jobId, String user) {
-        return this.jobDataStore.getByJobId(jobId, user);
-    }
+//    Job getJobById(String jobId, String user) {
+//        return this.jobDataStore.getByJobId(jobId, user);
+//    }
 
     void updateUser(User user) {
         this.authManager.update(user);
     }
 
     String submitJob(String jdfFilePath, User user) throws CompilerException {
-        logger.debug("Adding job of user " + user.getIdentifier() + " to buffer.");
+        logger.debug("Adding job of user " + user.getName() + " to buffer.");
 
         final Job job = buildJob(jdfFilePath, user);
         this.jobsToSubmit.offer(job);
-        this.jobDataStore.insert(job);
+//        this.jobDataStore.insert(job);
 
         return job.getId();
     }
 
     Job buildJob(String jdfFilePath, User user) throws CompilerException {
 
-        final String userIdentification = user.getIdentifier();
-        final String jobId = UUID.randomUUID().toString();
-        Job job = new Job(jobId, new ArrayList<>(), userIdentification);
+        final String userIdentification = user.getName();
+        Job job = new Job(new HashMap<>(), userIdentification, "");
 
-        logger.debug("Building job " + job.getId() + " of user " + user.getIdentifier());
+        logger.debug("Building job " + job.getId() + " of user " + user.getName());
         JobSpecification jobSpec = compile(job.getId(), jdfFilePath);
         JDFUtil.removeEmptySpaceFromVariables(jobSpec);
         OAuthToken oAuthToken = null;
         try {
-            oAuthToken = getCurrentTokenByUserId(userIdentification);
+//            oAuthToken = getCurrentTokenByUserId(userIdentification);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -95,34 +93,34 @@ public class IguassuController {
                 oAuthToken.getVersion());
     }
 
-    ArrayList<Job> getAllJobs(String userId) {
-        return (ArrayList<Job>) this.jobDataStore.getAllByUserId(userId);
-    }
+//    ArrayList<Job> getAllJobs(String userId) {
+//        return (ArrayList<Job>) this.jobDataStore.getAllByUserId(userId);
+//    }
 
-    void updateJob(Job job) {
-        this.jobDataStore.update(job);
-    }
+//    void updateJob(Job job) {
+//        this.jobDataStore.update(job);
+//    }
 
-    String stopJob(String jobId, String userId) {
-        final int updateCount = this.jobDataStore.deleteByJobId(jobId, userId);
+//    String stopJob(String jobId, String userId) {
+//        final int updateCount = this.jobDataStore.deleteByJobId(jobId, userId);
+//
+//        if (updateCount >= 1) {
+//            return jobId;
+//        } else {
+//            logger.error("Job with id [" + jobId + "] not found in the Datastore.");
+//            return null;
+//        }
+//    }
 
-        if (updateCount >= 1) {
-            return jobId;
-        } else {
-            logger.error("Job with id [" + jobId + "] not found in the Datastore.");
-            return null;
-        }
-    }
-
-    Task getTaskById(String taskId, String userId) {
-        for (Job job : getAllJobs(userId)) {
-            Task task = job.getTaskById(taskId);
-            if (task != null) {
-                return task;
-            }
-        }
-        return null;
-    }
+//    Task getTaskById(String taskId, String userId) {
+////        for (Job job : getAllJobs(userId)) {
+////            Task task = job.getTaskById(taskId);
+//            if (task != null) {
+//                return task;
+//            }
+//        }
+//        return null;
+//    }
 
     User authorizeUser(String credentials) throws GeneralSecurityException {
         if (Objects.isNull(credentials)) {
@@ -130,10 +128,10 @@ public class IguassuController {
             return null;
         }
 
-        Credential credential;
+        Credential credential = null;
         try {
             JSONObject jsonObject = new JSONObject(credentials);
-            credential = Credential.fromJSON(jsonObject);
+//            credential = Credential.fromJSON(jsonObject);
         } catch (JSONException e) {
             logger.error("Invalid credentials format.", e);
             return null;
@@ -154,21 +152,21 @@ public class IguassuController {
         return nonce;
     }
 
-    JobDataStore getJobDataStore() {
-        return this.jobDataStore;
-    }
-
-    void storeOAuthToken(OAuthToken oAuthToken) {
-        this.oAuthTokenDataStore.insert(oAuthToken);
-    }
-
-    OAuthToken getCurrentTokenByUserId(String userId) {
-        return this.oAuthTokenDataStore.getCurrentTokenByUserId(userId);
-    }
-
-    void deleteOAuthToken(OAuthToken oAuthToken) {
-        this.oAuthTokenDataStore.deleteByAccessToken(oAuthToken.getAccessToken());
-    }
+//    JobDataStore getJobDataStore() {
+//        return this.jobDataStore;
+//    }
+//
+//    void storeOAuthToken(OAuthToken oAuthToken) {
+//        this.oAuthTokenDataStore.insert(oAuthToken);
+//    }
+//
+//    OAuthToken getCurrentTokenByUserId(String userId) {
+//        return this.oAuthTokenDataStore.getCurrentTokenByUserId(userId);
+//    }
+//
+//    void deleteOAuthToken(OAuthToken oAuthToken) {
+//        this.oAuthTokenDataStore.deleteByAccessToken(oAuthToken.getAccessToken());
+//    }
 
     private JobSpecification compile(String jobId, String jdfFilePath) throws CompilerException {
         CommonCompiler commonCompiler = new CommonCompiler();
@@ -196,7 +194,7 @@ public class IguassuController {
                             + "] was built with success at time: "
                             + System.currentTimeMillis());
 
-            job.finishCreation();
+//            job.finishCreation();
 
         } catch (Exception e) {
 
@@ -206,7 +204,7 @@ public class IguassuController {
                             + "] : at time: "
                             + System.currentTimeMillis(),
                     e);
-            job.failCreation();
+//            job.failCreation();
         }
 
         return job;

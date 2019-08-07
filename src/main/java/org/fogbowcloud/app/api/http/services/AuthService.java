@@ -48,7 +48,7 @@ public class AuthService {
                         this.iguassuFacade.authenticateUser(applicationIds, rawCode);
 
                 return new AuthDTO(
-                        userAuthenticated.getIdentifier(), userAuthenticated.getIguassuToken());
+                        userAuthenticated.getName(), userAuthenticated.getIguassuToken());
             } catch (Exception e) {
                 throw new GeneralSecurityException();
             }
@@ -65,7 +65,7 @@ public class AuthService {
             user = this.iguassuFacade.authorizeUser(userCredentials);
             user.resetSession();
             this.iguassuFacade.updateUser(user);
-            logger.info("Retrieving user " + user.getIdentifier());
+            logger.info("Retrieving user " + user.getName());
         } catch (GeneralSecurityException e) {
             logger.error("Error while trying authorize", e);
             throw new UnauthorizedRequestException(
@@ -78,7 +78,8 @@ public class AuthService {
     }
 
     public String refreshToken(String userId, Long version) throws Exception {
-        OAuthToken oAuthToken = this.iguassuFacade.getCurrentTokenByUserId(userId);
+        OAuthToken oAuthToken = null;
+//        this.iguassuFacade.getCurrentTokenByUserId(userId);
         if (Objects.isNull(oAuthToken)) {
             throw new UnauthorizedRequestException("Was not found token for user [" + userId + "]");
         }
@@ -102,8 +103,8 @@ public class AuthService {
         } catch (GeneralSecurityException gse) {
             throw new GeneralSecurityException(gse.getMessage());
         }
-        this.iguassuFacade.deleteOAuthToken(oAuthToken);
-        this.iguassuFacade.storeOAuthToken(refreshedToken);
+//        this.iguassuFacade.deleteOAuthToken(oAuthToken);
+//        this.iguassuFacade.storeOAuthToken(refreshedToken);
         return refreshedToken;
     }
 

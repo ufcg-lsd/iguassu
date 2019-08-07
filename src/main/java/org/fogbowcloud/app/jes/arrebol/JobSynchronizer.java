@@ -1,14 +1,14 @@
 package org.fogbowcloud.app.jes.arrebol;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.core.models.arrebol.*;
 import org.fogbowcloud.app.core.models.command.Command;
 import org.fogbowcloud.app.core.models.command.CommandState;
+import org.fogbowcloud.app.core.models.job.Job;
+import org.fogbowcloud.app.core.models.job.JobState;
 import org.fogbowcloud.app.core.models.task.Task;
 import org.fogbowcloud.app.core.models.task.TaskState;
-import org.fogbowcloud.app.core.models.job.JDFJob;
-import org.fogbowcloud.app.core.models.job.JobState;
 import org.fogbowcloud.app.jes.JobExecutionService;
-import org.fogbowcloud.app.core.models.arrebol.*;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 import org.fogbowcloud.app.jes.exceptions.JobExecStatusException;
 
@@ -16,8 +16,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-/** Sync local job state with it execution. */
-public class JobSynchronizer implements Synchronizer<JDFJob> {
+/**
+ * Sync local job state with it execution.
+ */
+public class JobSynchronizer implements Synchronizer<Job> {
 
     private static final Logger logger = Logger.getLogger(JobSynchronizer.class);
 
@@ -28,7 +30,7 @@ public class JobSynchronizer implements Synchronizer<JDFJob> {
     }
 
     @Override
-    public JDFJob sync(JDFJob job) {
+    public Job sync(Job job) {
 
         final String executionId = job.getExecutionId();
         if (Objects.nonNull(executionId) && !executionId.trim().isEmpty()) {
@@ -59,7 +61,7 @@ public class JobSynchronizer implements Synchronizer<JDFJob> {
         return job;
     }
 
-    private void updateJob(JDFJob job, JobExecArrebol jobExecArrebol) {
+    private void updateJob(Job job, JobExecArrebol jobExecArrebol) {
         updateTasks(job.getTasks(), jobExecArrebol.getTasks());
         logger.info("Updated tasks state from job [" + job.getId() + "].");
         updateJobState(job, jobExecArrebol.getState());
@@ -91,14 +93,14 @@ public class JobSynchronizer implements Synchronizer<JDFJob> {
         List<ArrebolCommand> arrebolCommands = arrebolTask.getTaskSpec().getCommands();
         for (int i = 0; i < arrebolCommands.size(); i++) {
             ArrebolCommand arrebolCmd = arrebolCommands.get(i);
-            Command command = iguassuTask.getAllCommands().get(i);
+            Command command = iguassuTask.getCommands().get(i);
             CommandState commandState = getCommandState(arrebolCmd.getState());
             command.setState(commandState);
             command.setExitCode(arrebolCmd.getExitcode());
         }
     }
 
-    private void updateJobState(JDFJob job, ExecutionState executionState) {
+    private void updateJobState(Job job, ExecutionState executionState) {
         JobState jobState = this.getJobState(executionState);
 
         if (jobState != null) {

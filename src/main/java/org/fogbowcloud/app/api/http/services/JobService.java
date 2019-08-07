@@ -2,16 +2,17 @@ package org.fogbowcloud.app.api.http.services;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.IguassuFacade;
-import org.fogbowcloud.app.core.models.auth.User;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
+import org.fogbowcloud.app.core.models.auth.User;
 import org.fogbowcloud.app.core.models.job.Job;
+import org.fogbowcloud.app.datastore.repositories.JobRepository;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.util.List;
+import java.util.Collection;
 import java.util.Objects;
 
 @Lazy
@@ -20,25 +21,35 @@ public class JobService {
 
     private final Logger logger = Logger.getLogger(JobService.class);
 
-    @Lazy @Autowired private IguassuFacade iguassuFacade;
+    @Lazy
+    @Autowired
+    private IguassuFacade iguassuFacade;
 
-    public List<Job> getAllJobs(User user) {
-        return this.iguassuFacade.getAllJobs(user.getIdentifier());
+    private JobRepository jobRepository;
+
+    @Autowired
+    public JobService(JobRepository jobRepository) {
+        this.jobRepository = jobRepository;
+    }
+
+    public Collection<Job> getJobsByUser(User user) {
+        return this.jobRepository.findByUserId(user.getName());
     }
 
     public Job getJobById(String jobId, User user) throws InvalidParameterException {
-        Job job = this.iguassuFacade.getJobById(jobId, user.getIdentifier());
+        Job job = null;
+//        this.iguassuFacade.getJobById(jobId, user.getIdentifier());
         if (Objects.isNull(job)) {
             logger.info(
-                    "Could not find job with id " + jobId + " for user " + user.getIdentifier());
+                    "Could not find job with id " + jobId + " for user " + user.getName());
             throw new InvalidParameterException("Could not find job with id '" + jobId + "'.");
         }
         return job;
     }
+//    public String stopJob(String jobId, String user) {
+//        return this.iguassuFacade.stopJob(jobId, user);
 
-    public String stopJob(String jobId, String user) {
-        return this.iguassuFacade.stopJob(jobId, user);
-    }
+//    }
 
     public String submitJob(String jdfFilePath, User user) throws CompilerException, IOException {
         return this.iguassuFacade.submitJob(jdfFilePath, user);

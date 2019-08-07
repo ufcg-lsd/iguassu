@@ -1,23 +1,24 @@
-package org.fogbowcloud.app.datastorage;
+package org.fogbowcloud.app.datastore;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.models.job.Job;
+import org.fogbowcloud.app.datastore.repositories.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class JobsDatabaseManager implements DatabaseManager<Job> {
+public class JobDBManager implements DBManager<Job> {
 
-    private static final Logger logger = Logger.getLogger(JobsDatabaseManager.class);
+    private static final Logger logger = Logger.getLogger(JobDBManager.class);
 
-    private static JobsDatabaseManager instance;
+    private static JobDBManager instance;
 
     @Autowired
     private JobRepository jobRepository;
 
-    private JobsDatabaseManager() {}
+    private JobDBManager() {}
 
-    public synchronized static JobsDatabaseManager getInstance() {
+    public synchronized static JobDBManager getInstance() {
         if (instance == null) {
-            instance = new JobsDatabaseManager();
+            instance = new JobDBManager();
         }
         return instance;
     }

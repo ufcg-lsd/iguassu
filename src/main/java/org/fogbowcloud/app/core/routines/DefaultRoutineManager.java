@@ -14,7 +14,9 @@ import java.util.Properties;
 import java.util.Queue;
 import java.util.concurrent.Executors;
 
-/** Default implementation of the RoutineManager */
+/**
+ * Default implementation of the RoutineManager
+ */
 public class DefaultRoutineManager implements RoutineManager {
     private static final long DEFAULT_INITIAL_DELAY_MS = 3000;
     private static final int DEFAULT_POOL_THREAD_NUMBER = 1;
@@ -60,8 +62,7 @@ public class DefaultRoutineManager implements RoutineManager {
         final ManagerTimer syncJobTimer =
                 new ManagerTimer(Executors.newScheduledThreadPool(DEFAULT_POOL_THREAD_NUMBER));
         SyncJobStateRoutine syncJobStateRoutine =
-                new SyncJobStateRoutine(
-                        this.jobDataStore, new JobSynchronizer(this.jobExecutionService));
+                new SyncJobStateRoutine(new JobSynchronizer(this.jobExecutionService));
         syncJobTimer.scheduleAtFixedRate(
                 syncJobStateRoutine, DEFAULT_INITIAL_DELAY_MS, SYNC_PERIOD);
     }
@@ -75,7 +76,7 @@ public class DefaultRoutineManager implements RoutineManager {
         final ManagerTimer verifySessionTimer =
                 new ManagerTimer(Executors.newScheduledThreadPool(DEFAULT_POOL_THREAD_NUMBER));
         SessionVerificationRoutine sessionVerificationRoutine =
-                new SessionVerificationRoutine(this.oAuthTokenDataStore, this.authManager);
+                new SessionVerificationRoutine(this.authManager);
         verifySessionTimer.scheduleAtFixedRate(
                 sessionVerificationRoutine, DEFAULT_INITIAL_DELAY_MS, VERIFICATION_PERIOD);
     }
@@ -89,8 +90,7 @@ public class DefaultRoutineManager implements RoutineManager {
         final ManagerTimer submissionJobTimer =
                 new ManagerTimer(Executors.newScheduledThreadPool(DEFAULT_POOL_THREAD_NUMBER));
         JobSubmissionRoutine jobSubmissionRoutine =
-                new JobSubmissionRoutine(
-                        this.jobDataStore, this.jobExecutionService, this.jobsToSubmit);
+                new JobSubmissionRoutine(this.jobExecutionService, this.jobsToSubmit);
         submissionJobTimer.scheduleAtFixedRate(
                 jobSubmissionRoutine, DEFAULT_INITIAL_DELAY_MS, SUBMISSION_PERIOD);
     }

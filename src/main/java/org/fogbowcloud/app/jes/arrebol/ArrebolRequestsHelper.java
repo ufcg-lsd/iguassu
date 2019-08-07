@@ -10,8 +10,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.constants.ConfProperty;
 import org.fogbowcloud.app.core.dto.arrebol.ArrebolExecutionDTO;
-import org.fogbowcloud.app.core.models.job.JDFJob;
 import org.fogbowcloud.app.core.models.arrebol.JobExecArrebol;
+import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 import org.fogbowcloud.app.jes.exceptions.JobExecStatusException;
 import org.fogbowcloud.app.jes.exceptions.JobSubmissionException;
@@ -43,10 +43,10 @@ final class ArrebolRequestsHelper {
      * @param job to be performed.
      * @return an execution identifier.
      * @throws UnsupportedEncodingException if the job in the params has a bad shape.
-     * @throws JobSubmissionException if the post request failed.
-     * @throws ArrebolConnectException if the Arrebol Job Execution Service is down.
+     * @throws JobSubmissionException       if the post request failed.
+     * @throws ArrebolConnectException      if the Arrebol Job Execution Service is down.
      */
-    String submitToExecution(JDFJob job)
+    String submitToExecution(Job job)
             throws UnsupportedEncodingException, JobSubmissionException, ArrebolConnectException {
         StringEntity requestBody;
 
@@ -86,9 +86,9 @@ final class ArrebolRequestsHelper {
      * Takes the status of the execution of a job.
      *
      * @param executionId is the identifier of the execution. Each job has a unique execution
-     *     identifier.
+     *                    identifier.
      * @return the current execution state in json string.
-     * @throws JobExecStatusException if the get request failed.
+     * @throws JobExecStatusException  if the get request failed.
      * @throws ArrebolConnectException if the Arrebol Job Execution Service is down.
      */
     JobExecArrebol getExecutionStatus(String executionId)
@@ -113,7 +113,7 @@ final class ArrebolRequestsHelper {
         return jobExecArrebol;
     }
 
-    private StringEntity makeJSONBody(JDFJob job) throws UnsupportedEncodingException {
+    private StringEntity makeJSONBody(Job job) throws UnsupportedEncodingException {
         logger.info("Building JSON body of Job : [" + job.getId() + "]");
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();

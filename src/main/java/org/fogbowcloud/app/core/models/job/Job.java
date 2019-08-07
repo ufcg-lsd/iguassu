@@ -6,7 +6,9 @@ import org.springframework.data.annotation.Id;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Entity
@@ -14,10 +16,12 @@ import java.util.Objects;
 public class Job implements Serializable {
     private static final String USER_ID_COLUMN_NAME = "user_id";
     private static final String JOB_ID_COLUMN_NAME = "job_id";
+    private static final String TASK_ID_COLUMN_NAME = "task_id";
     private static final String STATE_COLUMN_NAME = "state";
     private static final String TIMESTAMP_COLUMN_NAME = "timestamp";
     private static final String LABEL_COLUMN_NAME = "label";
     private static final String EXECUTION_ID_COLUMN_NAME = "execution_id";
+    private static final String TASKS_COLUMN_NAME = "tasks";
 
     @Id
     @GeneratedValue
@@ -26,11 +30,15 @@ public class Job implements Serializable {
     @Column(name = USER_ID_COLUMN_NAME)
     private String userId;
 
+    @ElementCollection
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @MapKeyColumn(name = TASK_ID_COLUMN_NAME)
     @JoinColumn(name = JOB_ID_COLUMN_NAME)
-    private Collection<Task> tasks;
+    @Column(name = TASKS_COLUMN_NAME)
+    private Map<String, Task> tasks;
 
     @Column(name = STATE_COLUMN_NAME)
+    @Enumerated(EnumType.STRING)
     private JobState state;
 
     @Column(name = TIMESTAMP_COLUMN_NAME)
@@ -42,9 +50,10 @@ public class Job implements Serializable {
     @Column(name = EXECUTION_ID_COLUMN_NAME)
     private String executionId;
 
-    public Job() {}
+    public Job() {
+    }
 
-    public Job(Collection<Task> tasks, String label, String userID) {
+    public Job(Map<String, Task> tasks, String label, String userID) {
         this.state = JobState.CREATED;
         this.tasks = tasks;
         this.label = label.trim().isEmpty() ? userID + "_job" : label;
@@ -68,12 +77,16 @@ public class Job implements Serializable {
         this.userId = userId;
     }
 
-    public Collection<Task> getTasks() {
+    public Map<String, Task> getTasks() {
         return tasks;
     }
 
-    public void setTasks(Collection<Task> tasks) {
+    public void setTasks(Map<String, Task> tasks) {
         this.tasks = tasks;
+    }
+
+    public List<Task> getTasksAsList() {
+        return new ArrayList<>(tasks.values());
     }
 
     public JobState getState() {

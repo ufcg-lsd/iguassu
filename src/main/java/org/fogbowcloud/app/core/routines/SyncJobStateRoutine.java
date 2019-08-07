@@ -1,14 +1,8 @@
 package org.fogbowcloud.app.core.routines;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.datastore.JobDataStore;
-import org.fogbowcloud.app.core.models.job.JDFJob;
-import org.fogbowcloud.app.core.models.job.JobState;
+import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.jes.arrebol.Synchronizer;
-
-import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * This routine is responsible for synchronizing the state of jobs with the state of their
@@ -17,11 +11,9 @@ import java.util.stream.Collectors;
 public class SyncJobStateRoutine implements Runnable {
 
     private static final Logger logger = Logger.getLogger(SyncJobStateRoutine.class);
-    private JobDataStore jobDataStore;
-    private Synchronizer<JDFJob> synchronizer;
+    private Synchronizer<Job> synchronizer;
 
-    SyncJobStateRoutine(JobDataStore jobDataStore, Synchronizer<JDFJob> synchronizer) {
-        this.jobDataStore = jobDataStore;
+    SyncJobStateRoutine(Synchronizer<Job> synchronizer) {
         this.synchronizer = synchronizer;
     }
 
@@ -31,38 +23,38 @@ public class SyncJobStateRoutine implements Runnable {
                 "----> Running Sync Job State Routine in thread with id ["
                         + Thread.currentThread().getId()
                         + "]");
-        final List<JDFJob> jobs = filterUsefulJobs();
+//        final List<Job> jobs = filterUsefulJobs();
 
-        for (JDFJob job : jobs) {
-            if (Objects.nonNull(job.getExecutionId()) && !job.getExecutionId().trim().isEmpty()) {
-                JDFJob jobUpdated = this.synchronizer.sync(job);
-                boolean updateResult = this.jobDataStore.update(jobUpdated);
+//        for (Job job : jobs) {
+//            if (Objects.nonNull(job.getExecutionId()) && !job.getExecutionId().trim().isEmpty()) {
+//                Job jobUpdated = this.synchronizer.sync(job);
+        // update job
 
-                if (updateResult) {
-                    logger.debug(
-                            "Job ["
-                                    + job.getId()
-                                    + "] was successfully synchronized with its execution ["
-                                    + job.getExecutionId()
-                                    + "].");
-                } else {
-                    logger.error(
-                            "The state of the job ["
-                                    + job.getId()
-                                    + "] was not synchronized with its execution.");
-                }
-            } else {
-                logger.debug("Job with id [" + job.getId() + "] has no associated execution.");
-            }
-        }
+//                if (updateResult) {
+//                    logger.debug(
+//                            "Job ["
+//                                    + job.getId()
+//                                    + "] was successfully synchronized with its execution ["
+//                                    + job.getExecutionId()
+//                                    + "].");
+//                } else {
+//                    logger.error(
+//                            "The state of the job ["
+//                                    + job.getId()
+//                                    + "] was not synchronized with its execution.");
+//                }
+//            } else {
+//                logger.debug("Job with id [" + job.getId() + "] has no associated execution.");
+//            }
+//    }
     }
 
-    private List<JDFJob> filterUsefulJobs() {
-        return this.jobDataStore.getAll().stream()
-                .filter(
-                        job ->
-                                !(job.getState().equals(JobState.FINISHED)
-                                        || job.getState().equals(JobState.FAILED)))
-                .collect(Collectors.toList());
-    }
+//    private List<Job> filterUsefulJobs() {
+//        return this.jobDataStore.getAll().stream()
+//                .filter(
+//                        job ->
+//                                !(job.getState().equals(JobState.FINISHED)
+//                                        || job.getState().equals(JobState.FAILED)))
+//                .collect(Collectors.toList());
+//    }
 }

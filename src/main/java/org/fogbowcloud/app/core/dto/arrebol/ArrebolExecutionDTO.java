@@ -29,14 +29,14 @@ public class ArrebolExecutionDTO implements Serializable {
     }
 
     private void populateTaskSpec(Job job) {
-        Collection<Task> taskList = job.getTasks();
+        List<Task> taskList = job.getTasksAsList();
         for (Task task : taskList) {
             this.tasksSpecs.add(
                     new TaskSpecDTO(
                             task.getId(),
                             task.getSpecification(),
                             task.getAllCommandsInStr(),
-                            task.getAllMetadata()));
+                            task.getMetadata()));
         }
     }
 

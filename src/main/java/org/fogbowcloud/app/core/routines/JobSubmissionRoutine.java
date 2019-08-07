@@ -1,8 +1,7 @@
 package org.fogbowcloud.app.core.routines;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.datastore.JobDataStore;
-import org.fogbowcloud.app.core.models.job.JDFJob;
+import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.job.JobState;
 import org.fogbowcloud.app.jes.JobExecutionService;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
@@ -17,15 +16,11 @@ import java.util.Queue;
 public class JobSubmissionRoutine implements Runnable {
 
     private static final Logger logger = Logger.getLogger(JobSubmissionRoutine.class);
-    private JobDataStore jobDataStore;
-    private JobExecutionService jobExecutionSystem;
-    private Queue<JDFJob> jobsToSubmit;
 
-    JobSubmissionRoutine(
-            JobDataStore jobDataStore,
-            JobExecutionService jobExecutionSystem,
-            Queue<JDFJob> jobsToSubmit) {
-        this.jobDataStore = jobDataStore;
+    private JobExecutionService jobExecutionSystem;
+    private Queue<Job> jobsToSubmit;
+
+    JobSubmissionRoutine(JobExecutionService jobExecutionSystem, Queue<Job> jobsToSubmit) {
         this.jobExecutionSystem = jobExecutionSystem;
         this.jobsToSubmit = jobsToSubmit;
     }
@@ -37,13 +32,13 @@ public class JobSubmissionRoutine implements Runnable {
                         + Thread.currentThread().getId()
                         + "]");
         while (Objects.nonNull(this.jobsToSubmit.peek())) {
-            JDFJob job = this.jobsToSubmit.poll();
+            Job job = this.jobsToSubmit.poll();
             logger.debug("Job found! Starting job submission with id [" + job.getId() + "]");
             try {
                 final String executionId = this.jobExecutionSystem.submit(job);
                 job.setExecutionId(executionId);
                 job.setState(JobState.SUBMITTED);
-                this.jobDataStore.update(job);
+                // update job in db
 
                 logger.info(
                         "Iguassu Job ["
@@ -58,7 +53,7 @@ public class JobSubmissionRoutine implements Runnable {
                 break;
             } catch (Exception e) {
                 job.setState(JobState.FAILED);
-                this.jobDataStore.update(job);
+                // update job in db
                 logger.error(
                         "Error submitting job with id: ["
                                 + job.getId()
