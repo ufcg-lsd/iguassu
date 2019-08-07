@@ -3,7 +3,6 @@ package org.fogbowcloud.app.core;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.auth.DefaultAuthManager;
-import org.fogbowcloud.app.core.constants.ConfProperty;
 import org.fogbowcloud.app.core.models.auth.Credential;
 import org.fogbowcloud.app.core.models.auth.OAuth2Identifiers;
 import org.fogbowcloud.app.core.models.auth.OAuthToken;
@@ -13,7 +12,7 @@ import org.fogbowcloud.app.core.models.job.JobSpecification;
 import org.fogbowcloud.app.core.models.task.Task;
 import org.fogbowcloud.app.core.routines.DefaultRoutineManager;
 import org.fogbowcloud.app.core.routines.RoutineManager;
-import org.fogbowcloud.app.jdfcompiler.JDFJobBuilder;
+import org.fogbowcloud.app.jdfcompiler.JobBuilder;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
@@ -32,14 +31,14 @@ public class IguassuController {
     private final Properties properties;
     private final AuthManager authManager;
     private final List<Integer> nonceList;
-    private final JDFJobBuilder jobBuilder;
+    private final JobBuilder jobBuilder;
     private final Queue<Job> jobsToSubmit;
 
     public IguassuController(Properties properties) {
         this.properties = properties;
         this.jobsToSubmit = new ConcurrentLinkedQueue<>();
         this.authManager = new DefaultAuthManager(this.properties, this.oAuthTokenDataStore);
-        this.jobBuilder = new JDFJobBuilder(this.properties);
+        this.jobBuilder = new JobBuilder(this.properties);
         this.nonceList = new ArrayList<>();
     }
 

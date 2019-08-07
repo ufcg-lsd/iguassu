@@ -9,7 +9,6 @@ import org.fogbowcloud.app.core.models.auth.DefaultUser;
 import org.fogbowcloud.app.core.datastore.JobDataStore;
 import org.fogbowcloud.app.core.models.task.Specification;
 import org.fogbowcloud.app.core.models.task.Task;
-import org.fogbowcloud.app.core.models.task.TaskImpl;
 import org.fogbowcloud.app.core.models.task.TaskState;
 import org.fogbowcloud.app.core.models.job.JDFJob;
 import org.fogbowcloud.app.core.models.auth.User;
@@ -50,7 +49,7 @@ public class TestIguassuController {
                 FAKE_IMAGE_FLAVOR_NAME,
                 FAKE_USER_ID
         );
-        Task task = new TaskImpl(FAKE_TASK_ID, spec, FAKE_UUID);
+        Task task = new Task(FAKE_TASK_ID, spec, FAKE_UUID);
         taskList.add(task);
 
         JDFJob job = new JDFJob(FAKE_USER_ID, taskList, "");
@@ -201,7 +200,7 @@ public class TestIguassuController {
     @Test
     public void testGetTaskById() {
 
-        Task task = new TaskImpl(FAKE_TASK_ID, new Specification(
+        Task task = new Task(FAKE_TASK_ID, new Specification(
                 FAKE_IMAGE_FLAVOR_NAME,
                 FAKE_USER_ID
         ), FAKE_UUID);
@@ -235,22 +234,22 @@ public class TestIguassuController {
         );
         List<String> taskIds = new ArrayList<>();
         JDFJob job = new JDFJob("testuser", new ArrayList<Task>(), "'this is a test user");
-        Task task = new TaskImpl("TaskNumber-" + 0 + "-" + UUID.randomUUID(), spec, "0000");
+        Task task = new Task("TaskNumber-" + 0 + "-" + UUID.randomUUID(), spec, "0000");
         task.setState(TaskState.READY);
         taskIds.add(task.getId());
         job.addTask(task);
 
-        task = new TaskImpl("TaskNumber-" + 1 + "-" + UUID.randomUUID(), spec, "0000");
+        task = new Task("TaskNumber-" + 1 + "-" + UUID.randomUUID(), spec, "0000");
         task.setState(TaskState.RUNNING);
         taskIds.add(task.getId());
         job.addTask(task);
 
-        task = new TaskImpl("TaskNumber-" + 2 + "-" + UUID.randomUUID(), spec, "0000");
+        task = new Task("TaskNumber-" + 2 + "-" + UUID.randomUUID(), spec, "0000");
         task.setState(TaskState.FINISHED);
         taskIds.add(task.getId());
         job.addTask(task);
 
-        task = new TaskImpl("TaskNumber-" + 5 + "-" + UUID.randomUUID(), spec, "0000");
+        task = new Task("TaskNumber-" + 5 + "-" + UUID.randomUUID(), spec, "0000");
         task.setState(TaskState.FAILED);
         taskIds.add(task.getId());
         job.addTask(task);

@@ -94,19 +94,6 @@ public class JobSpecification implements Serializable {
     }
 
     /**
-     * Constructor.
-     *
-     * @param label The label for the job.
-     * @param requirements The logical expression that defines the job. It will be used to choose
-     *     machines that are able to run its tasks. To define it well, check the OurGrid manual.
-     * @param taskSpecs A list with all the task specifications of this job.
-     */
-    public JobSpecification(String label, String requirements, List<TaskSpecification> taskSpecs)
-            throws JobSpecificationException {
-        this(label, requirements, taskSpecs, new LinkedHashMap<>());
-    }
-
-    /**
      * The constructor
      *
      * @param label The label for the job.
@@ -116,21 +103,6 @@ public class JobSpecification implements Serializable {
         this.requirements = "";
         this.taskSpecs = new ArrayList<>();
         this.annotations = CommonUtils.createSerializableMap();
-    }
-
-    /**
-     * Default JDL compliant constructor.
-     *
-     * @param tasks One or more {@link TaskSpecification} built from a JDL expression.
-     */
-    public JobSpecification(TaskSpecification... tasks) {
-        this("");
-        assert tasks != null : "Null tasks must not be produced by the JDL compiler";
-        assert tasks.length != 0 : "Empty tasks must not be produced by the JDL compiler";
-        assert !Arrays.asList(tasks).contains(null)
-                : "Null tasks must not be produced by the JDL compiler";
-
-        taskSpecs = new ArrayList<>(Arrays.asList(tasks));
     }
 
     /** @return A list with the tasks specification in this job. */

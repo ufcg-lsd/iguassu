@@ -19,7 +19,7 @@ import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
 import org.junit.Test;
 
-public class TestJDFJobBuilder {
+public class TestJobBuilder {
 
 	private static final String RESOURCE_DIR = "test" + File.separator + "resources";
 	private static final String SIMPLE_JOB_EXAMPLE = RESOURCE_DIR + File.separator + "SimpleJob2.jdf";
@@ -37,8 +37,8 @@ public class TestJDFJobBuilder {
 		commonCompiler.compile(SIMPLE_JOB_EXAMPLE, FileType.JDF);
 		JobSpecification jobSpec = (JobSpecification) commonCompiler.getResult().get(0);
 
-		JDFJobBuilder jdfJobBuilder = new JDFJobBuilder(properties);
-		jdfJobBuilder.createJobFromJDFFile(
+		JobBuilder jobBuilder = new JobBuilder(properties);
+		jobBuilder.createJobFromJDFFile(
 				testJob,
 				SIMPLE_JOB_EXAMPLE,
 				jobSpec,
