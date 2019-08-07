@@ -5,6 +5,8 @@ import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.datastore.repositories.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 public class JobDBManager implements DBManager<Job> {
 
     private static final Logger logger = Logger.getLogger(JobDBManager.class);
@@ -25,16 +27,26 @@ public class JobDBManager implements DBManager<Job> {
 
     @Override
     public void save(Job job) {
-
+        this.jobRepository.save(job);
     }
 
     @Override
-    public Job retrieveById(String id) {
-        return null;
+    public Job findOne(String id) {
+        return this.jobRepository.findOne(id);
+    }
+
+    public List<Job> findAll() {
+        return this.jobRepository.findAll();
     }
 
     @Override
     public void update(Job job) {
+        this.jobRepository.delete(job.getId());
+        this.jobRepository.save(job);
+    }
 
+    @Override
+    public void delete(String id) {
+        this.jobRepository.delete(id);
     }
 }

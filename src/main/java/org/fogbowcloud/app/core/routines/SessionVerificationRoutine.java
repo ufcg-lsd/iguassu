@@ -2,8 +2,15 @@ package org.fogbowcloud.app.core.routines;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.AuthManager;
+import org.fogbowcloud.app.core.models.auth.OAuthToken;
+import org.fogbowcloud.app.core.models.auth.SessionState;
+import org.fogbowcloud.app.core.models.auth.User;
+import org.fogbowcloud.app.datastore.OAuthTokenDBManager;
+import org.fogbowcloud.app.datastore.UserDBManager;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * This routine checks from time to time if the user has been inactive for a long time. If so, your
@@ -26,19 +33,22 @@ public class SessionVerificationRoutine implements Runnable {
                         + "]");
         final long now = Instant.now().getEpochSecond();
         final long oneHourInSeconds = 3600;
-//        for (final OAuthToken token : this.oAuthTokenDataStore.getAll()) {
-//            final User currentUser = this.authManager.retrieve(token.getUserId());
-//
-//            if (Objects.nonNull(currentUser)) {
-//
-//                if ((Math.abs((now - currentUser.getSessionTime())) > oneHourInSeconds)
-//                        && currentUser.isActive()) {
-//                    logger.debug(
-//                            "User [ " + currentUser.getIdentifier() + " ] defined as not active.");
-//                    currentUser.changeSessionState(SessionState.EXPIRED);
-//                    this.authManager.update(currentUser);
-//                }
-//            }
-//        }
+        final List<OAuthToken> allTokens = OAuthTokenDBManager.getInstance().findAll();
+
+
+        for (final OAuthToken token : allTokens) {
+            final User currentUser = UserDBManager.getInstance().findUserByName(token.getUserId());
+
+            if (Objects.nonNull(currentUser)) {
+
+                if ((Math.abs((now - currentUser.getSessionTime())) > oneHourInSeconds)
+                        && currentUser.isActive()) {
+                    logger.debug(
+                            "User [ " + currentUser.getName() + " ] defined as not active.");
+                    currentUser.changeSessionState(SessionState.EXPIRED);
+                    UserDBManager.getInstance().update(currentUser);
+                }
+            }
+        }
     }
 }

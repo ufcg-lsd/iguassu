@@ -30,8 +30,12 @@ public class UserDBManager implements DBManager<User> {
     }
 
     @Override
-    public User retrieveById(String id) {
-        return this.userRepository.findUserByIdentifier(id);
+    public User findOne(String id) {
+        return this.userRepository.findOne(id);
+    }
+
+    public User findUserByName(String name) {
+        return this.userRepository.findUserByName(name);
     }
 
     @Override
@@ -39,5 +43,10 @@ public class UserDBManager implements DBManager<User> {
         this.userRepository.delete(user);
         this.userRepository.save(user);
         logger.info("User " + user.getName() + " was updated.");
+    }
+
+    @Override
+    public void delete(String id) {
+        this.userRepository.delete(id);
     }
 }
