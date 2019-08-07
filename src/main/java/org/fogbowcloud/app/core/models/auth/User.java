@@ -1,7 +1,6 @@
 package org.fogbowcloud.app.core.models.auth;
 
 import org.fogbowcloud.app.utils.TokenEncrypt;
-import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -21,8 +20,8 @@ public class User implements Serializable {
     private final String name;
 
     @Id
-    @GeneratedValue
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @Column(name = IGUASSU_TOKEN_COLUMN_NAME)
     @Convert(converter = TokenEncrypt.class)
@@ -96,31 +95,21 @@ public class User implements Serializable {
         this.iguassuToken = token;
     }
 
-    public String getId() {
+    public long getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return sessionState == user.sessionState
-                && sessionTime == user.sessionTime
-                && name.equals(user.name)
-                && iguassuToken.equals(user.iguassuToken);
+        return id == user.id &&
+                name.equals(user.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, iguassuToken, sessionState, sessionTime);
+        return Objects.hash(name, id);
     }
 }

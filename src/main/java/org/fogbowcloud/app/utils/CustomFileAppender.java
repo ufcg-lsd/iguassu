@@ -5,8 +5,12 @@ import org.apache.log4j.FileAppender;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-/** Utility class for log4j configuration. */
+/**
+ * Utility class for log4j configuration.
+ */
 public class CustomFileAppender extends FileAppender {
+
+
     @Override
     public void setFile(String fileName) {
         if (fileName.contains("%timestamp")) {

@@ -127,7 +127,7 @@ public class JobController {
 
     @PostMapping
     @ApiOperation(value = Documentation.Job.CREATE_OPERATION)
-    public ResponseEntity<String> submitJob(
+    public ResponseEntity<?> submitJob(
             @ApiParam(value = Documentation.Job.CREATE_REQUEST_PARAM)
                     @RequestParam(GeneralConstants.JDF_FILE_PATH)
                     MultipartFile file,
@@ -159,7 +159,7 @@ public class JobController {
             throw new StorageException("Could not store new job from user " + user.getName());
         }
 
-        String jobId;
+        long jobId;
         final String jdfAbsolutePath = fieldMap.get(GeneralConstants.JDF_FILE_PATH);
         try {
             logger.info("jdfpath <" + jdfAbsolutePath + ">");
@@ -172,7 +172,9 @@ public class JobController {
             logger.error("Could not read JDF file.", e);
             throw new StorageException("Could not read JDF file.");
         }
-        return new ResponseEntity<>(jobId, HttpStatus.CREATED);
+
+
+        return new ResponseEntity<>(new SimpleJobResponse(jobId), HttpStatus.CREATED);
     }
 
     @DeleteMapping(value = Documentation.Endpoint.JOB_ID)
@@ -195,18 +197,8 @@ public class JobController {
                     HttpStatus.UNAUTHORIZED);
         }
 
-        final String stoppedJobId = "";
+        final long stoppedJobId = 0L;
 //        this.jobService.stopJob(jobId, user.getIdentifier());
-
-        if (Objects.isNull(stoppedJobId)) {
-            logger.info(
-                    "Could not find job with id "
-                            + jobId
-                            + " for user ["
-                            + user.getName()
-                            + "].");
-            throw new InvalidParameterException("Could not find job with id [" + jobId + "].");
-        }
 
         return new ResponseEntity<>(new SimpleJobResponse(stoppedJobId), HttpStatus.ACCEPTED);
     }
@@ -228,13 +220,13 @@ public class JobController {
 
     static class SimpleJobResponse {
 
-        private String id;
+        private long id;
 
-        SimpleJobResponse(String id) {
+        SimpleJobResponse(long id) {
             this.id = id;
         }
 
-        public String getId() {
+        public long getId() {
             return this.id;
         }
     }

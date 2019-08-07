@@ -70,15 +70,15 @@ public class JobBuilder {
                         throw new InterruptedException();
                     }
                     Task task = new Task(spec);
-                    task.getMetadata().put(JsonKey.JOB_ID.getKey(), job.getId());
+                    task.getMetadata().put(JsonKey.JOB_ID.getKey(), String.valueOf(job.getId()));
                     task.getMetadata().put(USER_KEY, job.getUserId());
 
                     parseInitCommands(
-                            job.getId(), taskSpec, task, userId, externalOAuthToken, tokenVersion);
+                            taskSpec, task, userId, externalOAuthToken, tokenVersion);
                     parseTaskCommands(
-                            job.getId(), taskSpec, task, userId, externalOAuthToken, tokenVersion);
+                            taskSpec, task, userId, externalOAuthToken, tokenVersion);
                     parseFinalCommands(
-                            job.getId(), taskSpec, task, userId, externalOAuthToken, tokenVersion);
+                            taskSpec, task, userId, externalOAuthToken, tokenVersion);
 
                     tasks.put(task.getId(), task);
                     logger.debug("Task spec:\n" + task.getSpecification().toString());
@@ -128,46 +128,44 @@ public class JobBuilder {
     /**
      * This method translates the JDF remote executable command into the JDL format
      *
-     * @param jobId    ID of the Job
      * @param taskSpec The task specification {@link TaskSpecification}
      * @param task     The output expression containing the JDL job
      */
-    private void parseTaskCommands(String jobId, TaskSpecification taskSpec, Task task,
+    private void parseTaskCommands(TaskSpecification taskSpec, Task task,
                                    String userId, String externalOAuthToken, Long tokenVersion) {
         List<JDLCommand> initBlocks = taskSpec.getTaskBlocks();
-        addCommands(initBlocks, jobId, task, userId, externalOAuthToken, tokenVersion);
+        addCommands(initBlocks, task, userId, externalOAuthToken, tokenVersion);
     }
 
     /**
      * It translates the input IOBlocks to JDL Input
      *
-     * @param jobId    ID of the Job
      * @param taskSpec The task specification {@link TaskSpecification}
      * @param task     The output expression containing the JDL job
      */
-    private void parseInitCommands(String jobId, TaskSpecification taskSpec, Task task,
+    private void parseInitCommands(TaskSpecification taskSpec, Task task,
                                    String userId,
                                    String externalOAuthToken, Long tokenVersion) {
         List<JDLCommand> initBlocks = taskSpec.getInitBlocks();
-        addCommands(initBlocks, jobId, task, userId, externalOAuthToken, tokenVersion);
+        addCommands(initBlocks, task, userId, externalOAuthToken, tokenVersion);
     }
 
-    private void addCommands(List<JDLCommand> initBlocks, String jobId, Task task, String userId,
+    private void addCommands(List<JDLCommand> initBlocks, Task task, String userId,
                              String externalOAuthToken, Long tokenVersion) {
         if (initBlocks == null) {
             return;
         }
         for (JDLCommand jdlCommand : initBlocks) {
             if (jdlCommand.getBlockType().equals(JDLCommandType.IO)) {
-                addIOCommands(jobId, task, (IOCommand) jdlCommand, userId, externalOAuthToken,
+                addIOCommands(task, (IOCommand) jdlCommand, userId, externalOAuthToken,
                         tokenVersion);
             } else {
-                addRemoteCommand(jobId, task, (RemoteCommand) jdlCommand);
+                addRemoteCommand(task, (RemoteCommand) jdlCommand);
             }
         }
     }
 
-    private void addIOCommands(String jobId, Task task, IOCommand command, String userId,
+    private void addIOCommands(Task task, IOCommand command, String userId,
                                String externalOAuthToken, Long tokenVersion) {
         String sourceFile = command.getEntry().getSourceFile();
         String destination = command.getEntry().getDestination();
@@ -181,39 +179,31 @@ public class JobBuilder {
                 logger.debug(rawCommand);
 
                 task.addCommand(uploadFileCommand);
-                logger.debug("JobId: " + jobId + " task: " + task.getId() + " upload command:"
-                        + uploadFileCommand.getCommand());
                 break;
             case "GET":
                 Command downloadFileCommand = downloadFileCommands(sourceFile, destination, userId,
                         externalOAuthToken, tokenVersion, rawCommand);
                 task.addCommand(downloadFileCommand);
-                logger.debug("JobId: " + jobId + " task: " + task.getId() + " download command:"
-                        + downloadFileCommand.getCommand());
                 break;
         }
     }
 
-    private void addRemoteCommand(String jobId, Task task, RemoteCommand remCommand) {
+    private void addRemoteCommand(Task task, RemoteCommand remCommand) {
         String commandStr = remCommand.getContent();
-
         Command command = new Command(commandStr);
-        logger.debug("JobId: " + jobId + " task: " + task.getId() + " remote command: "
-                + remCommand.getContent());
         task.addCommand(command);
     }
 
     /**
      * This method translates the Ourgrid output IOBlocks to JDL Input
      *
-     * @param jobId    ID of the Job
      * @param taskSpec The task specification {@link TaskSpecification}
      * @param task     The output expression containing the JDL job
      */
-    private void parseFinalCommands(String jobId, TaskSpecification taskSpec, Task task,
+    private void parseFinalCommands(TaskSpecification taskSpec, Task task,
                                     String userId, String externalOAuthToken, Long tokenVersion) {
         List<JDLCommand> initBlocks = taskSpec.getFinalBlocks();
-        addCommands(initBlocks, jobId, task, userId, externalOAuthToken, tokenVersion);
+        addCommands(initBlocks, task, userId, externalOAuthToken, tokenVersion);
     }
 
     private Command uploadFileCommands(String localFilePath, String filePathToUpload, String userId,

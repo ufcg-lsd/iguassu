@@ -11,13 +11,12 @@ import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.job.JobSpecification;
 import org.fogbowcloud.app.core.routines.DefaultRoutineManager;
 import org.fogbowcloud.app.core.routines.RoutineManager;
+import org.fogbowcloud.app.datastore.UserDBManager;
 import org.fogbowcloud.app.jdfcompiler.JobBuilder;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.utils.JDFUtil;
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.security.GeneralSecurityException;
 import java.util.*;
@@ -55,10 +54,10 @@ public class IguassuController {
 //    }
 
     void updateUser(User user) {
-        this.authManager.update(user);
+        UserDBManager.getInstance().update(user);
     }
 
-    String submitJob(String jdfFilePath, User user) throws CompilerException {
+    long submitJob(String jdfFilePath, User user) throws CompilerException {
         logger.debug("Adding job of user " + user.getName() + " to buffer.");
 
         final Job job = buildJob(jdfFilePath, user);
@@ -73,8 +72,8 @@ public class IguassuController {
         final String userIdentification = user.getName();
         Job job = new Job(new HashMap<>(), userIdentification, "");
 
-        logger.debug("Building job " + job.getId() + " of user " + user.getName());
-        JobSpecification jobSpec = compile(job.getId(), jdfFilePath);
+        logger.debug("Building job " + job.getId() + " of user " + user.getName() + " of jdf " + jdfFilePath);
+        JobSpecification jobSpec = compile(jdfFilePath);
         JDFUtil.removeEmptySpaceFromVariables(jobSpec);
         OAuthToken oAuthToken = null;
         try {
@@ -129,13 +128,7 @@ public class IguassuController {
         }
 
         Credential credential = null;
-        try {
-            JSONObject jsonObject = new JSONObject(credentials);
-//            credential = Credential.fromJSON(jsonObject);
-        } catch (JSONException e) {
-            logger.error("Invalid credentials format.", e);
-            return null;
-        }
+        // retrieve the user credentials
 
         User authenticatedUser = null;
         logger.debug("Checking nonce.");
@@ -168,12 +161,12 @@ public class IguassuController {
 //        this.oAuthTokenDataStore.deleteByAccessToken(oAuthToken.getAccessToken());
 //    }
 
-    private JobSpecification compile(String jobId, String jdfFilePath) throws CompilerException {
+    private JobSpecification compile(String jdfFilePath) throws CompilerException {
         CommonCompiler commonCompiler = new CommonCompiler();
         logger.debug(
-                "Job " + jobId + " compilation started at time: " + System.currentTimeMillis());
+                "Job " + jdfFilePath + " compilation started at time: " + System.currentTimeMillis());
         commonCompiler.compile(jdfFilePath, FileType.JDF);
-        logger.debug("Job " + jobId + " compilation ended at time: " + System.currentTimeMillis());
+        logger.debug("Job " + jdfFilePath + " compilation ended at time: " + System.currentTimeMillis());
         return (JobSpecification) commonCompiler.getResult().get(0);
     }
 

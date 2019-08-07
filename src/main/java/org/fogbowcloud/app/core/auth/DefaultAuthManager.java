@@ -31,7 +31,7 @@ public class DefaultAuthManager implements AuthManager {
             OAuthToken oAuthToken =
                     this.requestsHelper.getToken(oAuth2Identifiers, authorizationCode);
 
-            User user = UserDBManager.getInstance().findOne(oAuthToken.getUserId());
+            User user = UserDBManager.getInstance().findUserByName(oAuthToken.getUserId());
 
             String iguassuToken;
             if (Objects.nonNull(user)) {

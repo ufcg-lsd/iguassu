@@ -1,17 +1,16 @@
 package org.fogbowcloud.app;
 
-import java.util.Properties;
-
 import org.fogbowcloud.app.core.IguassuController;
 import org.fogbowcloud.app.core.IguassuFacade;
-import org.fogbowcloud.app.core.exceptions.IguassuException;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.data.rest.RepositoryRestMvcAutoConfiguration;
-import org.springframework.boot.system.ApplicationPidFileWriter;
+import org.springframework.boot.context.ApplicationPidFileWriter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Lazy;
+
+import java.util.Properties;
 
 @SpringBootApplication(exclude = RepositoryRestMvcAutoConfiguration.class)
 public class IguassuApplication {

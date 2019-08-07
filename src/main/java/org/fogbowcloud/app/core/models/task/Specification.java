@@ -1,47 +1,43 @@
 package org.fogbowcloud.app.core.models.task;
 
-import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.constants.JsonKey;
-import org.fogbowcloud.app.utils.JSONUtils;
-import org.json.JSONException;
-import org.json.JSONObject;
-
+import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Sets meta information about Jobs. */
+/**
+ * Sets meta information about Jobs.
+ */
+@Entity
+@Table(name = "specification")
 public class Specification implements Serializable {
 
-    private static final long serialVersionUID = 5255295548723927267L;
-    private static final Logger logger = Logger.getLogger(Specification.class);
-
     private static final String LN = System.lineSeparator();
+    private static final String DOCKER_IMAGE_COLUMN_NAME = "docker_image";
+    private static final String USER_ID_COLUMN_NAME = "user_id";
+    private static final String REQUIREMENTS_KEY_COLUMN_NAME = "requirements_key";
+    private static final String REQUIREMENTS_COLUMN_NAME = "requirements";
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
+
+    @Column(name = DOCKER_IMAGE_COLUMN_NAME)
     private String dockerImage;
+
+    @Column(name = USER_ID_COLUMN_NAME)
     private String userId;
 
+    @ElementCollection
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @MapKeyColumn(name = REQUIREMENTS_KEY_COLUMN_NAME)
+    @Column(name = REQUIREMENTS_COLUMN_NAME)
     private Map<String, String> requirements;
 
     public Specification(String dockerImage, String userId) {
         this.dockerImage = dockerImage;
         this.userId = userId;
         this.requirements = new HashMap<>();
-    }
-
-    public static Specification fromJSON(JSONObject specJSON) {
-        Specification specification =
-                new Specification(
-                        specJSON.optString(JsonKey.DOCKER_IMAGE.getKey()),
-                        specJSON.optString(JsonKey.USER_ID.getKey()));
-        HashMap<String, String> reqMap =
-                (HashMap<String, String>) toMap(specJSON.optString(JsonKey.REQUIREMENTS.getKey()));
-        specification.putAllRequirements(reqMap);
-        return specification;
-    }
-
-    private static Map<String, String> toMap(String jsonStr) {
-        return JSONUtils.toMap(jsonStr);
     }
 
     public void addRequirement(String key, String value) {
@@ -89,19 +85,6 @@ public class Specification implements Serializable {
         return sb.toString();
     }
 
-    public JSONObject toJSON() {
-        try {
-            JSONObject specification = new JSONObject();
-            specification.put(JsonKey.DOCKER_IMAGE.getKey(), this.getDockerImage());
-            specification.put(JsonKey.USER_ID.getKey(), this.getUserId());
-            specification.put(JsonKey.REQUIREMENTS.getKey(), getAllRequirements().toString());
-            return specification;
-        } catch (JSONException e) {
-            logger.debug("Error while trying to create a JSON from Specification", e);
-            return null;
-        }
-    }
-
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -127,5 +110,9 @@ public class Specification implements Serializable {
         if (userId == null) {
             return other.userId == null;
         } else return userId.equals(other.userId);
+    }
+
+    public long getId() {
+        return id;
     }
 }

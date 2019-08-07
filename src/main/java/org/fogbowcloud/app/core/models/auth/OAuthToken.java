@@ -1,12 +1,8 @@
 package org.fogbowcloud.app.core.models.auth;
 
 import com.google.gson.annotations.SerializedName;
-import org.springframework.data.annotation.Id;
 
-import javax.persistence.Column;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
+import javax.persistence.*;
 import java.io.Serializable;
 import java.sql.Date;
 import java.sql.Timestamp;
@@ -25,8 +21,8 @@ public class OAuthToken implements Serializable {
     private static final String EXPIRATION_DATE = "expiration_date";
 
     @Id
-    @GeneratedValue
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     /**
      * An Access Token is used to make requests that can manipulate data in the Storage Service.
@@ -148,12 +144,8 @@ public class OAuthToken implements Serializable {
         this.version = version;
     }
 
-    public String getId() {
+    public long getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     @Override

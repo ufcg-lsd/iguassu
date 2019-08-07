@@ -1,7 +1,6 @@
 package org.fogbowcloud.app.core.models.job;
 
 import org.fogbowcloud.app.core.models.task.Task;
-import org.springframework.data.annotation.Id;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -24,8 +23,8 @@ public class Job implements Serializable {
     private static final String TASKS_COLUMN_NAME = "tasks";
 
     @Id
-    @GeneratedValue
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
     @Column(name = USER_ID_COLUMN_NAME)
     private String userId;
@@ -61,12 +60,8 @@ public class Job implements Serializable {
         this.timestamp = Instant.now().getEpochSecond();
     }
 
-    public String getId() {
+    public long getId() {
         return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
     }
 
     public String getUserId() {
@@ -125,17 +120,14 @@ public class Job implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Job job = (Job) o;
-
-        if (!Objects.equals(id, job.id)) return false;
-        return Objects.equals(userId, job.userId);
+        return id == job.id &&
+                userId.equals(job.userId) &&
+                executionId.equals(job.executionId);
     }
 
     @Override
     public int hashCode() {
-        int result = id != null ? id.hashCode() : 0;
-        result = 31 * result + (userId != null ? userId.hashCode() : 0);
-        return result;
+        return Objects.hash(id, userId, executionId);
     }
 }

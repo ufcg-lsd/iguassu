@@ -13,7 +13,8 @@ public class UserDBManager implements DBManager<User> {
     @Autowired
     private UserRepository userRepository;
 
-    private UserDBManager() {}
+    private UserDBManager() {
+    }
 
     public synchronized static UserDBManager getInstance() {
         if (instance == null) {
@@ -30,8 +31,8 @@ public class UserDBManager implements DBManager<User> {
     }
 
     @Override
-    public User findOne(String id) {
-        return this.userRepository.findOne(id);
+    public User findOne(long id) {
+        return this.userRepository.findById(id).isPresent() ? this.userRepository.findById(id).get() : null;
     }
 
     public User findUserByName(String name) {
@@ -46,7 +47,7 @@ public class UserDBManager implements DBManager<User> {
     }
 
     @Override
-    public void delete(String id) {
-        this.userRepository.delete(id);
+    public void delete(long id) {
+        this.userRepository.deleteById(id);
     }
 }

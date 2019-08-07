@@ -32,8 +32,8 @@ public class OAuthTokenDBManager implements DBManager<OAuthToken> {
     }
 
     @Override
-    public OAuthToken findOne(String id) {
-        return this.oAuthTokenRepository.findOne(id);
+    public OAuthToken findOne(long id) {
+        return this.oAuthTokenRepository.findById(id).isPresent() ? this.oAuthTokenRepository.findById(id).get() : null;
     }
 
     public OAuthToken findByUserId(String userId) {
@@ -46,12 +46,12 @@ public class OAuthTokenDBManager implements DBManager<OAuthToken> {
 
     @Override
     public void update(OAuthToken oAuthToken) {
-        this.oAuthTokenRepository.delete(oAuthToken.getId());
+        this.oAuthTokenRepository.deleteById(oAuthToken.getId());
         this.oAuthTokenRepository.save(oAuthToken);
     }
 
     @Override
-    public void delete(String id) {
-        this.oAuthTokenRepository.delete(id);
+    public void delete(long id) {
+        this.oAuthTokenRepository.deleteById(id);
     }
 }

@@ -25,7 +25,7 @@ public class IguassuFacade {
 //        return this.iguassuController.getJobById(jobId, userId);
 //    }
 
-    public String submitJob(String jdfFilePath, User user) throws CompilerException {
+    public long submitJob(String jdfFilePath, User user) throws CompilerException {
         return this.iguassuController.submitJob(jdfFilePath, user);
     }
 

@@ -4,10 +4,10 @@ public interface DBManager<T> {
 
     void save(T t);
 
-    T findOne(String id);
+    T findOne(long id);
 
     void update(T t);
 
-    void delete(String id);
+    void delete(long id);
 
 }

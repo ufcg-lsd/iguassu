@@ -31,8 +31,8 @@ public class JobDBManager implements DBManager<Job> {
     }
 
     @Override
-    public Job findOne(String id) {
-        return this.jobRepository.findOne(id);
+    public Job findOne(long id) {
+        return this.jobRepository.findById(id).isPresent() ? this.jobRepository.findById(id).get() : null;
     }
 
     public List<Job> findAll() {
@@ -41,12 +41,12 @@ public class JobDBManager implements DBManager<Job> {
 
     @Override
     public void update(Job job) {
-        this.jobRepository.delete(job.getId());
+        this.jobRepository.deleteById(job.getId());
         this.jobRepository.save(job);
     }
 
     @Override
-    public void delete(String id) {
-        this.jobRepository.delete(id);
+    public void delete(long id) {
+        this.jobRepository.deleteById(id);
     }
 }

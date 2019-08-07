@@ -51,7 +51,7 @@ public class JobService {
 
 //    }
 
-    public String submitJob(String jdfFilePath, User user) throws CompilerException, IOException {
+    public long submitJob(String jdfFilePath, User user) throws CompilerException, IOException {
         return this.iguassuFacade.submitJob(jdfFilePath, user);
     }
 }
