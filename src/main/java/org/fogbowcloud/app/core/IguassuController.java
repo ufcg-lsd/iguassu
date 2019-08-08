@@ -3,20 +3,22 @@ package org.fogbowcloud.app.core;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.auth.DefaultAuthManager;
+import org.fogbowcloud.app.core.datastore.managers.UserDBManager;
+import org.fogbowcloud.app.core.exceptions.UserNotExistException;
+import org.fogbowcloud.app.core.models.job.Job;
+import org.fogbowcloud.app.core.models.job.JobSpecification;
 import org.fogbowcloud.app.core.models.user.Credential;
 import org.fogbowcloud.app.core.models.user.OAuth2Identifiers;
 import org.fogbowcloud.app.core.models.user.OAuthToken;
 import org.fogbowcloud.app.core.models.user.User;
-import org.fogbowcloud.app.core.models.job.Job;
-import org.fogbowcloud.app.core.models.job.JobSpecification;
 import org.fogbowcloud.app.core.routines.DefaultRoutineManager;
 import org.fogbowcloud.app.core.routines.RoutineManager;
-import org.fogbowcloud.app.datastore.managers.UserDBManager;
 import org.fogbowcloud.app.jdfcompiler.JobBuilder;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.utils.JDFUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.security.GeneralSecurityException;
 import java.util.*;
@@ -26,26 +28,34 @@ public class IguassuController {
 
     private static final Logger logger = Logger.getLogger(IguassuController.class);
 
-    private final Properties properties;
-    private final AuthManager authManager;
+    private static IguassuController instance;
+
+    @Autowired
+    private Properties properties;
+
     private final List<Integer> nonceList;
-    private final JobBuilder jobBuilder;
     private final Queue<Job> jobsToSubmit;
 
-    public IguassuController(Properties properties) {
-        this.properties = properties;
+    private AuthManager authManager;
+    private JobBuilder jobBuilder;
+
+    private IguassuController() {
         this.jobsToSubmit = new ConcurrentLinkedQueue<>();
-        this.authManager = new DefaultAuthManager(this.properties);
-        this.jobBuilder = new JobBuilder(this.properties);
         this.nonceList = new ArrayList<>();
     }
 
-    public void init() {
-        final RoutineManager routineManager =
-                new DefaultRoutineManager(
-                        this.properties,
-                        this.authManager,
-                        this.jobsToSubmit);
+    public static IguassuController getInstance() {
+        if (instance == null) {
+            instance = new IguassuController();
+        }
+        return instance;
+    }
+
+    public void init(Properties properties) {
+        this.properties = properties;
+        this.authManager = new DefaultAuthManager(this.properties);
+        this.jobBuilder = new JobBuilder(this.properties);
+        final RoutineManager routineManager = new DefaultRoutineManager(this.properties, this.jobsToSubmit);
         routineManager.startAll();
     }
 
@@ -121,7 +131,7 @@ public class IguassuController {
 //        return null;
 //    }
 
-    User authorizeUser(String credentials) throws GeneralSecurityException {
+    User authorizeUser(String credentials) throws GeneralSecurityException, UserNotExistException {
         if (Objects.isNull(credentials)) {
             logger.error("Invalid credentials. The fields are null.");
             return null;
@@ -139,11 +149,6 @@ public class IguassuController {
         return authenticatedUser;
     }
 
-    int getNonce() {
-        final int nonce = UUID.randomUUID().hashCode();
-        this.nonceList.add(nonce);
-        return nonce;
-    }
 
 //    JobDataStore getJobDataStore() {
 //        return this.jobDataStore;
@@ -201,10 +206,16 @@ public class IguassuController {
     User authenticateUser(OAuth2Identifiers oAuth2Identifiers, String authorizationCode)
             throws GeneralSecurityException {
         try {
-            return this.authManager.authenticate(oAuth2Identifiers, authorizationCode);
+            return this.authManager.authenticate(oAuth2Identifiers, authorizationCode, this.getNonce());
         } catch (Exception gse) {
             throw new GeneralSecurityException(gse.getMessage());
         }
+    }
+
+    int getNonce() {
+        final int nonce = UUID.randomUUID().hashCode();
+        this.nonceList.add(nonce);
+        return nonce;
     }
 
     OAuthToken refreshToken(OAuthToken oAuthToken) throws GeneralSecurityException {

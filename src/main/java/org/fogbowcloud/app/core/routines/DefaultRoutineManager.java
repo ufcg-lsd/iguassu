@@ -25,17 +25,14 @@ public class DefaultRoutineManager implements RoutineManager {
 
     private final JobExecutionService jobExecutionService;
     private final Properties properties;
-    private final AuthManager authManager;
     private final Queue<Job> jobsToSubmit;
 
     public DefaultRoutineManager(
             Properties properties,
-            AuthManager authManager,
             Queue<Job> jobsToSubmit) {
 
         this.properties = properties;
         this.jobExecutionService = new ArrebolJobExecutionService(this.properties);
-        this.authManager = authManager;
         this.jobsToSubmit = jobsToSubmit;
     }
 
@@ -53,7 +50,7 @@ public class DefaultRoutineManager implements RoutineManager {
     }
 
     private void startSyncJobRoutine() {
-        logger.debug("----> Starting Sync Job State Routine...");
+        logger.info("----> Starting Sync Job State Routine...");
         final long SYNC_PERIOD =
                 Long.parseLong(
                         this.properties.getProperty(
@@ -68,7 +65,7 @@ public class DefaultRoutineManager implements RoutineManager {
     }
 
     private void startSessionRoutine() {
-        logger.debug("----> Starting Session Verification Routine...");
+        logger.info("----> Starting Session Verification Routine...");
         final long VERIFICATION_PERIOD =
                 Long.parseLong(
                         this.properties.getProperty(ConfProperty.SESSION_MONITOR_PERIOD.getProp()));
@@ -76,13 +73,13 @@ public class DefaultRoutineManager implements RoutineManager {
         final ManagerTimer verifySessionTimer =
                 new ManagerTimer(Executors.newScheduledThreadPool(DEFAULT_POOL_THREAD_NUMBER));
         SessionVerificationRoutine sessionVerificationRoutine =
-                new SessionVerificationRoutine(this.authManager);
+                new SessionVerificationRoutine();
         verifySessionTimer.scheduleAtFixedRate(
                 sessionVerificationRoutine, DEFAULT_INITIAL_DELAY_MS, VERIFICATION_PERIOD);
     }
 
     private void startJobSubmissionRoutine() {
-        logger.debug("----> Starting Job Submission Routine...");
+        logger.info("----> Starting Job Submission Routine...");
         final long SUBMISSION_PERIOD =
                 Long.parseLong(
                         this.properties.getProperty(

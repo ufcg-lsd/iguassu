@@ -23,7 +23,7 @@ public class Job implements Serializable {
     private static final String TASKS_COLUMN_NAME = "tasks";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     @Column(name = USER_ID_COLUMN_NAME)

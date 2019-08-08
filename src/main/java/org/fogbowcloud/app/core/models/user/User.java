@@ -1,43 +1,37 @@
 package org.fogbowcloud.app.core.models.user;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.google.gson.annotations.SerializedName;
-import org.fogbowcloud.app.utils.TokenEncrypt;
-
 import javax.persistence.*;
-import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
 
 @Entity
 @Table(name = "user")
-public class User implements Serializable {
+public class User {
 
     private static final String SESSION_STATE_COLUMN_NAME = "session_state";
     private static final String SESSION_TIME_COLUMN_NAME = "session_time";
     private static final String CREDENTIALS_ID_COLUMN_NAME = "credentials_id";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     @Column
-    private final String alias;
+    private String alias;
 
-    @Column
-    @OneToOne
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = CREDENTIALS_ID_COLUMN_NAME)
-    @Convert(converter = TokenEncrypt.class)
     private Credential credentials;
 
-    @JsonIgnore
     @Column(name = SESSION_STATE_COLUMN_NAME)
     @Enumerated(EnumType.STRING)
     private SessionState sessionState;
 
-    @JsonIgnore
     @Column(name = SESSION_TIME_COLUMN_NAME)
     private long sessionTime;
+
+    public User() {
+    }
 
     public User(String alias, Credential credentials) {
         this.alias = alias;

@@ -3,7 +3,7 @@ package org.fogbowcloud.app.core.routines;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.job.JobState;
-import org.fogbowcloud.app.datastore.managers.JobDBManager;
+import org.fogbowcloud.app.core.datastore.managers.JobDBManager;
 import org.fogbowcloud.app.jes.JobExecutionService;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 
@@ -28,11 +28,11 @@ public class JobSubmissionRoutine implements Runnable {
 
     @Override
     public void run() {
-        logger.debug(
+        logger.info(
                 "----> Running Job Submission Routine in thread with id [" + Thread.currentThread().getId() + "]");
         while (Objects.nonNull(this.jobsToSubmit.peek())) {
             Job job = this.jobsToSubmit.poll();
-            logger.debug("Job found! Starting job submission with id [" + job.getId() + "]");
+            logger.info("Job found! Starting job submission with id [" + job.getId() + "]");
             try {
                 final String executionId = this.jobExecutionSystem.submit(job);
                 job.setExecutionId(executionId);
@@ -54,7 +54,7 @@ public class JobSubmissionRoutine implements Runnable {
         }
 
         if (Objects.isNull(this.jobsToSubmit.peek())) {
-            logger.debug("Job submission buffer is empty.");
+            logger.info("Job submission buffer is empty.");
         }
     }
 }

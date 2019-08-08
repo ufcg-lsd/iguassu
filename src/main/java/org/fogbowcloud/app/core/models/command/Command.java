@@ -19,7 +19,7 @@ public class Command implements Serializable {
     private static final String EXIT_CODE_COLUMN_NAME = "exit_code";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     @Column

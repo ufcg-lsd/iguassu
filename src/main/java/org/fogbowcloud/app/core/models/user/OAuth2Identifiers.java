@@ -2,6 +2,7 @@ package org.fogbowcloud.app.core.models.user;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**

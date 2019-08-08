@@ -1,11 +1,12 @@
 package org.fogbowcloud.app.core.auth;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.core.exceptions.UserNotExistException;
 import org.fogbowcloud.app.core.models.user.*;
-import org.fogbowcloud.app.datastore.managers.OAuthTokenDBManager;
-import org.fogbowcloud.app.datastore.managers.UserDBManager;
+import org.fogbowcloud.app.core.datastore.managers.UserDBManager;
 import org.fogbowcloud.app.utils.RandomString;
 
+import javax.transaction.Transactional;
 import java.security.GeneralSecurityException;
 import java.util.Base64;
 import java.util.Objects;
@@ -18,6 +19,7 @@ public class DefaultAuthManager implements AuthManager {
 
     private static final Logger logger = Logger.getLogger(DefaultAuthManager.class);
     private static final int DEFAULT_IGUASSU_TOKEN_LENGTH = 64;
+    private final UserDBManager userDBManager = UserDBManager.getInstance();
 
     private AuthRequestsHelper requestsHelper;
 
@@ -26,53 +28,56 @@ public class DefaultAuthManager implements AuthManager {
     }
 
     @Override
-    public User authenticate(OAuth2Identifiers oAuth2Identifiers, String authorizationCode) {
+    @Transactional
+    public User authenticate(OAuth2Identifiers oAuth2Identifiers, String authorizationCode, int nonce) {
         try {
             OAuthToken oAuthToken =
                     this.requestsHelper.getToken(oAuth2Identifiers, authorizationCode);
+            User user = this.userDBManager.findUserByAlias(oAuthToken.getUserId());
 
-            User user = UserDBManager.getInstance().findUserByName(oAuthToken.getUserId());
-
-            String iguassuToken;
             if (Objects.nonNull(user)) {
-                logger.debug("Found user [" + user.getAlias() + "]");
+                logger.info("The user " + user.getAlias() + " has been found in our database.");
                 if (user.isActive()) {
-                    logger.debug("User [" + user.getAlias() + "] is active and has a valid Iguassu Token.");
+                    logger.info("User " + user.getAlias() + " is active and has already valid credentials.");
                 } else {
-                    iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
-                    logger.debug("Generating a new Iguassu Token for the user [" + user.getAlias() + "].");
+                    oAuthToken.setVersion(user.getCredentials().getOauthToken().getVersion() + 1);
+                    Credential newCredentials = updateUserCredentials(oAuthToken, user, nonce);
                     user.changeSessionState(SessionState.ACTIVE);
-                    logger.debug("User [" + user.getAlias() + "] setting to active.");
-                    user.updateToken(iguassuToken);
-                    UserDBManager.getInstance().update(user);
+                    user.setCredentials(newCredentials);
+                    logger.info("Updating user " + user.getAlias() + " to active.");
+                    this.userDBManager.update(user);
                 }
             } else {
-                iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
-                User newUser = new User(oAuthToken.getUserId(), iguassuToken);
-                UserDBManager.getInstance().save(newUser);
-                logger.info("OAuth2 tokens for the user [" + oAuthToken.getUserId() + "] was stored.");
+                logger.info("User " + oAuthToken.getUserId() + " does not exist yet, but has authorization and will" +
+                        " be stored for future orders");
+                final String iguassuToken = this.generateIguassuToken(oAuthToken.getUserId());
+                final Credential credentials = new Credential(iguassuToken, nonce, oAuthToken);
+                user = new User(oAuthToken.getUserId(), credentials);
+                this.userDBManager.save(user);
+                logger.info("User " + oAuthToken.getUserId() + " has been successfully authenticated.");
             }
-            this.storeNewToken(oAuthToken);
+
             return user;
 
         } catch (Exception e) {
-            logger.debug(e.getMessage());
+            logger.error(e.getMessage());
         }
         return null;
     }
 
     @Override
-    public User authorize(Credential credentials) throws GeneralSecurityException {
+    public User authorize(Credential credentials) throws GeneralSecurityException, UserNotExistException {
         User user;
         try {
-            user = Objects.requireNonNull(UserDBManager.getInstance().findUserByName((credentials.getUserId())));
-        } catch (NullPointerException npe) {
-            throw new GeneralSecurityException("The user couldn't be retrieved.");
+            user = Objects.requireNonNull(
+                    this.userDBManager.findUserByAlias((credentials.getOauthToken().getUserId())));
+        } catch (Exception npe) {
+            throw new UserNotExistException("The user couldn't be retrieved.");
         }
 
         logger.debug("Authorizing user with identifier: [" + user.getAlias() + "]");
 
-        if (!user.getIguassuToken().equalsIgnoreCase(credentials.getIguassuToken())) {
+        if (!user.getCredentials().getIguassuToken().equalsIgnoreCase(credentials.getIguassuToken())) {
             throw new GeneralSecurityException(
                     "User " + user.getAlias() + " not has a valid Iguassu token.");
         }
@@ -85,14 +90,15 @@ public class DefaultAuthManager implements AuthManager {
         return this.requestsHelper.refreshToken(oAuthToken);
     }
 
-    private void storeNewToken(OAuthToken oAuthToken) {
-        OAuthToken lastToken = OAuthTokenDBManager.getInstance().findByUserId(oAuthToken.getUserId());
-
+    private Credential updateUserCredentials(OAuthToken newOAuthToken, User user, int nonce) {
+        logger.debug("Generating new credentials for user " + user.getAlias() + ".");
+        final OAuthToken lastToken = user.getCredentials().getOauthToken();
+        final String iguassuToken = this.generateIguassuToken(user.getAlias());
         if (Objects.nonNull(lastToken)) {
-            oAuthToken.setVersion(lastToken.getVersion() + 1);
-            OAuthTokenDBManager.getInstance().delete(lastToken.getId());
+            newOAuthToken.setVersion(lastToken.getVersion() + 1);
         }
-        OAuthTokenDBManager.getInstance().save(oAuthToken);
+
+        return new Credential(iguassuToken, nonce, newOAuthToken);
     }
 
     private String generateIguassuToken(String userId) {

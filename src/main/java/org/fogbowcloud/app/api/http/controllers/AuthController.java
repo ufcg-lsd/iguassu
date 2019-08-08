@@ -6,6 +6,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.Documentation;
+import org.fogbowcloud.app.api.dtos.UserDTO;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.core.constants.GeneralConstants;
 import org.fogbowcloud.app.core.exceptions.StorageServiceConnectException;
@@ -26,7 +27,8 @@ public class AuthController {
 
     private final Logger logger = Logger.getLogger(AuthController.class);
 
-    @Lazy private AuthService authService;
+    @Lazy
+    private AuthService authService;
 
     @Autowired
     public AuthController(AuthService authService) {
@@ -45,15 +47,10 @@ public class AuthController {
         try {
             if (Objects.nonNull(authorizationCode) && !authorizationCode.trim().isEmpty()) {
                 try {
-                    final User userAuthenticated =
-                            this.authService.authenticate(
-                                    authorizationCode, applicationIdentifiers);
-                    logger.info("User " + userAuthenticated.getAlias() + " authenticated successfully.");
-                    Gson gson = new Gson();
+                    final User userAuthenticated = this.authService.authenticate(
+                            authorizationCode, applicationIdentifiers);
 
-                    final String response = gson.toJson(userAuthenticated, User.class);
-
-                    return new ResponseEntity<>(response, HttpStatus.OK);
+                    return new ResponseEntity<>(new UserDTO(userAuthenticated), HttpStatus.OK);
                 } catch (GeneralSecurityException gse) {
                     return new ResponseEntity<>(
                             "The authentication failed with error [" + gse.getMessage() + "]",
@@ -67,9 +64,9 @@ public class AuthController {
             return new ResponseEntity<>(
                     "Storage Service connection failed with error [" + ssce.getMessage() + "]",
                     HttpStatus.INTERNAL_SERVER_ERROR);
-        } catch (Exception e) {
+        } catch (Throwable throwable) {
             return new ResponseEntity<>(
-                    "The authentication failed with error [" + e.getMessage() + "]",
+                    "The authentication failed with error [" + throwable.getMessage() + "]",
                     HttpStatus.UNAUTHORIZED);
         }
     }

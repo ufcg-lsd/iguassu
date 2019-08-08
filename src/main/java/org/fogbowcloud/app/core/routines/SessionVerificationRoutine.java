@@ -1,16 +1,12 @@
 package org.fogbowcloud.app.core.routines;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.auth.AuthManager;
-import org.fogbowcloud.app.core.models.user.OAuthToken;
 import org.fogbowcloud.app.core.models.user.SessionState;
 import org.fogbowcloud.app.core.models.user.User;
-import org.fogbowcloud.app.datastore.managers.OAuthTokenDBManager;
-import org.fogbowcloud.app.datastore.managers.UserDBManager;
+import org.fogbowcloud.app.core.datastore.managers.UserDBManager;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
 
 /**
  * This routine checks from time to time if the user has been inactive for a long time. If so, your
@@ -19,35 +15,25 @@ import java.util.Objects;
 public class SessionVerificationRoutine implements Runnable {
 
     private static final Logger logger = Logger.getLogger(SessionVerificationRoutine.class);
-    private final AuthManager authManager;
+    private final UserDBManager userDBManager = UserDBManager.getInstance();
 
-    SessionVerificationRoutine(AuthManager authManager) {
-        this.authManager = authManager;
+    SessionVerificationRoutine() {
     }
 
     @Override
     public void run() {
-        logger.debug(
-                "----> Running Session Verification Routine in thread with id ["
-                        + Thread.currentThread().getId()
-                        + "]");
+        logger.info(
+                "----> Running Session Verification Routine in thread with id [" + Thread.currentThread().getId() + "]");
         final long now = Instant.now().getEpochSecond();
         final long oneHourInSeconds = 3600;
-        final List<OAuthToken> allTokens = OAuthTokenDBManager.getInstance().findAll();
+        final List<User> allUsers = this.userDBManager.findAll();
 
-
-        for (final OAuthToken token : allTokens) {
-            final User currentUser = UserDBManager.getInstance().findUserByName(token.getUserId());
-
-            if (Objects.nonNull(currentUser)) {
-
-                if ((Math.abs((now - currentUser.getSessionTime())) > oneHourInSeconds)
-                        && currentUser.isActive()) {
-                    logger.debug(
-                            "User [ " + currentUser.getAlias() + " ] defined as not active.");
-                    currentUser.changeSessionState(SessionState.EXPIRED);
-                    UserDBManager.getInstance().update(currentUser);
-                }
+        for (final User user : allUsers) {
+            if ((Math.abs((now - user.getSessionTime())) > oneHourInSeconds)
+                    && user.isActive()) {
+                logger.info("User " + user.getAlias() + " was defined as not active.");
+                user.changeSessionState(SessionState.EXPIRED);
+                this.userDBManager.update(user);
             }
         }
     }

@@ -1,10 +1,11 @@
-package org.fogbowcloud.app.datastore.managers;
+package org.fogbowcloud.app.core.datastore.managers;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.models.job.Job;
-import org.fogbowcloud.app.datastore.DBManager;
-import org.fogbowcloud.app.datastore.repositories.JobRepository;
+import org.fogbowcloud.app.core.datastore.DBManager;
+import org.fogbowcloud.app.core.datastore.repositories.JobRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 
@@ -50,4 +51,8 @@ public class JobDBManager implements DBManager<Job> {
     public void delete(long id) {
         this.jobRepository.deleteById(id);
     }
+
+   public void setJobRepository(JobRepository jobRepository) {
+        this.jobRepository = jobRepository;
+   }
 }

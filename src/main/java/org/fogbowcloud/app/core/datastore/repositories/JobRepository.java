@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.datastore.repositories;
+package org.fogbowcloud.app.core.datastore.repositories;
 
 import org.fogbowcloud.app.core.models.job.Job;
 import org.springframework.data.jpa.repository.JpaRepository;

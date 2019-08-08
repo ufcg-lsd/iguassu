@@ -1,21 +1,21 @@
 package org.fogbowcloud.app.core.models.user;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import org.fogbowcloud.app.utils.TokenEncrypt;
 
 import javax.persistence.*;
+import java.io.Serializable;
 
 /** This class encapsulates the user security information. */
 @Entity
 @Table(name = "credential")
 public class Credential {
     private static final String IGUASSU_TOKEN_COLUMN_NAME = "iguassu_token";
-    private static final String OAUTH_TOKEN_COLUMN_NAME = "oauth_token";
-    private static final String OAUTH_TOKEN_ID_COLUMN_NAME = "oauth_token_id";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     @Column(name = IGUASSU_TOKEN_COLUMN_NAME)
@@ -23,14 +23,13 @@ public class Credential {
     @SerializedName(IGUASSU_TOKEN_COLUMN_NAME)
     private String iguassuToken;
 
-    @JsonIgnore
-    @Column(name = OAUTH_TOKEN_COLUMN_NAME)
-    @JoinColumn(name = OAUTH_TOKEN_ID_COLUMN_NAME)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     private OAuthToken oauthToken;
 
-    @JsonIgnore
-    @Transient
+    @Column
     private Integer nonce;
+
+    public Credential() {}
 
     public Credential(String iguassuToken, Integer nonce, OAuthToken oauthToken) {
         this.iguassuToken = iguassuToken;

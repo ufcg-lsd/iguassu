@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.datastore;
+package org.fogbowcloud.app.core.datastore;
 
 public interface DBManager<T> {
 

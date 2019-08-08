@@ -3,7 +3,7 @@ package org.fogbowcloud.app.core.routines;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.job.JobState;
-import org.fogbowcloud.app.datastore.managers.JobDBManager;
+import org.fogbowcloud.app.core.datastore.managers.JobDBManager;
 import org.fogbowcloud.app.jes.arrebol.Synchronizer;
 
 import java.util.List;
@@ -18,6 +18,7 @@ public class SyncJobStateRoutine implements Runnable {
 
     private static final Logger logger = Logger.getLogger(SyncJobStateRoutine.class);
     private Synchronizer<Job> synchronizer;
+    private final JobDBManager jobDBManager = JobDBManager.getInstance();
 
     SyncJobStateRoutine(Synchronizer<Job> synchronizer) {
         this.synchronizer = synchronizer;
@@ -39,13 +40,13 @@ public class SyncJobStateRoutine implements Runnable {
                     logger.error("The state of the job [" + job.getId() + "] was not synchronized with its execution.");
                 }
             } else {
-                logger.debug("Job with id [" + job.getId() + "] has no associated execution.");
+                logger.error("Job with id [" + job.getId() + "] has no associated execution.");
             }
         }
     }
 
     private List<Job> filterUsefulJobs() {
-        return JobDBManager.getInstance().findAll().stream()
+        return this.jobDBManager.findAll().stream()
                 .filter(job -> !(job.getState().equals(JobState.FINISHED)
                         || job.getState().equals(JobState.FAILED))).collect(Collectors.toList());
     }

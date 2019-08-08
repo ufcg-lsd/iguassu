@@ -1,6 +1,8 @@
 package org.fogbowcloud.app.core.auth;
 
 import java.security.GeneralSecurityException;
+
+import org.fogbowcloud.app.core.exceptions.UserNotExistException;
 import org.fogbowcloud.app.core.models.user.Credential;
 import org.fogbowcloud.app.core.models.user.OAuth2Identifiers;
 import org.fogbowcloud.app.core.models.user.OAuthToken;
@@ -16,8 +18,9 @@ public interface AuthManager {
      * @return a user with credentials updated.
      * @param oAuth2Identifiers is the information provided by the OAuth2 protocol.
      * @param authorizationCode is the code that allows requesting an authentication.
+     * @param nonce a nonce code represents the hash of the request.
      */
-    User authenticate(OAuth2Identifiers oAuth2Identifiers, String authorizationCode)
+    User authenticate(OAuth2Identifiers oAuth2Identifiers, String authorizationCode, int nonce)
             throws GeneralSecurityException;
 
     /**
@@ -38,5 +41,5 @@ public interface AuthManager {
      * @return an authorized user instance.
      * @throws GeneralSecurityException if any information has a wrong shape or is expired.
      */
-    User authorize(Credential credentials) throws GeneralSecurityException;
+    User authorize(Credential credentials) throws GeneralSecurityException, UserNotExistException;
 }

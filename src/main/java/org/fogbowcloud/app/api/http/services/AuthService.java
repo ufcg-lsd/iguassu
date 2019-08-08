@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.IguassuFacade;
+import org.fogbowcloud.app.core.exceptions.UserNotExistException;
 import org.fogbowcloud.app.core.models.user.OAuth2Identifiers;
 import org.fogbowcloud.app.core.models.user.OAuthToken;
 import org.fogbowcloud.app.core.models.user.User;
@@ -24,7 +25,7 @@ public class AuthService {
 
     private static final Logger logger = Logger.getLogger(AuthService.class);
 
-    @Lazy @Autowired private IguassuFacade iguassuFacade;
+    private IguassuFacade iguassuFacade = IguassuFacade.getInstance();
 
     @Lazy @Autowired private Properties properties;
 
@@ -67,6 +68,8 @@ public class AuthService {
                     "There was an error trying to authenticate.\nTry again later.");
         } catch (NullPointerException e) {
             logger.error("Incorrect credentials! Try login again.");
+            throw new UnauthorizedRequestException("Incorrect credentials! Try login again.");
+        } catch (UserNotExistException e) {
             throw new UnauthorizedRequestException("Incorrect credentials! Try login again.");
         }
         return user;

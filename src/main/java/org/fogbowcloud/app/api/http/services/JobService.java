@@ -5,7 +5,7 @@ import org.fogbowcloud.app.core.IguassuFacade;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
 import org.fogbowcloud.app.core.models.user.User;
 import org.fogbowcloud.app.core.models.job.Job;
-import org.fogbowcloud.app.datastore.repositories.JobRepository;
+import org.fogbowcloud.app.core.datastore.repositories.JobRepository;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -21,9 +21,7 @@ public class JobService {
 
     private final Logger logger = Logger.getLogger(JobService.class);
 
-    @Lazy
-    @Autowired
-    private IguassuFacade iguassuFacade;
+    private IguassuFacade iguassuFacade = IguassuFacade.getInstance();
 
     private JobRepository jobRepository;
 

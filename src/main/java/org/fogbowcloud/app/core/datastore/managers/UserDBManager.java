@@ -1,14 +1,19 @@
-package org.fogbowcloud.app.datastore.managers;
+package org.fogbowcloud.app.core.datastore.managers;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.models.user.User;
-import org.fogbowcloud.app.datastore.DBManager;
-import org.fogbowcloud.app.datastore.repositories.UserRepository;
+import org.fogbowcloud.app.core.datastore.DBManager;
+import org.fogbowcloud.app.core.datastore.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.List;
+
+@Service
 public class UserDBManager implements DBManager<User> {
     private static final Logger logger = Logger.getLogger(UserDBManager.class);
 
+    @Autowired
     private static UserDBManager instance;
 
     @Autowired
@@ -36,8 +41,12 @@ public class UserDBManager implements DBManager<User> {
         return this.userRepository.findById(id).isPresent() ? this.userRepository.findById(id).get() : null;
     }
 
-    public User findUserByName(String name) {
-        return this.userRepository.findUserByName(name);
+    public User findUserByAlias(String alias) {
+        return this.userRepository.findUserByAlias(alias);
+    }
+
+    public List<User> findAll() {
+        return this.userRepository.findAll();
     }
 
     @Override
@@ -50,5 +59,9 @@ public class UserDBManager implements DBManager<User> {
     @Override
     public void delete(long id) {
         this.userRepository.deleteById(id);
+    }
+
+    public void setUserRepository(UserRepository userRepository) {
+        this.userRepository = userRepository;
     }
 }

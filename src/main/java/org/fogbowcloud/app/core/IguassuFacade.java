@@ -1,23 +1,35 @@
 package org.fogbowcloud.app.core;
 
+import org.fogbowcloud.app.core.exceptions.UserNotExistException;
 import org.fogbowcloud.app.core.models.user.OAuth2Identifiers;
 import org.fogbowcloud.app.core.models.user.OAuthToken;
 import org.fogbowcloud.app.core.models.user.User;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 
 import java.security.GeneralSecurityException;
+import java.util.Properties;
 
 public class IguassuFacade {
 
-    private final IguassuController iguassuController;
+    private static IguassuFacade instance;
+    private IguassuController iguassuController = IguassuController.getInstance();
 
-    public IguassuFacade(IguassuController iguassuController) {
-        this.iguassuController = iguassuController;
+    private IguassuFacade() {
     }
 
-    public void init() {
-        this.iguassuController.init();
+    public static IguassuFacade getInstance() {
+        synchronized (IguassuFacade.class) {
+            if (instance == null) {
+                instance = new IguassuFacade();
+            }
+            return instance;
+        }
     }
+
+    public void init(Properties properties) {
+        this.iguassuController.init(properties);
+    }
+
 
 //    public Job getJobById(String jobId, String userId) {
 //        return this.iguassuController.getJobById(jobId, userId);
@@ -40,7 +52,7 @@ public class IguassuFacade {
         return this.iguassuController.authenticateUser(oAuth2Identifiers, authorizationCode);
     }
 
-    public User authorizeUser(String credentials) throws GeneralSecurityException {
+    public User authorizeUser(String credentials) throws GeneralSecurityException, UserNotExistException {
         return this.iguassuController.authorizeUser(credentials);
     }
 

@@ -1,6 +1,7 @@
 package org.fogbowcloud.app.core.models.user;
 
 import com.google.gson.annotations.SerializedName;
+import org.fogbowcloud.app.utils.TokenEncrypt;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -15,7 +16,7 @@ import java.util.Objects;
 
 @Entity
 @Table(name = "oauth_token")
-public class OAuthToken implements Serializable {
+public class OAuthToken {
     private static final long INITIAL_VERSION = 0L;
     private static final String USER_ID = "user_id";
     private static final String ACCESS_TOKEN = "access_token";
@@ -24,7 +25,7 @@ public class OAuthToken implements Serializable {
     private static final String EXPIRATION_DATE = "expiration_date";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
     /**
@@ -32,6 +33,7 @@ public class OAuthToken implements Serializable {
      */
     @SerializedName(ACCESS_TOKEN)
     @Column(name = ACCESS_TOKEN)
+    @Convert(converter = TokenEncrypt.class)
     private String accessToken;
 
     /**
@@ -39,6 +41,7 @@ public class OAuthToken implements Serializable {
      */
     @SerializedName(REFRESH_TOKEN)
     @Column(name = REFRESH_TOKEN)
+    @Convert(converter = TokenEncrypt.class)
     private String refreshToken;
 
     /**
