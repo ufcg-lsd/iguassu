@@ -21,7 +21,8 @@ import java.util.*;
 
 public class JobBuilder {
 
-    private static final String USER_KEY = "user";
+    private static final String USER_ID_KEY = "user_id";
+    private static final String USER_ID_ALIAS = "user_alias";
     private static final String REQUIREMENTS_IMAGE_KEY = "image";
     private static final String REQUIREMENTS_SEPARATOR = "and";
     private static final String REQUIREMENTS_CONCAT_STR = " && ";
@@ -40,8 +41,8 @@ public class JobBuilder {
      * @throws IllegalArgumentException If path to jdf is empty
      * @throws IOException              If a problem during the reading of the file occurs
      */
-    public void createJobFromJDFFile(Job job, String jdfFilePath, JobSpecification jobSpec,
-                                     String userId, String externalOAuthToken, Long tokenVersion)
+    public void createJobFromJDFFile(Job job, String jdfFilePath, JobSpecification jobSpec, String userAlias,
+                                     String externalOAuthToken, Long tokenVersion)
             throws IOException, InterruptedException {
         if (Objects.isNull(jdfFilePath) || jdfFilePath.trim().isEmpty()) {
             throw new IllegalArgumentException("JDF file path cannot be null.");
@@ -71,14 +72,15 @@ public class JobBuilder {
                     }
                     Task task = new Task(requirements);
                     task.putMetadata(JsonKey.JOB_ID.getKey(), String.valueOf(job.getId()));
-                    task.putMetadata(USER_KEY, job.getUserAlias());
+                    task.putMetadata(USER_ID_KEY, String.valueOf(job.getOwnerId()));
+                    task.putMetadata(USER_ID_ALIAS, userAlias);
 
                     parseInitCommands(
-                            taskSpec, task, userId, externalOAuthToken, tokenVersion);
+                            taskSpec, task, job.getOwnerId(), externalOAuthToken, tokenVersion);
                     parseTaskCommands(
-                            taskSpec, task, userId, externalOAuthToken, tokenVersion);
+                            taskSpec, task, job.getOwnerId(), externalOAuthToken, tokenVersion);
                     parseFinalCommands(
-                            taskSpec, task, userId, externalOAuthToken, tokenVersion);
+                            taskSpec, task,job.getOwnerId(), externalOAuthToken, tokenVersion);
 
                     tasks.put(task.getId(), task);
                 }
@@ -130,7 +132,7 @@ public class JobBuilder {
      * @param task     The output expression containing the JDL job
      */
     private void parseTaskCommands(TaskSpecification taskSpec, Task task,
-                                   String userId, String externalOAuthToken, Long tokenVersion) {
+                                   long userId, String externalOAuthToken, Long tokenVersion) {
         List<JDLCommand> initBlocks = taskSpec.getTaskBlocks();
         addCommands(initBlocks, task, userId, externalOAuthToken, tokenVersion);
     }
@@ -142,13 +144,13 @@ public class JobBuilder {
      * @param task     The output expression containing the JDL job
      */
     private void parseInitCommands(TaskSpecification taskSpec, Task task,
-                                   String userId,
+                                   long userId,
                                    String externalOAuthToken, Long tokenVersion) {
         List<JDLCommand> initBlocks = taskSpec.getInitBlocks();
         addCommands(initBlocks, task, userId, externalOAuthToken, tokenVersion);
     }
 
-    private void addCommands(List<JDLCommand> initBlocks, Task task, String userId,
+    private void addCommands(List<JDLCommand> initBlocks, Task task, long userId,
                              String externalOAuthToken, Long tokenVersion) {
         if (initBlocks == null) {
             return;
@@ -163,7 +165,7 @@ public class JobBuilder {
         }
     }
 
-    private void addIOCommands(Task task, IOCommand command, String userId,
+    private void addIOCommands(Task task, IOCommand command, long userId,
                                String externalOAuthToken, Long tokenVersion) {
         String sourceFile = command.getEntry().getSourceFile();
         String destination = command.getEntry().getDestination();
@@ -199,17 +201,17 @@ public class JobBuilder {
      * @param task     The output expression containing the JDL job
      */
     private void parseFinalCommands(TaskSpecification taskSpec, Task task,
-                                    String userId, String externalOAuthToken, Long tokenVersion) {
+                                    long userId, String externalOAuthToken, Long tokenVersion) {
         List<JDLCommand> initBlocks = taskSpec.getFinalBlocks();
         addCommands(initBlocks, task, userId, externalOAuthToken, tokenVersion);
     }
 
-    private Command uploadFileCommands(String localFilePath, String filePathToUpload, String userId,
+    private Command uploadFileCommands(String localFilePath, String filePathToUpload, long userId,
                                        String token, Long tokenVersion, String rawCommand) {
         final String fileDriverHostIp =
                 this.properties.getProperty(ConfProperty.STORAGE_SERVICE_HOST_URL.getProp());
         final String requestRefreshedTokenCommand =
-                this.getRefreshTokenCommand(userId, tokenVersion);
+                this.getRefreshTokenCommand();
         final String uploadCommand =
                 " http_code=$(curl --write-out %{http_code} -X PUT --header \"Authorization:Bearer \"$token "
                         + " --data-binary @"
@@ -223,19 +225,17 @@ public class JobBuilder {
 
         final String commandIO = "server=" + fileDriverHostIp + "; " + "token=" + token + "; "
                 + uploadCommand + " while [ $http_code == " + HttpStatus.UNAUTHORIZED.toString()
-                + " ] ; do " + "userId=" + userId + "; " + "tokenVersion=" + tokenVersion.toString()
+                + " ] ; do " + "user_id=" + userId + "; " + "token_version=" + tokenVersion.toString()
                 + "; " + "token=$(" + requestRefreshedTokenCommand + "); " + uploadCommand
                 + sleepCommand + " done";
 
         return new Command(commandIO, rawCommand);
     }
 
-    private Command downloadFileCommands(String localFilePath, String filePathToDownload,
-                                         String userId, String token, Long tokenVersion, String rawCommand) {
-        final String fileDriverHostIp =
-                this.properties.getProperty(ConfProperty.STORAGE_SERVICE_HOST_URL.getProp());
-        final String requestRefreshedTokenCommand =
-                this.getRefreshTokenCommand(userId, tokenVersion);
+    private Command downloadFileCommands(String localFilePath, String filePathToDownload, long userId, String token,
+                                         Long tokenVersion, String rawCommand) {
+        final String fileDriverHostIp = this.properties.getProperty(ConfProperty.STORAGE_SERVICE_HOST_URL.getProp());
+        final String requestRefreshedTokenCommand = this.getRefreshTokenCommand();
         final String downloadCommand =
                 " full_response=$(curl --write-out %{http_code} --header \"Authorization:Bearer \"$token"
                         + " $server/remote.php/webdav/"
@@ -250,20 +250,16 @@ public class JobBuilder {
         final String commandIO = "server=" + fileDriverHostIp + "; " + "token=" + token + "; "
                 + downloadCommand + extractHttpStatusCode + " while [ $http_code == "
                 + HttpStatus.UNAUTHORIZED.toString() + " ] ; do "
-                + "userId=" + userId + "; " + "tokenVersion=" + tokenVersion.toString() + "; "
+                + "user_id=" + userId + "; " + "token_version=" + tokenVersion.toString() + "; "
                 + "token=$(" + requestRefreshedTokenCommand + "); " + downloadCommand
                 + extractHttpStatusCode + sleepCommand + " done";
 
         return new Command(commandIO, rawCommand);
     }
 
-    private String getRefreshTokenCommand(String userId, Long tokenVersion) {
-        final String iguassuUrl =
-                this.properties.getProperty(ConfProperty.IGUASSU_SERVICE_HOST_URL.getProp());
-        final String refreshTokenUrl =
-                String.format(
-                        "%s/auth/oauth2/refresh/${userId}/${tokenVersion}",
-                        iguassuUrl, userId, tokenVersion);
+    private String getRefreshTokenCommand() {
+        final String iguassuUrl = this.properties.getProperty(ConfProperty.IGUASSU_SERVICE_HOST_URL.getProp());
+        final String refreshTokenUrl = String.format("%s/auth/oauth2/refresh/${user_id}/${token_version}", iguassuUrl);
         return String.format("curl -X POST %s", refreshTokenUrl);
     }
 }

@@ -66,20 +66,18 @@ public class DefaultAuthManager implements AuthManager {
     }
 
     @Override
-    public User authorize(Credential credentials) throws GeneralSecurityException, UserNotExistException {
+    public User authorize(RequesterCredential requesterCredentials) throws GeneralSecurityException, UserNotExistException {
         User user;
         try {
-            user = Objects.requireNonNull(
-                    this.userDBManager.findUserByAlias((credentials.getOauthToken().getUserId())));
-        } catch (Exception npe) {
-            throw new UserNotExistException("The user couldn't be retrieved.");
+            user = Objects.requireNonNull(this.userDBManager.findOne(requesterCredentials.getUserId()));
+        } catch (NullPointerException npe) {
+            throw new UserNotExistException("The user could not be recovered because it has not yet been stored.");
         }
 
-        logger.debug("Authorizing user with identifier: [" + user.getAlias() + "]");
+        logger.info("Authorizing user with identifier: [" + user.getAlias() + "]");
 
-        if (!user.getCredentials().getIguassuToken().equalsIgnoreCase(credentials.getIguassuToken())) {
-            throw new GeneralSecurityException(
-                    "User " + user.getAlias() + " not has a valid Iguassu token.");
+        if (!user.getCredentials().getIguassuToken().equalsIgnoreCase(requesterCredentials.getIguassuToken())) {
+            throw new GeneralSecurityException("User " + user.getAlias() + " not has a valid Iguassu token.");
         }
 
         return user;

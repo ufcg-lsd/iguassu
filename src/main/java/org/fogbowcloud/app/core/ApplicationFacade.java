@@ -1,5 +1,6 @@
 package org.fogbowcloud.app.core;
 
+import com.google.gson.Gson;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.auth.DefaultAuthManager;
@@ -8,10 +9,7 @@ import org.fogbowcloud.app.core.datastore.managers.UserDBManager;
 import org.fogbowcloud.app.core.exceptions.UserNotExistException;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.job.JobSpecification;
-import org.fogbowcloud.app.core.models.user.Credential;
-import org.fogbowcloud.app.core.models.user.OAuth2Identifiers;
-import org.fogbowcloud.app.core.models.user.OAuthToken;
-import org.fogbowcloud.app.core.models.user.User;
+import org.fogbowcloud.app.core.models.user.*;
 import org.fogbowcloud.app.core.routines.DefaultRoutineManager;
 import org.fogbowcloud.app.core.routines.RoutineManager;
 import org.fogbowcloud.app.jdfcompiler.JobBuilder;
@@ -57,93 +55,42 @@ public class ApplicationFacade {
         routineManager.startAll();
     }
 
+    public String submitJob(String jdfFilePath, User jobOwner) throws CompilerException {
+        logger.debug("Adding job of user " + jobOwner.getAlias() + " to buffer.");
 
-//    public Job getJobById(String jobId, String userId) {
-//        return this.iguassuController.getJobById(jobId, userId);
-//    }
-
-    public long submitJob(String jdfFilePath, User user) throws CompilerException {
-        logger.debug("Adding job of user " + user.getAlias() + " to buffer.");
-
-        final Job job = buildJob(jdfFilePath, user);
+        final Job job = buildJob(jdfFilePath, jobOwner);
         this.jobsToSubmit.offer(job);
-//        this.jobDataStore.insert(job);
+        this.jobDBManager.save(job);
 
         return job.getId();
     }
 
-//    public ArrayList<Job> getAllJobs(String userId) {
-//        return this.iguassuController.getAllJobs(userId);
-//    }
+    private Job buildJob(String jdfFilePath, User owner) throws CompilerException {
 
-    private Job buildJob(String jdfFilePath, User user) throws CompilerException {
+        final String ownerAlias = owner.getAlias();
+        Job job = new Job(new HashMap<>(), ownerAlias, owner.getId());
 
-        final String userIdentification = user.getAlias();
-        Job job = new Job(new HashMap<>(), userIdentification, "");
-
-        logger.debug("Building job " + job.getId() + " of user " + user.getAlias() + " of jdf " + jdfFilePath);
+        logger.debug("Building job " + job.getId() + " of user " + owner.getAlias() + " of jdf " + jdfFilePath);
         JobSpecification jobSpec = compile(jdfFilePath);
         JDFUtil.removeEmptySpaceFromVariables(jobSpec);
-        OAuthToken oAuthToken = null;
-        try {
-//            oAuthToken = getCurrentTokenByUserId(userIdentification);
+        OAuthToken oAuthToken = owner.getCredentials().getOauthToken();
 
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return buildJobFromJDFFile(
-                job,
-                jdfFilePath,
-                jobSpec,
-                userIdentification,
-                Objects.requireNonNull(oAuthToken).getAccessToken(),
-                oAuthToken.getVersion());
+        return buildJobFromJDFFile(job, jdfFilePath, jobSpec, ownerAlias,
+                Objects.requireNonNull(oAuthToken).getAccessToken(), oAuthToken.getVersion());
     }
 
-//    ArrayList<Job> getAllJobs(String userId) {
-//        return (ArrayList<Job>) this.jobDataStore.getAllByUserId(userId);
-//    }
-
-//    void updateJob(Job job) {
-//        this.jobDataStore.update(job);
-//    }
-
-//    String stopJob(String jobId, String userId) {
-//        final int updateCount = this.jobDataStore.deleteByJobId(jobId, userId);
-//
-//        if (updateCount >= 1) {
-//            return jobId;
-//        } else {
-//            logger.error("Job with id [" + jobId + "] not found in the Datastore.");
-//            return null;
-//        }
-//    }
-
-//    Task getTaskById(String taskId, String userId) {
-////        for (Job job : getAllJobs(userId)) {
-////            Task task = job.getTaskById(taskId);
-//            if (task != null) {
-//                return task;
-//            }
-//        }
-//        return null;
-//    }
-
-    public User authorizeUser(String credentials) throws GeneralSecurityException, UserNotExistException {
-        if (Objects.isNull(credentials)) {
-            logger.error("Invalid credentials. The fields are null.");
-            return null;
+    public User authorizeUser(RequesterCredential requesterCredentials) throws GeneralSecurityException, UserNotExistException {
+        if (Objects.isNull(requesterCredentials.getIguassuToken())) {
+            throw new IllegalArgumentException("Iguassu Token missing.");
         }
-
-        Credential credential = null;
-        // retrieve the user credentials
 
         User authenticatedUser = null;
         logger.debug("Checking nonce.");
-        if (this.nonceList.contains(credential.getNonce())) {
-            this.nonceList.remove(credential.getNonce());
-            authenticatedUser = this.authManager.authorize(credential);
+        if (this.nonceList.contains(requesterCredentials.getNonce())) {
+            this.nonceList.remove(requesterCredentials.getNonce());
+            authenticatedUser = this.authManager.authorize(requesterCredentials);
+        } else {
+
         }
         return authenticatedUser;
     }
@@ -157,27 +104,14 @@ public class ApplicationFacade {
         return (JobSpecification) commonCompiler.getResult().get(0);
     }
 
-    private Job buildJobFromJDFFile(Job job, String jdfFilePath, JobSpecification jobSpec, String userId,
+    private Job buildJobFromJDFFile(Job job, String jdfFilePath, JobSpecification jobSpec, String userAlias,
                                     String externalOAuthToken, Long tokenVersion) {
         try {
-            this.jobBuilder.createJobFromJDFFile(
-                    job, jdfFilePath, jobSpec, userId, externalOAuthToken, tokenVersion);
-
-            logger.info(
-                    "Job ["
-                            + job.getId()
-                            + "] was built with success at time: "
-                            + System.currentTimeMillis());
-
+            this.jobBuilder.createJobFromJDFFile(job, jdfFilePath, jobSpec, userAlias, externalOAuthToken, tokenVersion);
+            logger.info("Job [" + job.getId() + "] was built with success at time: " + System.currentTimeMillis());
 //            job.finishCreation();
-
         } catch (Exception e) {
-
-            logger.error(
-                    "Failed to build ["
-                            + job.getId()
-                            + "] : at time: "
-                            + System.currentTimeMillis(),
+            logger.error("Failed to build [" + job.getId() + "] : at time: " + System.currentTimeMillis(),
                     e);
 //            job.failCreation();
         }
@@ -194,7 +128,7 @@ public class ApplicationFacade {
         }
     }
 
-    private int getNonce() {
+    public int getNonce() {
         final int nonce = UUID.randomUUID().hashCode();
         this.nonceList.add(nonce);
         return nonce;
@@ -209,14 +143,15 @@ public class ApplicationFacade {
     }
 
     public OAuthToken findUserOAuthTokenByAlias(String userAlias) {
-        return null;
+        return this.userDBManager.findUserByAlias(userAlias).getCredentials().getOauthToken();
     }
 
-    public Collection<Job> findJobsByUserAlias(String alias) {
-        Collection<Job> jobs = new ArrayList<>();
-        this.jobDBManager.findAll().forEach(job -> {
-            if (job.getUserAlias().equalsIgnoreCase(alias)) jobs.add(job);
-        });
-        return jobs;
+    public Collection<Job> findAllJobsByUserId(long userId) {
+        return this.jobDBManager.findByUserId(userId);
+    }
+
+    public String removeJob(String jobId, String user) {
+        return "";
+
     }
 }

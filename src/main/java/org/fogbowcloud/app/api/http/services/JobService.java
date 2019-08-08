@@ -22,7 +22,7 @@ public class JobService {
     private ApplicationFacade applicationFacade = ApplicationFacade.getInstance();
 
     public Collection<Job> getJobsByUser(User user) {
-        return this.applicationFacade.findJobsByUserAlias(user.getAlias());
+        return this.applicationFacade.findAllJobsByUserId(user.getId());
     }
 
     public Job getJobById(String jobId, User user) throws InvalidParameterException {
@@ -39,7 +39,7 @@ public class JobService {
         return this.applicationFacade.removeJob(jobId, user);
     }
 
-    public long submitJob(String jdfFilePath, User user) throws CompilerException, IOException {
+    public String submitJob(String jdfFilePath, User user) throws CompilerException, IOException {
         return this.applicationFacade.submitJob(jdfFilePath, user);
     }
 }

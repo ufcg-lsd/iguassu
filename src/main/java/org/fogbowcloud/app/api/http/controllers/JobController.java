@@ -1,22 +1,24 @@
 package org.fogbowcloud.app.api.http.controllers;
 
+import com.google.gson.Gson;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.Documentation;
-import org.fogbowcloud.app.core.exceptions.StorageException;
+import org.fogbowcloud.app.core.models.user.RequesterCredential;
+import org.fogbowcloud.app.api.dtos.JobDTO;
+import org.fogbowcloud.app.api.dtos.TaskDTO;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.api.http.services.FileStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
 import org.fogbowcloud.app.core.constants.GeneralConstants;
-import org.fogbowcloud.app.api.dtos.JobDTO;
-import org.fogbowcloud.app.api.dtos.TaskDTO;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
+import org.fogbowcloud.app.core.exceptions.StorageException;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
-import org.fogbowcloud.app.core.models.user.User;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.task.Task;
+import org.fogbowcloud.app.core.models.user.User;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -35,15 +37,17 @@ public class JobController {
 
     private final Logger logger = Logger.getLogger(JobController.class);
 
-    @Lazy private final FileStorageService storageService;
+    @Lazy
+    private final FileStorageService storageService;
 
-    @Lazy private JobService jobService;
+    @Lazy
+    private JobService jobService;
 
-    @Lazy private AuthService authService;
+    @Lazy
+    private AuthService authService;
 
     @Autowired
-    public JobController(
-            FileStorageService storageService, JobService jobService, AuthService authService) {
+    public JobController(FileStorageService storageService, JobService jobService, AuthService authService) {
         this.storageService = storageService;
         this.jobService = jobService;
         this.authService = authService;
@@ -53,17 +57,16 @@ public class JobController {
     @ApiOperation(value = Documentation.Job.GET_ALL_OPERATION)
     public ResponseEntity<?> getAllJobs(
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
-                    @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
-                    String userCredentials) {
+            @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS) String credentials) {
         logger.info("Recovery request for all jobs per user received.");
 
         User user;
 
         try {
-            user = this.authService.authorizeUser(userCredentials);
+            user = this.authService.authorizeUser(credentials);
         } catch (UnauthorizedRequestException ure) {
             return new ResponseEntity<>(
-                    "The authentication failed with error [" + ure.getMessage() + "]",
+                    "Error while trying to authorize [" + ure.getMessage() + "]",
                     HttpStatus.UNAUTHORIZED);
         }
 
@@ -81,7 +84,7 @@ public class JobController {
     public ResponseEntity<?> getJobById(
             @ApiParam(value = Documentation.Job.ID) @PathVariable String jobId,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
-                    @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
+            @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
                     String userCredentials)
             throws InvalidParameterException {
 
@@ -107,7 +110,7 @@ public class JobController {
     public ResponseEntity<?> getJobTasks(
             @ApiParam(value = Documentation.Job.ID) @PathVariable String jobId,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
-                    @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
+            @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
                     String userCredentials)
             throws InvalidParameterException {
         Job job;
@@ -128,10 +131,10 @@ public class JobController {
     @ApiOperation(value = Documentation.Job.CREATE_OPERATION)
     public ResponseEntity<?> submitJob(
             @ApiParam(value = Documentation.Job.CREATE_REQUEST_PARAM)
-                    @RequestParam(GeneralConstants.JDF_FILE_PATH)
+            @RequestParam(GeneralConstants.JDF_FILE_PATH)
                     MultipartFile file,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
-                    @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
+            @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
                     String userCredentials) {
 
         logger.info("Saving new Job.");
@@ -158,7 +161,7 @@ public class JobController {
             throw new StorageException("Could not store new job from user " + user.getAlias());
         }
 
-        long jobId;
+        String jobId;
         final String jdfAbsolutePath = fieldMap.get(GeneralConstants.JDF_FILE_PATH);
         try {
             logger.info("jdfpath <" + jdfAbsolutePath + ">");
@@ -181,7 +184,7 @@ public class JobController {
     public ResponseEntity<?> stopJob(
             @ApiParam(value = Documentation.Job.ID) @PathVariable String jobId,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
-                    @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
+            @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
                     String userCredentials)
             throws InvalidParameterException {
         logger.info("Deleting job with Id " + jobId + ".");
@@ -196,8 +199,7 @@ public class JobController {
                     HttpStatus.UNAUTHORIZED);
         }
 
-        final long stoppedJobId = 0L;
-         this.jobService.removeJob(jobId, user.getAlias());
+        final String stoppedJobId = this.jobService.removeJob(jobId, user.getAlias());
 
         return new ResponseEntity<>(new SimpleJobResponse(stoppedJobId), HttpStatus.ACCEPTED);
     }
@@ -219,13 +221,13 @@ public class JobController {
 
     static class SimpleJobResponse {
 
-        private long id;
+        private String id;
 
-        SimpleJobResponse(long id) {
+        SimpleJobResponse(String id) {
             this.id = id;
         }
 
-        public long getId() {
+        public String getId() {
             return this.id;
         }
     }

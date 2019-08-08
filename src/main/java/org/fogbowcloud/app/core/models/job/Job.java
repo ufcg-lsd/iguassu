@@ -5,10 +5,7 @@ import org.fogbowcloud.app.core.models.task.Task;
 import javax.persistence.*;
 import java.io.Serializable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Entity
 @Table(name = "job")
@@ -23,11 +20,10 @@ public class Job implements Serializable {
     private static final String TASKS_COLUMN_NAME = "tasks";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private String id;
 
     @Column(name = USER_ID_COLUMN_NAME)
-    private String userId;
+    private long ownerId;
 
     @ElementCollection
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -52,24 +48,25 @@ public class Job implements Serializable {
     public Job() {
     }
 
-    public Job(Map<String, Task> tasks, String label, String userID) {
+    public Job(Map<String, Task> tasks, String label, long ownerId) {
+        this.id = UUID.randomUUID().toString();
         this.state = JobState.CREATED;
         this.tasks = tasks;
-        this.label = label.trim().isEmpty() ? userID + "_job" : label;
-        this.userId = userID;
+        this.label = label.trim().isEmpty() ? ownerId + "_job" : label;
+        this.ownerId = ownerId;
         this.timestamp = Instant.now().getEpochSecond();
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public String getUserAlias() {
-        return userId;
+    public long getOwnerId() {
+        return ownerId;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setOwnerId(long ownerId) {
+        this.ownerId = ownerId;
     }
 
     public Map<String, Task> getTasks() {
@@ -121,13 +118,11 @@ public class Job implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Job job = (Job) o;
-        return id == job.id &&
-                userId.equals(job.userId) &&
-                executionId.equals(job.executionId);
+        return id.equals(job.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, userId, executionId);
+        return Objects.hash(id);
     }
 }

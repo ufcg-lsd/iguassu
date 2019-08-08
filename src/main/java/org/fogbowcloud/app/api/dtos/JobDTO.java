@@ -8,10 +8,11 @@ import java.util.Date;
 
 public class JobDTO {
 
-    private long id;
+    private String id;
     private String label;
     private String creationDate;
     private JobState state;
+    private long ownerId;
 
     public JobDTO(Job job) {
         setFields(job);
@@ -19,6 +20,7 @@ public class JobDTO {
 
     private void setFields(Job job) {
         this.id = job.getId();
+        this.ownerId = job.getOwnerId();
         this.label = job.getLabel();
         this.creationDate = timestampToDate(job.getTimestamp());
         this.state = job.getState();
@@ -32,11 +34,11 @@ public class JobDTO {
         this.label = label;
     }
 
-    public long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

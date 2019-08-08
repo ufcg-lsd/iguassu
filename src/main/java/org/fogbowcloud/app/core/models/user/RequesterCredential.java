@@ -1,20 +1,19 @@
-package org.fogbowcloud.app.api.dtos;
+package org.fogbowcloud.app.core.models.user;
 
-import com.google.gson.annotations.SerializedName;
-import org.fogbowcloud.app.core.models.user.Credential;
+public class RequesterCredential {
 
-import java.util.Objects;
-
-public class CredentialDTO {
-
-    @SerializedName("iguassu_token")
+    private long userId;
     private String iguassuToken;
     private int nonce;
 
-    CredentialDTO(Credential credential) {
+    public RequesterCredential() {}
 
-        this.iguassuToken = credential.getIguassuToken();
-        this.nonce = credential.getNonce();
+    public long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(long userId) {
+        this.userId = userId;
     }
 
     public String getIguassuToken() {
@@ -37,12 +36,19 @@ public class CredentialDTO {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        CredentialDTO that = (CredentialDTO) o;
+
+        RequesterCredential that = (RequesterCredential) o;
+
+        if (userId != that.userId) return false;
+        if (nonce != that.nonce) return false;
         return iguassuToken.equals(that.iguassuToken);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(iguassuToken);
+        int result = (int) (userId ^ (userId >>> 32));
+        result = 31 * result + iguassuToken.hashCode();
+        result = 31 * result + nonce;
+        return result;
     }
 }

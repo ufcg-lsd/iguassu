@@ -4,13 +4,13 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.ApplicationFacade;
-import org.fogbowcloud.app.core.exceptions.UserNotExistException;
-import org.fogbowcloud.app.core.models.user.OAuth2Identifiers;
-import org.fogbowcloud.app.core.models.user.OAuthToken;
-import org.fogbowcloud.app.core.models.user.User;
 import org.fogbowcloud.app.core.constants.ConfProperty;
 import org.fogbowcloud.app.core.constants.JsonKey;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
+import org.fogbowcloud.app.core.models.user.OAuth2Identifiers;
+import org.fogbowcloud.app.core.models.user.OAuthToken;
+import org.fogbowcloud.app.core.models.user.RequesterCredential;
+import org.fogbowcloud.app.core.models.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -27,7 +27,9 @@ public class AuthService {
 
     private ApplicationFacade applicationFacade = ApplicationFacade.getInstance();
 
-    @Lazy @Autowired private Properties properties;
+    @Lazy
+    @Autowired
+    private Properties properties;
 
     public User authenticate(String authorizationCode, String applicationIdentifiers)
             throws Exception {
@@ -55,22 +57,14 @@ public class AuthService {
         }
     }
 
-    public User authorizeUser(String userCredentials) throws UnauthorizedRequestException {
+    public User authorizeUser(String credentials) throws UnauthorizedRequestException {
         User user;
+        Gson gson = new Gson();
         try {
-            user = this.applicationFacade.authorizeUser(userCredentials);
-            user.resetSession();
-            this.applicationFacade.updateUser(user);
-            logger.info("Retrieving user " + user.getAlias());
-        } catch (GeneralSecurityException e) {
+            user = this.applicationFacade.authorizeUser(gson.fromJson(credentials, RequesterCredential.class));
+        } catch (Exception e) {
             logger.error("Error while trying authorize", e);
-            throw new UnauthorizedRequestException(
-                    "There was an error trying to authenticate.\nTry again later.");
-        } catch (NullPointerException e) {
-            logger.error("Incorrect credentials! Try login again.");
-            throw new UnauthorizedRequestException("Incorrect credentials! Try login again.");
-        } catch (UserNotExistException e) {
-            throw new UnauthorizedRequestException("Incorrect credentials! Try login again.");
+            throw new UnauthorizedRequestException("Unauthorized operation. Credentials are not valid.");
         }
         return user;
     }

@@ -1,24 +1,19 @@
 package org.fogbowcloud.app.core.datastore.managers;
 
-import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.models.job.Job;
-import org.fogbowcloud.app.core.datastore.DBManager;
 import org.fogbowcloud.app.core.datastore.repositories.JobRepository;
+import org.fogbowcloud.app.core.models.job.Job;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-public class JobDBManager implements DBManager<Job> {
-
-    private static final Logger logger = Logger.getLogger(JobDBManager.class);
-
+public class JobDBManager {
     private static JobDBManager instance;
 
     @Autowired
     private JobRepository jobRepository;
 
-    private JobDBManager() {}
+    private JobDBManager() {
+    }
 
     public synchronized static JobDBManager getInstance() {
         if (instance == null) {
@@ -27,13 +22,11 @@ public class JobDBManager implements DBManager<Job> {
         return instance;
     }
 
-    @Override
     public void save(Job job) {
         this.jobRepository.save(job);
     }
 
-    @Override
-    public Job findOne(long id) {
+    public Job findOne(String id) {
         return this.jobRepository.findById(id).isPresent() ? this.jobRepository.findById(id).get() : null;
     }
 
@@ -41,18 +34,20 @@ public class JobDBManager implements DBManager<Job> {
         return this.jobRepository.findAll();
     }
 
-    @Override
     public void update(Job job) {
         this.jobRepository.deleteById(job.getId());
         this.jobRepository.save(job);
     }
 
-    @Override
-    public void delete(long id) {
+    public List<Job> findByUserId(long userId) {
+        return this.jobRepository.findAllByOwnerId(userId);
+    }
+
+    public void delete(String id) {
         this.jobRepository.deleteById(id);
     }
 
-   public void setJobRepository(JobRepository jobRepository) {
+    public void setJobRepository(JobRepository jobRepository) {
         this.jobRepository = jobRepository;
-   }
+    }
 }
