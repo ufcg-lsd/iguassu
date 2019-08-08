@@ -3,7 +3,7 @@ package org.fogbowcloud.app;
 import java.io.FileInputStream;
 import java.util.Properties;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.IguassuFacade;
+import org.fogbowcloud.app.core.ApplicationFacade;
 import org.fogbowcloud.app.core.constants.GeneralConstants;
 import org.fogbowcloud.app.core.constants.ExitCode;
 import org.fogbowcloud.app.core.datastore.managers.JobDBManager;
@@ -44,7 +44,7 @@ public class IguassuMainRunner implements CommandLineRunner {
 		loadProperties(CONF_FILE_PATH);
 
 		try {
-			IguassuFacade.getInstance().init(this.properties);
+			ApplicationFacade.getInstance().init(this.properties);
 		} catch (Exception e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());

@@ -71,7 +71,7 @@ public class JobBuilder {
                     }
                     Task task = new Task(requirements);
                     task.putMetadata(JsonKey.JOB_ID.getKey(), String.valueOf(job.getId()));
-                    task.putMetadata(USER_KEY, job.getUserId());
+                    task.putMetadata(USER_KEY, job.getUserAlias());
 
                     parseInitCommands(
                             taskSpec, task, userId, externalOAuthToken, tokenVersion);

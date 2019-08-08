@@ -55,20 +55,19 @@ public class JobController {
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
                     @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
                     String userCredentials) {
+        logger.info("Recovery request for all jobs per user received.");
+
         User user;
 
         try {
             user = this.authService.authorizeUser(userCredentials);
-
         } catch (UnauthorizedRequestException ure) {
             return new ResponseEntity<>(
                     "The authentication failed with error [" + ure.getMessage() + "]",
                     HttpStatus.UNAUTHORIZED);
         }
 
-        final Collection<Job> allJobsOfUser = this.jobService.getJobsByUser(user);;
-//
-        logger.debug("Retrieving all jobs of user [" + user.getAlias() + "]");
+        final Collection<Job> allJobsOfUser = this.jobService.getJobsByUser(user);
 
         final List<JobDTO> jobsResponse = new LinkedList<>();
 
@@ -198,7 +197,7 @@ public class JobController {
         }
 
         final long stoppedJobId = 0L;
-//        this.jobService.stopJob(jobId, user.getIdentifier());
+         this.jobService.removeJob(jobId, user.getAlias());
 
         return new ResponseEntity<>(new SimpleJobResponse(stoppedJobId), HttpStatus.ACCEPTED);
     }

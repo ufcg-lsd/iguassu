@@ -3,6 +3,7 @@ package org.fogbowcloud.app.core;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.auth.DefaultAuthManager;
+import org.fogbowcloud.app.core.datastore.managers.JobDBManager;
 import org.fogbowcloud.app.core.datastore.managers.UserDBManager;
 import org.fogbowcloud.app.core.exceptions.UserNotExistException;
 import org.fogbowcloud.app.core.models.job.Job;
@@ -15,59 +16,53 @@ import org.fogbowcloud.app.core.routines.DefaultRoutineManager;
 import org.fogbowcloud.app.core.routines.RoutineManager;
 import org.fogbowcloud.app.jdfcompiler.JobBuilder;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
-import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler.FileType;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.utils.JDFUtil;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.security.GeneralSecurityException;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
-public class IguassuController {
+public class ApplicationFacade {
+    private static final Logger logger = Logger.getLogger(ApplicationFacade.class);
 
-    private static final Logger logger = Logger.getLogger(IguassuController.class);
-
-    private static IguassuController instance;
-
-    @Autowired
-    private Properties properties;
-
+    private static ApplicationFacade instance;
     private final List<Integer> nonceList;
     private final Queue<Job> jobsToSubmit;
-
     private AuthManager authManager;
     private JobBuilder jobBuilder;
+    private JobDBManager jobDBManager;
+    private UserDBManager userDBManager;
 
-    private IguassuController() {
+    private ApplicationFacade() {
         this.jobsToSubmit = new ConcurrentLinkedQueue<>();
         this.nonceList = new ArrayList<>();
+        this.jobDBManager = JobDBManager.getInstance();
+        this.userDBManager = UserDBManager.getInstance();
     }
 
-    public static IguassuController getInstance() {
-        if (instance == null) {
-            instance = new IguassuController();
+    public static ApplicationFacade getInstance() {
+        synchronized (ApplicationFacade.class) {
+            if (instance == null) {
+                instance = new ApplicationFacade();
+            }
+            return instance;
         }
-        return instance;
     }
 
     public void init(Properties properties) {
-        this.properties = properties;
-        this.authManager = new DefaultAuthManager(this.properties);
-        this.jobBuilder = new JobBuilder(this.properties);
-        final RoutineManager routineManager = new DefaultRoutineManager(this.properties, this.jobsToSubmit);
+        this.authManager = new DefaultAuthManager(properties);
+        this.jobBuilder = new JobBuilder(properties);
+        final RoutineManager routineManager = new DefaultRoutineManager(properties, this.jobsToSubmit);
         routineManager.startAll();
     }
 
-//    Job getJobById(String jobId, String user) {
-//        return this.jobDataStore.getByJobId(jobId, user);
+
+//    public Job getJobById(String jobId, String userId) {
+//        return this.iguassuController.getJobById(jobId, userId);
 //    }
 
-    void updateUser(User user) {
-        UserDBManager.getInstance().update(user);
-    }
-
-    long submitJob(String jdfFilePath, User user) throws CompilerException {
+    public long submitJob(String jdfFilePath, User user) throws CompilerException {
         logger.debug("Adding job of user " + user.getAlias() + " to buffer.");
 
         final Job job = buildJob(jdfFilePath, user);
@@ -76,6 +71,10 @@ public class IguassuController {
 
         return job.getId();
     }
+
+//    public ArrayList<Job> getAllJobs(String userId) {
+//        return this.iguassuController.getAllJobs(userId);
+//    }
 
     private Job buildJob(String jdfFilePath, User user) throws CompilerException {
 
@@ -131,7 +130,7 @@ public class IguassuController {
 //        return null;
 //    }
 
-    User authorizeUser(String credentials) throws GeneralSecurityException, UserNotExistException {
+    public User authorizeUser(String credentials) throws GeneralSecurityException, UserNotExistException {
         if (Objects.isNull(credentials)) {
             logger.error("Invalid credentials. The fields are null.");
             return null;
@@ -149,28 +148,11 @@ public class IguassuController {
         return authenticatedUser;
     }
 
-
-//    JobDataStore getJobDataStore() {
-//        return this.jobDataStore;
-//    }
-//
-//    void storeOAuthToken(OAuthToken oAuthToken) {
-//        this.oAuthTokenDataStore.insert(oAuthToken);
-//    }
-//
-//    OAuthToken getCurrentTokenByUserId(String userId) {
-//        return this.oAuthTokenDataStore.getCurrentTokenByUserId(userId);
-//    }
-//
-//    void deleteOAuthToken(OAuthToken oAuthToken) {
-//        this.oAuthTokenDataStore.deleteByAccessToken(oAuthToken.getAccessToken());
-//    }
-
     private JobSpecification compile(String jdfFilePath) throws CompilerException {
         CommonCompiler commonCompiler = new CommonCompiler();
         logger.debug(
                 "Job " + jdfFilePath + " compilation started at time: " + System.currentTimeMillis());
-        commonCompiler.compile(jdfFilePath, FileType.JDF);
+        commonCompiler.compile(jdfFilePath, CommonCompiler.FileType.JDF);
         logger.debug("Job " + jdfFilePath + " compilation ended at time: " + System.currentTimeMillis());
         return (JobSpecification) commonCompiler.getResult().get(0);
     }
@@ -203,7 +185,7 @@ public class IguassuController {
         return job;
     }
 
-    User authenticateUser(OAuth2Identifiers oAuth2Identifiers, String authorizationCode)
+    public User authenticateUser(OAuth2Identifiers oAuth2Identifiers, String authorizationCode)
             throws GeneralSecurityException {
         try {
             return this.authManager.authenticate(oAuth2Identifiers, authorizationCode, this.getNonce());
@@ -212,13 +194,13 @@ public class IguassuController {
         }
     }
 
-    int getNonce() {
+    private int getNonce() {
         final int nonce = UUID.randomUUID().hashCode();
         this.nonceList.add(nonce);
         return nonce;
     }
 
-    OAuthToken refreshToken(OAuthToken oAuthToken) throws GeneralSecurityException {
+    public OAuthToken refreshToken(OAuthToken oAuthToken) throws GeneralSecurityException {
         try {
             return this.authManager.refreshOAuth2Token(oAuthToken);
         } catch (Exception e) {
@@ -226,7 +208,15 @@ public class IguassuController {
         }
     }
 
-    OAuthToken findUserOAuthTokenByAlias(String userAlias) {
+    public OAuthToken findUserOAuthTokenByAlias(String userAlias) {
         return null;
+    }
+
+    public Collection<Job> findJobsByUserAlias(String alias) {
+        Collection<Job> jobs = new ArrayList<>();
+        this.jobDBManager.findAll().forEach(job -> {
+            if (job.getUserAlias().equalsIgnoreCase(alias)) jobs.add(job);
+        });
+        return jobs;
     }
 }

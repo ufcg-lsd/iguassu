@@ -3,7 +3,7 @@ package org.fogbowcloud.app.api.http.services;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.IguassuFacade;
+import org.fogbowcloud.app.core.ApplicationFacade;
 import org.fogbowcloud.app.core.exceptions.UserNotExistException;
 import org.fogbowcloud.app.core.models.user.OAuth2Identifiers;
 import org.fogbowcloud.app.core.models.user.OAuthToken;
@@ -25,7 +25,7 @@ public class AuthService {
 
     private static final Logger logger = Logger.getLogger(AuthService.class);
 
-    private IguassuFacade iguassuFacade = IguassuFacade.getInstance();
+    private ApplicationFacade applicationFacade = ApplicationFacade.getInstance();
 
     @Lazy @Autowired private Properties properties;
 
@@ -44,7 +44,7 @@ public class AuthService {
 
         if (isAReliableApp(applicationIds)) {
             try {
-                return this.iguassuFacade.authenticateUser(applicationIds, rawAuthorizationCode);
+                return this.applicationFacade.authenticateUser(applicationIds, rawAuthorizationCode);
             } catch (Exception e) {
                 throw new GeneralSecurityException();
             }
@@ -58,9 +58,9 @@ public class AuthService {
     public User authorizeUser(String userCredentials) throws UnauthorizedRequestException {
         User user;
         try {
-            user = this.iguassuFacade.authorizeUser(userCredentials);
+            user = this.applicationFacade.authorizeUser(userCredentials);
             user.resetSession();
-            this.iguassuFacade.updateUser(user);
+            this.applicationFacade.updateUser(user);
             logger.info("Retrieving user " + user.getAlias());
         } catch (GeneralSecurityException e) {
             logger.error("Error while trying authorize", e);
@@ -76,7 +76,7 @@ public class AuthService {
     }
 
     public String refreshToken(String userAlias, Long version) throws Exception {
-        OAuthToken oAuthToken = this.iguassuFacade.findUserOAuthTokenByAlias(userAlias);
+        OAuthToken oAuthToken = this.applicationFacade.findUserOAuthTokenByAlias(userAlias);
         if (Objects.isNull(oAuthToken)) {
             throw new UnauthorizedRequestException("Was not found token for user [" + userAlias + "]");
         }
@@ -96,7 +96,7 @@ public class AuthService {
     private OAuthToken refreshAndDelete(OAuthToken oAuthToken) throws GeneralSecurityException {
         OAuthToken refreshedToken;
         try {
-            refreshedToken = this.iguassuFacade.refreshToken(oAuthToken);
+            refreshedToken = this.applicationFacade.refreshToken(oAuthToken);
         } catch (GeneralSecurityException gse) {
             throw new GeneralSecurityException(gse.getMessage());
         }

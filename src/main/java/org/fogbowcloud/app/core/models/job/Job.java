@@ -64,7 +64,7 @@ public class Job implements Serializable {
         return id;
     }
 
-    public String getUserId() {
+    public String getUserAlias() {
         return userId;
     }
 
