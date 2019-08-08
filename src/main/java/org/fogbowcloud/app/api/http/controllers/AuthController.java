@@ -1,6 +1,5 @@
 package org.fogbowcloud.app.api.http.controllers;
 
-import com.google.gson.Gson;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -43,22 +42,27 @@ public class AuthController {
             @ApiParam(value = Documentation.CommonParameters.OAUTH_CREDENTIALS)
             @RequestHeader(value = GeneralConstants.X_AUTH_APP_IDENTIFIERS)
                     String applicationIdentifiers) {
-
+        logger.info("Authentication request received.");
         try {
             if (Objects.nonNull(authorizationCode) && !authorizationCode.trim().isEmpty()) {
-                try {
-                    final User userAuthenticated = this.authService.authenticate(
-                            authorizationCode, applicationIdentifiers);
+                if (Objects.nonNull(applicationIdentifiers) && !applicationIdentifiers.trim().isEmpty()) {
+                    try {
+                        final User userAuthenticated = this.authService.authenticate(
+                                authorizationCode, applicationIdentifiers);
 
-                    return new ResponseEntity<>(new UserDTO(userAuthenticated), HttpStatus.OK);
-                } catch (GeneralSecurityException gse) {
+                        return new ResponseEntity<>(new UserDTO(userAuthenticated), HttpStatus.OK);
+                    } catch (GeneralSecurityException gse) {
+                        return new ResponseEntity<>(
+                                "The authentication failed with error [" + gse.getMessage() + "]",
+                                HttpStatus.UNAUTHORIZED);
+                    }
+                } else {
                     return new ResponseEntity<>(
-                            "The authentication failed with error [" + gse.getMessage() + "]",
-                            HttpStatus.UNAUTHORIZED);
+                            "Application identifiers are invalid. Check and try again.", HttpStatus.BAD_REQUEST);
                 }
             } else {
                 return new ResponseEntity<>(
-                        "The authorization code is invalid.", HttpStatus.BAD_REQUEST);
+                        "The authorization code is invalid. Check and try again.", HttpStatus.BAD_REQUEST);
             }
         } catch (StorageServiceConnectException ssce) {
             return new ResponseEntity<>(
@@ -74,6 +78,7 @@ public class AuthController {
     @PostMapping(Documentation.Endpoint.REFRESH_TOKEN_VERSION)
     public ResponseEntity<?> refreshToken(
             @PathVariable String userId, @PathVariable Long tokenVersion) {
+        logger.info("Refresh OAuth2 tokens request received.");
         try {
             String refreshedAccessToken = this.authService.refreshToken(userId, tokenVersion);
             return new ResponseEntity<>(refreshedAccessToken, HttpStatus.CREATED);
