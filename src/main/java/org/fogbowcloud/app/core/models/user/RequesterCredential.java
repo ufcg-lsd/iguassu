@@ -4,7 +4,7 @@ public class RequesterCredential {
 
     private long userId;
     private String iguassuToken;
-    private int nonce;
+    private Integer nonce;
 
     public RequesterCredential() {}
 
@@ -24,11 +24,11 @@ public class RequesterCredential {
         this.iguassuToken = iguassuToken;
     }
 
-    public int getNonce() {
+    public Integer getNonce() {
         return nonce;
     }
 
-    public void setNonce(int nonce) {
+    public void setNonce(Integer nonce) {
         this.nonce = nonce;
     }
 

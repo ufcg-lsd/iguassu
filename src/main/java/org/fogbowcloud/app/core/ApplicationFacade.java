@@ -84,13 +84,13 @@ public class ApplicationFacade {
             throw new IllegalArgumentException("Iguassu Token missing.");
         }
 
-        User authenticatedUser = null;
-        logger.debug("Checking nonce.");
+        User authenticatedUser;
+        logger.info("Checking nonce.");
         if (this.nonceList.contains(requesterCredentials.getNonce())) {
             this.nonceList.remove(requesterCredentials.getNonce());
             authenticatedUser = this.authManager.authorize(requesterCredentials);
         } else {
-
+            throw new GeneralSecurityException("Invalid nonce for this request.");
         }
         return authenticatedUser;
     }

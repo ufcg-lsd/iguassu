@@ -56,7 +56,6 @@ public class DefaultAuthManager implements AuthManager {
                 this.userDBManager.save(user);
                 logger.info("User " + oAuthToken.getUserId() + " has been successfully authenticated.");
             }
-
             return user;
 
         } catch (Exception e) {
@@ -69,7 +68,7 @@ public class DefaultAuthManager implements AuthManager {
     public User authorize(RequesterCredential requesterCredentials) throws GeneralSecurityException, UserNotExistException {
         User user;
         try {
-            user = Objects.requireNonNull(this.userDBManager.findOne(requesterCredentials.getUserId()));
+            user = Objects.requireNonNull(this.userDBManager.findById(requesterCredentials.getUserId()));
         } catch (NullPointerException npe) {
             throw new UserNotExistException("The user could not be recovered because it has not yet been stored.");
         }
@@ -79,6 +78,9 @@ public class DefaultAuthManager implements AuthManager {
         if (!user.getCredentials().getIguassuToken().equalsIgnoreCase(requesterCredentials.getIguassuToken())) {
             throw new GeneralSecurityException("User " + user.getAlias() + " not has a valid Iguassu token.");
         }
+
+        user.resetSession();
+        this.userDBManager.update(user);
 
         return user;
     }
