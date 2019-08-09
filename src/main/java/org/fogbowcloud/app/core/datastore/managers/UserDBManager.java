@@ -33,7 +33,7 @@ public class UserDBManager {
         logger.info("User " + user.getAlias() + " was saved.");
     }
 
-    public User findById(long id) {
+    public User findById(Long id) {
         return this.userRepository.findById(id).isPresent() ? this.userRepository.findById(id).get() : null;
     }
 
@@ -50,7 +50,7 @@ public class UserDBManager {
         logger.info("User " + user.getAlias() + " was updated.");
     }
 
-    public void delete(long id) {
+    public void delete(Long id) {
         this.userRepository.deleteById(id);
     }
 

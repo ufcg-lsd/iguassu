@@ -1,6 +1,7 @@
 package org.fogbowcloud.app.core.models.job;
 
 import org.fogbowcloud.app.core.models.task.Task;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
 import java.io.Serializable;
@@ -19,25 +20,25 @@ public class Job implements Serializable {
     private static final String EXECUTION_ID_COLUMN_NAME = "execution_id";
     private static final String TASKS_COLUMN_NAME = "tasks";
 
-    @Id
-    private String id;
+    @Id @GeneratedValue(strategy = GenerationType.TABLE)
+    private Long id;
 
     @Column(name = USER_ID_COLUMN_NAME)
-    private long ownerId;
+    private Long ownerId;
 
     @ElementCollection
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @MapKeyColumn(name = TASK_ID_COLUMN_NAME)
     @JoinColumn(name = JOB_ID_COLUMN_NAME)
     @Column(name = TASKS_COLUMN_NAME)
-    private Map<String, Task> tasks;
+    private Map<Long, Task> tasks;
 
     @Column(name = STATE_COLUMN_NAME)
     @Enumerated(EnumType.STRING)
     private JobState state;
 
     @Column(name = TIMESTAMP_COLUMN_NAME)
-    private long timestamp;
+    private Long timestamp;
 
     @Column(name = LABEL_COLUMN_NAME)
     private String label;
@@ -48,8 +49,7 @@ public class Job implements Serializable {
     public Job() {
     }
 
-    public Job(Map<String, Task> tasks, String label, long ownerId) {
-        this.id = UUID.randomUUID().toString();
+    public Job(Map<Long, Task> tasks, String label, Long ownerId) {
         this.state = JobState.CREATED;
         this.tasks = tasks;
         this.label = label.trim().isEmpty() ? ownerId + "_job" : label;
@@ -57,23 +57,23 @@ public class Job implements Serializable {
         this.timestamp = Instant.now().getEpochSecond();
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public long getOwnerId() {
+    public Long getOwnerId() {
         return ownerId;
     }
 
-    public void setOwnerId(long ownerId) {
+    public void setOwnerId(Long ownerId) {
         this.ownerId = ownerId;
     }
 
-    public Map<String, Task> getTasks() {
+    public Map<Long, Task> getTasks() {
         return tasks;
     }
 
-    public void setTasks(Map<String, Task> tasks) {
+    public void setTasks(Map<Long, Task> tasks) {
         this.tasks = tasks;
     }
 
@@ -89,7 +89,7 @@ public class Job implements Serializable {
         this.state = state;
     }
 
-    public long getTimestamp() {
+    public Long getTimestamp() {
         return timestamp;
     }
 

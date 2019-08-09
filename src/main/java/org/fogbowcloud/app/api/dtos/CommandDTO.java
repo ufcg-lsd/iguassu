@@ -1,12 +1,16 @@
 package org.fogbowcloud.app.api.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.fogbowcloud.app.core.models.command.Command;
 import org.fogbowcloud.app.core.models.command.CommandState;
 
 public class CommandDTO {
 
+    @JsonProperty("raw_command")
     private String rawCommand;
+
     private CommandState state;
+
     private int exitCode;
 
     public CommandDTO(Command command){

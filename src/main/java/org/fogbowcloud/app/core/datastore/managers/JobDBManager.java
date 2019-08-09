@@ -26,7 +26,7 @@ public class JobDBManager {
         this.jobRepository.save(job);
     }
 
-    public Job findOne(String id) {
+    public Job findOne(Long id) {
         return this.jobRepository.findById(id).isPresent() ? this.jobRepository.findById(id).get() : null;
     }
 
@@ -35,15 +35,14 @@ public class JobDBManager {
     }
 
     public void update(Job job) {
-        this.jobRepository.deleteById(job.getId());
         this.jobRepository.save(job);
     }
 
-    public List<Job> findByUserId(long userId) {
-        return this.jobRepository.findAllByOwnerId(userId);
+    public List<Job> findByUserId(Long ownerId) {
+        return this.jobRepository.findAllByOwnerId(ownerId);
     }
 
-    public void delete(String id) {
+    public void delete(Long id) {
         this.jobRepository.deleteById(id);
     }
 

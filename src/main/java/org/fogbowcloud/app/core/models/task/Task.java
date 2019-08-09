@@ -20,8 +20,8 @@ public class Task {
     private static final String REQUIREMENTS_MAP_KEY_COLUMN_NAME = "requirements_key";
 
     @Id
-    @GeneratedValue
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
 
     @Enumerated(EnumType.STRING)
     private TaskState state;
@@ -71,11 +71,11 @@ public class Task {
         this.commands.add(command);
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 

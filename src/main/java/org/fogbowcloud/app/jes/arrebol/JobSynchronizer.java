@@ -67,9 +67,9 @@ public class JobSynchronizer implements Synchronizer<Job> {
         updateJobState(job, jobExecArrebol.getState());
     }
 
-    private void updateTasks(Map<String, Task> iguassuTasks, List<ArrebolTask> arrebolTasks) {
+    private void updateTasks(Map<Long, Task> iguassuTasks, List<ArrebolTask> arrebolTasks) {
         for (ArrebolTask arrebolTask : arrebolTasks) {
-            final String iguassuTaskId = arrebolTask.getTaskSpec().getId();
+            final Long iguassuTaskId = arrebolTask.getTaskSpec().getId();
             final Task iguassuTask = iguassuTasks.get(iguassuTaskId);
 
             if (iguassuTask != null) {

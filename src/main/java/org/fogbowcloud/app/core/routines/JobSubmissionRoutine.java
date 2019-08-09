@@ -47,7 +47,7 @@ public class JobSubmissionRoutine implements Runnable {
                 break;
             } catch (Exception e) {
                 job.setState(JobState.FAILED);
-                JobDBManager.getInstance().update(job);
+                JobDBManager.getInstance().save(job);
                 logger.error("Error submitting job with id: [" + job.getId() + "]. " +
                                 "Maybe the Job is poorly formed.", e);
             }

@@ -1,5 +1,6 @@
 package org.fogbowcloud.app.api.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.job.JobState;
 
@@ -8,11 +9,13 @@ import java.util.Date;
 
 public class JobDTO {
 
-    private String id;
+    private Long id;
     private String label;
     private String creationDate;
     private JobState state;
-    private long ownerId;
+
+    @JsonProperty("owner_id")
+    private Long ownerId;
 
     public JobDTO(Job job) {
         setFields(job);
@@ -34,11 +37,11 @@ public class JobDTO {
         this.label = label;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -54,10 +57,14 @@ public class JobDTO {
         return this.creationDate;
     }
 
-    private String timestampToDate(long timestamp) {
+    private String timestampToDate(Long timestamp) {
         Date date = new java.util.Date(timestamp * 1000L);
         SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
         sdf.setTimeZone(java.util.TimeZone.getTimeZone("GMT-3"));
         return sdf.format(date);
+    }
+
+    public Long getOwnerId() {
+        return ownerId;
     }
 }

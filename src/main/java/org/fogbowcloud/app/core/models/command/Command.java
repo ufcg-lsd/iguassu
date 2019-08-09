@@ -20,7 +20,7 @@ public class Command implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     @Column
     private final String command;
@@ -76,7 +76,7 @@ public class Command implements Serializable {
         return this.rawCommand;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 

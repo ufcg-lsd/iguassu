@@ -7,12 +7,12 @@ import java.util.Map;
 public class TaskSpecDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    private String id;
+    private Long id;
     private Map<String, String> requirements;
     private List<String> commands;
     private Map<String, String> metadata;
 
-    public TaskSpecDTO(String id, Map<String, String> requirements, List<String> commands,
+    public TaskSpecDTO(Long id, Map<String, String> requirements, List<String> commands,
                        Map<String, String> metadata) {
         this.id = id;
         this.requirements = requirements;
@@ -31,7 +31,7 @@ public class TaskSpecDTO implements Serializable {
         return this.metadata;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 

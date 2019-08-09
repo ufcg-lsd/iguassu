@@ -26,7 +26,7 @@ public class OAuthToken {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     /**
      * An Access Token is used to make requests that can manipulate data in the Storage Service.
@@ -63,7 +63,7 @@ public class OAuthToken {
      * distributed, so some control over them is required.
      */
     @Column
-    private long version;
+    private Long version;
 
     /**
      * The time of expiration encapsulated in a Date object.
@@ -118,9 +118,9 @@ public class OAuthToken {
         return expirationDate;
     }
 
-    public void setExpirationDate(long secondsToExpires) {
+    public void setExpirationDate(Long secondsToExpires) {
         Timestamp stamp = new Timestamp(System.currentTimeMillis());
-        long expiresInMillisecond = secondsToExpires * 1000;
+        Long expiresInMillisecond = secondsToExpires * 1000;
         this.expirationDate = new Date(stamp.getTime() + expiresInMillisecond);
     }
 
@@ -142,15 +142,15 @@ public class OAuthToken {
         this.expirationDate = new Date(stamp.getTime());
     }
 
-    public long getVersion() {
+    public Long getVersion() {
         return version;
     }
 
-    public void setVersion(long version) {
+    public void setVersion(Long version) {
         this.version = version;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 

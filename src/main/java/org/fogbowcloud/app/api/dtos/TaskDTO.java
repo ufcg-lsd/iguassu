@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class TaskDTO {
 
-    private String id;
+    private Long id;
     private List<CommandDTO> commands;
     private Map<String, String> requirements;
     private TaskState state;
@@ -32,7 +32,7 @@ public class TaskDTO {
         return l;
     }
 
-    public String getId() {
+    public Long getId() {
         return id;
     }
 

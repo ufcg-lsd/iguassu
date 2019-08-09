@@ -16,7 +16,7 @@ public class Credential {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     @Column(name = IGUASSU_TOKEN_COLUMN_NAME)
     @Convert(converter = TokenEncrypt.class)
@@ -53,7 +53,7 @@ public class Credential {
         this.nonce = nonce;
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 

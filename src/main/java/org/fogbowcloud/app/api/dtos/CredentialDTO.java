@@ -1,14 +1,16 @@
 package org.fogbowcloud.app.api.dtos;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import org.fogbowcloud.app.core.models.user.Credential;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class CredentialDTO {
+public class CredentialDTO implements Serializable {
 
-    @SerializedName("iguassu_token")
+    @JsonProperty("iguassu_token")
     private String iguassuToken;
+
     private int nonce;
 
     CredentialDTO(Credential credential) {

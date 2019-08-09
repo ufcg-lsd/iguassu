@@ -6,9 +6,9 @@ import org.fogbowcloud.app.core.constants.DockerConstants;
 import org.fogbowcloud.app.core.constants.JsonKey;
 import org.fogbowcloud.app.core.models.command.Command;
 import org.fogbowcloud.app.core.models.job.Job;
-import org.fogbowcloud.app.core.models.job.JobSpecification;
-import org.fogbowcloud.app.core.models.job.TaskSpecification;
 import org.fogbowcloud.app.core.models.task.Task;
+import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
+import org.fogbowcloud.app.jdfcompiler.job.TaskSpecification;
 import org.fogbowcloud.app.jdfcompiler.semantic.IOCommand;
 import org.fogbowcloud.app.jdfcompiler.semantic.JDLCommand;
 import org.fogbowcloud.app.jdfcompiler.semantic.JDLCommand.JDLCommandType;
@@ -65,7 +65,7 @@ public class JobBuilder {
                 requirements.put("image", image);
                 addAllRequirements(jobRequirements, requirements);
 
-                Map<String, Task> tasks = new HashMap<>();
+                Map<Long, Task> tasks = new HashMap<>();
                 for (TaskSpecification taskSpec : jobSpec.getTaskSpecs()) {
                     if (Thread.interrupted()) {
                         throw new InterruptedException();
@@ -80,7 +80,7 @@ public class JobBuilder {
                     parseTaskCommands(
                             taskSpec, task, job.getOwnerId(), externalOAuthToken, tokenVersion);
                     parseFinalCommands(
-                            taskSpec, task,job.getOwnerId(), externalOAuthToken, tokenVersion);
+                            taskSpec, task, job.getOwnerId(), externalOAuthToken, tokenVersion);
 
                     tasks.put(task.getId(), task);
                 }
@@ -132,7 +132,7 @@ public class JobBuilder {
      * @param task     The output expression containing the JDL job
      */
     private void parseTaskCommands(TaskSpecification taskSpec, Task task,
-                                   long userId, String externalOAuthToken, Long tokenVersion) {
+                                   Long userId, String externalOAuthToken, Long tokenVersion) {
         List<JDLCommand> initBlocks = taskSpec.getTaskBlocks();
         addCommands(initBlocks, task, userId, externalOAuthToken, tokenVersion);
     }
@@ -144,13 +144,13 @@ public class JobBuilder {
      * @param task     The output expression containing the JDL job
      */
     private void parseInitCommands(TaskSpecification taskSpec, Task task,
-                                   long userId,
+                                   Long userId,
                                    String externalOAuthToken, Long tokenVersion) {
         List<JDLCommand> initBlocks = taskSpec.getInitBlocks();
         addCommands(initBlocks, task, userId, externalOAuthToken, tokenVersion);
     }
 
-    private void addCommands(List<JDLCommand> initBlocks, Task task, long userId,
+    private void addCommands(List<JDLCommand> initBlocks, Task task, Long userId,
                              String externalOAuthToken, Long tokenVersion) {
         if (initBlocks == null) {
             return;
@@ -165,7 +165,7 @@ public class JobBuilder {
         }
     }
 
-    private void addIOCommands(Task task, IOCommand command, long userId,
+    private void addIOCommands(Task task, IOCommand command, Long userId,
                                String externalOAuthToken, Long tokenVersion) {
         String sourceFile = command.getEntry().getSourceFile();
         String destination = command.getEntry().getDestination();
@@ -201,12 +201,12 @@ public class JobBuilder {
      * @param task     The output expression containing the JDL job
      */
     private void parseFinalCommands(TaskSpecification taskSpec, Task task,
-                                    long userId, String externalOAuthToken, Long tokenVersion) {
+                                    Long userId, String externalOAuthToken, Long tokenVersion) {
         List<JDLCommand> initBlocks = taskSpec.getFinalBlocks();
         addCommands(initBlocks, task, userId, externalOAuthToken, tokenVersion);
     }
 
-    private Command uploadFileCommands(String localFilePath, String filePathToUpload, long userId,
+    private Command uploadFileCommands(String localFilePath, String filePathToUpload, Long userId,
                                        String token, Long tokenVersion, String rawCommand) {
         final String fileDriverHostIp =
                 this.properties.getProperty(ConfProperty.STORAGE_SERVICE_HOST_URL.getProp());
@@ -232,7 +232,7 @@ public class JobBuilder {
         return new Command(commandIO, rawCommand);
     }
 
-    private Command downloadFileCommands(String localFilePath, String filePathToDownload, long userId, String token,
+    private Command downloadFileCommands(String localFilePath, String filePathToDownload, Long userId, String token,
                                          Long tokenVersion, String rawCommand) {
         final String fileDriverHostIp = this.properties.getProperty(ConfProperty.STORAGE_SERVICE_HOST_URL.getProp());
         final String requestRefreshedTokenCommand = this.getRefreshTokenCommand();

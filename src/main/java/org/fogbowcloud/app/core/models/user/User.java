@@ -14,7 +14,7 @@ public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long id;
+    private Long id;
 
     @Column
     private String alias;
@@ -28,7 +28,7 @@ public class User {
     private SessionState sessionState;
 
     @Column(name = SESSION_TIME_COLUMN_NAME)
-    private long sessionTime;
+    private Long sessionTime;
 
     public User() {
     }
@@ -64,11 +64,11 @@ public class User {
     /**
      * Returns the value of the last session start in epoch seconds format.
      */
-    public long getSessionTime() {
+    public Long getSessionTime() {
         return this.sessionTime;
     }
 
-    private void setSessionTime(long sessionTime) {
+    private void setSessionTime(Long sessionTime) {
         this.sessionTime = sessionTime;
     }
 
@@ -87,7 +87,7 @@ public class User {
         this.credentials.setIguassuToken(token);
     }
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 

@@ -17,7 +17,7 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.fogbowcloud.app.core.models.job;
+package org.fogbowcloud.app.jdfcompiler.job;
 
 import java.io.Serializable;
 import java.util.List;

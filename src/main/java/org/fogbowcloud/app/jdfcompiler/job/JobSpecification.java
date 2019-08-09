@@ -17,13 +17,13 @@
  * along with this program. If not, see <http://www.gnu.org/licenses/>.
  *
  */
-package org.fogbowcloud.app.core.models.job;
-
-import java.io.Serializable;
-import java.util.*;
+package org.fogbowcloud.app.jdfcompiler.job;
 
 import org.fogbowcloud.app.jdfcompiler.CommonUtils;
 import org.fogbowcloud.app.jdfcompiler.exceptions.JobSpecificationException;
+
+import java.io.Serializable;
+import java.util.*;
 
 /**
  * Entity that encapsulates all the information given by the user about each job. To inform, the
@@ -39,32 +39,46 @@ public class JobSpecification implements Serializable {
      */
     private static final long serialVersionUID = 1L;
 
-    /** A friendly name for the job. */
+    /**
+     * A friendly name for the job.
+     */
     private String label;
 
-    /** */
+    /**
+     *
+     */
     private String requirements;
 
-    /** Describes the user preferences to be checked against the resources' annotations. */
+    private String schedPath = "";
+
+    /**
+     * Describes the user preferences to be checked against the resources' annotations.
+     */
     private Map<String, String> annotations;
 
     private List<TaskSpecification> taskSpecs;
 
-    public JobSpecification() {}
+    /**
+     * Job source directory where results files are stored
+     */
+    private String sourceParentDir;
+
+    public JobSpecification() {
+    }
 
     /**
      * Constructor.
      *
-     * @param label The label for the job.
+     * @param label        The label for the job.
      * @param requirements The logical expression that defines the job. It will be used to choose
-     *     machines that are able to run its tasks. To define it well, check the OurGrid manual.
-     * @param taskSpecs A list with all the task specifications of this job.
+     *                     machines that are able to run its tasks. To define it well, check the OurGrid manual.
+     * @param taskSpecs    A list with all the task specifications of this job.
      */
-	private JobSpecification(
-			String label,
-			String requirements,
-			List<TaskSpecification> taskSpecs,
-			Map<String, String> annotations)
+    private JobSpecification(
+            String label,
+            String requirements,
+            List<TaskSpecification> taskSpecs,
+            Map<String, String> annotations)
             throws JobSpecificationException {
 
         this.annotations = annotations;
@@ -74,7 +88,49 @@ public class JobSpecification implements Serializable {
         validate();
     }
 
-    /** This method validates the attributes of this Job Spec */
+    /**
+     * Constructor.
+     *
+     * @param label        The label for the job.
+     * @param requirements The logical expression that defines the job. It will be used to choose
+     *                     machines that are able to run its tasks. To define it well, check the OurGrid manual.
+     * @param taskSpecs    A list with all the task specifications of this job.
+     */
+    public JobSpecification(String label, String requirements, List<TaskSpecification> taskSpecs)
+            throws JobSpecificationException {
+        this(label, requirements, taskSpecs, new LinkedHashMap<>());
+    }
+
+    /**
+     * The constructor
+     *
+     * @param label The label for the job.
+     */
+    public JobSpecification(String label) {
+        this.label = label;
+        this.requirements = "";
+        this.taskSpecs = new ArrayList<>();
+        this.annotations = CommonUtils.createSerializableMap();
+    }
+
+    /**
+     * Default JDL compliant constructor.
+     *
+     * @param tasks One or more {@link TaskSpecification} built from a JDL expression.
+     */
+    public JobSpecification(TaskSpecification... tasks) {
+        this("");
+        assert tasks != null : "Null tasks must not be produced by the JDL compiler";
+        assert tasks.length != 0 : "Empty tasks must not be produced by the JDL compiler";
+        assert !Arrays.asList(tasks).contains(null)
+                : "Null tasks must not be produced by the JDL compiler";
+
+        taskSpecs = new ArrayList<>(Arrays.asList(tasks));
+    }
+
+    /**
+     * This method validates the attributes of this Job Spec
+     */
     private void validate() throws JobSpecificationException {
 
         if (Objects.isNull(this.taskSpecs)) {
@@ -94,18 +150,8 @@ public class JobSpecification implements Serializable {
     }
 
     /**
-     * The constructor
-     *
-     * @param label The label for the job.
+     * @return A list with the tasks specification in this job.
      */
-    public JobSpecification(String label) {
-        this.label = label;
-        this.requirements = "";
-        this.taskSpecs = new ArrayList<>();
-        this.annotations = CommonUtils.createSerializableMap();
-    }
-
-    /** @return A list with the tasks specification in this job. */
     public List<TaskSpecification> getTaskSpecs() {
         return taskSpecs;
     }
@@ -123,7 +169,7 @@ public class JobSpecification implements Serializable {
 
     /**
      * @return The logical expression that will be used to choose machines to run the tasks in this
-     *     job.
+     * job.
      */
     public String getRequirements() {
         return this.requirements;
@@ -133,7 +179,7 @@ public class JobSpecification implements Serializable {
      * Sets the logical expression for the job.
      *
      * @param expression The logical expression that defines the job. It will be used to choose
-     *     machines that are able to run its tasks.
+     *                   machines that are able to run its tasks.
      */
     public void setRequirements(String expression) {
         this.requirements = expression;
@@ -141,7 +187,7 @@ public class JobSpecification implements Serializable {
 
     /**
      * @return Gets the set of pair attribute=value defining the annotations for the job's
-     *     preferences.
+     * preferences.
      */
     public Map<String, String> getAnnotations() {
         return this.annotations;
@@ -157,7 +203,9 @@ public class JobSpecification implements Serializable {
         this.annotations = annotations;
     }
 
-    /** @return The label of the job. */
+    /**
+     * @return The label of the job.
+     */
     public String getLabel() {
         return this.label;
     }
@@ -167,24 +215,35 @@ public class JobSpecification implements Serializable {
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    public int hashCode() {
 
-        JobSpecification that = (JobSpecification) o;
-
-        if (!label.equals(that.label)) return false;
-        if (!requirements.equals(that.requirements)) return false;
-        if (!annotations.equals(that.annotations)) return false;
-        return taskSpecs.equals(that.taskSpecs);
+        final int PRIME = 31;
+        int result = 1;
+        result = PRIME * result + ((this.label == null) ? 0 : this.label.hashCode());
+        result = PRIME * result + ((this.requirements == null) ? 0 : this.requirements.hashCode());
+        result = PRIME * result + ((this.annotations == null) ? 0 : this.annotations.hashCode());
+        result = PRIME * result + ((this.taskSpecs == null) ? 0 : this.taskSpecs.hashCode());
+        result =
+                PRIME * result
+                        + ((this.sourceParentDir == null) ? 0 : this.sourceParentDir.hashCode());
+        return result;
     }
 
     @Override
-    public int hashCode() {
-        int result = label.hashCode();
-        result = 31 * result + requirements.hashCode();
-        result = 31 * result + annotations.hashCode();
-        result = 31 * result + taskSpecs.hashCode();
-        return result;
+    public boolean equals(Object obj) {
+
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        final JobSpecification other = (JobSpecification) obj;
+        if (!(Objects.equals(this.label, other.label))) return false;
+        if (!(Objects.equals(this.requirements, other.requirements))) return false;
+        if (!(Objects.equals(this.annotations, other.annotations))) return false;
+        if (!(Objects.equals(this.taskSpecs, other.taskSpecs))) return false;
+        return Objects.equals(this.sourceParentDir, other.sourceParentDir);
+    }
+
+    public void setSchedPath(String symbol) {
+        this.schedPath = symbol;
     }
 }

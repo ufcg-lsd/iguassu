@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface JobRepository extends JpaRepository<Job, String> {
+public interface JobRepository extends JpaRepository<Job, Long> {
 
-    List<Job> findAllByOwnerId(long ownerId);
+    List<Job> findAllByOwnerId(Long ownerId);
 }

@@ -1,18 +1,24 @@
 package org.fogbowcloud.app.core.models.user;
 
+import com.google.gson.annotations.SerializedName;
+
 public class RequesterCredential {
 
-    private long userId;
+    @SerializedName("user_id")
+    private Long userId;
+
+    @SerializedName("iguassu_token")
     private String iguassuToken;
+
     private Integer nonce;
 
     public RequesterCredential() {}
 
-    public long getUserId() {
+    public Long getUserId() {
         return userId;
     }
 
-    public void setUserId(long userId) {
+    public void setUserId(Long userId) {
         this.userId = userId;
     }
 

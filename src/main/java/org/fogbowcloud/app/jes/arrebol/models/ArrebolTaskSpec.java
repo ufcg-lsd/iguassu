@@ -4,15 +4,15 @@ import java.util.List;
 
 public class ArrebolTaskSpec {
 
-    private String id;
+    private Long id;
 
     private List<ArrebolCommand> commands;
 
-    public ArrebolTaskSpec(String id){
+    public ArrebolTaskSpec(Long id){
         this.id = id;
     }
 
-    public String getId(){
+    public Long getId(){
         return id;
     }
 

@@ -1,12 +1,10 @@
 package org.fogbowcloud.app.api.http.controllers;
 
-import com.google.gson.Gson;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.Documentation;
-import org.fogbowcloud.app.core.models.user.RequesterCredential;
 import org.fogbowcloud.app.api.dtos.JobDTO;
 import org.fogbowcloud.app.api.dtos.TaskDTO;
 import org.fogbowcloud.app.api.http.services.AuthService;
@@ -14,6 +12,7 @@ import org.fogbowcloud.app.api.http.services.FileStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
 import org.fogbowcloud.app.core.constants.GeneralConstants;
 import org.fogbowcloud.app.core.exceptions.InvalidParameterException;
+import org.fogbowcloud.app.core.exceptions.JobNotFoundException;
 import org.fogbowcloud.app.core.exceptions.StorageException;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
 import org.fogbowcloud.app.core.models.job.Job;
@@ -82,17 +81,16 @@ public class JobController {
     @GetMapping(value = Documentation.Endpoint.JOB_ID)
     @ApiOperation(value = Documentation.Job.GET_BY_ID_OPERATION)
     public ResponseEntity<?> getJobById(
-            @ApiParam(value = Documentation.Job.ID) @PathVariable String jobId,
+            @ApiParam(value = Documentation.Job.ID) @PathVariable Long jobId,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
-                    String userCredentials)
-            throws InvalidParameterException {
+                    String userCredentials) {
 
         Job job;
         try {
             job = getJDFJob(jobId, userCredentials);
 
-        } catch (UnauthorizedRequestException ure) {
+        } catch (UnauthorizedRequestException | JobNotFoundException ure) {
             return new ResponseEntity<>(
                     "The authentication failed with error [" + ure.getMessage() + "]",
                     HttpStatus.UNAUTHORIZED);
@@ -108,16 +106,15 @@ public class JobController {
                             + Documentation.Endpoint.STATUS)
     @ApiOperation(value = Documentation.Job.GET_TASKS_OPERATION)
     public ResponseEntity<?> getJobTasks(
-            @ApiParam(value = Documentation.Job.ID) @PathVariable String jobId,
+            @ApiParam(value = Documentation.Job.ID) @PathVariable Long jobId,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
-                    String userCredentials)
-            throws InvalidParameterException {
+                    String userCredentials) {
         Job job;
         try {
             job = getJDFJob(jobId, userCredentials);
 
-        } catch (UnauthorizedRequestException ure) {
+        } catch (UnauthorizedRequestException | JobNotFoundException ure) {
             return new ResponseEntity<>(
                     "The authentication failed with error [" + ure.getMessage() + "]",
                     HttpStatus.UNAUTHORIZED);
@@ -161,7 +158,7 @@ public class JobController {
             throw new StorageException("Could not store new job from user " + user.getAlias());
         }
 
-        String jobId;
+        Long jobId;
         final String jdfAbsolutePath = fieldMap.get(GeneralConstants.JDF_FILE_PATH);
         try {
             logger.info("jdfpath <" + jdfAbsolutePath + ">");
@@ -182,7 +179,7 @@ public class JobController {
     @DeleteMapping(value = Documentation.Endpoint.JOB_ID)
     @ApiOperation(value = Documentation.Job.DELETE_OPERATION)
     public ResponseEntity<?> stopJob(
-            @ApiParam(value = Documentation.Job.ID) @PathVariable String jobId,
+            @ApiParam(value = Documentation.Job.ID) @PathVariable Long jobId,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
                     String userCredentials)
@@ -199,9 +196,14 @@ public class JobController {
                     HttpStatus.UNAUTHORIZED);
         }
 
-        final String stoppedJobId = this.jobService.removeJob(jobId, user.getAlias());
+        Long removedJob = null;
+        try {
+            removedJob = this.jobService.removeJob(jobId, user.getId());
+        } catch (UnauthorizedRequestException e) {
+            e.printStackTrace();
+        }
 
-        return new ResponseEntity<>(new SimpleJobResponse(stoppedJobId), HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(new SimpleJobResponse(removedJob), HttpStatus.ACCEPTED);
     }
 
     private Collection<TaskDTO> toTasksDTOList(Collection<Task> tasks) {
@@ -212,8 +214,8 @@ public class JobController {
         return l;
     }
 
-    private Job getJDFJob(String jobId, String userCredentials)
-            throws InvalidParameterException, UnauthorizedRequestException {
+    private Job getJDFJob(Long jobId, String userCredentials)
+            throws UnauthorizedRequestException, JobNotFoundException {
         final User user = this.authService.authorizeUser(userCredentials);
 
         return this.jobService.getJobById(jobId, user);
@@ -221,13 +223,13 @@ public class JobController {
 
     static class SimpleJobResponse {
 
-        private String id;
+        private Long id;
 
-        SimpleJobResponse(String id) {
+        SimpleJobResponse(Long id) {
             this.id = id;
         }
 
-        public String getId() {
+        public Long getId() {
             return this.id;
         }
     }
