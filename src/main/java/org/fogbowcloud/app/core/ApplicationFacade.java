@@ -16,7 +16,7 @@ import org.fogbowcloud.app.core.models.user.RequesterCredential;
 import org.fogbowcloud.app.core.models.user.User;
 import org.fogbowcloud.app.core.routines.DefaultRoutineManager;
 import org.fogbowcloud.app.core.routines.RoutineManager;
-import org.fogbowcloud.app.jdfcompiler.JobBuilder;
+import org.fogbowcloud.app.jdfcompiler.job.JobBuilder;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
@@ -60,12 +60,12 @@ public class ApplicationFacade {
         routineManager.startAll();
     }
 
-    public Long submitJob(String jdfFilePath, User jobOwner) throws CompilerException {
+    public String submitJob(String jdfFilePath, User jobOwner) throws CompilerException {
         logger.debug("Adding job of user " + jobOwner.getAlias() + " to buffer.");
 
         final Job job = buildJob(jdfFilePath, jobOwner);
-        this.jobsToSubmit.offer(job);
         this.jobDBManager.save(job);
+        this.jobsToSubmit.offer(this.jobDBManager.findOne(job.getId()));
 
         return job.getId();
     }
@@ -73,7 +73,7 @@ public class ApplicationFacade {
     private Job buildJob(String jdfFilePath, User owner) throws CompilerException {
 
         final String ownerAlias = owner.getAlias();
-        Job job = new Job(new HashMap<>(), ownerAlias, owner.getId());
+        Job job = new Job(new ArrayList<>(), ownerAlias, owner.getId());
 
         logger.debug("Building job " + job.getId() + " of user " + owner.getAlias() + " of jdf " + jdfFilePath);
         JobSpecification jobSpec = compile(jdfFilePath);
@@ -102,10 +102,10 @@ public class ApplicationFacade {
 
     private JobSpecification compile(String jdfFilePath) throws CompilerException {
         CommonCompiler commonCompiler = new CommonCompiler();
-        logger.debug(
+        logger.info(
                 "Job " + jdfFilePath + " compilation started at time: " + System.currentTimeMillis());
         commonCompiler.compile(jdfFilePath, CommonCompiler.FileType.JDF);
-        logger.debug("Job " + jdfFilePath + " compilation ended at time: " + System.currentTimeMillis());
+        logger.info("Job " + jdfFilePath + " compilation ended at time: " + System.currentTimeMillis());
         return (JobSpecification) commonCompiler.getResult().get(0);
     }
 
@@ -113,12 +113,12 @@ public class ApplicationFacade {
                                     String externalOAuthToken, Long tokenVersion) {
         try {
             this.jobBuilder.createJobFromJDFFile(job, jdfFilePath, jobSpec, userAlias, externalOAuthToken, tokenVersion);
-            logger.info("Job [" + jdfFilePath + "] was built with success at time: " + System.currentTimeMillis());
-//            job.finishCreation();
+            logger.info("JDF [" + jdfFilePath + "] was built with success at time: [" + System.currentTimeMillis() + "]");
+            job.setState(JobState.CREATED);
         } catch (Exception e) {
-            logger.error("Failed to build [" + job.getId() + "] : at time: " + System.currentTimeMillis(),
+            logger.error("Failed to build [" + job.getId() + "] : at time: [" + System.currentTimeMillis() + "]",
                     e);
-//            job.failCreation();
+            job.setState(JobState.FAILED);
         }
 
         return job;
@@ -155,7 +155,7 @@ public class ApplicationFacade {
         return this.jobDBManager.findByUserId(userId);
     }
 
-    public Long removeJob(Long jobId, Long userId) throws UnauthorizedRequestException {
+    public String removeJob(String jobId, Long userId) throws UnauthorizedRequestException {
         Job job = this.jobDBManager.findOne(jobId);
         if (match(job, userId)) {
             job.setState(JobState.REMOVED);
@@ -167,7 +167,7 @@ public class ApplicationFacade {
         return job.getId();
     }
 
-    public Job findJobById(Long jobId, User user) throws JobNotFoundException, UnauthorizedRequestException {
+    public Job findJobById(String jobId, User user) throws JobNotFoundException, UnauthorizedRequestException {
         Job job;
         try {
             job = Objects.requireNonNull(this.jobDBManager.findOne(jobId));

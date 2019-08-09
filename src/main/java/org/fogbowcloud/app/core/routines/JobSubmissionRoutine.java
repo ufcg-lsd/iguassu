@@ -36,8 +36,8 @@ public class JobSubmissionRoutine implements Runnable {
             try {
                 final String executionId = this.jobExecutionSystem.submit(job);
                 job.setExecutionId(executionId);
-                job.setState(JobState.SUBMITTED);
-                JobDBManager.getInstance().update(job);
+                job.setState(JobState.QUEUED);
+                JobDBManager.getInstance().save(job);
 
                 logger.info("Iguassu Job [" + job.getId() + "] has execution id: [" + job.getExecutionId() + "]");
 

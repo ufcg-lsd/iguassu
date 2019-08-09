@@ -69,7 +69,7 @@ public class JobController {
                     HttpStatus.UNAUTHORIZED);
         }
 
-        final Collection<Job> allJobsOfUser = this.jobService.getJobsByUser(user);
+        final Collection<Job> allJobsOfUser = this.jobService.getActiveJobsByUser(user);
 
         final List<JobDTO> jobsResponse = new LinkedList<>();
 
@@ -81,7 +81,7 @@ public class JobController {
     @GetMapping(value = Documentation.Endpoint.JOB_ID)
     @ApiOperation(value = Documentation.Job.GET_BY_ID_OPERATION)
     public ResponseEntity<?> getJobById(
-            @ApiParam(value = Documentation.Job.ID) @PathVariable Long jobId,
+            @ApiParam(value = Documentation.Job.ID) @PathVariable String jobId,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
                     String userCredentials) {
@@ -106,7 +106,7 @@ public class JobController {
                             + Documentation.Endpoint.STATUS)
     @ApiOperation(value = Documentation.Job.GET_TASKS_OPERATION)
     public ResponseEntity<?> getJobTasks(
-            @ApiParam(value = Documentation.Job.ID) @PathVariable Long jobId,
+            @ApiParam(value = Documentation.Job.ID) @PathVariable String jobId,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
                     String userCredentials) {
@@ -120,8 +120,8 @@ public class JobController {
                     HttpStatus.UNAUTHORIZED);
         }
         logger.info("Retrieving tasks from job with id [" + jobId + "].");
-        Collection<TaskDTO> taskRespons = toTasksDTOList(job.getTasksAsList());
-        return new ResponseEntity<>(taskRespons, HttpStatus.OK);
+        Collection<TaskDTO> response = toTasksDTOList(job.getTasks());
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @PostMapping
@@ -158,7 +158,7 @@ public class JobController {
             throw new StorageException("Could not store new job from user " + user.getAlias());
         }
 
-        Long jobId;
+        String jobId;
         final String jdfAbsolutePath = fieldMap.get(GeneralConstants.JDF_FILE_PATH);
         try {
             logger.info("jdfpath <" + jdfAbsolutePath + ">");
@@ -179,7 +179,7 @@ public class JobController {
     @DeleteMapping(value = Documentation.Endpoint.JOB_ID)
     @ApiOperation(value = Documentation.Job.DELETE_OPERATION)
     public ResponseEntity<?> stopJob(
-            @ApiParam(value = Documentation.Job.ID) @PathVariable Long jobId,
+            @ApiParam(value = Documentation.Job.ID) @PathVariable String jobId,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
                     String userCredentials)
@@ -196,7 +196,7 @@ public class JobController {
                     HttpStatus.UNAUTHORIZED);
         }
 
-        Long removedJob = null;
+        String removedJob = null;
         try {
             removedJob = this.jobService.removeJob(jobId, user.getId());
         } catch (UnauthorizedRequestException e) {
@@ -214,7 +214,7 @@ public class JobController {
         return l;
     }
 
-    private Job getJDFJob(Long jobId, String userCredentials)
+    private Job getJDFJob(String jobId, String userCredentials)
             throws UnauthorizedRequestException, JobNotFoundException {
         final User user = this.authService.authorizeUser(userCredentials);
 
@@ -223,13 +223,13 @@ public class JobController {
 
     static class SimpleJobResponse {
 
-        private Long id;
+        private String id;
 
-        SimpleJobResponse(Long id) {
+        SimpleJobResponse(String id) {
             this.id = id;
         }
 
-        public Long getId() {
+        public String getId() {
             return this.id;
         }
     }

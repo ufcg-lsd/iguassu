@@ -28,7 +28,7 @@ public class ArrebolExecutionDTO implements Serializable {
     }
 
     private void populateTaskSpec(Job job) {
-        List<Task> taskList = job.getTasksAsList();
+        List<Task> taskList = job.getTasks();
         for (Task task : taskList) {
             this.tasksSpecs.add(
                     new TaskSpecDTO(

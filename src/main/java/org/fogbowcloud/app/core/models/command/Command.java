@@ -1,6 +1,7 @@
 package org.fogbowcloud.app.core.models.command;
 
 import javax.persistence.*;
+import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -17,22 +18,28 @@ public class Command implements Serializable {
 
     private static final String RAW_COMMAND_COLUMN_NAME = "raw_command";
     private static final String EXIT_CODE_COLUMN_NAME = "exit_code";
+    private static final int COMMAND_MAX_SIZE = 2048;
+    private static final int RAW_COMMAND_MAX_SIZE = 1024;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
     @Column
-    private final String command;
+    @Size(max = COMMAND_MAX_SIZE)
+    private String command;
 
     @Column(name = RAW_COMMAND_COLUMN_NAME)
-    private final String rawCommand;
+    @Size(max = RAW_COMMAND_MAX_SIZE)
+    private String rawCommand;
 
     @Enumerated(EnumType.STRING)
     private CommandState state;
 
     @Column(name = EXIT_CODE_COLUMN_NAME)
     private int exitCode;
+
+    public Command() {}
 
     public Command(String command, CommandState state) {
         this.rawCommand = command;

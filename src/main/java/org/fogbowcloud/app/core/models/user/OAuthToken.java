@@ -73,14 +73,7 @@ public class OAuthToken {
     private Date expirationDate;
 
     public OAuthToken() {
-    }
-
-    public OAuthToken(String accessToken, String refreshToken, String userId, Date expirationDate) {
         this.version = INITIAL_VERSION;
-        this.accessToken = accessToken;
-        this.refreshToken = refreshToken;
-        this.userId = userId;
-        this.expirationDate = expirationDate;
         this.expirationTime = 3600;
     }
 

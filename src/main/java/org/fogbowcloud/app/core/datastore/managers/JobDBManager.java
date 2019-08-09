@@ -26,7 +26,7 @@ public class JobDBManager {
         this.jobRepository.save(job);
     }
 
-    public Job findOne(Long id) {
+    public Job findOne(String id) {
         return this.jobRepository.findById(id).isPresent() ? this.jobRepository.findById(id).get() : null;
     }
 
@@ -42,7 +42,7 @@ public class JobDBManager {
         return this.jobRepository.findAllByOwnerId(ownerId);
     }
 
-    public void delete(Long id) {
+    public void delete(String id) {
         this.jobRepository.deleteById(id);
     }
 

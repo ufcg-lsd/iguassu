@@ -9,7 +9,7 @@ import java.util.Date;
 
 public class JobDTO {
 
-    private Long id;
+    private String id;
     private String label;
     private String creationDate;
     private JobState state;
@@ -37,11 +37,11 @@ public class JobDTO {
         this.label = label;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 

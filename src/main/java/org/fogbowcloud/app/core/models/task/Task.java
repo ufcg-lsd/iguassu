@@ -1,6 +1,9 @@
 package org.fogbowcloud.app.core.models.task;
 
 import org.fogbowcloud.app.core.models.command.Command;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.LazyCollection;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -26,15 +29,15 @@ public class Task {
     @Enumerated(EnumType.STRING)
     private TaskState state;
 
-    @ElementCollection
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(FetchMode.SUBSELECT)
     private List<Command> commands;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name = METADATA_MAP_KEY_COLUMN_NAME)
     private Map<String, String> metadata;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     @MapKeyColumn(name = REQUIREMENTS_MAP_KEY_COLUMN_NAME)
     private Map<String, String> requirements;
 
@@ -101,5 +104,20 @@ public class Task {
 
     public void setRequirements(Map<String, String> requirements) {
         this.requirements = requirements;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Task task = (Task) o;
+
+        return id.equals(task.id);
+    }
+
+    @Override
+    public int hashCode() {
+        return id.hashCode();
     }
 }

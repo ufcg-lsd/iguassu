@@ -34,6 +34,7 @@ public class SyncJobStateRoutine implements Runnable {
 
                 try {
                     this.synchronizer.sync(job);
+                    this.jobDBManager.save(job);
                     logger.info("Job [" + job.getId() + "] was successfully synchronized with its execution ["
                             + job.getExecutionId() + "].");
                 } catch (Exception e) {

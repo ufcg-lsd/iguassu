@@ -1,7 +1,6 @@
 package org.fogbowcloud.app.jes.arrebol;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.jes.arrebol.models.*;
 import org.fogbowcloud.app.core.models.command.Command;
 import org.fogbowcloud.app.core.models.command.CommandState;
 import org.fogbowcloud.app.core.models.job.Job;
@@ -9,11 +8,11 @@ import org.fogbowcloud.app.core.models.job.JobState;
 import org.fogbowcloud.app.core.models.task.Task;
 import org.fogbowcloud.app.core.models.task.TaskState;
 import org.fogbowcloud.app.jes.JobExecutionService;
+import org.fogbowcloud.app.jes.arrebol.models.*;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 import org.fogbowcloud.app.jes.exceptions.JobExecStatusException;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 /**
@@ -38,11 +37,7 @@ public class JobSynchronizer implements Synchronizer<Job> {
             try {
                 jobExecArrebol = this.jobExecutionService.status(executionId);
             } catch (ArrebolConnectException ace) {
-                logger.debug(
-                        "Error to get status for execution ["
-                                + executionId
-                                + "] with message + "
-                                + ace.getMessage());
+                logger.error("Error to get status for execution [" + executionId + "] with message + " + ace.getMessage());
             } catch (RuntimeException e) {
                 throw new JobExecStatusException(e.getMessage());
             }
@@ -53,24 +48,22 @@ public class JobSynchronizer implements Synchronizer<Job> {
                         "Could not get job execution status with job id [" + job.getId() + "] and execution id " +
                                 "[" + job.getExecutionId() + "]");
             }
-
         } else {
-            logger.debug("Execution identifier from Job [" + job.getId() + "] is null.");
+            logger.error("Execution identifier from Job [" + job.getId() + "] is null.");
         }
-
         return job;
     }
 
     private void updateJob(Job job, JobExecArrebol jobExecArrebol) {
-        updateTasks(job.getTasks(), jobExecArrebol.getTasks());
+        updateTasks(job, jobExecArrebol.getTasks());
         logger.info("Updated tasks state from job [" + job.getId() + "].");
         updateJobState(job, jobExecArrebol.getState());
     }
 
-    private void updateTasks(Map<Long, Task> iguassuTasks, List<ArrebolTask> arrebolTasks) {
+    private void updateTasks(Job job, List<ArrebolTask> arrebolTasks) {
         for (ArrebolTask arrebolTask : arrebolTasks) {
             final Long iguassuTaskId = arrebolTask.getTaskSpec().getId();
-            final Task iguassuTask = iguassuTasks.get(iguassuTaskId);
+            final Task iguassuTask = job.getTaskById(iguassuTaskId);
 
             if (iguassuTask != null) {
                 updateTaskCommands(arrebolTask, iguassuTask);
@@ -79,11 +72,7 @@ public class JobSynchronizer implements Synchronizer<Job> {
                 final TaskState taskState = getTaskState(arrebolTaskState);
                 if (Objects.nonNull(taskState)) {
                     iguassuTask.setState(taskState);
-                    logger.debug(
-                            "Updated task ["
-                                    + iguassuTask.getId()
-                                    + "] to state "
-                                    + taskState.toString());
+                    logger.debug("Updated task [" + iguassuTask.getId() + "] to state " + taskState.toString());
                 }
             }
         }
@@ -141,7 +130,6 @@ public class JobSynchronizer implements Synchronizer<Job> {
     private JobState getJobState(ExecutionState executionState) {
         switch (executionState) {
             case SUBMITTED:
-                return JobState.SUBMITTED;
             case QUEUED:
                 return JobState.QUEUED;
             case RUNNING:

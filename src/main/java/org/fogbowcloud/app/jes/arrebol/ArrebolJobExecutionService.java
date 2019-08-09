@@ -26,7 +26,6 @@ public class ArrebolJobExecutionService implements JobExecutionService {
     @Override
     public String submit(Job job)
             throws UnsupportedEncodingException, JobSubmissionException, ArrebolConnectException {
-        logger.info("Job with id :[" + job.getId() + "] was submitted for execution.");
 
         return this.requestsHelper.submitToExecution(job);
     }

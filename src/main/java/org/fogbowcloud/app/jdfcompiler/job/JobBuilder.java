@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.jdfcompiler;
+package org.fogbowcloud.app.jdfcompiler.job;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.constants.ConfProperty;
@@ -7,8 +7,6 @@ import org.fogbowcloud.app.core.constants.JsonKey;
 import org.fogbowcloud.app.core.models.command.Command;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.task.Task;
-import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
-import org.fogbowcloud.app.jdfcompiler.job.TaskSpecification;
 import org.fogbowcloud.app.jdfcompiler.semantic.IOCommand;
 import org.fogbowcloud.app.jdfcompiler.semantic.JDLCommand;
 import org.fogbowcloud.app.jdfcompiler.semantic.JDLCommand.JDLCommandType;
@@ -65,7 +63,7 @@ public class JobBuilder {
                 requirements.put("image", image);
                 addAllRequirements(jobRequirements, requirements);
 
-                Map<Long, Task> tasks = new HashMap<>();
+                List<Task> tasks = new ArrayList<>();
                 for (TaskSpecification taskSpec : jobSpec.getTaskSpecs()) {
                     if (Thread.interrupted()) {
                         throw new InterruptedException();
@@ -82,7 +80,7 @@ public class JobBuilder {
                     parseFinalCommands(
                             taskSpec, task, job.getOwnerId(), externalOAuthToken, tokenVersion);
 
-                    tasks.put(task.getId(), task);
+                    tasks.add(task);
                 }
                 job.setTasks(tasks);
             } else {
