@@ -159,7 +159,7 @@ public class ApplicationFacade {
         return this.jobDBManager.findByUserId(userId);
     }
 
-    public String removeJob(String jobId, Long userId) throws UnauthorizedRequestException {
+    public synchronized String removeJob(String jobId, Long userId) throws UnauthorizedRequestException {
         Job job = this.jobDBManager.findOne(jobId);
         if (match(job, userId)) {
             job.setState(JobState.REMOVED);
