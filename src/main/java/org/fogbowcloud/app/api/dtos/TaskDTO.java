@@ -4,16 +4,22 @@ import org.fogbowcloud.app.core.models.command.Command;
 import org.fogbowcloud.app.core.models.task.Task;
 import org.fogbowcloud.app.core.models.task.TaskState;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-public class TaskDTO {
+/** Data transfer object projection */
+public class TaskDTO implements Serializable {
 
     private Long id;
+
     private List<CommandDTO> commands;
+
     private Map<String, String> requirements;
+
     private TaskState state;
+
     private Map<String, String> metadata;
 
     public TaskDTO(Task task) {

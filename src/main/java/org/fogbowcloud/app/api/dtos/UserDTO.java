@@ -2,12 +2,16 @@ package org.fogbowcloud.app.api.dtos;
 
 import org.fogbowcloud.app.core.models.user.User;
 
+import java.io.Serializable;
 import java.util.Objects;
 
-public class UserDTO {
+/** Data transfer object projection */
+public class UserDTO implements Serializable {
 
     private Long id;
+
     private String alias;
+
     private CredentialDTO credentials;
 
     public UserDTO(User user) {

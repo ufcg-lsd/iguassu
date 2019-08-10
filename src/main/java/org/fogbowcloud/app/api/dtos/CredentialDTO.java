@@ -6,6 +6,7 @@ import org.fogbowcloud.app.core.models.user.Credential;
 import java.io.Serializable;
 import java.util.Objects;
 
+/** Data transfer object projection */
 public class CredentialDTO implements Serializable {
 
     @JsonProperty("iguassu_token")

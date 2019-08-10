@@ -4,14 +4,19 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.job.JobState;
 
+import java.io.Serializable;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class JobDTO {
+/** Data transfer object projection */
+public class JobDTO implements Serializable  {
 
     private String id;
+
     private String label;
+
     private String creationDate;
+
     private JobState state;
 
     @JsonProperty("owner_id")

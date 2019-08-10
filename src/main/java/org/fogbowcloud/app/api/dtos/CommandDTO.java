@@ -4,7 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.fogbowcloud.app.core.models.command.Command;
 import org.fogbowcloud.app.core.models.command.CommandState;
 
-public class CommandDTO {
+import java.io.Serializable;
+
+/** Data transfer object projection */
+public class CommandDTO implements Serializable {
 
     @JsonProperty("raw_command")
     private String rawCommand;
@@ -13,7 +16,7 @@ public class CommandDTO {
 
     private int exitCode;
 
-    public CommandDTO(Command command){
+    CommandDTO(Command command){
         this.rawCommand = command.getRawCommand();
         this.state = command.getState();
         this.exitCode = command.getExitCode();
