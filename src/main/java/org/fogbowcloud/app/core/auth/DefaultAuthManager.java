@@ -6,7 +6,6 @@ import org.fogbowcloud.app.core.models.user.*;
 import org.fogbowcloud.app.core.datastore.managers.UserDBManager;
 import org.fogbowcloud.app.utils.RandomString;
 
-import javax.transaction.Transactional;
 import java.security.GeneralSecurityException;
 import java.util.Base64;
 import java.util.Objects;
@@ -28,7 +27,6 @@ public class DefaultAuthManager implements AuthManager {
     }
 
     @Override
-    @Transactional
     public User authenticate(OAuth2Identifiers oAuth2Identifiers, String authorizationCode, int nonce) {
         try {
             OAuthToken oAuthToken =

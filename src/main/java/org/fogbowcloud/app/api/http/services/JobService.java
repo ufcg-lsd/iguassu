@@ -1,6 +1,5 @@
 package org.fogbowcloud.app.api.http.services;
 
-import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.ApplicationFacade;
 import org.fogbowcloud.app.core.exceptions.JobNotFoundException;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
@@ -18,8 +17,6 @@ import java.util.stream.Collectors;
 @Lazy
 @Service
 public class JobService {
-
-    private final Logger logger = Logger.getLogger(JobService.class);
 
     private ApplicationFacade applicationFacade = ApplicationFacade.getInstance();
 

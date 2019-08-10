@@ -22,6 +22,7 @@ import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.utils.JDFUtil;
 
+import org.springframework.transaction.annotation.Transactional;
 import java.security.GeneralSecurityException;
 import java.util.*;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -60,6 +61,7 @@ public class ApplicationFacade {
         routineManager.startAll();
     }
 
+    @Transactional
     public synchronized String submitJob(String jdfFilePath, User jobOwner) throws CompilerException {
         logger.debug("Adding job of user " + jobOwner.getAlias() + " to buffer.");
 
@@ -84,7 +86,8 @@ public class ApplicationFacade {
                 Objects.requireNonNull(oAuthToken).getAccessToken(), oAuthToken.getVersion());
     }
 
-    public User authorizeUser(RequesterCredential requesterCredentials) throws GeneralSecurityException, UserNotExistException {
+    @Transactional
+    public synchronized User authorizeUser(RequesterCredential requesterCredentials) throws GeneralSecurityException, UserNotExistException {
         if (Objects.isNull(requesterCredentials.getIguassuToken())) {
             throw new IllegalArgumentException("Iguassu Token missing.");
         }
@@ -124,7 +127,8 @@ public class ApplicationFacade {
         return job;
     }
 
-    public User authenticateUser(OAuth2Identifiers oAuth2Identifiers, String authorizationCode)
+    @Transactional
+    public synchronized User authenticateUser(OAuth2Identifiers oAuth2Identifiers, String authorizationCode)
             throws GeneralSecurityException {
         try {
             return this.authManager.authenticate(oAuth2Identifiers, authorizationCode, this.getNonce());
@@ -133,13 +137,13 @@ public class ApplicationFacade {
         }
     }
 
-    public int getNonce() {
+    public synchronized int getNonce() {
         final int nonce = UUID.randomUUID().hashCode();
         this.nonceList.add(nonce);
         return nonce;
     }
 
-    public OAuthToken refreshToken(OAuthToken oAuthToken) throws GeneralSecurityException {
+    public synchronized OAuthToken refreshToken(OAuthToken oAuthToken) throws GeneralSecurityException {
         try {
             return this.authManager.refreshOAuth2Token(oAuthToken);
         } catch (Exception e) {
