@@ -27,10 +27,7 @@ public class DefaultRoutineManager implements RoutineManager {
     private final Properties properties;
     private final Queue<Job> jobsToSubmit;
 
-    public DefaultRoutineManager(
-            Properties properties,
-            Queue<Job> jobsToSubmit) {
-
+    public DefaultRoutineManager(Properties properties, Queue<Job> jobsToSubmit) {
         this.properties = properties;
         this.jobExecutionService = new ArrebolJobExecutionService(this.properties);
         this.jobsToSubmit = jobsToSubmit;
@@ -52,9 +49,7 @@ public class DefaultRoutineManager implements RoutineManager {
     private void startSyncJobRoutine() {
         logger.info("----> Starting Sync Job State Routine...");
         final long SYNC_PERIOD =
-                Long.parseLong(
-                        this.properties.getProperty(
-                                ConfProperty.JOB_STATE_MONITOR_PERIOD.getProp()));
+                Long.parseLong(this.properties.getProperty(ConfProperty.JOB_STATE_MONITOR_PERIOD.getProp()));
 
         final ManagerTimer syncJobTimer =
                 new ManagerTimer(Executors.newScheduledThreadPool(DEFAULT_POOL_THREAD_NUMBER));
@@ -67,13 +62,11 @@ public class DefaultRoutineManager implements RoutineManager {
     private void startSessionRoutine() {
         logger.info("----> Starting Session Verification Routine...");
         final long VERIFICATION_PERIOD =
-                Long.parseLong(
-                        this.properties.getProperty(ConfProperty.SESSION_MONITOR_PERIOD.getProp()));
+                Long.parseLong(this.properties.getProperty(ConfProperty.SESSION_MONITOR_PERIOD.getProp()));
 
         final ManagerTimer verifySessionTimer =
                 new ManagerTimer(Executors.newScheduledThreadPool(DEFAULT_POOL_THREAD_NUMBER));
-        SessionVerificationRoutine sessionVerificationRoutine =
-                new SessionVerificationRoutine();
+        SessionVerificationRoutine sessionVerificationRoutine = new SessionVerificationRoutine();
         verifySessionTimer.scheduleAtFixedRate(
                 sessionVerificationRoutine, DEFAULT_INITIAL_DELAY_MS, VERIFICATION_PERIOD);
     }
@@ -81,13 +74,10 @@ public class DefaultRoutineManager implements RoutineManager {
     private void startJobSubmissionRoutine() {
         logger.info("----> Starting Job Submission Routine...");
         final long SUBMISSION_PERIOD =
-                Long.parseLong(
-                        this.properties.getProperty(
-                                ConfProperty.JOB_SUBMISSION_MONITOR_PERIOD.getProp()));
+                Long.parseLong(this.properties.getProperty(ConfProperty.JOB_SUBMISSION_MONITOR_PERIOD.getProp()));
         final ManagerTimer submissionJobTimer =
                 new ManagerTimer(Executors.newScheduledThreadPool(DEFAULT_POOL_THREAD_NUMBER));
-        JobSubmissionRoutine jobSubmissionRoutine =
-                new JobSubmissionRoutine(this.jobExecutionService, this.jobsToSubmit);
+        JobSubmissionRoutine jobSubmissionRoutine = new JobSubmissionRoutine(this.jobExecutionService, this.jobsToSubmit);
         submissionJobTimer.scheduleAtFixedRate(
                 jobSubmissionRoutine, DEFAULT_INITIAL_DELAY_MS, SUBMISSION_PERIOD);
     }
