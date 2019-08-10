@@ -42,10 +42,6 @@ public class JobDBManager {
         return this.jobRepository.findAllByOwnerId(ownerId);
     }
 
-    public void delete(String id) {
-        this.jobRepository.deleteById(id);
-    }
-
     public void setJobRepository(JobRepository jobRepository) {
         this.jobRepository = jobRepository;
     }

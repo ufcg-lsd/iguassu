@@ -50,10 +50,6 @@ public class UserDBManager {
         logger.info("User " + user.getAlias() + " was updated.");
     }
 
-    public void delete(Long id) {
-        this.userRepository.deleteById(id);
-    }
-
     public void setUserRepository(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
