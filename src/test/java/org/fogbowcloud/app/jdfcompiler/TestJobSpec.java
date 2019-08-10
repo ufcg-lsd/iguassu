@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import java.io.File;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 public class TestJobSpec {
     private static final String RESOURCE_DIR = "test" + File.separator + "resources";
