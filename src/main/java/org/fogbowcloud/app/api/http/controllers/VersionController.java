@@ -17,6 +17,7 @@ public class VersionController {
     @GetMapping
     @ApiOperation(value = Documentation.Version.GET_OPERATION)
     public ResponseEntity<String> getNonce() {
-        return new ResponseEntity<>("{\"version\": \"1.0.0\"}", HttpStatus.OK);
+        return new ResponseEntity<>("{\"version\": \"1.0.0\"}",
+                HttpStatus.OK);
     }
 }

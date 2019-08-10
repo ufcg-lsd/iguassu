@@ -134,9 +134,6 @@ public class JobController {
             @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
                     String userCredentials) {
 
-        logger.info("Saving new Job.");
-        logger.info(file.toString());
-
         final Map<String, String> fieldMap = new HashMap<>();
         fieldMap.put(GeneralConstants.JDF_FILE_PATH, null);
         fieldMap.put(GeneralConstants.X_AUTH_USER_CREDENTIALS, null);
@@ -147,14 +144,13 @@ public class JobController {
         try {
             user = this.authService.authorizeUser(userCredentials);
         } catch (UnauthorizedRequestException ure) {
-            return new ResponseEntity<>(
-                    "The authentication failed with error [" + ure.getMessage() + "]",
+            return new ResponseEntity<>("The authentication failed with error [" + ure.getMessage() + "]",
                     HttpStatus.UNAUTHORIZED);
         }
 
         final String jdf = fieldMap.get(GeneralConstants.JDF_FILE_PATH);
         if (Objects.isNull(jdf)) {
-            logger.info("Could not store  new job from user " + user.getAlias());
+            logger.info("Could not store new jdf from user " + user.getAlias());
             throw new StorageException("Could not store new job from user " + user.getAlias());
         }
 
@@ -172,7 +168,6 @@ public class JobController {
             throw new StorageException("Could not read JDF file.");
         }
 
-
         return new ResponseEntity<>(new SimpleJobResponse(jobId), HttpStatus.CREATED);
     }
 
@@ -182,8 +177,7 @@ public class JobController {
             @ApiParam(value = Documentation.Job.ID) @PathVariable String jobId,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
-                    String userCredentials)
-            throws InvalidParameterException {
+                    String userCredentials) {
         logger.info("Deleting job with Id " + jobId + ".");
 
         User user;

@@ -9,6 +9,7 @@ import org.fogbowcloud.app.core.models.user.*;
  * This interface defines the operations that an authentication and authorization manager must have.
  */
 public interface AuthManager {
+
     /**
      * Registers a user if there's no already exist or update it credentials case already exists.
      *
