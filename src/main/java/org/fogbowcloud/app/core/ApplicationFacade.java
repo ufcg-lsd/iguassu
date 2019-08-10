@@ -60,7 +60,7 @@ public class ApplicationFacade {
         routineManager.startAll();
     }
 
-    public String submitJob(String jdfFilePath, User jobOwner) throws CompilerException {
+    public synchronized String submitJob(String jdfFilePath, User jobOwner) throws CompilerException {
         logger.debug("Adding job of user " + jobOwner.getAlias() + " to buffer.");
 
         final Job job = buildJob(jdfFilePath, jobOwner);
