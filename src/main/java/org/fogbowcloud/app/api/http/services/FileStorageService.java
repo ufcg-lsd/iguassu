@@ -18,7 +18,7 @@ public class FileStorageService {
 
     private final Logger logger = Logger.getLogger(FileStorageService.class);
 
-    public void store(MultipartFile file, Map<String, String> formFieldsToLoad) {
+    public synchronized void store(MultipartFile file, Map<String, String> formFieldsToLoad) {
         final String fileName = file.getOriginalFilename();
 
         logger.info("Storing file of name [" + fileName + "];");
