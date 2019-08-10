@@ -194,7 +194,8 @@ public class JobController {
         try {
             removedJob = this.jobService.removeJob(jobId, user.getId());
         } catch (UnauthorizedRequestException e) {
-            e.printStackTrace();
+            logger.error(e.getMessage());
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.UNAUTHORIZED);
         }
 
         return new ResponseEntity<>(new SimpleJobResponse(removedJob), HttpStatus.ACCEPTED);
