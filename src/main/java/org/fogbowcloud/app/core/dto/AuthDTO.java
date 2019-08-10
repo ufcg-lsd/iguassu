@@ -40,7 +40,6 @@ public class AuthDTO {
 
         if (!iguassuToken.equals(that.iguassuToken)) return false;
         return userId.equals(that.userId);
-
     }
 
     @Override
