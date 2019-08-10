@@ -72,7 +72,7 @@ public class JobSynchronizer implements Synchronizer<Job> {
                 final TaskState taskState = getTaskState(arrebolTaskState);
                 if (Objects.nonNull(taskState)) {
                     iguassuTask.setState(taskState);
-                    logger.debug("Updated task [" + iguassuTask.getId() + "] to state " + taskState.toString());
+                    logger.info("Updated task [" + iguassuTask.getId() + "] to state " + taskState.toString());
                 }
             }
         }
@@ -94,7 +94,7 @@ public class JobSynchronizer implements Synchronizer<Job> {
 
         if (jobState != null) {
             job.setState(jobState);
-            logger.info("Updated job [" + job.getId() + "] to state " + jobState.toString());
+            logger.info("Resuming job [" + job.getId() + "] to state " + jobState.toString());
         }
     }
 

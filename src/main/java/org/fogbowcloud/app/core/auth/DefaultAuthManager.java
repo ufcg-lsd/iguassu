@@ -71,7 +71,7 @@ public class DefaultAuthManager implements AuthManager {
             throw new UserNotExistException("The user could not be recovered because it has not yet been stored.");
         }
 
-        logger.info("Authorizing user with identifier: [" + user.getAlias() + "]");
+        logger.info("Authorizing user " + user.getAlias() + ".");
 
         if (!user.getCredentials().getIguassuToken().equalsIgnoreCase(requesterCredentials.getIguassuToken())) {
             throw new GeneralSecurityException("User " + user.getAlias() + " not has a valid Iguassu token.");
@@ -89,7 +89,7 @@ public class DefaultAuthManager implements AuthManager {
     }
 
     private Credential updateUserCredentials(OAuthToken newOAuthToken, User user, int nonce) {
-        logger.debug("Generating new credentials for user " + user.getAlias() + ".");
+        logger.info("Generating new credentials for user " + user.getAlias() + ".");
         final OAuthToken lastToken = user.getCredentials().getOauthToken();
         final String iguassuToken = this.generateIguassuToken(user.getAlias());
         if (Objects.nonNull(lastToken)) {
@@ -100,8 +100,7 @@ public class DefaultAuthManager implements AuthManager {
     }
 
     private String generateIguassuToken(String userId) {
-        final String sessionToken =
-                new RandomString(DEFAULT_IGUASSU_TOKEN_LENGTH, userId).nextString();
+        final String sessionToken = new RandomString(DEFAULT_IGUASSU_TOKEN_LENGTH, userId).nextString();
 
         return Base64.getEncoder().encodeToString(sessionToken.getBytes());
     }

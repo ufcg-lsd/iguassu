@@ -100,14 +100,12 @@ final class ArrebolRequestsHelper {
 
         try {
             jsonResponse = HttpWrapper.doRequest(HttpGet.METHOD_NAME, endpoint, null);
-            logger.debug("JSON Response [" + jsonResponse + "]");
 
             jobExecArrebol = this.jsonUtil.fromJson(jsonResponse, JobExecArrebol.class);
         } catch (HttpHostConnectException e) {
             throw new ArrebolConnectException("Failed connect to Arrebol: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new JobExecStatusException(
-                    "Getting Job from Arrebol has FAILED: " + e.getMessage());
+            throw new JobExecStatusException("Getting Job from Arrebol has FAILED: " + e.getMessage());
         }
 
         return jobExecArrebol;
@@ -119,8 +117,6 @@ final class ArrebolRequestsHelper {
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         ArrebolExecutionDTO arrebolExecutionDTO = new ArrebolExecutionDTO(job);
         String json = gson.toJson(arrebolExecutionDTO);
-
-        logger.info("json looks like: " + json);
 
         return new StringEntity(json);
     }
