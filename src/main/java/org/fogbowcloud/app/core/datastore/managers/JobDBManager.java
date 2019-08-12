@@ -2,18 +2,15 @@ package org.fogbowcloud.app.core.datastore.managers;
 
 import org.fogbowcloud.app.core.datastore.repositories.JobRepository;
 import org.fogbowcloud.app.core.models.job.Job;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 
 public class JobDBManager {
     private static JobDBManager instance;
 
-    @Autowired
     private JobRepository jobRepository;
 
-    private JobDBManager() {
-    }
+    private JobDBManager() { }
 
     public synchronized static JobDBManager getInstance() {
         if (instance == null) {
