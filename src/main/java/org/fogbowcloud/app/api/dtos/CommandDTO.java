@@ -14,6 +14,7 @@ public class CommandDTO implements Serializable {
 
     private CommandState state;
 
+    @JsonProperty("exit_code")
     private int exitCode;
 
     CommandDTO(Command command){

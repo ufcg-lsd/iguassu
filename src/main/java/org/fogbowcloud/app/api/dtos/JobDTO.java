@@ -15,6 +15,7 @@ public class JobDTO implements Serializable  {
 
     private String label;
 
+    @JsonProperty("creation_date")
     private String creationDate;
 
     private JobState state;
