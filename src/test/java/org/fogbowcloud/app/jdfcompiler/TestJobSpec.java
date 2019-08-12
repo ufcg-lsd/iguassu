@@ -12,7 +12,7 @@ import java.io.File;
 import static org.junit.Assert.assertEquals;
 
 public class TestJobSpec {
-    private static final String RESOURCE_DIR = "test" + File.separator + "resources";
+    private static final String RESOURCE_DIR = "docs" + File.separator + "jobs-examples";
     private static final String SIMPLE_JOB = RESOURCE_DIR + File.separator + "simplejob.jdf";
     private static final String SIMPLE_JOB_REQ = RESOURCE_DIR + File.separator + "simplejobreq.jdf";
     private static final String SIMPLEST_JOB = RESOURCE_DIR + File.separator + "simplestjob.jdf";
@@ -24,9 +24,9 @@ public class TestJobSpec {
     private static final String SIMPLE_JOB_7 = RESOURCE_DIR + File.separator + File.separator + "NewSimpleJob4.jdf";
     private static final String SIMPLE_JOB_8 = RESOURCE_DIR + File.separator + "FJob.jdf";
     private static final String SIMPLE_JOB1 = RESOURCE_DIR + File.separator + "SimpleJob1.jdf";
-    private static final String SIMPLE_JOB2 = RESOURCE_DIR + File.separator + "SimpleJob2.jdf";
-    private static final String SIMPLE_JOB3 = RESOURCE_DIR + File.separator + "SimpleJob3.jdf";
-    private static final String SIMPLE_JOB4 = RESOURCE_DIR + File.separator + "SimpleJob4.jdf";
+    private static final String SIMPLE_JOB2 = RESOURCE_DIR + File.separator + "simplejob2.jdf";
+    private static final String SIMPLE_JOB3 = RESOURCE_DIR + File.separator + "simplejob3.jdf";
+    private static final String SIMPLE_JOB4 = RESOURCE_DIR + File.separator + "simplejob4.jdf";
     private static final String JOB_WITH_LOCATION = RESOURCE_DIR + File.separator + "location.jdf";
     private static final String LOCATION_REQUIREMENT = " Glue2CloudComputeManagerID == \" SomeCloud \"";
 
@@ -80,14 +80,14 @@ public class TestJobSpec {
     public void testSimpleJob2() throws Exception {
         JobSpecification spec = DescriptionFileCompile.compileJDF(SIMPLE_JOB2);
         assertEquals("SimpleJob2", spec.getLabel());
-        assertEquals(3, spec.getTaskSpecs().size());
+        assertEquals(2, spec.getTaskSpecs().size());
     }
 
     @Test
     public void testSimpleJob3() throws Exception {
         JobSpecification spec = DescriptionFileCompile.compileJDF(SIMPLE_JOB3);
-        assertEquals("SimpleJob", spec.getLabel());
-        assertEquals(4, spec.getTaskSpecs().size());
+        assertEquals("SimpleJob3", spec.getLabel());
+        assertEquals(1, spec.getTaskSpecs().size());
     }
 
     @Test

@@ -3,4 +3,4 @@ jdk:
   - openjdk8
 
 script:
-   - mvn clean install -DskipTests
+   - mvn clean install -B -V
