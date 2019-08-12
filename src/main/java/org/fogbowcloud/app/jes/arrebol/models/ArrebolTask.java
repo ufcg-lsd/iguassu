@@ -1,11 +1,14 @@
 package org.fogbowcloud.app.jes.arrebol.models;
 
+import com.google.gson.annotations.SerializedName;
+
 public class ArrebolTask {
 
     private String id;
 
     private ArrebolTaskState state;
 
+    @SerializedName("tasks_specs")
     private ArrebolTaskSpec taskSpec;
 
     public ArrebolTask(String id) {

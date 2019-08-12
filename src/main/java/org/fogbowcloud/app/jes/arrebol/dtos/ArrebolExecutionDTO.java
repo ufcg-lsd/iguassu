@@ -1,5 +1,6 @@
 package org.fogbowcloud.app.jes.arrebol.dtos;
 
+import com.google.gson.annotations.SerializedName;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.task.Task;
 
@@ -19,6 +20,8 @@ public class ArrebolExecutionDTO implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private String label;
+
+    @SerializedName("tasks_specs")
     private List<TaskSpecDTO> tasksSpecs;
 
     public ArrebolExecutionDTO(Job job) {
