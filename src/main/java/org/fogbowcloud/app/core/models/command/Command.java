@@ -41,7 +41,7 @@ public class Command implements Serializable {
 
     public Command() {}
 
-    public Command(String command, CommandState state) {
+    private Command(String command, CommandState state) {
         this.rawCommand = command;
         this.command = command;
         this.state = state;
