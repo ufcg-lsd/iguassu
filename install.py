@@ -133,6 +133,7 @@ def write_iguassu_conf(confs, iguassu_dir_name):
 
 def main():
     print("---> Installing Iguassu System Service\n")
+    print("---> Requirements:\n------>OpenJDK8\n------>Maven\n------>Node < 11\n------>Yarn\n")
     print("Configure the following settings...\n")
     ds_properties = input_datastore_properties()
     host_addresses = input_service_host_addresses()
