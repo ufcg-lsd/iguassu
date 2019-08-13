@@ -70,7 +70,7 @@ def install_web_ui():
 
     iwi_dir_name = "iwi-{}".format(WEB_UI_BRANCH.replace("/", "-"))
     os.chdir(iwi_dir_name)
-    os.system("npm install")
+    os.system("yarn install")
     os.chdir("..")
     return iwi_dir_name
 
