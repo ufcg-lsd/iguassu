@@ -9,9 +9,9 @@ import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.constants.ConfProperty;
-import org.fogbowcloud.app.core.dto.arrebol.ArrebolExecutionDTO;
-import org.fogbowcloud.app.jdfcompiler.job.JDFJob;
+import org.fogbowcloud.app.jes.arrebol.dtos.ArrebolExecutionDTO;
 import org.fogbowcloud.app.jes.arrebol.models.JobExecArrebol;
+import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 import org.fogbowcloud.app.jes.exceptions.JobExecStatusException;
 import org.fogbowcloud.app.jes.exceptions.JobSubmissionException;
@@ -43,10 +43,10 @@ final class ArrebolRequestsHelper {
      * @param job to be performed.
      * @return an execution identifier.
      * @throws UnsupportedEncodingException if the job in the params has a bad shape.
-     * @throws JobSubmissionException if the post request failed.
-     * @throws ArrebolConnectException if the Arrebol Job Execution Service is down.
+     * @throws JobSubmissionException       if the post request failed.
+     * @throws ArrebolConnectException      if the Arrebol Job Execution Service is down.
      */
-    String submitToExecution(JDFJob job)
+    String submitToExecution(Job job)
             throws UnsupportedEncodingException, JobSubmissionException, ArrebolConnectException {
         StringEntity requestBody;
 
@@ -86,9 +86,9 @@ final class ArrebolRequestsHelper {
      * Takes the status of the execution of a job.
      *
      * @param executionId is the identifier of the execution. Each job has a unique execution
-     *     identifier.
+     *                    identifier.
      * @return the current execution state in json string.
-     * @throws JobExecStatusException if the get request failed.
+     * @throws JobExecStatusException  if the get request failed.
      * @throws ArrebolConnectException if the Arrebol Job Execution Service is down.
      */
     JobExecArrebol getExecutionStatus(String executionId)
@@ -100,27 +100,23 @@ final class ArrebolRequestsHelper {
 
         try {
             jsonResponse = HttpWrapper.doRequest(HttpGet.METHOD_NAME, endpoint, null);
-            logger.debug("JSON Response [" + jsonResponse + "]");
 
             jobExecArrebol = this.jsonUtil.fromJson(jsonResponse, JobExecArrebol.class);
         } catch (HttpHostConnectException e) {
             throw new ArrebolConnectException("Failed connect to Arrebol: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new JobExecStatusException(
-                    "Getting Job from Arrebol has FAILED: " + e.getMessage());
+            throw new JobExecStatusException("Getting Job from Arrebol has FAILED: " + e.getMessage());
         }
 
         return jobExecArrebol;
     }
 
-    private StringEntity makeJSONBody(JDFJob job) throws UnsupportedEncodingException {
+    private StringEntity makeJSONBody(Job job) throws UnsupportedEncodingException {
         logger.info("Building JSON body of Job : [" + job.getId() + "]");
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         ArrebolExecutionDTO arrebolExecutionDTO = new ArrebolExecutionDTO(job);
         String json = gson.toJson(arrebolExecutionDTO);
-
-        logger.info("json looks like: " + json);
 
         return new StringEntity(json);
     }

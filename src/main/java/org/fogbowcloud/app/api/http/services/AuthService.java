@@ -3,14 +3,14 @@ package org.fogbowcloud.app.api.http.services;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.core.IguassuFacade;
-import org.fogbowcloud.app.core.auth.models.OAuth2Identifiers;
-import org.fogbowcloud.app.core.auth.models.OAuthToken;
-import org.fogbowcloud.app.core.auth.models.User;
+import org.fogbowcloud.app.core.ApplicationFacade;
 import org.fogbowcloud.app.core.constants.ConfProperty;
 import org.fogbowcloud.app.core.constants.JsonKey;
-import org.fogbowcloud.app.core.dto.AuthDTO;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
+import org.fogbowcloud.app.core.models.user.OAuth2Identifiers;
+import org.fogbowcloud.app.core.models.user.OAuthToken;
+import org.fogbowcloud.app.core.models.user.RequesterCredential;
+import org.fogbowcloud.app.core.models.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
@@ -25,16 +25,18 @@ public class AuthService {
 
     private static final Logger logger = Logger.getLogger(AuthService.class);
 
-    @Lazy @Autowired private IguassuFacade iguassuFacade;
+    private ApplicationFacade applicationFacade = ApplicationFacade.getInstance();
 
-    @Lazy @Autowired private Properties properties;
+    @Lazy
+    @Autowired
+    private Properties properties;
 
-    public AuthDTO authenticate(String authorizationCode, String applicationIdentifiers)
+    public User authenticate(String authorizationCode, String applicationIdentifiers)
             throws Exception {
 
         final Gson gson = new Gson();
 
-        final String rawCode =
+        final String rawAuthorizationCode =
                 gson.fromJson(authorizationCode, JsonObject.class)
                         .get(JsonKey.AUTHORIZATION_CODE.getKey())
                         .getAsString();
@@ -44,11 +46,7 @@ public class AuthService {
 
         if (isAReliableApp(applicationIds)) {
             try {
-                final User userAuthenticated =
-                        this.iguassuFacade.authenticateUser(applicationIds, rawCode);
-
-                return new AuthDTO(
-                        userAuthenticated.getIdentifier(), userAuthenticated.getIguassuToken());
+                return this.applicationFacade.authenticateUser(applicationIds, rawAuthorizationCode);
             } catch (Exception e) {
                 throw new GeneralSecurityException();
             }
@@ -59,28 +57,22 @@ public class AuthService {
         }
     }
 
-    public User authorizeUser(String userCredentials) throws UnauthorizedRequestException {
+    public User authorizeUser(String credentials) throws UnauthorizedRequestException {
         User user;
+        Gson gson = new Gson();
         try {
-            user = this.iguassuFacade.authorizeUser(userCredentials);
-            user.resetSession();
-            this.iguassuFacade.updateUser(user);
-            logger.info("Retrieving user " + user.getIdentifier());
-        } catch (GeneralSecurityException e) {
+            user = this.applicationFacade.authorizeUser(gson.fromJson(credentials, RequesterCredential.class));
+        } catch (Exception e) {
             logger.error("Error while trying authorize", e);
-            throw new UnauthorizedRequestException(
-                    "There was an error trying to authenticate.\nTry again later.");
-        } catch (NullPointerException e) {
-            logger.error("Incorrect credentials! Try login again.");
-            throw new UnauthorizedRequestException("Incorrect credentials! Try login again.");
+            throw new UnauthorizedRequestException("Unauthorized operation. Credentials are not valid.");
         }
         return user;
     }
 
-    public String refreshToken(String userId, Long version) throws Exception {
-        OAuthToken oAuthToken = this.iguassuFacade.getCurrentTokenByUserId(userId);
+    public String refreshToken(String userAlias, Long version) throws Exception {
+        OAuthToken oAuthToken = this.applicationFacade.findUserOAuthTokenByAlias(userAlias);
         if (Objects.isNull(oAuthToken)) {
-            throw new UnauthorizedRequestException("Was not found token for user [" + userId + "]");
+            throw new UnauthorizedRequestException("Was not found token for user [" + userAlias + "]");
         }
         if (oAuthToken.getVersion() > version) {
             if (oAuthToken.hasExpired()) {
@@ -98,12 +90,12 @@ public class AuthService {
     private OAuthToken refreshAndDelete(OAuthToken oAuthToken) throws GeneralSecurityException {
         OAuthToken refreshedToken;
         try {
-            refreshedToken = this.iguassuFacade.refreshToken(oAuthToken);
+            refreshedToken = this.applicationFacade.refreshToken(oAuthToken);
         } catch (GeneralSecurityException gse) {
             throw new GeneralSecurityException(gse.getMessage());
         }
-        this.iguassuFacade.deleteOAuthToken(oAuthToken);
-        this.iguassuFacade.storeOAuthToken(refreshedToken);
+//        this.iguassuFacade.deleteOAuthToken(oAuthToken);
+//        this.iguassuFacade.storeOAuthToken(refreshedToken);
         return refreshedToken;
     }
 

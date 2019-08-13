@@ -35,7 +35,7 @@ public class DescriptionFileCompile {
 	 * @return
 	 * @throws CompilerException
 	 */
-	public static JobSpecification compileJDF( String descriptionFilePath ) throws CompilerException {
+	public static JobSpecification compileJDF(String descriptionFilePath ) throws CompilerException {
 
 		CommonCompiler compiler = new CommonCompiler();
 

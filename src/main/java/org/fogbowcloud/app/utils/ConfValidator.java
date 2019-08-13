@@ -22,7 +22,7 @@ public class ConfValidator {
         validateServicesAddresses(properties);
         validateMonitorPeriods(properties);
 
-        logger.debug(
+        logger.info(
                 "All properties of the configuration file were loaded successfully at time <"
                         + Instant.now().getNano()
                         + ">.");
@@ -30,7 +30,6 @@ public class ConfValidator {
 
     private static void validateServicesAddresses(Properties properties) {
         validatePropKey(properties, ConfProperty.ARREBOL_SERVICE_HOST_URL.getProp());
-        validatePropKey(properties, ConfProperty.DATABASE_HOST_URL.getProp());
         validatePropKey(properties, ConfProperty.IGUASSU_SERVICE_HOST_URL.getProp());
         validatePropKey(properties, ConfProperty.STORAGE_SERVICE_HOST_URL.getProp());
     }

@@ -7,7 +7,6 @@ public enum ConfProperty {
     ARREBOL_SERVICE_HOST_URL("arrebol_service_host_url"),
     IGUASSU_SERVICE_HOST_URL("iguassu_service_host_url"),
     STORAGE_SERVICE_HOST_URL("storage_service_host_url"),
-    DATABASE_HOST_URL("database_host_url"),
     JOB_STATE_MONITOR_PERIOD("job_state_monitor_period"),
     JOB_SUBMISSION_MONITOR_PERIOD("job_submission_monitor_period"),
     SESSION_MONITOR_PERIOD("session_monitor_period");

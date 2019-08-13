@@ -10,12 +10,17 @@ public class JobExecArrebol {
 
     private String id;
 
-    @SerializedName("jobState")
+    @SerializedName("job_state")
     private ExecutionState state;
+
+    private String label;
 
     private List<ArrebolTask> tasks;
 
+    public JobExecArrebol() {}
+
     public JobExecArrebol(String label, Collection<ArrebolTask> tasks) {
+        this.label = label;
         this.state = ExecutionState.SUBMITTED;
         this.tasks = new LinkedList<>(tasks);
     }

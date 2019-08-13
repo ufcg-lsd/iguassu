@@ -2,8 +2,8 @@ package org.fogbowcloud.app.api.http.services;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.api.exceptions.StorageException;
 import org.fogbowcloud.app.core.constants.GeneralConstants;
+import org.fogbowcloud.app.core.exceptions.StorageException;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,7 +18,7 @@ public class FileStorageService {
 
     private final Logger logger = Logger.getLogger(FileStorageService.class);
 
-    public void store(MultipartFile file, Map<String, String> formFieldsToLoad) {
+    public synchronized void store(MultipartFile file, Map<String, String> formFieldsToLoad) {
         final String fileName = file.getOriginalFilename();
 
         logger.info("Storing file of name [" + fileName + "];");
