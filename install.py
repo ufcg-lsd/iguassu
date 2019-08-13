@@ -1,9 +1,14 @@
 import os
 from zipfile import ZipFile
+import shutil
 
 IGUASSU_BRANCH=
 ARREBOL_BRANCH=
 WEB_UI_BRANCH=
+
+iguassu_dir_name = "iguassu-{}".format(IGUASSU_BRANCH.replace("/", "-"))
+arrebol_dir_name = "arrebol-{}".format(ARREBOL_BRANCH.replace("/", "-"))
+iwi_dir_name = "iwi-{}".format(WEB_UI_BRANCH.replace("/", "-"))
 
 #Properties names
 oauth_storage_service_token_url="oauth_storage_service_token_url"
@@ -29,6 +34,9 @@ VUE_APP_OWNCLOUD_OAUTH_SECRET="VUE_APP_OWNCLOUD_OAUTH_SECRET"
 VUE_APP_OWNCLOUD_OAUTH_REDIRECT_URI="VUE_APP_OWNCLOUD_OAUTH_REDIRECT_URI"
 VUE_APP_IGUASSU_API="VUE_APP_IGUASSU_API"
 
+FAIL = '\033[91m'
+ENDC = '\033[0m'
+
 def unzip_file(file_name):
     zf = ZipFile(file_name, 'r')
     zf.extractall()
@@ -46,33 +54,27 @@ def install_iguassu():
     url = "https://github.com/ufcg-lsd/iguassu/archive/{}.zip".format(IGUASSU_BRANCH)
     download_repository(url)
 
-    iguassu_dir_name = "iguassu-{}".format(IGUASSU_BRANCH.replace("/", "-"))
     os.chdir(iguassu_dir_name)
     os.system("mvn clean install -DskipTests")
     os.chdir("..")
-    return iguassu_dir_name
 
 def install_arrebol():
     print("---> Installing Arrebol")
     url = "https://github.com/ufcg-lsd/arrebol/archive/{}.zip".format(ARREBOL_BRANCH)
     download_repository(url)
 
-    arrebol_dir_name = "arrebol-{}".format(ARREBOL_BRANCH.replace("/", "-"))
     os.chdir(arrebol_dir_name)
     os.system("mvn clean install -DskipTests")
     os.chdir("..")
-    return arrebol_dir_name
 
 def install_web_ui():
     print("---> Installing Web UI")
     url = "https://github.com/emanueljoivo/iwi/archive/{}.zip".format(WEB_UI_BRANCH)
     download_repository(url)
 
-    iwi_dir_name = "iwi-{}".format(WEB_UI_BRANCH.replace("/", "-"))
     os.chdir(iwi_dir_name)
     os.system("yarn install")
     os.chdir("..")
-    return iwi_dir_name
 
 def input_datastore_properties():
     properties = {}
@@ -90,7 +92,6 @@ def input_service_host_addresses():
     addresses[iguassu_service_host_url]=input(iguassu_service_host_url + "=")
     addresses[arrebol_service_host_url]=input(arrebol_service_host_url + "=")
     addresses[web_ui_host_url]=input(web_ui_host_url + "=")
-    print('\n')
     return addresses
 
 def get_monitors_periods():
@@ -140,12 +141,19 @@ def main():
     monitors_periods = get_monitors_periods()
     confs = {**ds_properties, **host_addresses, **monitors_periods}
 
-    iguassu_dir_name = install_iguassu()
-    arrebol_dir_name = install_arrebol()
-    web_ui_dir_name = install_web_ui()
-
-    write_web_ui_conf(confs, web_ui_dir_name)
-    write_iguassu_conf(confs, iguassu_dir_name)
+    try:
+        install_iguassu()
+        install_arrebol()
+        install_web_ui()
+        
+        write_web_ui_conf(confs, iwi_dir_name)
+        write_iguassu_conf(confs, iguassu_dir_name)
+    except:
+        print(FAIL + "An exception was thrown during an installation." + ENDC)
+        print(FAIL + "Rolling back..." + ENDC)
+        shutil.rmtree(iguassu_dir_name, ignore_errors=True)
+        shutil.rmtree(arrebol_dir_name, ignore_errors=True)
+        shutil.rmtree(iwi_dir_name, ignore_errors=True)
 
 if __name__ == "__main__":
     main()
