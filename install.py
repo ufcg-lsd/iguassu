@@ -1,16 +1,40 @@
 import os
 from zipfile import ZipFile
 
-IGUASSU_BRANCH="release/v1.0.0"
-ARREBOL_BRANCH="feature/remote-worker"
-WEB_UI_BRANCH="master"
+IGUASSU_BRANCH=
+ARREBOL_BRANCH=
+WEB_UI_BRANCH=
+
+#Properties names
+oauth_storage_service_token_url="oauth_storage_service_token_url"
+oauth_storage_service_client_id="oauth_storage_service_client_id"
+oauth_storage_service_client_secret="oauth_storage_service_client_secret"
+
+storage_service_host_url="storage_service_host_url"
+arrebol_service_host_url="arrebol_service_host_url"
+iguassu_service_host_url="iguassu_service_host_url"
+web_ui_host_url="web_ui_host_url"
+
+job_state_monitor_period="job_state_monitor_period"
+session_monitor_period="session_monitor_period"
+job_submission_monitor_period="job_submission_monitor_period"
+
+VUE_APP_EXTERNAL_LINK_DOCS="VUE_APP_EXTERNAL_LINK_DOCS"
+VUE_APP_EXTERNAL_LINK_GITHUB_REPO="VUE_APP_EXTERNAL_LINK_GITHUB_REPO"
+VUE_APP_EXTERNAL_LINK_ABOUT="VUE_APP_EXTERNAL_LINK_ABOUT"
+
+VUE_APP_OWNCLOUD_SERVER_HOST="VUE_APP_OWNCLOUD_SERVER_HOST"
+VUE_APP_OWNCLOUD_OAUTH_CLIENT_ID="VUE_APP_OWNCLOUD_OAUTH_CLIENT_ID"
+VUE_APP_OWNCLOUD_OAUTH_SECRET="VUE_APP_OWNCLOUD_OAUTH_SECRET"
+VUE_APP_OWNCLOUD_OAUTH_REDIRECT_URI="VUE_APP_OWNCLOUD_OAUTH_REDIRECT_URI"
+VUE_APP_IGUASSU_API="VUE_APP_IGUASSU_API"
 
 def unzip_file(file_name):
     zf = ZipFile(file_name, 'r')
     zf.extractall()
     zf.close()
 
-# Download and extract the archive file from repository
+# Download/extract the archive file from repository and delete zip
 def download_repository(url):
     os.system("wget {}".format(url))
     file_name = os.path.basename(url)
@@ -50,19 +74,7 @@ def install_web_ui():
     os.chdir("..")
     return iwi_dir_name
 
-oauth_storage_service_token_url="oauth_storage_service_token_url"
-oauth_storage_service_client_id="oauth_storage_service_client_id"
-oauth_storage_service_client_secret="oauth_storage_service_client_secret"
-
-storage_service_host_url="storage_service_host_url"
-iguassu_service_host_url="iguassu_service_host_url"
-arrebol_service_host_url="arrebol_service_host_url"
-
-job_state_monitor_period="job_state_monitor_period"
-session_monitor_period="session_monitor_period"
-job_submission_monitor_period="job_submission_monitor_period"
-
-def datastore_properties():
+def input_datastore_properties():
     properties = {}
     print("Datastore Service Configuration Properties")
     properties[oauth_storage_service_token_url]=input(oauth_storage_service_token_url + "=")
@@ -70,17 +82,18 @@ def datastore_properties():
     properties[oauth_storage_service_client_secret]=input(oauth_storage_service_client_secret + "=")
     return properties
 
-def service_host_addresses():
+def input_service_host_addresses():
     addresses = {}
     print("Service Host Addresses")
     print("Requires http prefix 'http://")
     addresses[storage_service_host_url]=input(storage_service_host_url + "=")
     addresses[iguassu_service_host_url]=input(iguassu_service_host_url + "=")
     addresses[arrebol_service_host_url]=input(arrebol_service_host_url + "=")
+    addresses[web_ui_host_url]=input(web_ui_host_url + "=")
     print('\n')
     return addresses
 
-def monitors_periods():
+def get_monitors_periods():
     periods = {}
     periods[job_state_monitor_period]=5000
     periods[session_monitor_period]=3600000
@@ -95,21 +108,43 @@ def write_conf_file(confs, path, file_name):
     f.close()
     os.chdir("..")
 
+def get_web_ui_conf(confs):
+    ui_conf = {}
+    ui_conf[VUE_APP_EXTERNAL_LINK_DOCS] = "https://nicedoc.io/ufcg-lsd/iguassu"
+    ui_conf[VUE_APP_EXTERNAL_LINK_GITHUB_REPO] = "https://github.com/ufcg-lsd/iguassu"
+    ui_conf[VUE_APP_EXTERNAL_LINK_ABOUT] = "http://cloudlab-brasil.rnp.br/iguassu"
+
+    ui_conf[VUE_APP_OWNCLOUD_SERVER_HOST] = confs[storage_service_host_url]
+    ui_conf[VUE_APP_OWNCLOUD_OAUTH_CLIENT_ID] = confs[oauth_storage_service_client_id]
+    ui_conf[VUE_APP_OWNCLOUD_OAUTH_SECRET] = confs[oauth_storage_service_client_secret]
+    ui_conf[VUE_APP_OWNCLOUD_OAUTH_REDIRECT_URI] = confs[web_ui_host_url] + "/auth"
+
+    ui_conf[VUE_APP_IGUASSU_API] = confs[iguassu_service_host_url]
+
+    return ui_conf
+
+def write_web_ui_conf(confs, web_ui_dir_name):
+    ui_confs = get_web_ui_conf(confs)
+    write_conf_file(ui_confs, web_ui_dir_name, ".env")
+
+def write_iguassu_conf(confs, iguassu_dir_name):
+    confs.pop(web_ui_host_url, None)
+    write_conf_file(confs, iguassu_dir_name, "iguassu.conf")
 
 def main():
     print("---> Installing Iguassu System Service\n")
     print("Configure the following settings...\n")
-    ds_properties = datastore_properties()
-    host_addresses = service_host_addresses()
-    monitors_periods_ = monitors_periods()
-    confs = {**ds_properties, **host_addresses, **monitors_periods_}
+    ds_properties = input_datastore_properties()
+    host_addresses = input_service_host_addresses()
+    monitors_periods = get_monitors_periods()
+    confs = {**ds_properties, **host_addresses, **monitors_periods}
 
     iguassu_dir_name = install_iguassu()
     arrebol_dir_name = install_arrebol()
     web_ui_dir_name = install_web_ui()
 
-    write_conf_file(confs, iguassu_dir_name, "iguassu.conf")
-    write_conf_file(confs, web_ui_dir_name, ".env")
+    write_web_ui_conf(confs, web_ui_dir_name)
+    write_iguassu_conf(confs, iguassu_dir_name)
 
 if __name__ == "__main__":
     main()
