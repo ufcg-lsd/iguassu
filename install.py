@@ -2,6 +2,8 @@ import os
 from zipfile import ZipFile
 import shutil
 
+#RUN WITH PYTHON 3 AND IN SUDO MODE
+
 IGUASSU_BRANCH=
 ARREBOL_BRANCH=
 WEB_UI_BRANCH=
@@ -133,8 +135,9 @@ def write_iguassu_conf(confs, iguassu_dir_name):
     write_conf_file(confs, iguassu_dir_name, "iguassu.conf")
 
 def main():
+    print("---> Run with python 3 and in sudo mode\n")
     print("---> Installing Iguassu System Service\n")
-    print("---> Requirements:\n------>OpenJDK8\n------>Maven\n------>Node < 11\n------>Yarn\n")
+    print("---> Requirements:\n------> OpenJDK8\n------> Maven\n------> Node < 11\n------> Yarn\n")
     print("Configure the following settings...\n")
     ds_properties = input_datastore_properties()
     host_addresses = input_service_host_addresses()
