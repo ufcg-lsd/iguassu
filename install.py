@@ -1,6 +1,7 @@
 import os
 from zipfile import ZipFile
 import shutil
+import sys
 
 #RUN WITH PYTHON 3 AND IN SUDO MODE
 
@@ -138,25 +139,29 @@ def main():
     print("---> Run with python 3 and in sudo mode\n")
     print("---> Installing Iguassu System Service\n")
     print("---> Requirements:\n------> OpenJDK8\n------> Maven\n------> Node < 11\n------> Yarn\n")
-    print("Configure the following settings...\n")
-    ds_properties = input_datastore_properties()
-    host_addresses = input_service_host_addresses()
-    monitors_periods = get_monitors_periods()
-    confs = {**ds_properties, **host_addresses, **monitors_periods}
+    reply = input("Do you meet all the requirements?(y/n):").lower().strip()
+    if reply == "y":
+        print("Configure the following settings...\n")
+        ds_properties = input_datastore_properties()
+        host_addresses = input_service_host_addresses()
+        monitors_periods = get_monitors_periods()
+        confs = {**ds_properties, **host_addresses, **monitors_periods}
 
-    try:
-        install_iguassu()
-        install_arrebol()
-        install_web_ui()
-        
-        write_web_ui_conf(confs, iwi_dir_name)
-        write_iguassu_conf(confs, iguassu_dir_name)
-    except:
-        print(FAIL + "An exception was thrown during an installation." + ENDC)
-        print(FAIL + "Rolling back..." + ENDC)
-        shutil.rmtree(iguassu_dir_name, ignore_errors=True)
-        shutil.rmtree(arrebol_dir_name, ignore_errors=True)
-        shutil.rmtree(iwi_dir_name, ignore_errors=True)
+        try:
+            install_iguassu()
+            install_arrebol()
+            install_web_ui()
+            
+            write_web_ui_conf(confs, iwi_dir_name)
+            write_iguassu_conf(confs, iguassu_dir_name)
+        except:
+            print(FAIL + "An exception was thrown during an installation." + ENDC)
+            print(FAIL + "Rolling back..." + ENDC)
+            shutil.rmtree(iguassu_dir_name, ignore_errors=True)
+            shutil.rmtree(arrebol_dir_name, ignore_errors=True)
+            shutil.rmtree(iwi_dir_name, ignore_errors=True)
+    else:
+        sys.exit(0)
 
 if __name__ == "__main__":
     main()
