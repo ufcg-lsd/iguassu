@@ -14,19 +14,20 @@ import java.util.stream.Collectors;
  * This routine is responsible for synchronizing the state of jobs with the state of their
  * execution.
  */
-public class SyncJobStateRoutine implements Runnable {
+public class SyncJobStateRoutine extends Routine implements Runnable {
 
     private static final Logger logger = Logger.getLogger(SyncJobStateRoutine.class);
     private final JobDBManager jobDBManager = JobDBManager.getInstance();
     private Synchronizer<Job> synchronizer;
 
-    SyncJobStateRoutine(Synchronizer<Job> synchronizer) {
+    SyncJobStateRoutine(long id, String name, Synchronizer<Job> synchronizer)  {
+        super(id, name);
         this.synchronizer = synchronizer;
     }
 
     @Override
     public void run() {
-        logger.info("----> Running Sync Job State Routine in thread with id [" + Thread.currentThread().getId() + "]");
+        logger.info("Running routine " + this.name + ".");
         final List<Job> jobs = filterUsefulJobs();
 
         for (Job job : jobs) {

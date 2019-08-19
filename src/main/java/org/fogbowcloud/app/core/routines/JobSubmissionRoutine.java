@@ -14,22 +14,22 @@ import java.util.Queue;
  * This routine checks from time to time if there are any jobs in the buffer to be submitted to the
  * execution system.
  */
-public class JobSubmissionRoutine implements Runnable {
+public class JobSubmissionRoutine extends Routine implements Runnable  {
 
     private static final Logger logger = Logger.getLogger(JobSubmissionRoutine.class);
 
     private JobExecutionService jobExecutionSystem;
     private Queue<Job> jobsToSubmit;
 
-    JobSubmissionRoutine(JobExecutionService jobExecutionSystem, Queue<Job> jobsToSubmit) {
+    JobSubmissionRoutine(long id, String name, JobExecutionService jobExecutionSystem, Queue<Job> jobsToSubmit) {
+        super(id, name);
         this.jobExecutionSystem = jobExecutionSystem;
         this.jobsToSubmit = jobsToSubmit;
     }
 
     @Override
     public void run() {
-        logger.info(
-                "----> Running Job Submission Routine in thread with id [" + Thread.currentThread().getId() + "]");
+        logger.info("Running routine " + this.name + ".");
         while (Objects.nonNull(this.jobsToSubmit.peek())) {
             Job job = this.jobsToSubmit.poll();
             logger.info("Job found! Starting job submission with id [" + job.getId() + "]");
