@@ -1,34 +1,25 @@
 package org.fogbowcloud.app.api.http.controllers;
 
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiParam;
-import org.fogbowcloud.app.IguassuController;
-import org.fogbowcloud.app.api.http.config.ApiDocumentation;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import io.swagger.annotations.ApiOperation;
+import org.fogbowcloud.app.api.constants.Documentation;
+import org.fogbowcloud.app.core.ApplicationFacade;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-@CrossOrigin
-@EnableWebMvc
 @RestController
-@RequestMapping(value = NonceController.NONCE_ENDPOINT)
-@Api(description = ApiDocumentation.Nonce.API)
+@RequestMapping(value = Documentation.Endpoint.NONCE)
+@Api(Documentation.Nonce.DESCRIPTION)
 public class NonceController {
 
-    public static final String NONCE_ENDPOINT = "nonce";
+    private ApplicationFacade applicationFacade = ApplicationFacade.getInstance();
 
-    @Lazy
-    @Autowired
-    IguassuController iguassuController;
-
-    @RequestMapping(method = RequestMethod.GET)
-    @ApiParam(value = ApiDocumentation.Nonce.GET_OPERATION)
+    @GetMapping
+    @ApiOperation(value = Documentation.Nonce.GET_OPERATION)
     public ResponseEntity<String> getNonce() {
-        int nonce = this.iguassuController.getNonce();
-        String nonceStr = String.valueOf(nonce);
-        return new ResponseEntity<String>(nonceStr, HttpStatus.OK);
+        return new ResponseEntity<>(String.valueOf(this.applicationFacade.getNonce()), HttpStatus.OK);
     }
 }

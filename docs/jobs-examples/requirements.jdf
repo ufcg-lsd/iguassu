@@ -1,0 +1,3 @@
+job:
+label: Requirements-Example
+requirements: DockerMemory >= 4024 AND DockerCPUWeight == 1024

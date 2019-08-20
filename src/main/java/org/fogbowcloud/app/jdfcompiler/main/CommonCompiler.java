@@ -179,7 +179,7 @@ public class CommonCompiler implements Compiler {
 			LOG.error( "The grammar could not be loaded because the file specified could not be found." );
 			throw new CompilerException( CompilerMessages.BAD_GRAMMAR_FILE_NOT_FOUND, fnfex );
 		} catch ( IOException ioex ) {
-			LOG.error( "The grammar could not be loaded because of some I/O exception." );
+			LOG.error( "The grammar could not be loaded because of some I/O exceptions." );
 			throw new CompilerException( CompilerMessages.ERROR_GRAMMAR_IO, ioex );
 		}
 	}

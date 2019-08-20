@@ -6,24 +6,18 @@
 ##                                                ##
 ####################################################
 
-#### Server configuration properties ####
-rest_server_port=8080
-
-#### Datastore configuration properties ####
+#### Datastore Service Configuration Properties ####
 oauth_storage_service_token_url=
-oauth_storage_service_users_url=
 oauth_storage_service_client_id=
 oauth_storage_service_client_secret=
 
-#### Storage Service ####
-storage_service_host=
-storage_service_vm_public_ip=
-storage_service_admin_username=
-storage_service_admin_password=
+#### Service host addresses             ####
+#### Requires http prefix 'http://'     ####
+storage_service_host_url=http://storage-service-base-url
+iguassu_service_host_url=http://iguassu-service-base-url
+arrebol_service_host_url=http://arrebol-service-base-url
 
-#### Default
-default_compute_flavor_spec=defaulResource.json
-
-#### Properties to SSH communication ####
-iguassu_public_key=
-iguassu_private_key_filepath=/home/user/.ssh/id_rsa
+#### Monitors ####
+job_state_monitor_period=
+session_monitor_period=
+job_submission_monitor_period=

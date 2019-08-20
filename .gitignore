@@ -1,11 +1,19 @@
+# IDE
+
 /target
 .idea/
+
+.classpath
+.project
+.settings/
 
 jobgenerator.py
 bigjob.py
 
 *.db
 datastores/
+bin/shutdown.pid
+
 
 iguassu.conf
 sched.conf
@@ -17,5 +25,7 @@ test/blowout2.conf
 
 *.log
 *.log.*
+logs/
 
 iguassu.iml
+nohup.out
