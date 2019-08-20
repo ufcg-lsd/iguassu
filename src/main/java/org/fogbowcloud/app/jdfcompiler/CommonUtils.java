@@ -33,7 +33,7 @@ import org.apache.log4j.Logger;
 
 public class CommonUtils {
 	
-	private static final transient Logger LOG = Logger.getLogger(CommonUtils.class );
+	private static final Logger LOG = Logger.getLogger(CommonUtils.class );
 	
 	/**
 	 * Loads properties from a persistent File

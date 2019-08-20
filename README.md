@@ -1,4 +1,4 @@
-![alt logo](docs/IGUASSU-LG.png)
+![alt logo](docs/assets/IGUASSU-LG.png)
 
 # Iguassu
 ## What is Iguassu?

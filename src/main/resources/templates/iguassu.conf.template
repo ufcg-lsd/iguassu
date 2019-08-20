@@ -17,9 +17,6 @@ storage_service_host_url=http://storage-service-base-url
 iguassu_service_host_url=http://iguassu-service-base-url
 arrebol_service_host_url=http://arrebol-service-base-url
 
-#### Local JDBC database directory ####
-database_host_url=jdbc:sqlite:/path/to/db
-
 #### Monitors ####
 job_state_monitor_period=
 session_monitor_period=
