@@ -56,7 +56,7 @@ public class QueueAPI {
     @ApiOperation(value = Documentation.Queue.SUBMIT_JOB)
     public ResponseEntity<?> submitJob(
             @ApiParam(value = Documentation.Queue.CREATE_REQUEST_PARAM)
-            @RequestParam(GeneralConstants.JDF_FILE_PATH) MultipartFile jdf,
+            @RequestParam(GeneralConstants.JDF_FILE_PATH) MultipartFile rawJDF,
 
             @ApiParam(value = Documentation.Queue.QUEUE_ID)
             @PathVariable String queueId,
@@ -76,7 +76,7 @@ public class QueueAPI {
         fieldMap.put(GeneralConstants.JDF_FILE_PATH, null);
         fieldMap.put(GeneralConstants.X_AUTH_USER_CREDENTIALS, null);
 
-        this.storageService.store(jdf, fieldMap);
+        this.storageService.store(rawJDF, fieldMap);
         User user;
 
         try {
