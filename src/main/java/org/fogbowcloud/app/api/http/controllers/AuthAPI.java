@@ -22,15 +22,15 @@ import java.util.Objects;
 @RestController
 @RequestMapping(value = Documentation.Endpoint.AUTH)
 @Api(Documentation.Auth.DESCRIPTION)
-public class AuthController {
+public class AuthAPI {
 
-    private final Logger logger = Logger.getLogger(AuthController.class);
+    private final Logger logger = Logger.getLogger(AuthAPI.class);
 
     @Lazy
     private AuthService authService;
 
     @Autowired
-    public AuthController(AuthService authService) {
+    public AuthAPI(AuthService authService) {
         this.authService = authService;
     }
 
