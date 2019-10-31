@@ -7,8 +7,10 @@ import org.fogbowcloud.app.core.ApplicationFacade;
 import org.fogbowcloud.app.core.constants.GeneralConstants;
 import org.fogbowcloud.app.core.constants.ExitCode;
 import org.fogbowcloud.app.core.datastore.managers.JobDBManager;
+import org.fogbowcloud.app.core.datastore.managers.QueueDBManager;
 import org.fogbowcloud.app.core.datastore.managers.UserDBManager;
 import org.fogbowcloud.app.core.datastore.repositories.JobRepository;
+import org.fogbowcloud.app.core.datastore.repositories.QueueRepository;
 import org.fogbowcloud.app.core.datastore.repositories.UserRepository;
 import org.fogbowcloud.app.utils.ConfValidator;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,11 +29,15 @@ public class IguassuMainRunner implements CommandLineRunner {
 	@Autowired
 	JobRepository jobRepository;
 
+	@Autowired
+	QueueRepository queueRepository;
+
 
 	@Override
 	public void run(String... args) throws Exception {
 		JobDBManager.getInstance().setJobRepository(jobRepository);
 		UserDBManager.getInstance().setUserRepository(userRepository);
+		QueueDBManager.getInstance().setQueueRepository(queueRepository);
 
 		logger.info("Running " + IguassuMainRunner.class.getName());
 		if (args.length > 0) {

@@ -36,7 +36,7 @@ public class JobService {
         return this.applicationFacade.removeJob(jobId, userId);
     }
 
-    public String submitJob(String jdfFilePath, User user) throws CompilerException, IOException {
-        return this.applicationFacade.submitJob(jdfFilePath, user);
+    public String submitJob(String queueId, String jdfFilePath, User user) throws CompilerException, IOException {
+        return this.applicationFacade.submitJob(queueId, jdfFilePath, user);
     }
 }

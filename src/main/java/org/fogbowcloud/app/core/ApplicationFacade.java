@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.auth.DefaultAuthManager;
 import org.fogbowcloud.app.core.datastore.managers.JobDBManager;
+import org.fogbowcloud.app.core.datastore.managers.QueueDBManager;
 import org.fogbowcloud.app.core.datastore.managers.UserDBManager;
 import org.fogbowcloud.app.core.exceptions.JobNotFoundException;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
@@ -22,6 +23,7 @@ import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.utils.JDFUtil;
 
+import org.fogbowcloud.app.utils.Pair;
 import org.springframework.transaction.annotation.Transactional;
 import java.security.GeneralSecurityException;
 import java.util.*;
@@ -32,7 +34,7 @@ public class ApplicationFacade {
 
     private static ApplicationFacade instance;
     private final List<Integer> nonceList;
-    private final Queue<Job> jobsToSubmit;
+    private final Queue<Pair<String, Job>> jobsToSubmit;
     private AuthManager authManager;
     private JobBuilder jobBuilder;
     private JobDBManager jobDBManager;
@@ -62,12 +64,14 @@ public class ApplicationFacade {
     }
 
     @Transactional
-    public synchronized String submitJob(String jdfFilePath, User jobOwner) throws CompilerException {
+    public synchronized String submitJob(String queueId, String jdfFilePath, User jobOwner) throws CompilerException {
         logger.debug("Adding job of user " + jobOwner.getAlias() + " to buffer.");
 
         final Job job = buildJob(jdfFilePath, jobOwner);
         this.jobDBManager.save(job);
-        this.jobsToSubmit.offer(this.jobDBManager.findOne(job.getId()));
+        Pair<String, Job> pair = new Pair<>(queueId, this.jobDBManager.findOne(job.getId()));
+        QueueDBManager.getInstance().save(pair);
+        this.jobsToSubmit.offer(pair);
 
         return job.getId();
     }

@@ -46,7 +46,7 @@ final class ArrebolRequestsHelper {
      * @throws JobSubmissionException       if the post request failed.
      * @throws ArrebolConnectException      if the Arrebol Job Execution Service is down.
      */
-    String submitToExecution(Job job)
+    String submitToExecution(String queueId, Job job)
             throws UnsupportedEncodingException, JobSubmissionException, ArrebolConnectException {
         StringEntity requestBody;
 
@@ -57,7 +57,7 @@ final class ArrebolRequestsHelper {
                     "Job with id [" + job.getId() + "] is not well formed to built JSON.");
         }
 
-        final String jobEndpoint = serviceBaseUrl + "/job";
+        final String jobEndpoint = serviceBaseUrl + "/queues/" + queueId + "/jobs";
 
         String executionId;
         final String JSON_KEY_JOB_ID_ARREBOL = "id";
@@ -91,9 +91,9 @@ final class ArrebolRequestsHelper {
      * @throws JobExecStatusException  if the get request failed.
      * @throws ArrebolConnectException if the Arrebol Job Execution Service is down.
      */
-    JobExecArrebol getExecutionStatus(String executionId)
+    JobExecArrebol getExecutionStatus(String queueId, String executionId)
             throws JobExecStatusException, ArrebolConnectException {
-        final String endpoint = serviceBaseUrl + "/job/" + executionId;
+        final String endpoint = serviceBaseUrl + "/queues/" + queueId + "/jobs/" + executionId;
 
         String jsonResponse;
         JobExecArrebol jobExecArrebol;

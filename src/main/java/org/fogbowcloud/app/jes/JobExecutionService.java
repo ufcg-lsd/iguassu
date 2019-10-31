@@ -16,7 +16,7 @@ public interface JobExecutionService {
      * @throws Exception If any part of the operation goes wrong, be it submission to the Execution
      *                   Service or manipulation of some intermediate object.
      */
-    String submit(Job job) throws Exception;
+    String submit(String queueId, Job job) throws Exception;
 
     /**
      * Queries the state of the execution and represent as a JobState.
@@ -24,5 +24,5 @@ public interface JobExecutionService {
      * @param executionId to be queried in the Execution Service.
      * @return the current {@link JobExecArrebol} state for the refer execution.
      */
-    JobExecArrebol status(String executionId);
+    JobExecArrebol status(String queueId, String executionId);
 }

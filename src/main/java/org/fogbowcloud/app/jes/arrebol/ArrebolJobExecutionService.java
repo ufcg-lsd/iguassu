@@ -24,16 +24,16 @@ public class ArrebolJobExecutionService implements JobExecutionService {
     }
 
     @Override
-    public String submit(Job job)
+    public String submit(String queueId, Job job)
             throws UnsupportedEncodingException, JobSubmissionException, ArrebolConnectException {
 
-        return this.requestsHelper.submitToExecution(job);
+        return this.requestsHelper.submitToExecution(queueId, job);
     }
 
     @Override
-    public JobExecArrebol status(String executionId) {
+    public JobExecArrebol status(String queueId, String executionId) {
         logger.info("Getting the status of execution with id [" + executionId + "]");
 
-        return this.requestsHelper.getExecutionStatus(executionId);
+        return this.requestsHelper.getExecutionStatus(queueId, executionId);
     }
 }

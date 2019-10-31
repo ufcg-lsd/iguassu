@@ -17,6 +17,6 @@ public class GeneralConstants {
     /*
      *  General useful paths.
      */
-    public static final String IGUASSU_CONF_FILE = "iguassu.conf";
+    public static final String IGUASSU_CONF_FILE = "src/main/iguassu.conf";
     public static final String JDF_FILE_PATH = "jdffilepath";
 }

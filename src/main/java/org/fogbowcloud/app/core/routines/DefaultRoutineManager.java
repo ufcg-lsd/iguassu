@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.concurrent.Executors;
+import org.fogbowcloud.app.utils.Pair;
 
 /**
  * Default implementation of the RoutineManager
@@ -24,9 +25,9 @@ public class DefaultRoutineManager implements RoutineManager {
 
     private final JobExecutionService jobExecutionService;
     private final Properties properties;
-    private final Queue<Job> jobsToSubmit;
+    private final Queue<Pair<String, Job>> jobsToSubmit;
 
-    public DefaultRoutineManager(Properties properties, Queue<Job> jobsToSubmit) {
+    public DefaultRoutineManager(Properties properties, Queue<Pair<String, Job>> jobsToSubmit) {
         this.properties = properties;
         this.jobExecutionService = new ArrebolJobExecutionService(this.properties);
         this.jobsToSubmit = jobsToSubmit;

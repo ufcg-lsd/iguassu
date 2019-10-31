@@ -96,7 +96,7 @@ public class QueueAPI {
         final String jdfAbsolutePath = fieldMap.get(GeneralConstants.JDF_FILE_PATH);
         try {
             logger.info("Job description file path's <" + jdfAbsolutePath + ">");
-            jobId = this.jobService.submitJob(jdfAbsolutePath, user);
+            jobId = this.jobService.submitJob(queueId, jdfAbsolutePath, user);
             logger.info("Job " + jobId + " created at time: " + System.currentTimeMillis());
         } catch (CompilerException ce) {
             logger.error(ce.getMessage(), ce);
