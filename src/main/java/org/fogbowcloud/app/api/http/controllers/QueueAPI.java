@@ -133,7 +133,7 @@ public class QueueAPI {
                     HttpStatus.UNAUTHORIZED);
         }
 
-        final Collection<Job> allJobsOfUser = this.jobService.getActiveJobsByUser(user);
+        final Collection<Job> allJobsOfUser = this.jobService.getActiveJobsFromQueueByUser(queueId, user);
 
         final List<JobDTO> response = new LinkedList<>();
 
@@ -158,7 +158,7 @@ public class QueueAPI {
 
         Job job;
         try {
-            job = getJDFJob(jobId, userCredentials);
+            job = getJDFJob(queueId, jobId, userCredentials);
 
         } catch (UnauthorizedRequestException | JobNotFoundException ure) {
             return new ResponseEntity<>(
@@ -185,7 +185,7 @@ public class QueueAPI {
 
         Job job;
         try {
-            job = getJDFJob(jobId, userCredentials);
+            job = getJDFJob(queueId, jobId, userCredentials);
 
         } catch (UnauthorizedRequestException | JobNotFoundException ure) {
             return new ResponseEntity<>(
@@ -242,11 +242,11 @@ public class QueueAPI {
         return l;
     }
 
-    private Job getJDFJob(String jobId, String userCredentials)
+    private Job getJDFJob(String queueId, String jobId, String userCredentials)
             throws UnauthorizedRequestException, JobNotFoundException {
         final User user = this.authService.authorizeUser(userCredentials);
 
-        return this.jobService.getJobById(jobId, user);
+        return this.jobService.getJobFromQueueById(queueId, jobId, user);
     }
 
     static class SimpleJobResponse {

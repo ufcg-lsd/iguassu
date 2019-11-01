@@ -8,7 +8,7 @@ import javax.persistence.OneToMany;
 import org.fogbowcloud.app.core.models.job.Job;
 
 @Entity
-public class Queue {
+public class ArrebolQueue {
 
     @Id
     private String queueId;
@@ -16,12 +16,12 @@ public class Queue {
     @OneToMany(fetch = FetchType.EAGER, targetEntity = Job.class)
     private List<Job> jobs;
 
-    public Queue(String queueId, List<Job> jobs) {
+    public ArrebolQueue(String queueId, List<Job> jobs) {
         this.queueId = queueId;
         this.jobs = jobs;
     }
 
-    public Queue() {
+    public ArrebolQueue() {
     }
 
     public String getQueueId() {

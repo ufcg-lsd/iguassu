@@ -8,7 +8,7 @@ import org.fogbowcloud.app.core.datastore.managers.JobDBManager;
 import org.fogbowcloud.app.core.datastore.managers.QueueDBManager;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.job.JobState;
-import org.fogbowcloud.app.core.models.queue.Queue;
+import org.fogbowcloud.app.core.models.queue.ArrebolQueue;
 import org.fogbowcloud.app.jes.arrebol.Synchronizer;
 import org.fogbowcloud.app.utils.Pair;
 
@@ -54,8 +54,8 @@ public class SyncJobStateRoutine extends Routine implements Runnable {
 
     private List<Pair<String, Job>> filterUsefulJobs() {
         List<Pair<String, Job>> jobs = new ArrayList<>();
-        List<Queue> queues = QueueDBManager.getInstance().findAll();
-        for (Queue queue : queues) {
+        List<ArrebolQueue> queues = QueueDBManager.getInstance().findAll();
+        for (ArrebolQueue queue : queues) {
             queue.getJobs().stream().filter(job -> !(job.getState().equals(JobState.FINISHED) || job.getState()
                 .equals(JobState.REMOVED)) || job.getState().equals(JobState.FAILED))
                 .forEach((job) -> {

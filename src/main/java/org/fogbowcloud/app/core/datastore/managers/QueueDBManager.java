@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Objects;
 import org.fogbowcloud.app.core.datastore.repositories.QueueRepository;
 import org.fogbowcloud.app.core.models.job.Job;
-import org.fogbowcloud.app.core.models.queue.Queue;
+import org.fogbowcloud.app.core.models.queue.ArrebolQueue;
 import org.fogbowcloud.app.utils.Pair;
 
 public class QueueDBManager {
@@ -25,16 +25,16 @@ public class QueueDBManager {
         return instance;
     }
 
-    public Queue findOne(String queueId) {
+    public ArrebolQueue findOne(String queueId) {
         return this.queueRepository.findById(queueId).isPresent() ? this.queueRepository
             .findById(queueId).get() : null;
     }
 
-    public List<Queue> findAll() {
+    public List<ArrebolQueue> findAll() {
         return this.queueRepository.findAll();
     }
 
-    public void update(Queue queue) {
+    public void update(ArrebolQueue queue) {
         this.queueRepository.save(queue);
     }
 
@@ -45,7 +45,7 @@ public class QueueDBManager {
     public synchronized void save(Pair<String, Job> pair) {
         String queueId = pair.getKey();
         Job job = pair.getValue();
-        Queue queue = this.findOne(queueId);
+        ArrebolQueue queue = this.findOne(queueId);
         if(Objects.isNull(queue)){
             queue = createQueue(queueId);
         }
@@ -53,9 +53,9 @@ public class QueueDBManager {
         this.queueRepository.save(queue);
     }
 
-    private Queue createQueue(String queueId) {
+    private ArrebolQueue createQueue(String queueId) {
         List<Job> jobs = Collections.synchronizedList(new ArrayList<>());
-        Queue queue = new Queue(queueId, jobs);
+        ArrebolQueue queue = new ArrebolQueue(queueId, jobs);
         return queue;
     }
 }

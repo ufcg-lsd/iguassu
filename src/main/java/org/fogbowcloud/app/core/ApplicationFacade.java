@@ -1,5 +1,6 @@
 package org.fogbowcloud.app.core;
 
+import java.util.stream.Collectors;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.auth.DefaultAuthManager;
@@ -11,6 +12,7 @@ import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
 import org.fogbowcloud.app.core.exceptions.UserNotExistException;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.job.JobState;
+import org.fogbowcloud.app.core.models.queue.ArrebolQueue;
 import org.fogbowcloud.app.core.models.user.OAuth2Identifiers;
 import org.fogbowcloud.app.core.models.user.OAuthToken;
 import org.fogbowcloud.app.core.models.user.RequesterCredential;
@@ -159,8 +161,13 @@ public class ApplicationFacade {
         return this.userDBManager.findUserByAlias(userAlias).getCredentials().getOauthToken();
     }
 
-    public Collection<Job> findAllJobsByUserId(Long userId) {
-        return this.jobDBManager.findByUserId(userId);
+    public Collection<Job> findAllJobsFromQueueByUserId(String queueId, Long userId) {
+        ArrebolQueue queue = QueueDBManager.getInstance().findOne(queueId);
+        if(Objects.isNull(queue)) {
+            throw new IllegalArgumentException("Queue not found [" + queueId + "]");
+        }
+        List<Job> jobsByUser = queue.getJobs().stream().filter(job -> job.getOwnerId().equals(userId)).collect(Collectors.toList());
+        return jobsByUser;
     }
 
     public synchronized String removeJob(String jobId, Long userId) throws UnauthorizedRequestException {
@@ -175,14 +182,16 @@ public class ApplicationFacade {
         return job.getId();
     }
 
-    public Job findJobById(String jobId, User user) throws JobNotFoundException, UnauthorizedRequestException {
+    public Job findJobFromQueueById(String queueId, String jobId, User user) throws JobNotFoundException, UnauthorizedRequestException {
         Job job;
-        try {
-            job = Objects.requireNonNull(this.jobDBManager.findOne(jobId));
-        } catch (Exception e) {
+        ArrebolQueue queue = QueueDBManager.getInstance().findOne(queueId);
+        List<Job> jobs = queue.getJobs().stream().filter(job1 -> job1.getId().equals(jobId)).collect(
+            Collectors.toList());
+        if(jobs.isEmpty()) {
             logger.error("Could not find job with id [" + jobId + "].");
             throw new JobNotFoundException("Could not find job with id [" + jobId + "].");
         }
+        job = jobs.get(0);
 
         if (!match(job, user.getId())) {
             throw new UnauthorizedRequestException("User with id [" + user.getId() + "] does not own this job.");

@@ -20,16 +20,16 @@ public class JobService {
 
     private ApplicationFacade applicationFacade = ApplicationFacade.getInstance();
 
-    public Collection<Job> getActiveJobsByUser(User user) {
-        return this.applicationFacade.findAllJobsByUserId(user.getId())
+    public Collection<Job> getActiveJobsFromQueueByUser(String queueId, User user) {
+        return this.applicationFacade.findAllJobsFromQueueByUserId(queueId, user.getId())
                 .stream()
                 .filter(
                         job -> !job.getState().equals(JobState.REMOVED)
                 ).collect(Collectors.toList());
     }
 
-    public Job getJobById(String jobId, User user) throws JobNotFoundException, UnauthorizedRequestException {
-        return this.applicationFacade.findJobById(jobId, user);
+    public Job getJobFromQueueById(String queueId, String jobId, User user) throws JobNotFoundException, UnauthorizedRequestException {
+        return this.applicationFacade.findJobFromQueueById(queueId, jobId, user);
     }
 
     public String removeJob(String jobId, Long userId) throws UnauthorizedRequestException {
