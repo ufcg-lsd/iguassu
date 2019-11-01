@@ -1,9 +1,12 @@
 package org.fogbowcloud.app.core;
 
 import java.util.stream.Collectors;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.auth.DefaultAuthManager;
+import org.fogbowcloud.app.core.constants.ConfProperty;
 import org.fogbowcloud.app.core.datastore.managers.JobDBManager;
 import org.fogbowcloud.app.core.datastore.managers.QueueDBManager;
 import org.fogbowcloud.app.core.datastore.managers.UserDBManager;
@@ -23,6 +26,10 @@ import org.fogbowcloud.app.jdfcompiler.job.JobBuilder;
 import org.fogbowcloud.app.jdfcompiler.job.JobSpecification;
 import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
+import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
+import org.fogbowcloud.app.jes.exceptions.JobExecStatusException;
+import org.fogbowcloud.app.jes.exceptions.QueueNotFoundException;
+import org.fogbowcloud.app.utils.HttpWrapper;
 import org.fogbowcloud.app.utils.JDFUtil;
 
 import org.fogbowcloud.app.utils.Pair;
@@ -41,6 +48,7 @@ public class ApplicationFacade {
     private JobBuilder jobBuilder;
     private JobDBManager jobDBManager;
     private UserDBManager userDBManager;
+    private Properties properties;
 
     private ApplicationFacade() {
         this.jobsToSubmit = new ConcurrentLinkedQueue<>();
@@ -59,6 +67,7 @@ public class ApplicationFacade {
     }
 
     public void init(Properties properties) {
+        this.properties = properties;
         this.authManager = new DefaultAuthManager(properties);
         this.jobBuilder = new JobBuilder(properties);
         final RoutineManager routineManager = new DefaultRoutineManager(properties, this.jobsToSubmit);
@@ -69,8 +78,11 @@ public class ApplicationFacade {
     public synchronized String submitJob(String queueId, String jdfFilePath, User jobOwner) throws CompilerException {
         logger.debug("Adding job of user " + jobOwner.getAlias() + " to buffer.");
 
+        if(!this.existsQueue(queueId)){
+            throw new QueueNotFoundException("Not found queue [" + queueId + "]");
+        }
         final Job job = buildJob(jdfFilePath, jobOwner);
-        this.jobDBManager.save(job);
+        JobDBManager.getInstance().save(job);
         Pair<String, Job> pair = new Pair<>(queueId, this.jobDBManager.findOne(job.getId()));
         QueueDBManager.getInstance().save(pair);
         this.jobsToSubmit.offer(pair);
@@ -201,5 +213,22 @@ public class ApplicationFacade {
 
     private boolean match(Job job, Long userId) {
         return job.getOwnerId().equals(userId);
+    }
+
+    private boolean existsQueue(String queueId) {
+        String serviceBaseUrl = properties.getProperty(ConfProperty.ARREBOL_SERVICE_HOST_URL.getProp());
+        final String queueEndpoint = serviceBaseUrl + "/queues/" + queueId;
+
+        boolean exists;
+
+        try {
+            int statusCode = HttpWrapper.getStatusCode(HttpGet.METHOD_NAME, queueEndpoint, null);
+            exists = (statusCode == 200);
+            return exists;
+        } catch (HttpHostConnectException e) {
+            throw new ArrebolConnectException("Failed connect to Arrebol: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new JobExecStatusException("Getting Queue from Arrebol has FAILED: " + e.getMessage());
+        }
     }
 }

@@ -26,7 +26,7 @@ import java.util.Properties;
  * A utility class that encapsulates communication logic, that is, requests, with the Job Execution
  * Service.
  */
-final class ArrebolRequestsHelper {
+public final class ArrebolRequestsHelper {
 
     private static final Logger logger = Logger.getLogger(ArrebolRequestsHelper.class);
     private final String serviceBaseUrl;
