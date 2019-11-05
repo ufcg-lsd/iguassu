@@ -38,6 +38,7 @@ public class IguassuMainRunner implements CommandLineRunner {
 		JobDBManager.getInstance().setJobRepository(jobRepository);
 		UserDBManager.getInstance().setUserRepository(userRepository);
 		QueueDBManager.getInstance().setQueueRepository(queueRepository);
+		QueueDBManager.getInstance().init();
 
 		logger.info("Running " + IguassuMainRunner.class.getName());
 		if (args.length > 0) {

@@ -3,6 +3,7 @@ package org.fogbowcloud.app.api.http.controllers;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import javax.validation.Valid;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.Documentation;
 import org.fogbowcloud.app.api.dtos.InvalidRequestDTO;
@@ -11,6 +12,7 @@ import org.fogbowcloud.app.api.dtos.TaskDTO;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.api.http.services.FileStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
+import org.fogbowcloud.app.api.http.services.QueueService;
 import org.fogbowcloud.app.core.constants.GeneralConstants;
 import org.fogbowcloud.app.core.exceptions.JobNotFoundException;
 import org.fogbowcloud.app.core.exceptions.StorageException;
@@ -19,6 +21,8 @@ import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.task.Task;
 import org.fogbowcloud.app.core.models.user.User;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
+import org.fogbowcloud.app.jes.arrebol.dtos.QueueDTO;
+import org.fogbowcloud.app.jes.arrebol.models.QueueSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -43,13 +47,17 @@ public class QueueAPI {
     private JobService jobService;
 
     @Lazy
+    private QueueService queueService;
+
+    @Lazy
     private AuthService authService;
 
     @Autowired
-    public QueueAPI(FileStorageService storageService, JobService jobService, AuthService authService) {
+    public QueueAPI(FileStorageService storageService, JobService jobService, AuthService authService, QueueService queueService) {
         this.storageService = storageService;
         this.jobService = jobService;
         this.authService = authService;
+        this.queueService = queueService;
     }
 
     @PostMapping(value = Documentation.Endpoint.SUBMIT_JOB)
@@ -232,6 +240,57 @@ public class QueueAPI {
         }
 
         return new ResponseEntity<>(new SimpleJobResponse(removedJob), HttpStatus.ACCEPTED);
+    }
+
+    @PostMapping
+    public ResponseEntity<?> addQueue(@Valid @RequestBody QueueSpec queueSpec,
+        @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
+            String userCredentials) {
+
+        User user;
+
+        try {
+            user = this.authService.authorizeUser(userCredentials);
+        } catch (UnauthorizedRequestException ure) {
+            return new ResponseEntity<>(
+                "The authentication failed with error [" + ure.getMessage() + "]",
+                HttpStatus.UNAUTHORIZED);
+        }
+
+        String queueId;
+        try {
+            queueId = this.queueService.createQueue(user, queueSpec);
+            Map<String, String> body = new HashMap<>();
+            body.put("id", queueId);
+            return new ResponseEntity<>(body, HttpStatus.CREATED);
+        } catch (Throwable t) {
+            logger.error(String.format("Operation returned error: %s", t.getMessage()), t);
+            throw t;
+        }
+
+    }
+
+    @GetMapping
+    public ResponseEntity<?> getQueues(@RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
+        String userCredentials) {
+        User user;
+
+        try {
+            user = this.authService.authorizeUser(userCredentials);
+        } catch (UnauthorizedRequestException ure) {
+            return new ResponseEntity<>(
+                "The authentication failed with error [" + ure.getMessage() + "]",
+                HttpStatus.UNAUTHORIZED);
+        }
+
+        List<QueueDTO> queues;
+        try {
+            queues = this.queueService.getQueues(user);
+            return new ResponseEntity<>(queues, HttpStatus.OK);
+        } catch (Throwable t) {
+            logger.error(String.format("Operation returned error: %s", t.getMessage()), t);
+            throw t;
+        }
     }
 
     private Collection<TaskDTO> generateTaskList(Collection<Task> tasks) {

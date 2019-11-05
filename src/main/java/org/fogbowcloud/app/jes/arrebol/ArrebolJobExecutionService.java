@@ -5,6 +5,7 @@ import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.jes.JobExecutionService;
+import org.fogbowcloud.app.jes.arrebol.helpers.ArrebolRequestsHelper;
 import org.fogbowcloud.app.jes.arrebol.models.JobExecArrebol;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 import org.fogbowcloud.app.jes.exceptions.JobSubmissionException;

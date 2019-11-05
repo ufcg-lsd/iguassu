@@ -13,11 +13,14 @@ public class ArrebolQueue {
     @Id
     private String queueId;
 
+    private Long ownerId;
+
     @OneToMany(fetch = FetchType.EAGER, targetEntity = Job.class)
     private List<Job> jobs;
 
-    public ArrebolQueue(String queueId, List<Job> jobs) {
+    public ArrebolQueue(String queueId, Long ownerId, List<Job> jobs) {
         this.queueId = queueId;
+        this.ownerId = ownerId;
         this.jobs = jobs;
     }
 
@@ -30,5 +33,9 @@ public class ArrebolQueue {
 
     public List<Job> getJobs() {
         return jobs;
+    }
+
+    public Long getOwnerId() {
+        return ownerId;
     }
 }

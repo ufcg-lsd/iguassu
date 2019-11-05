@@ -7,13 +7,15 @@ import java.util.Objects;
 import org.fogbowcloud.app.core.datastore.repositories.QueueRepository;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.queue.ArrebolQueue;
-import org.fogbowcloud.app.utils.Pair;
+import org.fogbowcloud.app.core.models.user.User;
 
 public class QueueDBManager {
 
     private static QueueDBManager instance;
 
     private QueueRepository queueRepository;
+    private static final String DEFAULT_QUEUE_ID = "default";
+    private static final ArrebolQueue DEFAULT_QUEUE = new ArrebolQueue(DEFAULT_QUEUE_ID, (long) -1, new ArrayList<>());
 
     private QueueDBManager() {
     }
@@ -23,6 +25,10 @@ public class QueueDBManager {
             instance = new QueueDBManager();
         }
         return instance;
+    }
+
+    public void init() {
+        this.queueRepository.save(DEFAULT_QUEUE);
     }
 
     public ArrebolQueue findOne(String queueId) {
@@ -42,20 +48,32 @@ public class QueueDBManager {
         this.queueRepository = queueRepository;
     }
 
-    public synchronized void save(Pair<String, Job> pair) {
-        String queueId = pair.getKey();
-        Job job = pair.getValue();
+    public void addJobToQueue(String queueId, Job job) {
         ArrebolQueue queue = this.findOne(queueId);
-        if(Objects.isNull(queue)){
-            queue = createQueue(queueId);
-        }
         queue.getJobs().add(job);
         this.queueRepository.save(queue);
     }
 
-    private ArrebolQueue createQueue(String queueId) {
+    public void save(String queueId, Long ownerId) {
         List<Job> jobs = Collections.synchronizedList(new ArrayList<>());
-        ArrebolQueue queue = new ArrebolQueue(queueId, jobs);
-        return queue;
+        ArrebolQueue queue = new ArrebolQueue(queueId, ownerId, jobs);
+        this.queueRepository.save(queue);
+    }
+
+    public List<ArrebolQueue> getQueuesByUser(User user) {
+         List<ArrebolQueue> queues = this.queueRepository.getArrebolQueuesByOwnerIdEquals(user.getId());
+         queues.add(this.queueRepository.findById(DEFAULT_QUEUE_ID).get());
+         return queues;
+    }
+
+    public boolean existsQueueFromUser(String queueId, User user) {
+        if (queueId.equals(DEFAULT_QUEUE_ID)) {
+            return true;
+        }
+        ArrebolQueue arrebolQueue = this.queueRepository.getArrebolQueueByQueueIdAndOwnerId(queueId, user.getId());
+        if (Objects.isNull(arrebolQueue)) {
+            return false;
+        }
+        return true;
     }
 }

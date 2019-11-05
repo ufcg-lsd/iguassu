@@ -21,7 +21,7 @@ public class Documentation {
 
         static final String JOBS = "/jobs";
         static final String TASKS = "/tasks";
-        static final String QUEUE_ID = "/{queueId}";
+        public static final String QUEUE_ID = "/{queueId}";
         static final String JOB_ID = "/{jobId}";
 
         public static final String SUBMIT_JOB = QUEUE_ID + JOBS;
