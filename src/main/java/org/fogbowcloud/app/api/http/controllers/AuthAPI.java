@@ -7,7 +7,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.Documentation;
 import org.fogbowcloud.app.api.dtos.UserDTO;
 import org.fogbowcloud.app.api.http.services.AuthService;
-import org.fogbowcloud.app.core.constants.GeneralConstants;
+import org.fogbowcloud.app.core.constants.AppConstant;
 import org.fogbowcloud.app.core.exceptions.StorageServiceConnectException;
 import org.fogbowcloud.app.core.models.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ public class AuthAPI {
             @ApiParam(value = Documentation.Auth.AUTHORIZATION_CODE) @RequestBody
                     String authorizationCode,
             @ApiParam(value = Documentation.CommonParameters.OAUTH_CREDENTIALS)
-            @RequestHeader(value = GeneralConstants.X_AUTH_APP_IDENTIFIERS)
+            @RequestHeader(value = AppConstant.X_AUTH_APP_IDENTIFIERS)
                     String applicationIdentifiers) {
         logger.info("Authentication request received.");
         try {

@@ -1,6 +1,6 @@
 package org.fogbowcloud.app.core.constants;
 
-public class GeneralConstants {
+public class AppConstant {
 
     /*
      *  Users datastore location.
@@ -17,6 +17,6 @@ public class GeneralConstants {
     /*
      *  General useful paths.
      */
-    public static final String IGUASSU_CONF_FILE = "src/main/iguassu.conf";
+    public static final String CONF_FILE_PATH = "src/main/resources/iguassu.conf";
     public static final String JDF_FILE_PATH = "jdffilepath";
 }

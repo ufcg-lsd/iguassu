@@ -13,7 +13,7 @@ import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.api.http.services.FileStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
 import org.fogbowcloud.app.api.http.services.QueueService;
-import org.fogbowcloud.app.core.constants.GeneralConstants;
+import org.fogbowcloud.app.core.constants.AppConstant;
 import org.fogbowcloud.app.core.exceptions.JobNotFoundException;
 import org.fogbowcloud.app.core.exceptions.StorageException;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
@@ -64,13 +64,13 @@ public class QueueAPI {
     @ApiOperation(value = Documentation.Queue.SUBMIT_JOB)
     public ResponseEntity<?> submitJob(
             @ApiParam(value = Documentation.Queue.CREATE_REQUEST_PARAM)
-            @RequestParam(GeneralConstants.JDF_FILE_PATH) MultipartFile rawJDF,
+            @RequestParam(AppConstant.JDF_FILE_PATH) MultipartFile rawJDF,
 
             @ApiParam(value = Documentation.Queue.QUEUE_ID)
             @PathVariable String queueId,
 
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
-            @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
                     String userCredentials) {
 
         if (Objects.isNull(queueId)) {
@@ -81,8 +81,8 @@ public class QueueAPI {
         // Todo: manages the queue id
 
         final Map<String, String> fieldMap = new HashMap<>();
-        fieldMap.put(GeneralConstants.JDF_FILE_PATH, null);
-        fieldMap.put(GeneralConstants.X_AUTH_USER_CREDENTIALS, null);
+        fieldMap.put(AppConstant.JDF_FILE_PATH, null);
+        fieldMap.put(AppConstant.X_AUTH_USER_CREDENTIALS, null);
 
         this.storageService.store(rawJDF, fieldMap);
         User user;
@@ -94,14 +94,14 @@ public class QueueAPI {
                     HttpStatus.UNAUTHORIZED);
         }
 
-        final String jdf = fieldMap.get(GeneralConstants.JDF_FILE_PATH);
+        final String jdf = fieldMap.get(AppConstant.JDF_FILE_PATH);
         if (Objects.isNull(jdf)) {
             logger.info("Could not store new jdf from user " + user.getAlias());
             throw new StorageException("Could not store new job from user " + user.getAlias());
         }
 
         String jobId;
-        final String jdfAbsolutePath = fieldMap.get(GeneralConstants.JDF_FILE_PATH);
+        final String jdfAbsolutePath = fieldMap.get(AppConstant.JDF_FILE_PATH);
         try {
             logger.info("Job description file path's <" + jdfAbsolutePath + ">");
             jobId = this.jobService.submitJob(queueId, jdfAbsolutePath, user);
@@ -123,7 +123,7 @@ public class QueueAPI {
             @ApiParam(value = Documentation.Queue.QUEUE_ID)
             @PathVariable String queueId,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
-            @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS) String credentials) {
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) String credentials) {
         logger.info("Request to retrieve all jobs per user received");
 
         User user;
@@ -156,7 +156,7 @@ public class QueueAPI {
             @ApiParam(value = Documentation.Queue.QUEUE_ID) @PathVariable String queueId,
             @ApiParam(value = Documentation.Queue.JOB_ID) @PathVariable String jobId,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
-            @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
                     String userCredentials) {
 
         if (Objects.isNull(queueId) || Objects.isNull(jobId)) {
@@ -183,7 +183,7 @@ public class QueueAPI {
             @ApiParam(value = Documentation.Queue.QUEUE_ID) @PathVariable String queueId,
             @ApiParam(value = Documentation.Queue.JOB_ID) @PathVariable String jobId,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
-            @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
                     String userCredentials) {
 
         if (Objects.isNull(queueId) || Objects.isNull(jobId)) {
@@ -211,7 +211,7 @@ public class QueueAPI {
             @ApiParam(value = Documentation.Queue.QUEUE_ID) @PathVariable String queueId,
             @ApiParam(value = Documentation.Queue.JOB_ID) @PathVariable String jobId,
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
-            @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
                     String userCredentials) {
 
         if (Objects.isNull(queueId) || Objects.isNull(jobId)) {
@@ -244,7 +244,7 @@ public class QueueAPI {
 
     @PostMapping
     public ResponseEntity<?> addQueue(@Valid @RequestBody QueueSpec queueSpec,
-        @RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
+        @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
             String userCredentials) {
 
         User user;
@@ -271,7 +271,7 @@ public class QueueAPI {
     }
 
     @GetMapping
-    public ResponseEntity<?> getQueues(@RequestHeader(value = GeneralConstants.X_AUTH_USER_CREDENTIALS)
+    public ResponseEntity<?> getQueues(@RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
         String userCredentials) {
         User user;
 
