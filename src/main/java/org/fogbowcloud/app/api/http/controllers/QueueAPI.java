@@ -3,11 +3,11 @@ package org.fogbowcloud.app.api.http.controllers;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import javax.validation.Valid;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.Documentation;
 import org.fogbowcloud.app.api.dtos.InvalidRequestDTO;
 import org.fogbowcloud.app.api.dtos.JobDTO;
+import org.fogbowcloud.app.api.dtos.QueueRequest;
 import org.fogbowcloud.app.api.dtos.TaskDTO;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.api.http.services.FileStorageService;
@@ -22,7 +22,6 @@ import org.fogbowcloud.app.core.models.task.Task;
 import org.fogbowcloud.app.core.models.user.User;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jes.arrebol.dtos.QueueDTO;
-import org.fogbowcloud.app.jes.arrebol.models.QueueSpec;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -30,6 +29,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.validation.Valid;
 import java.io.IOException;
 import java.util.*;
 
@@ -243,7 +243,7 @@ public class QueueAPI {
     }
 
     @PostMapping
-    public ResponseEntity<?> addQueue(@Valid @RequestBody QueueSpec queueSpec,
+    public ResponseEntity<?> addQueue(@Valid @RequestBody QueueRequest queue,
         @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
             String userCredentials) {
 
@@ -259,7 +259,7 @@ public class QueueAPI {
 
         String queueId;
         try {
-            queueId = this.queueService.createQueue(user, queueSpec);
+            queueId = this.queueService.createQueue(user, queue);
             Map<String, String> body = new HashMap<>();
             body.put("id", queueId);
             return new ResponseEntity<>(body, HttpStatus.CREATED);

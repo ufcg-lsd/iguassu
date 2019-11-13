@@ -71,9 +71,6 @@ public class QueueDBManager {
             return true;
         }
         ArrebolQueue arrebolQueue = this.queueRepository.getArrebolQueueByQueueIdAndOwnerId(queueId, user.getId());
-        if (Objects.isNull(arrebolQueue)) {
-            return false;
-        }
-        return true;
+        return !Objects.isNull(arrebolQueue);
     }
 }
