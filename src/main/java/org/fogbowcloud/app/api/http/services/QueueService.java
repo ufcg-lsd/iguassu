@@ -1,7 +1,11 @@
 package org.fogbowcloud.app.api.http.services;
 
+import org.fogbowcloud.app.api.dtos.NodeDTO;
+import org.fogbowcloud.app.api.dtos.NodeRequest;
 import org.fogbowcloud.app.api.dtos.QueueRequest;
 import org.fogbowcloud.app.core.ApplicationFacade;
+import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
+import org.fogbowcloud.app.core.models.queue.ArrebolQueue;
 import org.fogbowcloud.app.core.models.user.User;
 import org.fogbowcloud.app.jes.arrebol.dtos.QueueDTO;
 import org.springframework.context.annotation.Lazy;
@@ -21,5 +25,18 @@ public class QueueService {
 
     public List<QueueDTO> getQueues(User user) {
         return this.applicationFacade.getQueues(user);
+    }
+
+    public NodeDTO addNode(User user, String queueId, NodeRequest node) throws UnauthorizedRequestException {
+        return this.applicationFacade.addNode(user, queueId, node);
+    }
+
+    public NodeDTO getNodes(User user, String queueId) throws UnauthorizedRequestException {
+
+        return this.applicationFacade.getNodes(user, queueId);
+    }
+
+    public ArrebolQueue getQueue(User user, String queueId) throws UnauthorizedRequestException {
+        return this.applicationFacade.getQueue(user, queueId);
     }
 }

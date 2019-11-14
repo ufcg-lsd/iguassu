@@ -5,10 +5,7 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.Documentation;
-import org.fogbowcloud.app.api.dtos.InvalidRequestDTO;
-import org.fogbowcloud.app.api.dtos.JobDTO;
-import org.fogbowcloud.app.api.dtos.QueueRequest;
-import org.fogbowcloud.app.api.dtos.TaskDTO;
+import org.fogbowcloud.app.api.dtos.*;
 import org.fogbowcloud.app.api.http.services.AuthService;
 import org.fogbowcloud.app.api.http.services.FileStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
@@ -18,6 +15,7 @@ import org.fogbowcloud.app.core.exceptions.JobNotFoundException;
 import org.fogbowcloud.app.core.exceptions.StorageException;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
 import org.fogbowcloud.app.core.models.job.Job;
+import org.fogbowcloud.app.core.models.queue.ArrebolQueue;
 import org.fogbowcloud.app.core.models.task.Task;
 import org.fogbowcloud.app.core.models.user.User;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
@@ -29,6 +27,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.print.Doc;
 import javax.validation.Valid;
 import java.io.IOException;
 import java.util.*;
@@ -58,6 +57,87 @@ public class QueueAPI {
         this.jobService = jobService;
         this.authService = authService;
         this.queueService = queueService;
+    }
+
+    @PostMapping
+    @ApiOperation(value = Documentation.Queue.CREATE_QUEUE)
+    public ResponseEntity<?> addQueue(@Valid @RequestBody QueueRequest queue,
+                                      @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
+                                              String userCredentials) {
+
+        User user;
+
+        try {
+            user = this.authService.authorizeUser(userCredentials);
+        } catch (UnauthorizedRequestException ure) {
+            return new ResponseEntity<>(
+                    "The authentication failed with error [" + ure.getMessage() + "]",
+                    HttpStatus.UNAUTHORIZED);
+        }
+
+        String queueId;
+        try {
+            queueId = this.queueService.createQueue(user, queue);
+            Map<String, String> body = new HashMap<>();
+            body.put("id", queueId);
+            return new ResponseEntity<>(body, HttpStatus.CREATED);
+        } catch (Throwable t) {
+            logger.error(String.format("Operation returned error: %s", t.getMessage()), t);
+            throw t;
+        }
+
+    }
+
+    @GetMapping
+    @ApiOperation(value = Documentation.Queue.RETRIEVES_QUEUES)
+    public ResponseEntity<?> getQueues(@RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
+                                               String userCredentials) {
+        User user;
+
+        try {
+            user = this.authService.authorizeUser(userCredentials);
+        } catch (UnauthorizedRequestException ure) {
+            return new ResponseEntity<>(
+                    "The authentication failed with error [" + ure.getMessage() + "]",
+                    HttpStatus.UNAUTHORIZED);
+        }
+
+        List<QueueDTO> queues;
+        try {
+            queues = this.queueService.getQueues(user);
+            return new ResponseEntity<>(queues, HttpStatus.OK);
+        } catch (Throwable t) {
+            logger.error(String.format("Operation returned error: %s", t.getMessage()), t);
+            throw t;
+        }
+    }
+
+    @GetMapping(Documentation.Endpoint.QUEUE)
+    @ApiOperation(value = Documentation.Queue.RETRIEVE_QUEUE)
+    public ResponseEntity<?> getQueues(
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) String userCredentials,
+            @ApiParam(value = Documentation.Queue.QUEUE_ID) @PathVariable String queueId) {
+
+        User user;
+
+        try {
+            user = this.authService.authorizeUser(userCredentials);
+        } catch (UnauthorizedRequestException ure) {
+            return new ResponseEntity<>(
+                    "The authentication failed with error [" + ure.getMessage() + "]",
+                    HttpStatus.UNAUTHORIZED);
+        }
+
+        ArrebolQueue queue;
+        try {
+            queue = this.queueService.getQueue(user, queueId);
+            return new ResponseEntity<>(queue, HttpStatus.OK);
+        } catch (UnauthorizedRequestException ure) {
+            logger.error(String.format("Operation returned error: %s", ure));
+            return new ResponseEntity<>(
+                    "Queue " + queueId + "not found [" + ure.getMessage() + "]",
+                    HttpStatus.NOT_FOUND);
+        }
     }
 
     @PostMapping(value = Documentation.Endpoint.SUBMIT_JOB)
@@ -168,10 +248,14 @@ public class QueueAPI {
         try {
             job = getJDFJob(queueId, jobId, userCredentials);
 
-        } catch (UnauthorizedRequestException | JobNotFoundException ure) {
+        } catch (UnauthorizedRequestException ure) {
             return new ResponseEntity<>(
                     "The authentication failed with error [" + ure.getMessage() + "]",
                     HttpStatus.UNAUTHORIZED);
+        } catch (JobNotFoundException e) {
+            return new ResponseEntity<>(
+                    "Job " + jobId + "not found [" + e.getMessage() + "]",
+                    HttpStatus.NOT_FOUND);
         }
         logger.info("Retrieving job with id [" + jobId + "]");
         return new ResponseEntity<>(new JobDTO(job), HttpStatus.OK);
@@ -195,10 +279,14 @@ public class QueueAPI {
         try {
             job = getJDFJob(queueId, jobId, userCredentials);
 
-        } catch (UnauthorizedRequestException | JobNotFoundException ure) {
+        } catch (UnauthorizedRequestException ure) {
             return new ResponseEntity<>(
                     "The authentication failed with error [" + ure.getMessage() + "]",
                     HttpStatus.UNAUTHORIZED);
+        } catch (JobNotFoundException e) {
+            return new ResponseEntity<>(
+                    "Job " + jobId + "not found [" + e.getMessage() + "]",
+                    HttpStatus.NOT_FOUND);
         }
         logger.info("Retrieving tasks from job with id [" + jobId + "]");
         Collection<TaskDTO> response = generateTaskList(job.getTasks());
@@ -242,56 +330,61 @@ public class QueueAPI {
         return new ResponseEntity<>(new SimpleJobResponse(removedJob), HttpStatus.ACCEPTED);
     }
 
-    @PostMapping
-    public ResponseEntity<?> addQueue(@Valid @RequestBody QueueRequest queue,
-        @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
-            String userCredentials) {
+    @PostMapping(value = Documentation.Endpoint.NODE_ENDPOINT)
+    @ApiOperation(value = Documentation.Queue.SUBMIT_NODES)
+    public ResponseEntity<?> addWorkers(
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) String userCredentials,
+            @ApiParam (value = Documentation.Queue.QUEUE_ID) @PathVariable String queueId,
+            @Valid @RequestBody NodeRequest node) throws Throwable{
 
         User user;
-
         try {
             user = this.authService.authorizeUser(userCredentials);
         } catch (UnauthorizedRequestException ure) {
             return new ResponseEntity<>(
-                "The authentication failed with error [" + ure.getMessage() + "]",
-                HttpStatus.UNAUTHORIZED);
+                    "The authentication failed with error [" + ure.getMessage() + "]",
+                    HttpStatus.UNAUTHORIZED);
         }
 
-        String queueId;
+        NodeDTO nodeDTO;
         try {
-            queueId = this.queueService.createQueue(user, queue);
-            Map<String, String> body = new HashMap<>();
-            body.put("id", queueId);
-            return new ResponseEntity<>(body, HttpStatus.CREATED);
-        } catch (Throwable t) {
+            nodeDTO = queueService.addNode(user, queueId, node);
+            return new ResponseEntity<>(nodeDTO, HttpStatus.CREATED);
+        } catch (UnauthorizedRequestException t) {
             logger.error(String.format("Operation returned error: %s", t.getMessage()), t);
-            throw t;
+            return new ResponseEntity<>(
+                    "The authentication failed with error [" + t.getMessage() + "]",
+                    HttpStatus.UNAUTHORIZED);
         }
-
     }
 
-    @GetMapping
-    public ResponseEntity<?> getQueues(@RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
-        String userCredentials) {
-        User user;
+    @GetMapping(value = Documentation.Endpoint.NODE_ENDPOINT)
+    @ApiOperation(value = Documentation.Queue.RETRIEVES_NODES)
+    public ResponseEntity<?> getWorkers(
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) String userCredentials,
+            @ApiParam (value = Documentation.Queue.QUEUE_ID) @PathVariable String queueId) {
 
+        User user;
         try {
             user = this.authService.authorizeUser(userCredentials);
         } catch (UnauthorizedRequestException ure) {
             return new ResponseEntity<>(
-                "The authentication failed with error [" + ure.getMessage() + "]",
-                HttpStatus.UNAUTHORIZED);
+                    "The authentication failed with error [" + ure.getMessage() + "]",
+                    HttpStatus.UNAUTHORIZED);
         }
 
-        List<QueueDTO> queues;
+        NodeDTO nodeDTO;
         try {
-            queues = this.queueService.getQueues(user);
-            return new ResponseEntity<>(queues, HttpStatus.OK);
-        } catch (Throwable t) {
+            nodeDTO = queueService.getNodes(user, queueId);
+            return new ResponseEntity<>(nodeDTO, HttpStatus.OK);
+        } catch (UnauthorizedRequestException t) {
             logger.error(String.format("Operation returned error: %s", t.getMessage()), t);
-            throw t;
+            return new ResponseEntity<>(
+                    "The authentication failed with error [" + t.getMessage() + "]",
+                    HttpStatus.UNAUTHORIZED);
         }
     }
+
 
     private Collection<TaskDTO> generateTaskList(Collection<Task> tasks) {
         final Collection<TaskDTO> l = new ArrayList<>();

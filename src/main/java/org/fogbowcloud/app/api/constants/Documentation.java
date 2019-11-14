@@ -21,14 +21,19 @@ public class Documentation {
 
         static final String JOBS = "/jobs";
         static final String TASKS = "/tasks";
-        public static final String QUEUE_ID = "/{queueId}";
+        static final String QUEUE_ID = "/{queueId}";
         static final String JOB_ID = "/{jobId}";
+        static final String NODES = "/nodes";
+
+        public static final String NODE_ENDPOINT = QUEUE_ID + NODES;
 
         public static final String SUBMIT_JOB = QUEUE_ID + JOBS;
         public static final String RETRIEVE_ALL_JOBS = QUEUE_ID + JOBS;
         public static final String RETRIEVE_JOB_BY_ID = QUEUE_ID + JOBS + JOB_ID;
         public static final String RETRIEVE_TASKS_BY_JOB = QUEUE_ID + JOBS + JOB_ID + TASKS;
         public static final String DELETE_JOB_BY_ID = QUEUE_ID + JOBS + JOB_ID;
+
+        public static final String QUEUE = QUEUE_ID;
     }
 
     public static class ApiInfo {
@@ -52,10 +57,16 @@ public class Documentation {
         public static final String RETRIEVE_JOB_BY_ID = "Retrieves a specific job";
         public static final String DELETE_JOB_BY_ID = "Deletes a specific job by id";
         public static final String RETRIEVE_TASKS_BY_JOB = "Get tasks of a specific job";
+        public static final String CREATE_QUEUE = "Create a new queue";
+        public static final String RETRIEVES_QUEUES = "Retrieves all queues";
+        public static final String SUBMIT_NODES = "Submit a new node to be provisioned and used to execute the Jobs";
+        public static final String RETRIEVES_NODES = "Retrieves all nodes submitted";
 
         public static final String JOB_ID = "The ID of the specific job";
         public static final String QUEUE_ID = "The ID of the specific queue";
         public static final String CREATE_REQUEST_PARAM = "Request parameter of URL";
+
+        public static final String RETRIEVE_QUEUE = "Retrieve a specific queue";
     }
 
     public static class Nonce {

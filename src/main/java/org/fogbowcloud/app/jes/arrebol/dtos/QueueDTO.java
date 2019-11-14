@@ -6,13 +6,17 @@ import com.google.gson.annotations.SerializedName;
 public class QueueDTO {
 
     public String id;
+
     public String name;
+
     @JsonProperty("waiting_jobs")
     @SerializedName("waiting_jobs")
     public long waitingJobs;
+
     @JsonProperty("worker_pools")
     @SerializedName("worker_pools")
     public Integer workerPools;
+
     @JsonProperty("pools_size")
     @SerializedName("pools_size")
     public Integer poolsSize;

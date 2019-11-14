@@ -1,6 +1,8 @@
 package org.fogbowcloud.app.core;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.api.dtos.NodeDTO;
+import org.fogbowcloud.app.api.dtos.NodeRequest;
 import org.fogbowcloud.app.api.dtos.QueueRequest;
 import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.auth.DefaultAuthManager;
@@ -227,7 +229,8 @@ public class ApplicationFacade {
 
         try {
             queueId = queueRequestHelper.createQueue(queue);
-            QueueDBManager.getInstance().save(queueId, user.getId());
+            QueueDTO queueCreated = queueRequestHelper.getQueue(queueId);
+            QueueDBManager.getInstance().save(queueId, user.getId(), queueCreated.getName());
             return queueId;
         } catch (Exception e) {
             logger.error("Error while creating queue on Arrebol");
@@ -246,5 +249,46 @@ public class ApplicationFacade {
             queues.add(queue);
         }
         return queues;
+    }
+
+    public NodeDTO addNode(User user, String queueId, NodeRequest node) throws UnauthorizedRequestException {
+        ArrebolQueue arrebolQueue = QueueDBManager.getInstance().findOne(queueId);
+
+        verifyUser(arrebolQueue.getOwnerId(), user.getId());
+
+        arrebolQueue.addNode(node.getAddress());
+
+        QueueDTO queue = this.queueRequestHelper.getQueue(arrebolQueue.getQueueId());
+
+        // submit the node to be provisioned
+        // create a thread to pooling the provisioning service until the node is not provisioned
+        return null;
+    }
+
+    public NodeDTO getNodes(User user, String queueId) throws UnauthorizedRequestException {
+        ArrebolQueue arrebolQueue = QueueDBManager.getInstance().findOne(queueId);
+
+        verifyUser(arrebolQueue.getOwnerId(), user.getId());
+
+        QueueDTO queueDTO = this.queueRequestHelper.getQueue(arrebolQueue.getQueueId());
+
+
+        return null;
+    }
+
+    private void verifyUser(Long queueUserId, Long userId) throws UnauthorizedRequestException {
+        if (!queueUserId.equals(userId)) {
+            final String errMsg = "User is not allowed for such operation";
+            logger.info(errMsg);
+            throw new UnauthorizedRequestException(errMsg);
+        }
+    }
+
+    public ArrebolQueue getQueue(User user, String queueId) throws UnauthorizedRequestException {
+        ArrebolQueue arrebolQueue = QueueDBManager.getInstance().findOne(queueId);
+
+        verifyUser(arrebolQueue.getOwnerId(), user.getId());
+
+        return arrebolQueue;
     }
 }
