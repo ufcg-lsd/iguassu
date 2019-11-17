@@ -3,21 +3,22 @@ package org.fogbowcloud.app.jes.arrebol.helpers;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
-import java.io.UnsupportedEncodingException;
-import java.util.LinkedList;
-import java.util.Properties;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.api.dtos.QueueRequest;
 import org.fogbowcloud.app.core.constants.ConfProperty;
 import org.fogbowcloud.app.jes.arrebol.constants.Constants.Endpoint;
 import org.fogbowcloud.app.jes.arrebol.dtos.QueueDTO;
-import org.fogbowcloud.app.jes.arrebol.models.QueueSpec;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 import org.fogbowcloud.app.jes.exceptions.QueueCreationException;
 import org.fogbowcloud.app.utils.HttpWrapper;
+
+import java.io.UnsupportedEncodingException;
+import java.util.LinkedList;
+import java.util.Properties;
 
 public class QueueRequestHelper {
 
@@ -30,14 +31,14 @@ public class QueueRequestHelper {
         this.gson = new Gson();
     }
 
-    public String createQueue(QueueSpec queueSpec) throws UnsupportedEncodingException {
+    public String createQueue(QueueRequest queue) throws UnsupportedEncodingException {
         final String QUEUE_ID_JSON_KEY = "id";
         final String endpoint = String.format(Endpoint.QUEUES, serviceBaseUrl);
         StringEntity requestBody;
         String queueId;
 
         try {
-            requestBody = makeJSONBody(queueSpec);
+            requestBody = makeJSONBody(queue);
             final String jsonResponse = HttpWrapper
                 .doRequest(HttpPost.METHOD_NAME, endpoint, new LinkedList<>(), requestBody);
             JsonObject jobResponse = this.gson.fromJson(jsonResponse, JsonObject.class);
@@ -70,11 +71,11 @@ public class QueueRequestHelper {
         }
     }
 
-    private StringEntity makeJSONBody(QueueSpec queueSpec) throws UnsupportedEncodingException {
+    private StringEntity makeJSONBody(QueueRequest queue) throws UnsupportedEncodingException {
         LOGGER.info("Building JSON body of Queue!");
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(queueSpec);
+        String json = gson.toJson(queue);
 
         return new StringEntity(json);
     }

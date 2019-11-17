@@ -1,21 +1,11 @@
 package org.fogbowcloud.app.core;
 
-import java.security.GeneralSecurityException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
-import java.util.Queue;
-import java.util.UUID;
-import java.util.concurrent.ConcurrentLinkedQueue;
-import java.util.stream.Collectors;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.HttpHostConnectException;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.api.dtos.NodeDTO;
+import org.fogbowcloud.app.api.dtos.NodeRequest;
+import org.fogbowcloud.app.api.dtos.QueueRequest;
 import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.auth.DefaultAuthManager;
-import org.fogbowcloud.app.core.constants.ConfProperty;
 import org.fogbowcloud.app.core.datastore.managers.JobDBManager;
 import org.fogbowcloud.app.core.datastore.managers.QueueDBManager;
 import org.fogbowcloud.app.core.datastore.managers.UserDBManager;
@@ -37,11 +27,15 @@ import org.fogbowcloud.app.jdfcompiler.main.CommonCompiler;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jes.arrebol.dtos.QueueDTO;
 import org.fogbowcloud.app.jes.arrebol.helpers.QueueRequestHelper;
-import org.fogbowcloud.app.jes.arrebol.models.QueueSpec;
 import org.fogbowcloud.app.jes.exceptions.QueueNotFoundException;
 import org.fogbowcloud.app.utils.JDFUtil;
 import org.fogbowcloud.app.utils.Pair;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.security.GeneralSecurityException;
+import java.util.*;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.stream.Collectors;
 
 public class ApplicationFacade {
 
@@ -55,7 +49,6 @@ public class ApplicationFacade {
     private JobBuilder jobBuilder;
     private JobDBManager jobDBManager;
     private UserDBManager userDBManager;
-    private Properties properties;
 
     private ApplicationFacade() {
         this.jobsToSubmit = new ConcurrentLinkedQueue<>();
@@ -74,7 +67,6 @@ public class ApplicationFacade {
     }
 
     public void init(Properties properties) {
-        this.properties = properties;
         this.authManager = new DefaultAuthManager(properties);
         this.jobBuilder = new JobBuilder(properties);
         final RoutineManager routineManager = new DefaultRoutineManager(properties,
@@ -191,9 +183,8 @@ public class ApplicationFacade {
         if (Objects.isNull(queue)) {
             throw new IllegalArgumentException("Queue not found [" + queueId + "]");
         }
-        List<Job> jobsByUser = queue.getJobs().stream()
+        return queue.getJobs().stream()
             .filter(job -> job.getOwnerId().equals(userId)).collect(Collectors.toList());
-        return jobsByUser;
     }
 
     public synchronized String removeJob(String jobId, Long userId)
@@ -232,12 +223,14 @@ public class ApplicationFacade {
         return job.getOwnerId().equals(userId);
     }
 
-    public String createQueue(User user, QueueSpec queueSpec) {
-        logger.info("Creating queue [" + queueSpec.getName() + "] on Arrebol");
+    public synchronized String createQueue(User user, QueueRequest queue) {
+        logger.info("Creating queue [" + queue.getName() + "] on Arrebol");
         String queueId = null;
+
         try {
-            queueId = queueRequestHelper.createQueue(queueSpec);
-            QueueDBManager.getInstance().save(queueId, user.getId());
+            queueId = queueRequestHelper.createQueue(queue);
+            QueueDTO queueCreated = queueRequestHelper.getQueue(queueId);
+            QueueDBManager.getInstance().save(queueId, user.getId(), queueCreated.getName());
             return queueId;
         } catch (Exception e) {
             logger.error("Error while creating queue on Arrebol");
@@ -256,5 +249,46 @@ public class ApplicationFacade {
             queues.add(queue);
         }
         return queues;
+    }
+
+    public NodeDTO addNode(User user, String queueId, NodeRequest node) throws UnauthorizedRequestException {
+        ArrebolQueue arrebolQueue = QueueDBManager.getInstance().findOne(queueId);
+
+        verifyUser(arrebolQueue.getOwnerId(), user.getId());
+
+        arrebolQueue.addNode(node.getAddress());
+
+        QueueDTO queue = this.queueRequestHelper.getQueue(arrebolQueue.getQueueId());
+
+        // submit the node to be provisioned
+        // create a thread to pooling the provisioning service until the node is not provisioned
+        return null;
+    }
+
+    public NodeDTO getNodes(User user, String queueId) throws UnauthorizedRequestException {
+        ArrebolQueue arrebolQueue = QueueDBManager.getInstance().findOne(queueId);
+
+        verifyUser(arrebolQueue.getOwnerId(), user.getId());
+
+        QueueDTO queueDTO = this.queueRequestHelper.getQueue(arrebolQueue.getQueueId());
+
+
+        return null;
+    }
+
+    private void verifyUser(Long queueUserId, Long userId) throws UnauthorizedRequestException {
+        if (!queueUserId.equals(userId)) {
+            final String errMsg = "User is not allowed for such operation";
+            logger.info(errMsg);
+            throw new UnauthorizedRequestException(errMsg);
+        }
+    }
+
+    public ArrebolQueue getQueue(User user, String queueId) throws UnauthorizedRequestException {
+        ArrebolQueue arrebolQueue = QueueDBManager.getInstance().findOne(queueId);
+
+        verifyUser(arrebolQueue.getOwnerId(), user.getId());
+
+        return arrebolQueue;
     }
 }
