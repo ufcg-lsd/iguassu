@@ -1,13 +1,6 @@
 package org.fogbowcloud.app.core.constants;
 
 public class AppConstant {
-
-    /*
-     *  Users datastore location.
-     */
-    public static final String DATASTORES_USERS_FILE_PATH = "datastores/users";
-    public static final String DATASTORES_USERS_DB_FILE_PATH = "datastores/users.db";
-
     /*
      *  Authentication and authorization custom headers.
      */
