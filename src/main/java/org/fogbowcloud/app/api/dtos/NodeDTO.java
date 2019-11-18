@@ -1,11 +1,15 @@
 package org.fogbowcloud.app.api.dtos;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 
 public class NodeDTO implements Serializable {
 
     private String address;
-    private String status;
+
+    @JsonProperty("provision_status")
+    private String provisionStatus;
 
     public NodeDTO() {}
 
@@ -17,11 +21,11 @@ public class NodeDTO implements Serializable {
         this.address = address;
     }
 
-    public String getStatus() {
-        return status;
+    public String getProvisionStatus() {
+        return provisionStatus;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setProvisionStatus(String provisionStatus) {
+        this.provisionStatus = provisionStatus;
     }
 }

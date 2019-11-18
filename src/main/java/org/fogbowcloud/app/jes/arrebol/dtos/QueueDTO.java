@@ -11,15 +11,15 @@ public class QueueDTO {
 
     @JsonProperty("waiting_jobs")
     @SerializedName("waiting_jobs")
-    public long waitingJobs;
+    private long waitingJobs;
 
-    @JsonProperty("worker_pools")
+    @JsonProperty("nodes")
     @SerializedName("worker_pools")
-    public Integer workerPools;
+    private Integer workerPools;
 
-    @JsonProperty("pools_size")
+    @JsonProperty("workers")
     @SerializedName("pools_size")
-    public Integer poolsSize;
+    private Integer poolsSize;
 
     public QueueDTO(String id, String name, long waitingJobs, int workerPools, int poolsSize) {
         this.id = id;

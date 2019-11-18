@@ -5,9 +5,6 @@ package org.fogbowcloud.app.api.constants;
  */
 public class Documentation {
 
-    private Documentation() {
-    }
-
     public static class Endpoint {
 
         public static final String AUTH = "auth";
@@ -22,18 +19,15 @@ public class Documentation {
         static final String JOBS = "/jobs";
         static final String TASKS = "/tasks";
         static final String QUEUE_ID = "/{queueId}";
-        static final String JOB_ID = "/{jobId}";
-        static final String NODES = "/nodes";
-
-        public static final String NODE_ENDPOINT = QUEUE_ID + NODES;
-
         public static final String SUBMIT_JOB = QUEUE_ID + JOBS;
         public static final String RETRIEVE_ALL_JOBS = QUEUE_ID + JOBS;
+        public static final String QUEUE = QUEUE_ID;
+        static final String JOB_ID = "/{jobId}";
         public static final String RETRIEVE_JOB_BY_ID = QUEUE_ID + JOBS + JOB_ID;
         public static final String RETRIEVE_TASKS_BY_JOB = QUEUE_ID + JOBS + JOB_ID + TASKS;
         public static final String DELETE_JOB_BY_ID = QUEUE_ID + JOBS + JOB_ID;
-
-        public static final String QUEUE = QUEUE_ID;
+        static final String NODES = "/nodes";
+        public static final String NODE_ENDPOINT = QUEUE_ID + NODES;
     }
 
     public static class ApiInfo {

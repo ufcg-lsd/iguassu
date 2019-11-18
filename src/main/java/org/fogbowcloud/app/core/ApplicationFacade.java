@@ -286,9 +286,9 @@ public class ApplicationFacade {
 
     public ArrebolQueue getQueue(User user, String queueId) throws UnauthorizedRequestException {
         ArrebolQueue arrebolQueue = QueueDBManager.getInstance().findOne(queueId);
-
-        verifyUser(arrebolQueue.getOwnerId(), user.getId());
-
+        if (!queueId.equals(QueueDBManager.DEFAULT_QUEUE_ID)) {
+            verifyUser(arrebolQueue.getOwnerId(), user.getId());
+        }
         return arrebolQueue;
     }
 }

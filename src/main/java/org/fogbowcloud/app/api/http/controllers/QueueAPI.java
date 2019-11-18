@@ -26,10 +26,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import javax.print.Doc;
 import javax.validation.Valid;
 import java.io.IOException;
+import java.net.URI;
 import java.util.*;
 
 @RestController
@@ -61,18 +62,17 @@ public class QueueAPI {
 
     @PostMapping
     @ApiOperation(value = Documentation.Queue.CREATE_QUEUE)
-    public ResponseEntity<?> addQueue(@Valid @RequestBody QueueRequest queue,
-                                      @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
-                                              String userCredentials) {
+    public ResponseEntity<?> addQueue(
+            @Valid @RequestBody QueueRequest queue,
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) String userCredentials) {
 
         User user;
 
         try {
             user = this.authService.authorizeUser(userCredentials);
         } catch (UnauthorizedRequestException ure) {
-            return new ResponseEntity<>(
-                    "The authentication failed with error [" + ure.getMessage() + "]",
-                    HttpStatus.UNAUTHORIZED);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("The authentication failed with error [" + ure.getMessage() + "]");
         }
 
         String queueId;
@@ -80,41 +80,41 @@ public class QueueAPI {
             queueId = this.queueService.createQueue(user, queue);
             Map<String, String> body = new HashMap<>();
             body.put("id", queueId);
-            return new ResponseEntity<>(body, HttpStatus.CREATED);
+            URI location = ServletUriComponentsBuilder
+                    .fromCurrentContextPath().path(Documentation.Endpoint.QUEUE)
+                    .buildAndExpand(queueId).toUri();
+            return ResponseEntity.created(location).body(body);
         } catch (Throwable t) {
-            logger.error(String.format("Operation returned error: %s", t.getMessage()), t);
-            throw t;
+            return ResponseEntity.badRequest().body(String.format("Operation returned error: %s", t.getMessage()));
         }
-
     }
 
     @GetMapping
     @ApiOperation(value = Documentation.Queue.RETRIEVES_QUEUES)
-    public ResponseEntity<?> getQueues(@RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
-                                               String userCredentials) {
+    public ResponseEntity<?> getQueues(
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) String userCredentials) {
+
         User user;
 
         try {
             user = this.authService.authorizeUser(userCredentials);
         } catch (UnauthorizedRequestException ure) {
-            return new ResponseEntity<>(
-                    "The authentication failed with error [" + ure.getMessage() + "]",
-                    HttpStatus.UNAUTHORIZED);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("The authentication failed with error [" + ure.getMessage() + "]");
         }
 
         List<QueueDTO> queues;
         try {
             queues = this.queueService.getQueues(user);
-            return new ResponseEntity<>(queues, HttpStatus.OK);
+            return ResponseEntity.ok(queues);
         } catch (Throwable t) {
-            logger.error(String.format("Operation returned error: %s", t.getMessage()), t);
-            throw t;
+            return ResponseEntity.badRequest().body(String.format("Operation returned error: %s", t.getMessage()));
         }
     }
 
     @GetMapping(Documentation.Endpoint.QUEUE)
     @ApiOperation(value = Documentation.Queue.RETRIEVE_QUEUE)
-    public ResponseEntity<?> getQueues(
+    public ResponseEntity<?> getQueue(
             @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) String userCredentials,
             @ApiParam(value = Documentation.Queue.QUEUE_ID) @PathVariable String queueId) {
 
@@ -123,20 +123,16 @@ public class QueueAPI {
         try {
             user = this.authService.authorizeUser(userCredentials);
         } catch (UnauthorizedRequestException ure) {
-            return new ResponseEntity<>(
-                    "The authentication failed with error [" + ure.getMessage() + "]",
-                    HttpStatus.UNAUTHORIZED);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("The authentication failed with error [" + ure.getMessage() + "]");
         }
 
         ArrebolQueue queue;
         try {
             queue = this.queueService.getQueue(user, queueId);
-            return new ResponseEntity<>(queue, HttpStatus.OK);
+            return ResponseEntity.ok(queue);
         } catch (UnauthorizedRequestException ure) {
-            logger.error(String.format("Operation returned error: %s", ure));
-            return new ResponseEntity<>(
-                    "Queue " + queueId + "not found [" + ure.getMessage() + "]",
-                    HttpStatus.NOT_FOUND);
+            return ResponseEntity.notFound().build();
         }
     }
 
@@ -170,8 +166,8 @@ public class QueueAPI {
         try {
             user = this.authService.authorizeUser(userCredentials);
         } catch (UnauthorizedRequestException ure) {
-            return new ResponseEntity<>("The authentication failed with error [" + ure.getMessage() + "]",
-                    HttpStatus.UNAUTHORIZED);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("The authentication failed with error [" + ure.getMessage() + "]");
         }
 
         final String jdf = fieldMap.get(AppConstant.JDF_FILE_PATH);
@@ -193,8 +189,10 @@ public class QueueAPI {
             logger.error("Could not read JDF file", e);
             throw new StorageException("Could not read JDF file");
         }
-
-        return new ResponseEntity<>(new SimpleJobResponse(jobId), HttpStatus.CREATED);
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentContextPath().path("/{jobId}")
+                .buildAndExpand(queueId).toUri();
+        return ResponseEntity.created(location).body(new SimpleJobResponse(jobId));
     }
 
     @GetMapping(value = Documentation.Endpoint.RETRIEVE_ALL_JOBS)
@@ -334,8 +332,8 @@ public class QueueAPI {
     @ApiOperation(value = Documentation.Queue.SUBMIT_NODES)
     public ResponseEntity<?> addWorkers(
             @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) String userCredentials,
-            @ApiParam (value = Documentation.Queue.QUEUE_ID) @PathVariable String queueId,
-            @Valid @RequestBody NodeRequest node) throws Throwable{
+            @ApiParam(value = Documentation.Queue.QUEUE_ID) @PathVariable String queueId,
+            @Valid @RequestBody NodeRequest node) throws Throwable {
 
         User user;
         try {
@@ -362,7 +360,7 @@ public class QueueAPI {
     @ApiOperation(value = Documentation.Queue.RETRIEVES_NODES)
     public ResponseEntity<?> getWorkers(
             @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) String userCredentials,
-            @ApiParam (value = Documentation.Queue.QUEUE_ID) @PathVariable String queueId) {
+            @ApiParam(value = Documentation.Queue.QUEUE_ID) @PathVariable String queueId) {
 
         User user;
         try {
