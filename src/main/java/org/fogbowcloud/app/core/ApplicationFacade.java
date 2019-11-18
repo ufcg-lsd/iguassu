@@ -1,9 +1,9 @@
 package org.fogbowcloud.app.core;
 
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.api.dtos.NodeDTO;
-import org.fogbowcloud.app.api.dtos.NodeRequest;
-import org.fogbowcloud.app.api.dtos.QueueRequest;
+import org.fogbowcloud.app.api.dtos.ResourceDTOResponse;
+import org.fogbowcloud.app.api.dtos.ResourceDTORequest;
+import org.fogbowcloud.app.api.dtos.QueueDTORequest;
 import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.auth.DefaultAuthManager;
 import org.fogbowcloud.app.core.datastore.managers.JobDBManager;
@@ -223,7 +223,7 @@ public class ApplicationFacade {
         return job.getOwnerId().equals(userId);
     }
 
-    public synchronized String createQueue(User user, QueueRequest queue) {
+    public synchronized String createQueue(User user, QueueDTORequest queue) {
         logger.info("Creating queue [" + queue.getName() + "] on Arrebol");
         String queueId = null;
 
@@ -251,7 +251,7 @@ public class ApplicationFacade {
         return queues;
     }
 
-    public NodeDTO addNode(User user, String queueId, NodeRequest node) throws UnauthorizedRequestException {
+    public ResourceDTOResponse addNode(User user, String queueId, ResourceDTORequest node) throws UnauthorizedRequestException {
         ArrebolQueue arrebolQueue = QueueDBManager.getInstance().findOne(queueId);
 
         verifyUser(arrebolQueue.getOwnerId(), user.getId());
@@ -265,7 +265,7 @@ public class ApplicationFacade {
         return null;
     }
 
-    public NodeDTO getNodes(User user, String queueId) throws UnauthorizedRequestException {
+    public ResourceDTOResponse getNodes(User user, String queueId) throws UnauthorizedRequestException {
         ArrebolQueue arrebolQueue = QueueDBManager.getInstance().findOne(queueId);
 
         verifyUser(arrebolQueue.getOwnerId(), user.getId());

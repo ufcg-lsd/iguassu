@@ -8,7 +8,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
-import org.fogbowcloud.app.api.dtos.QueueRequest;
+import org.fogbowcloud.app.api.dtos.QueueDTORequest;
 import org.fogbowcloud.app.core.constants.ConfProperty;
 import org.fogbowcloud.app.jes.arrebol.constants.Constants.Endpoint;
 import org.fogbowcloud.app.jes.arrebol.dtos.QueueDTO;
@@ -31,7 +31,7 @@ public class QueueRequestHelper {
         this.gson = new Gson();
     }
 
-    public String createQueue(QueueRequest queue) throws UnsupportedEncodingException {
+    public String createQueue(QueueDTORequest queue) throws UnsupportedEncodingException {
         final String QUEUE_ID_JSON_KEY = "id";
         final String endpoint = String.format(Endpoint.QUEUES, serviceBaseUrl);
         StringEntity requestBody;
@@ -71,7 +71,7 @@ public class QueueRequestHelper {
         }
     }
 
-    private StringEntity makeJSONBody(QueueRequest queue) throws UnsupportedEncodingException {
+    private StringEntity makeJSONBody(QueueDTORequest queue) throws UnsupportedEncodingException {
         LOGGER.info("Building JSON body of Queue!");
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();

@@ -7,12 +7,10 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.Documentation;
 import org.fogbowcloud.app.api.dtos.*;
 import org.fogbowcloud.app.api.http.services.AuthService;
-import org.fogbowcloud.app.api.http.services.FileStorageService;
 import org.fogbowcloud.app.api.http.services.JobService;
 import org.fogbowcloud.app.api.http.services.QueueService;
 import org.fogbowcloud.app.core.constants.AppConstant;
 import org.fogbowcloud.app.core.exceptions.JobNotFoundException;
-import org.fogbowcloud.app.core.exceptions.StorageException;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.queue.ArrebolQueue;
@@ -29,7 +27,8 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
-import java.io.IOException;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.util.*;
 
@@ -41,9 +40,6 @@ public class QueueAPI {
     private final Logger logger = Logger.getLogger(QueueAPI.class);
 
     @Lazy
-    private final FileStorageService storageService;
-
-    @Lazy
     private JobService jobService;
 
     @Lazy
@@ -53,8 +49,7 @@ public class QueueAPI {
     private AuthService authService;
 
     @Autowired
-    public QueueAPI(FileStorageService storageService, JobService jobService, AuthService authService, QueueService queueService) {
-        this.storageService = storageService;
+    public QueueAPI(JobService jobService, AuthService authService, QueueService queueService) {
         this.jobService = jobService;
         this.authService = authService;
         this.queueService = queueService;
@@ -63,8 +58,8 @@ public class QueueAPI {
     @PostMapping
     @ApiOperation(value = Documentation.Queue.CREATE_QUEUE)
     public ResponseEntity<?> addQueue(
-            @Valid @RequestBody QueueRequest queue,
-            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) String userCredentials) {
+            @Valid @RequestBody QueueDTORequest queueDTORequest,
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String userCredentials) {
 
         User user;
 
@@ -77,7 +72,7 @@ public class QueueAPI {
 
         String queueId;
         try {
-            queueId = this.queueService.createQueue(user, queue);
+            queueId = this.queueService.createQueue(user, queueDTORequest);
             Map<String, String> body = new HashMap<>();
             body.put("id", queueId);
             URI location = ServletUriComponentsBuilder
@@ -92,7 +87,7 @@ public class QueueAPI {
     @GetMapping
     @ApiOperation(value = Documentation.Queue.RETRIEVES_QUEUES)
     public ResponseEntity<?> getQueues(
-            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) String userCredentials) {
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String userCredentials) {
 
         User user;
 
@@ -115,8 +110,8 @@ public class QueueAPI {
     @GetMapping(Documentation.Endpoint.QUEUE)
     @ApiOperation(value = Documentation.Queue.RETRIEVE_QUEUE)
     public ResponseEntity<?> getQueue(
-            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) String userCredentials,
-            @ApiParam(value = Documentation.Queue.QUEUE_ID) @PathVariable String queueId) {
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String userCredentials,
+            @ApiParam(value = Documentation.Queue.QUEUE_ID) @PathVariable @Valid @NotBlank String queueId) {
 
         User user;
 
@@ -127,10 +122,10 @@ public class QueueAPI {
                     .body("The authentication failed with error [" + ure.getMessage() + "]");
         }
 
-        ArrebolQueue queue;
+        QueueDTOResponse response;
         try {
-            queue = this.queueService.getQueue(user, queueId);
-            return ResponseEntity.ok(queue);
+            response = this.queueService.getQueue(user, queueId);
+            return ResponseEntity.ok(response);
         } catch (UnauthorizedRequestException ure) {
             return ResponseEntity.notFound().build();
         }
@@ -140,27 +135,18 @@ public class QueueAPI {
     @ApiOperation(value = Documentation.Queue.SUBMIT_JOB)
     public ResponseEntity<?> submitJob(
             @ApiParam(value = Documentation.Queue.CREATE_REQUEST_PARAM)
-            @RequestParam(AppConstant.JDF_FILE_PATH) MultipartFile rawJDF,
+            @RequestParam(AppConstant.JDF_FILE_PATH) @Valid @NotNull MultipartFile rawJDF,
 
-            @ApiParam(value = Documentation.Queue.QUEUE_ID)
-            @PathVariable String queueId,
+            @ApiParam(value = Documentation.Queue.QUEUE_ID) @PathVariable @Valid @NotBlank String queueId,
 
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
-                    String userCredentials) {
+            @Valid @NotBlank String userCredentials) {
 
         if (Objects.isNull(queueId)) {
-            return new ResponseEntity<>(new InvalidRequestDTO("No queued specified"),
-                    HttpStatus.BAD_REQUEST);
+            return ResponseEntity.badRequest().body(new InvalidRequestDTO("No queued specified"));
         }
 
-        // Todo: manages the queue id
-
-        final Map<String, String> fieldMap = new HashMap<>();
-        fieldMap.put(AppConstant.JDF_FILE_PATH, null);
-        fieldMap.put(AppConstant.X_AUTH_USER_CREDENTIALS, null);
-
-        this.storageService.store(rawJDF, fieldMap);
         User user;
 
         try {
@@ -170,25 +156,15 @@ public class QueueAPI {
                     .body("The authentication failed with error [" + ure.getMessage() + "]");
         }
 
-        final String jdf = fieldMap.get(AppConstant.JDF_FILE_PATH);
-        if (Objects.isNull(jdf)) {
-            logger.info("Could not store new jdf from user " + user.getAlias());
-            throw new StorageException("Could not store new job from user " + user.getAlias());
+        String jobId;
+        try {
+            jobId = this.jobService.submitJob(queueId, rawJDF, user);
+        } catch (CompilerException e) {
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(String.format("Operation returned error: %s", e.getMessage()));
         }
 
-        String jobId;
-        final String jdfAbsolutePath = fieldMap.get(AppConstant.JDF_FILE_PATH);
-        try {
-            logger.info("Job description file path's <" + jdfAbsolutePath + ">");
-            jobId = this.jobService.submitJob(queueId, jdfAbsolutePath, user);
-            logger.info("Job " + jobId + " created at time: " + System.currentTimeMillis());
-        } catch (CompilerException ce) {
-            logger.error(ce.getMessage(), ce);
-            throw new StorageException("Could not compile JDF file", ce);
-        } catch (IOException e) {
-            logger.error("Could not read JDF file", e);
-            throw new StorageException("Could not read JDF file");
-        }
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/{jobId}")
                 .buildAndExpand(queueId).toUri();
@@ -198,25 +174,19 @@ public class QueueAPI {
     @GetMapping(value = Documentation.Endpoint.RETRIEVE_ALL_JOBS)
     @ApiOperation(value = Documentation.Queue.RETRIEVE_ALL_JOBS)
     public ResponseEntity<?> getAllJobs(
-            @ApiParam(value = Documentation.Queue.QUEUE_ID)
-            @PathVariable String queueId,
+            @ApiParam(value = Documentation.Queue.QUEUE_ID) @Valid @NotBlank @PathVariable String queueId,
+
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
-            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) String credentials) {
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String credentials) {
         logger.info("Request to retrieve all jobs per user received");
 
         User user;
 
-        if (Objects.isNull(queueId)) {
-            return new ResponseEntity<>(new InvalidRequestDTO("No queued specified"),
-                    HttpStatus.BAD_REQUEST);
-        }
-
         try {
             user = this.authService.authorizeUser(credentials);
         } catch (UnauthorizedRequestException ure) {
-            return new ResponseEntity<>(
-                    "Error while trying to authorize [" + ure.getMessage() + "]",
-                    HttpStatus.UNAUTHORIZED);
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("The authentication failed with error [" + ure.getMessage() + "]");
         }
 
         final Collection<Job> allJobsOfUser = this.jobService.getActiveJobsFromQueueByUser(queueId, user);
@@ -225,22 +195,19 @@ public class QueueAPI {
 
         allJobsOfUser.forEach(job -> response.add(new JobDTO(job)));
 
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping(value = Documentation.Endpoint.RETRIEVE_JOB_BY_ID)
     @ApiOperation(value = Documentation.Queue.RETRIEVE_JOB_BY_ID)
     public ResponseEntity<?> getJobById(
-            @ApiParam(value = Documentation.Queue.QUEUE_ID) @PathVariable String queueId,
-            @ApiParam(value = Documentation.Queue.JOB_ID) @PathVariable String jobId,
+            @ApiParam(value = Documentation.Queue.QUEUE_ID) @Valid @NotBlank @PathVariable String queueId,
+
+            @ApiParam(value = Documentation.Queue.JOB_ID) @Valid @NotBlank @PathVariable String jobId,
+
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
-                    String userCredentials) {
-
-        if (Objects.isNull(queueId) || Objects.isNull(jobId)) {
-            return new ResponseEntity<>(new InvalidRequestDTO("Some fields are missing"),
-                    HttpStatus.BAD_REQUEST);
-        }
+            @Valid @NotBlank String userCredentials) {
 
         Job job;
         try {
@@ -262,16 +229,13 @@ public class QueueAPI {
     @GetMapping(value = Documentation.Endpoint.RETRIEVE_TASKS_BY_JOB)
     @ApiOperation(value = Documentation.Queue.RETRIEVE_TASKS_BY_JOB)
     public ResponseEntity<?> getJobTasks(
-            @ApiParam(value = Documentation.Queue.QUEUE_ID) @PathVariable String queueId,
-            @ApiParam(value = Documentation.Queue.JOB_ID) @PathVariable String jobId,
+            @ApiParam(value = Documentation.Queue.QUEUE_ID) @Valid @NotBlank @PathVariable String queueId,
+
+            @ApiParam(value = Documentation.Queue.JOB_ID) @Valid @NotBlank @PathVariable String jobId,
+
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
-                    String userCredentials) {
-
-        if (Objects.isNull(queueId) || Objects.isNull(jobId)) {
-            return new ResponseEntity<>(new InvalidRequestDTO("Some fields are missing"),
-                    HttpStatus.BAD_REQUEST);
-        }
+            @Valid @NotBlank String userCredentials) {
 
         Job job;
         try {
@@ -294,16 +258,12 @@ public class QueueAPI {
     @DeleteMapping(value = Documentation.Endpoint.DELETE_JOB_BY_ID)
     @ApiOperation(value = Documentation.Queue.DELETE_JOB_BY_ID)
     public ResponseEntity<?> stopJob(
-            @ApiParam(value = Documentation.Queue.QUEUE_ID) @PathVariable String queueId,
-            @ApiParam(value = Documentation.Queue.JOB_ID) @PathVariable String jobId,
-            @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
-            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
-                    String userCredentials) {
+            @ApiParam(value = Documentation.Queue.QUEUE_ID) @Valid @NotBlank @PathVariable String queueId,
 
-        if (Objects.isNull(queueId) || Objects.isNull(jobId)) {
-            return new ResponseEntity<>(new InvalidRequestDTO("Some fields are missing"),
-                    HttpStatus.BAD_REQUEST);
-        }
+            @ApiParam(value = Documentation.Queue.JOB_ID) @Valid @NotBlank @PathVariable String jobId,
+
+            @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String userCredentials) {
 
         logger.info("Deleting job with Id " + jobId + ".");
 
@@ -331,9 +291,11 @@ public class QueueAPI {
     @PostMapping(value = Documentation.Endpoint.NODE_ENDPOINT)
     @ApiOperation(value = Documentation.Queue.SUBMIT_NODES)
     public ResponseEntity<?> addWorkers(
-            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) String userCredentials,
-            @ApiParam(value = Documentation.Queue.QUEUE_ID) @PathVariable String queueId,
-            @Valid @RequestBody NodeRequest node) throws Throwable {
+            @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String userCredentials,
+
+            @ApiParam(value = Documentation.Queue.QUEUE_ID) @Valid @NotBlank @PathVariable String queueId,
+            @Valid @RequestBody ResourceDTORequest resourceDTORequest) {
 
         User user;
         try {
@@ -344,10 +306,10 @@ public class QueueAPI {
                     HttpStatus.UNAUTHORIZED);
         }
 
-        NodeDTO nodeDTO;
+        ResourceDTOResponse resourceDTOResponse;
         try {
-            nodeDTO = queueService.addNode(user, queueId, node);
-            return new ResponseEntity<>(nodeDTO, HttpStatus.CREATED);
+            resourceDTOResponse = queueService.addNode(user, queueId, resourceDTORequest);
+            return new ResponseEntity<>(resourceDTOResponse, HttpStatus.CREATED);
         } catch (UnauthorizedRequestException t) {
             logger.error(String.format("Operation returned error: %s", t.getMessage()), t);
             return new ResponseEntity<>(
@@ -359,8 +321,10 @@ public class QueueAPI {
     @GetMapping(value = Documentation.Endpoint.NODE_ENDPOINT)
     @ApiOperation(value = Documentation.Queue.RETRIEVES_NODES)
     public ResponseEntity<?> getWorkers(
-            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) String userCredentials,
-            @ApiParam(value = Documentation.Queue.QUEUE_ID) @PathVariable String queueId) {
+            @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String userCredentials,
+
+            @ApiParam(value = Documentation.Queue.QUEUE_ID) @Valid @NotBlank @PathVariable String queueId) {
 
         User user;
         try {
@@ -371,10 +335,10 @@ public class QueueAPI {
                     HttpStatus.UNAUTHORIZED);
         }
 
-        NodeDTO nodeDTO;
+        ResourceDTOResponse resourceDTOResponse;
         try {
-            nodeDTO = queueService.getNodes(user, queueId);
-            return new ResponseEntity<>(nodeDTO, HttpStatus.OK);
+            resourceDTOResponse = queueService.getNodes(user, queueId);
+            return new ResponseEntity<>(resourceDTOResponse, HttpStatus.OK);
         } catch (UnauthorizedRequestException t) {
             logger.error(String.format("Operation returned error: %s", t.getMessage()), t);
             return new ResponseEntity<>(
@@ -382,7 +346,6 @@ public class QueueAPI {
                     HttpStatus.UNAUTHORIZED);
         }
     }
-
 
     private Collection<TaskDTO> generateTaskList(Collection<Task> tasks) {
         final Collection<TaskDTO> l = new ArrayList<>();

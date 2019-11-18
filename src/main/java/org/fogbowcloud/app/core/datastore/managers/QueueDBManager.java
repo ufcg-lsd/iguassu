@@ -14,7 +14,7 @@ public class QueueDBManager {
 
     public static final String DEFAULT_QUEUE_ID = "default";
     private static final ArrebolQueue DEFAULT_QUEUE = new ArrebolQueue(DEFAULT_QUEUE_ID, (long) -1, new ArrayList<>(),
-            "Default");
+            "Default", new ArrayList<>());
     private static QueueDBManager instance;
     private QueueRepository queueRepository;
 
@@ -57,7 +57,7 @@ public class QueueDBManager {
 
     public void save(String queueId, Long ownerId, String name) {
         List<Job> jobs = Collections.synchronizedList(new ArrayList<>());
-        ArrebolQueue queue = new ArrebolQueue(queueId, ownerId, jobs, name);
+        ArrebolQueue queue = new ArrebolQueue(queueId, ownerId, jobs, name, new ArrayList<>());
         this.queueRepository.save(queue);
     }
 

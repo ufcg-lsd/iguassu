@@ -1,16 +1,14 @@
 package org.fogbowcloud.app.api.dtos;
 
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
-public class NodeRequest implements Serializable {
+public class ResourceDTORequest implements Serializable {
 
-    @NotEmpty
-    @NotNull
+    @NotBlank
     private String address;
 
-    public NodeRequest() {}
+    public ResourceDTORequest() {}
 
     public String getAddress() {
         return address;

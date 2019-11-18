@@ -4,14 +4,14 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.Serializable;
 
-public class NodeDTO implements Serializable {
+public class ResourceDTOResponse implements Serializable {
 
     private String address;
 
     @JsonProperty("provision_status")
     private String provisionStatus;
 
-    public NodeDTO() {}
+    public ResourceDTOResponse() {}
 
     public String getAddress() {
         return address;

@@ -19,14 +19,14 @@ public class ArrebolQueue {
 
     private Long ownerId;
 
-    @ElementCollection
-    @JsonIgnore
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<String> pool;
 
     @OneToMany(fetch = FetchType.EAGER, targetEntity = Job.class)
+    @Fetch(FetchMode.SUBSELECT)
     private List<Job> jobs;
 
-    public ArrebolQueue(String queueId, Long ownerId, List<Job> jobs, String name) {
+    public ArrebolQueue(String queueId, Long ownerId, List<Job> jobs, String name, List<String> pool) {
         this.queueId = queueId;
         this.ownerId = ownerId;
         this.jobs = jobs;

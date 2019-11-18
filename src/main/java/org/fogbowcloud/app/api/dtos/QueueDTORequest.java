@@ -1,12 +1,14 @@
 package org.fogbowcloud.app.api.dtos;
 
+import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
 
-public class QueueRequest implements Serializable {
+public class QueueDTORequest implements Serializable {
 
+    @NotBlank
     private String name;
 
-    public QueueRequest() {}
+    public QueueDTORequest() {}
 
     public String getName() {
         return name;

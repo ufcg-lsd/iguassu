@@ -1,8 +1,9 @@
 package org.fogbowcloud.app.api.http.services;
 
-import org.fogbowcloud.app.api.dtos.NodeDTO;
-import org.fogbowcloud.app.api.dtos.NodeRequest;
-import org.fogbowcloud.app.api.dtos.QueueRequest;
+import org.fogbowcloud.app.api.dtos.QueueDTOResponse;
+import org.fogbowcloud.app.api.dtos.ResourceDTOResponse;
+import org.fogbowcloud.app.api.dtos.ResourceDTORequest;
+import org.fogbowcloud.app.api.dtos.QueueDTORequest;
 import org.fogbowcloud.app.core.ApplicationFacade;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
 import org.fogbowcloud.app.core.models.queue.ArrebolQueue;
@@ -19,7 +20,7 @@ public class QueueService {
 
     private ApplicationFacade applicationFacade = ApplicationFacade.getInstance();
 
-    public String createQueue(User user, QueueRequest queue) {
+    public String createQueue(User user, QueueDTORequest queue) {
         return this.applicationFacade.createQueue(user, queue);
     }
 
@@ -27,16 +28,16 @@ public class QueueService {
         return this.applicationFacade.getQueues(user);
     }
 
-    public NodeDTO addNode(User user, String queueId, NodeRequest node) throws UnauthorizedRequestException {
+    public ResourceDTOResponse addNode(User user, String queueId, ResourceDTORequest node) throws UnauthorizedRequestException {
         return this.applicationFacade.addNode(user, queueId, node);
     }
 
-    public NodeDTO getNodes(User user, String queueId) throws UnauthorizedRequestException {
+    public ResourceDTOResponse getNodes(User user, String queueId) throws UnauthorizedRequestException {
 
         return this.applicationFacade.getNodes(user, queueId);
     }
 
-    public ArrebolQueue getQueue(User user, String queueId) throws UnauthorizedRequestException {
-        return this.applicationFacade.getQueue(user, queueId);
+    public QueueDTOResponse getQueue(User user, String queueId) throws UnauthorizedRequestException {
+        return new QueueDTOResponse(this.applicationFacade.getQueue(user, queueId));
     }
 }

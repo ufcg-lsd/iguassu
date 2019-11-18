@@ -1,5 +1,6 @@
 package org.fogbowcloud.app.core.models.job;
 
+import org.fogbowcloud.app.api.dtos.JobDTO;
 import org.fogbowcloud.app.core.models.task.Task;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -15,7 +16,7 @@ import java.util.*;
 @Table(name = "job")
 public class Job implements Serializable {
     private static final String USER_ID_COLUMN_NAME = "user_id";
-    public static final int ID_FIXED_SIZE = 36;
+    private static final int ID_FIXED_SIZE = 36;
     private static final String STATE_COLUMN_NAME = "state";
     private static final String TIMESTAMP_COLUMN_NAME = "timestamp";
     private static final String LABEL_COLUMN_NAME = "label";
@@ -57,6 +58,10 @@ public class Job implements Serializable {
         this.label = Objects.isNull(label) || label.trim().isEmpty() ? ownerId + "_job" : label;
         this.ownerId = ownerId;
         this.timestamp = Instant.now().getEpochSecond();
+    }
+
+    public JobDTO toDTO() {
+        return new JobDTO(this);
     }
 
     public String getId() {
