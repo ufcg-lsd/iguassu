@@ -12,7 +12,7 @@ import java.util.Objects;
 
 public class QueueDBManager {
 
-    private static final String DEFAULT_QUEUE_ID = "default";
+    public static final String DEFAULT_QUEUE_ID = "default";
     private static final ArrebolQueue DEFAULT_QUEUE = new ArrebolQueue(DEFAULT_QUEUE_ID, (long) -1, new ArrayList<>(),
             "Default");
     private static QueueDBManager instance;
