@@ -1,10 +1,12 @@
 package org.fogbowcloud.app.api.dtos;
 
 import org.fogbowcloud.app.core.models.job.Job;
+import org.fogbowcloud.app.core.models.job.JobState;
 import org.fogbowcloud.app.core.models.queue.ArrebolQueue;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class QueueDTOResponse {
 
@@ -27,7 +29,11 @@ public class QueueDTOResponse {
     public QueueDTOResponse() {}
 
     private void parseCollections(List<Job> jobs, List<String> pool) {
-        for (Job job : jobs) {
+        List<Job> tmp = jobs.stream()
+                .filter(
+                        job -> !job.getState().equals(JobState.REMOVED)
+                ).collect(Collectors.toList());
+        for (Job job : tmp) {
             this.jobs.add(job.toDTO());
         }
 
