@@ -1,12 +1,11 @@
 package org.fogbowcloud.app.api.http.services;
 
-import org.fogbowcloud.app.api.dtos.QueueDTOResponse;
-import org.fogbowcloud.app.api.dtos.ResourceDTOResponse;
-import org.fogbowcloud.app.api.dtos.ResourceDTORequest;
 import org.fogbowcloud.app.api.dtos.QueueDTORequest;
+import org.fogbowcloud.app.api.dtos.QueueDTOResponse;
+import org.fogbowcloud.app.api.dtos.ResourceDTORequest;
+import org.fogbowcloud.app.api.dtos.ResourceDTOResponse;
 import org.fogbowcloud.app.core.ApplicationFacade;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
-import org.fogbowcloud.app.core.models.queue.ArrebolQueue;
 import org.fogbowcloud.app.core.models.user.User;
 import org.fogbowcloud.app.jes.arrebol.dtos.QueueDTO;
 import org.springframework.context.annotation.Lazy;

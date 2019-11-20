@@ -167,7 +167,7 @@ public class QueueAPI {
 
         URI location = ServletUriComponentsBuilder
                 .fromCurrentContextPath().path("/{jobId}")
-                .buildAndExpand(queueId).toUri();
+                .buildAndExpand(jobId).toUri();
         return ResponseEntity.created(location).body(new SimpleJobResponse(jobId));
     }
 
@@ -193,7 +193,7 @@ public class QueueAPI {
 
         final List<JobDTO> response = new LinkedList<>();
 
-        allJobsOfUser.forEach(job -> response.add(new JobDTO(job)));
+        allJobsOfUser.forEach(job -> response.add(new JobDTO(job, queueId)));
 
         return ResponseEntity.ok(response);
     }
@@ -223,7 +223,7 @@ public class QueueAPI {
                     HttpStatus.NOT_FOUND);
         }
         logger.info("Retrieving job with id [" + jobId + "]");
-        return new ResponseEntity<>(new JobDTO(job), HttpStatus.OK);
+        return new ResponseEntity<>(new JobDTO(job, queueId), HttpStatus.OK);
     }
 
     @GetMapping(value = Documentation.Endpoint.RETRIEVE_TASKS_BY_JOB)

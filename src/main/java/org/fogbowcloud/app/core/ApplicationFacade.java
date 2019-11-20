@@ -88,8 +88,12 @@ public class ApplicationFacade {
         final Job job = buildJob(jdfFilePath, jobOwner);
         JobDBManager.getInstance().save(job);
         QueueDBManager.getInstance().addJobToQueue(queueId, job);
-        Pair<String, Job> pair = new Pair<>(queueId, this.jobDBManager.findOne(job.getId()));
+        Pair<String, Job> pair = new Pair<>(queueId, job);
         this.jobsToSubmit.offer(pair);
+
+        synchronized (this.jobsToSubmit) {
+            this.jobsToSubmit.notifyAll();
+        }
 
         return job.getId();
     }

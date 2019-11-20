@@ -1,12 +1,10 @@
 package org.fogbowcloud.app.core.models.queue;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -22,7 +20,8 @@ public class ArrebolQueue {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> pool;
 
-    @OneToMany(fetch = FetchType.EAGER, targetEntity = Job.class)
+    @ElementCollection
+    @OneToMany(fetch= FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = Job.class)
     @Fetch(FetchMode.SUBSELECT)
     private List<Job> jobs;
 

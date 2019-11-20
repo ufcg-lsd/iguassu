@@ -4,6 +4,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.constants.ConfProperty;
 import org.fogbowcloud.app.core.constants.DockerConstant;
 import org.fogbowcloud.app.core.constants.JsonKey;
+import org.fogbowcloud.app.core.datastore.managers.JobDBManager;
 import org.fogbowcloud.app.core.models.command.Command;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.task.Task;
@@ -80,8 +81,11 @@ public class JobBuilder {
                     parseFinalCommands(
                             taskSpec, task, job.getOwnerId(), externalOAuthToken, tokenVersion);
 
+
                     tasks.add(task);
+                    JobDBManager.getInstance().save(task);
                 }
+
                 job.setTasks(tasks);
             } else {
                 throw new IllegalArgumentException(

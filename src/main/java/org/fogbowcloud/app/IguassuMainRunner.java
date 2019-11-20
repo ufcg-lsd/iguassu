@@ -14,6 +14,7 @@ import org.fogbowcloud.app.core.datastore.managers.QueueDBManager;
 import org.fogbowcloud.app.core.datastore.managers.UserDBManager;
 import org.fogbowcloud.app.core.datastore.repositories.JobRepository;
 import org.fogbowcloud.app.core.datastore.repositories.QueueRepository;
+import org.fogbowcloud.app.core.datastore.repositories.TaskRepository;
 import org.fogbowcloud.app.core.datastore.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;

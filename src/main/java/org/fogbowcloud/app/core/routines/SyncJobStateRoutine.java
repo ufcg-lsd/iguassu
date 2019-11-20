@@ -19,7 +19,6 @@ import org.fogbowcloud.app.utils.Pair;
 public class SyncJobStateRoutine extends Routine implements Runnable {
 
     private static final Logger logger = Logger.getLogger(SyncJobStateRoutine.class);
-    private final JobDBManager jobDBManager = JobDBManager.getInstance();
     private Synchronizer<Pair<String, Job>> synchronizer;
 
     SyncJobStateRoutine(long id, String name, Synchronizer<Pair<String, Job>> synchronizer) {
@@ -38,7 +37,7 @@ public class SyncJobStateRoutine extends Routine implements Runnable {
 
                 try {
                     this.synchronizer.sync(pair);
-                    this.jobDBManager.save(job);
+                    JobDBManager.getInstance().save(job);
                     logger.info("Job [" + job.getId()
                         + "] was successfully synchronized with its execution [" + job
                         .getExecutionId() + "].");

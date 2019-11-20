@@ -78,16 +78,7 @@ public class DefaultRoutineManager implements RoutineManager {
 
     private void startJobSubmissionRoutine() {
         logger.info("----> Starting Job Submission Routine...");
-        final long SUBMISSION_PERIOD = Long.parseLong(
-                this.properties.getProperty(ConfProperty.JOB_SUBMISSION_MONITOR_PERIOD.getProp()));
-        final String JOB_SUBMISSION = "job_submission";
-        final long JOB_SUBMISSION_ROUTINE_ID = 3;
-
-        final ManagerTimer submissionJobTimer =
-                new ManagerTimer(Executors.newScheduledThreadPool(DEFAULT_POOL_THREAD_NUMBER));
-        JobSubmissionRoutine jobSubmissionRoutine = new JobSubmissionRoutine(JOB_SUBMISSION_ROUTINE_ID, JOB_SUBMISSION,
-                this.jobExecutionService, this.jobsToSubmit);
-        submissionJobTimer.scheduleAtFixedRate(
-                jobSubmissionRoutine, DEFAULT_INITIAL_DELAY_MS, SUBMISSION_PERIOD);
+        JobSubmissionRoutine jobSubmissionRoutine = new JobSubmissionRoutine(this.jobExecutionService, this.jobsToSubmit);
+        jobSubmissionRoutine.start();
     }
 }
