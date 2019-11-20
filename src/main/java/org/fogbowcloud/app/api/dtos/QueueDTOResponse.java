@@ -34,7 +34,7 @@ public class QueueDTOResponse {
                         job -> !job.getState().equals(JobState.REMOVED)
                 ).collect(Collectors.toList());
         for (Job job : tmp) {
-            this.jobs.add(job.toDTO());
+            this.jobs.add(job.toDTO(this.id));
         }
 
         this.pool.addAll(pool);

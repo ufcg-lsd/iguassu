@@ -20,7 +20,8 @@ public class ArrebolQueue {
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> pool;
 
-    @OneToMany(fetch = FetchType.EAGER, targetEntity = Job.class)
+    @ElementCollection
+    @OneToMany(fetch= FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = Job.class)
     @Fetch(FetchMode.SUBSELECT)
     private List<Job> jobs;
 

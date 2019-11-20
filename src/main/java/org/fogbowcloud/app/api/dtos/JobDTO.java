@@ -15,6 +15,9 @@ public class JobDTO implements Serializable  {
 
     private String label;
 
+    @JsonProperty("queue_id")
+    private String queueId;
+
     @JsonProperty("creation_date")
     private String creationDate;
 
@@ -23,7 +26,8 @@ public class JobDTO implements Serializable  {
     @JsonProperty("owner_id")
     private Long ownerId;
 
-    public JobDTO(Job job) {
+    public JobDTO(Job job, String queueId) {
+        this.queueId = queueId;
         setFields(job);
     }
 
@@ -72,5 +76,13 @@ public class JobDTO implements Serializable  {
 
     public Long getOwnerId() {
         return ownerId;
+    }
+
+    public String getQueueId() {
+        return queueId;
+    }
+
+    public void setQueueId(String queueId) {
+        this.queueId = queueId;
     }
 }

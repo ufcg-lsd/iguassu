@@ -1,5 +1,7 @@
 package org.fogbowcloud.app.core.datastore.managers;
 
+import org.apache.log4j.Logger;
+import org.fogbowcloud.app.core.ApplicationFacade;
 import org.fogbowcloud.app.core.datastore.repositories.QueueRepository;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.queue.ArrebolQueue;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.Objects;
 
 public class QueueDBManager {
+    private static final Logger logger = Logger.getLogger(QueueDBManager.class);
 
     public static final String DEFAULT_QUEUE_ID = "default";
     private static final ArrebolQueue DEFAULT_QUEUE = new ArrebolQueue(DEFAULT_QUEUE_ID, (long) -1, new ArrayList<>(),
@@ -53,6 +56,7 @@ public class QueueDBManager {
         ArrebolQueue queue = this.findOne(queueId);
         queue.getJobs().add(job);
         this.queueRepository.save(queue);
+        logger.debug("Queue " + this.findOne(queueId).getQueueId() + " updated");
     }
 
     public void save(String queueId, Long ownerId, String name) {

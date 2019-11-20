@@ -55,18 +55,16 @@ public class JobService {
     public String submitJob(String queueId, MultipartFile rawJDF, User user) throws CompilerException {
         final Map<String, String> fieldMap = new HashMap<>();
         fieldMap.put(AppConstant.JDF_FILE_PATH, null);
-        fieldMap.put(AppConstant.X_AUTH_USER_CREDENTIALS, null);
 
         this.storageService.store(rawJDF, fieldMap);
 
-        final String jdf = fieldMap.get(AppConstant.JDF_FILE_PATH);
-        if (Objects.isNull(jdf)) {
+        final String jdfAbsolutePath = fieldMap.get(AppConstant.JDF_FILE_PATH);
+        if (Objects.isNull(jdfAbsolutePath)) {
             logger.info("Could not store new jdf from user " + user.getAlias());
             throw new StorageException("Could not store new job from user " + user.getAlias());
         }
 
         String jobId;
-        final String jdfAbsolutePath = fieldMap.get(AppConstant.JDF_FILE_PATH);
         try {
             logger.info("Job description file path's <" + jdfAbsolutePath + ">");
             jobId = this.applicationFacade.submitJob(queueId, jdfAbsolutePath, user);

@@ -30,9 +30,11 @@ public class Job implements Serializable {
     @Column(name = USER_ID_COLUMN_NAME)
     private Long ownerId;
 
-    @ElementCollection
-    @OneToMany(fetch= FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(fetch= FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = Task.class)
     @Fetch(FetchMode.SUBSELECT)
+    @JoinColumns({
+            @JoinColumn(name = "task_id", referencedColumnName = "id")
+    })
     private List<Task> tasks;
 
     @Column(name = STATE_COLUMN_NAME)
@@ -60,8 +62,8 @@ public class Job implements Serializable {
         this.timestamp = Instant.now().getEpochSecond();
     }
 
-    public JobDTO toDTO() {
-        return new JobDTO(this);
+    public JobDTO toDTO(String queueId) {
+        return new JobDTO(this, queueId);
     }
 
     public String getId() {
