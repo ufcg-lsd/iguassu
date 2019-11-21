@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
 import org.apache.http.client.methods.HttpGet;
@@ -33,14 +34,14 @@ public class ProvisioningRequestHelper {
         poolBody.addProperty(Constants.POOL_NAME_KEY, poolName);
         StringEntity body = new StringEntity(poolBody.toString());
 
-        String jsonResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, url, null, body);
+        String jsonResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, url, new LinkedList<>(), body);
         JsonObject response = this.jsonUtil.fromJson(jsonResponse, JsonObject.class);
         logger.info("Response message: " + response.get(Constants.MSG_KEY));
     }
 
     public Pool getPool(String poolName) throws Exception {
         String url = String.format(serviceBaseUrl + Endpoint.POOL, poolName);
-        String jsonResponse = HttpWrapper.doRequest(HttpGet.METHOD_NAME, url, null);
+        String jsonResponse = HttpWrapper.doRequest(HttpGet.METHOD_NAME, url, new LinkedList<>());
         Pool pool = this.jsonUtil.fromJson(jsonResponse, Pool.class);
         return pool;
     }
@@ -53,7 +54,7 @@ public class ProvisioningRequestHelper {
         nodeBody.addProperty(Constants.ADDRESS_KEY, nodeAddress);
         StringEntity body = new StringEntity(nodeBody.toString());
 
-        String jsonResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, url, null, body);
+        String jsonResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, url, new LinkedList<>(), body);
         JsonObject response = this.jsonUtil.fromJson(jsonResponse, JsonObject.class);
         logger.info("Response message: " + response.get(Constants.MSG_KEY));
     }
@@ -62,7 +63,7 @@ public class ProvisioningRequestHelper {
         boolean answer = false;
         String url = serviceBaseUrl + Endpoint.POOLS;
         Type type = new TypeToken<Map<String, Pool>>() {}.getType();
-        String jsonResponse = HttpWrapper.doRequest(HttpGet.METHOD_NAME, url, null);
+        String jsonResponse = HttpWrapper.doRequest(HttpGet.METHOD_NAME, url, new LinkedList<>());
         Map<String, Pool> pools = this.jsonUtil.fromJson(jsonResponse, type);
         if (pools.containsKey(poolName)) {
             answer = true;
