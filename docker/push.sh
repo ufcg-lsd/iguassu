@@ -1,8 +1,11 @@
- #!/bin/bash
+#!/bin/bash
 
 if [ "$#" -ne 1 ]; then
-  echo "Usage: $0 <docker image name>"
-  exit 1
+    echo "Usage: $0 <image name>"
+    exit 1
 fi
 
-sudo docker push $1
+readonly IMAGE=ufcglsd/iguassu
+TAG=$1
+
+sudo docker push "$IMAGE":"$TAG"

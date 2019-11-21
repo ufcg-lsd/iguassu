@@ -1,10 +1,11 @@
- #!/bin/bash
+#!/bin/bash
 
-if [ "$#" -ne 2 ]; then
-  echo "Usage: $0 <git branch> <docker tag>"
+if [[ "$#" -ne 1 ]]; then
+  echo "Usage: $0 <docker tag>"
   exit 1
 fi
 
-branch=$1
-tag=$2
-sudo docker build --build-arg IGUASSU_BRANCH=$branch --no-cache -t ufcglsd/iguassu:$tag .
+readonly IMAGE=ufcglsd/iguassu
+TAG=$1
+
+sudo docker build -t "$IMAGE":"$TAG" -f docker/Dockerfile .
