@@ -20,7 +20,6 @@ import org.springframework.boot.CommandLineRunner;
 public class IguassuMainRunner implements CommandLineRunner {
 
 	private static final Logger logger = Logger.getLogger(IguassuMainRunner.class);
-	private static String CONF_FILE_PATH = AppConstant.CONF_FILE_PATH;
 
 	@Autowired Properties properties;
 
@@ -46,14 +45,7 @@ public class IguassuMainRunner implements CommandLineRunner {
 		QueueDBManager.getInstance().init();
 
 		logger.info("Running " + IguassuMainRunner.class.getName());
-		if (args.length > 0) {
-			CONF_FILE_PATH = args[0];
-			logger.info("Configuration file found in path " + CONF_FILE_PATH + ".");
-
-		} else {
-			logger.info("Configuration file found in default path " + CONF_FILE_PATH + ".");
-		}
-		loadProperties(CONF_FILE_PATH);
+		loadProperties();
 
 		try {
 			ApplicationFacade.getInstance().init(this.properties);
@@ -64,10 +56,11 @@ public class IguassuMainRunner implements CommandLineRunner {
 
 	}
 
-	private void loadProperties(String iguassuConfFilePath) {
+	private void loadProperties() {
 		try {
-			properties.load(new FileInputStream(iguassuConfFilePath));
-			logger.info("Configuration file " + iguassuConfFilePath + " was loaded with success.");
+			properties.load(IguassuApplication.class.getClassLoader()
+				.getResourceAsStream(AppConstant.CONF_FILE_NAME));
+			logger.info("Configuration file " + AppConstant.CONF_FILE_NAME + " was loaded with success.");
 			ConfValidator.validate(this.properties);
 		} catch (Exception e) {
 			logger.info("Configuration file was not founded or not loaded with success.");
