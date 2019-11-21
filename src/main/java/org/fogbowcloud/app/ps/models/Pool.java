@@ -18,4 +18,15 @@ public class Pool {
     public List<Node> getNodes() {
         return nodes;
     }
+
+    public Node getNode(String nodeAddress) {
+        Node node = null;
+        for(Node n : nodes) {
+            if(n.getAddress().equals(nodeAddress)) {
+                node = n;
+                break;
+            }
+        }
+        return node;
+    }
 }

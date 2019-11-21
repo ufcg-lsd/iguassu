@@ -17,4 +17,8 @@ public class Node {
     public String getState() {
         return state;
     }
+
+    public boolean isProvisioned() {
+        return state.equals("PROVISIONED");
+    }
 }
