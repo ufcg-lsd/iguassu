@@ -14,7 +14,6 @@ import org.fogbowcloud.app.core.exceptions.JobNotFoundException;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
 import org.fogbowcloud.app.core.exceptions.UserNotExistException;
 import org.fogbowcloud.app.core.models.job.Job;
-import org.fogbowcloud.app.core.models.queue.ArrebolQueue;
 import org.fogbowcloud.app.core.models.task.Task;
 import org.fogbowcloud.app.core.models.user.User;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
@@ -295,7 +294,7 @@ public class QueueAPI {
             @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String userCredentials,
 
             @ApiParam(value = Documentation.Queue.QUEUE_ID) @Valid @NotBlank @PathVariable String queueId,
-            @Valid @RequestBody ResourceDTORequest resourceDTORequest) {
+            @Valid @RequestBody ResourceNode resourceNode) {
 
         User user;
         try {
@@ -307,7 +306,7 @@ public class QueueAPI {
 
         ResourceDTOResponse resourceDTOResponse;
         try {
-            resourceDTOResponse = queueService.addNode(user, queueId, resourceDTORequest);
+            resourceDTOResponse = queueService.addNode(user, queueId, resourceNode);
             return new ResponseEntity<>(resourceDTOResponse, HttpStatus.CREATED);
         } catch (UnauthorizedRequestException t) {
             logger.error(String.format("Operation returned error: %s", t.getMessage()), t);

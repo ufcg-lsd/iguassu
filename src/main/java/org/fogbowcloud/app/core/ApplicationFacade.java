@@ -2,7 +2,7 @@ package org.fogbowcloud.app.core;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.dtos.ResourceDTOResponse;
-import org.fogbowcloud.app.api.dtos.ResourceDTORequest;
+import org.fogbowcloud.app.api.dtos.ResourceNode;
 import org.fogbowcloud.app.api.dtos.QueueDTORequest;
 import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.auth.DefaultAuthManager;
@@ -260,12 +260,12 @@ public class ApplicationFacade {
         return queues;
     }
 
-    public ResourceDTOResponse addNode(User user, String queueId, ResourceDTORequest node) throws UnauthorizedRequestException {
+    public ResourceDTOResponse addNode(User user, String queueId, ResourceNode node) throws UnauthorizedRequestException {
         ArrebolQueue arrebolQueue = QueueDBManager.getInstance().findOne(queueId);
 
         verifyUser(arrebolQueue.getOwnerId(), user.getId());
 
-        arrebolQueue.addNode(node.getAddress());
+        arrebolQueue.addNode(node.getResourceAddress());
 
         QueueDTO queue = this.queueRequestHelper.getQueue(arrebolQueue.getQueueId());
 
