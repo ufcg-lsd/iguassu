@@ -18,6 +18,7 @@ import org.fogbowcloud.app.core.models.task.Task;
 import org.fogbowcloud.app.core.models.user.User;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jes.arrebol.dtos.QueueDTO;
+import org.fogbowcloud.app.ps.models.Pool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -304,14 +305,14 @@ public class QueueAPI {
                     .body("The authentication failed with error [" + e + "]");
         }
 
-        ResourceDTOResponse resourceDTOResponse;
+        Pool pool;
         try {
-            resourceDTOResponse = queueService.addNode(user, queueId, resourceNode);
-            return new ResponseEntity<>(resourceDTOResponse, HttpStatus.CREATED);
-        } catch (UnauthorizedRequestException t) {
-            logger.error(String.format("Operation returned error: %s", t.getMessage()), t);
+            pool = queueService.addNode(user, queueId, resourceNode);
+            return new ResponseEntity<>(pool, HttpStatus.CREATED);
+        } catch (Exception e) {
+            logger.error(String.format("Operation returned error: %s", e.getMessage()), e);
             return new ResponseEntity<>(
-                    "The authentication failed with error [" + t.getMessage() + "]",
+                    "The authentication failed with error [" + e.getMessage() + "]",
                     HttpStatus.UNAUTHORIZED);
         }
     }

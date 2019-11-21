@@ -8,6 +8,7 @@ import org.fogbowcloud.app.core.ApplicationFacade;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
 import org.fogbowcloud.app.core.models.user.User;
 import org.fogbowcloud.app.jes.arrebol.dtos.QueueDTO;
+import org.fogbowcloud.app.ps.models.Pool;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ public class QueueService {
         return this.applicationFacade.getQueues(user);
     }
 
-    public ResourceDTOResponse addNode(User user, String queueId, ResourceNode node) throws UnauthorizedRequestException {
+    public Pool addNode(User user, String queueId, ResourceNode node) throws Exception {
         return this.applicationFacade.addNode(user, queueId, node);
     }
 

@@ -28,6 +28,9 @@ import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jes.arrebol.dtos.QueueDTO;
 import org.fogbowcloud.app.jes.arrebol.helpers.QueueRequestHelper;
 import org.fogbowcloud.app.jes.exceptions.QueueNotFoundException;
+import org.fogbowcloud.app.ps.ProvisioningRequestHelper;
+import org.fogbowcloud.app.ps.ResourceProvideThread;
+import org.fogbowcloud.app.ps.models.Pool;
 import org.fogbowcloud.app.utils.JDFUtil;
 import org.fogbowcloud.app.utils.Pair;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +48,7 @@ public class ApplicationFacade {
     private final List<Integer> nonceList;
     private final Queue<Pair<String, Job>> jobsToSubmit;
     private QueueRequestHelper queueRequestHelper;
+    private ProvisioningRequestHelper provisioningRequestHelper;
     private AuthManager authManager;
     private JobBuilder jobBuilder;
     private JobDBManager jobDBManager;
@@ -73,6 +77,7 @@ public class ApplicationFacade {
             this.jobsToSubmit);
         routineManager.startAll();
         this.queueRequestHelper = new QueueRequestHelper(properties);
+        this.provisioningRequestHelper = new ProvisioningRequestHelper(properties);
     }
 
     @Transactional
@@ -260,18 +265,20 @@ public class ApplicationFacade {
         return queues;
     }
 
-    public ResourceDTOResponse addNode(User user, String queueId, ResourceNode node) throws UnauthorizedRequestException {
+    public Pool addNode(User user, String queueId, ResourceNode node)
+        throws Exception {
         ArrebolQueue arrebolQueue = QueueDBManager.getInstance().findOne(queueId);
 
         verifyUser(arrebolQueue.getOwnerId(), user.getId());
 
         arrebolQueue.addNode(node.getResourceAddress());
 
-        QueueDTO queue = this.queueRequestHelper.getQueue(arrebolQueue.getQueueId());
+        Thread resourceProvideThread = new ResourceProvideThread("Thread-Resource-Provide-" + user.getAlias() + "-" + queueId,
+            queueId, node, provisioningRequestHelper, queueRequestHelper);
+        resourceProvideThread.start();
 
-        // submit the node to be provisioned
-        // create a thread to pooling the provisioning service until the node is not provisioned
-        return null;
+        Pool pool = this.provisioningRequestHelper.getPool(queueId);
+        return pool;
     }
 
     public ResourceDTOResponse getNodes(User user, String queueId) throws UnauthorizedRequestException {
