@@ -9,6 +9,7 @@ import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.dtos.QueueDTORequest;
+import org.fogbowcloud.app.api.dtos.ResourceNode;
 import org.fogbowcloud.app.core.constants.ConfProperty;
 import org.fogbowcloud.app.jes.arrebol.constants.Constants.Endpoint;
 import org.fogbowcloud.app.jes.arrebol.dtos.QueueDTO;
@@ -71,11 +72,34 @@ public class QueueRequestHelper {
         }
     }
 
+    public void addWorkerNode(String queueId, ResourceNode resourceNode) {
+        final String endpoint = String.format(Endpoint.WORKERS, serviceBaseUrl, queueId);
+        StringEntity requestBody;
+
+        try {
+            requestBody = makeJSONBody(resourceNode);
+            HttpWrapper.doRequest(HttpPost.METHOD_NAME, endpoint, new LinkedList<>(), requestBody);
+        } catch (HttpHostConnectException e) {
+            throw new ArrebolConnectException("Failed connect to Arrebol: " + e.getMessage(), e);
+        } catch (Exception e) {
+            throw new RuntimeException("Adding Worker Node to Queue from Arrebol has FAILED: " + e.getMessage());
+        }
+    }
+
     private StringEntity makeJSONBody(QueueDTORequest queue) throws UnsupportedEncodingException {
         LOGGER.info("Building JSON body of Queue!");
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
         String json = gson.toJson(queue);
+
+        return new StringEntity(json);
+    }
+
+    private StringEntity makeJSONBody(ResourceNode resourceNode)
+        throws UnsupportedEncodingException {
+        LOGGER.info("Building JSON body of Worker Node");
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        String json = gson.toJson(resourceNode);
 
         return new StringEntity(json);
     }
