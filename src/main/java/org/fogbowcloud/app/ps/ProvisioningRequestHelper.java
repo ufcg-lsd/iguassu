@@ -28,7 +28,7 @@ public class ProvisioningRequestHelper {
     }
 
     public void createPool(String poolName) throws Exception {
-        String url = String.format(serviceBaseUrl + Endpoint.POOL, poolName);
+        String url = String.format(serviceBaseUrl + Endpoint.POOLS);
 
         JsonObject poolBody = new JsonObject();
         poolBody.addProperty(Constants.POOL_NAME_KEY, poolName);
@@ -47,7 +47,7 @@ public class ProvisioningRequestHelper {
     }
 
     public void addNode(String poolName, String nodeAddress) throws Exception {
-        String url = String.format(serviceBaseUrl, Endpoint.POOL, poolName);
+        String url = String.format(serviceBaseUrl + Endpoint.POOL, poolName);
 
         JsonObject nodeBody = new JsonObject();
         nodeBody.addProperty(Constants.PROVIDER_KEY, "ansible");

@@ -19,10 +19,10 @@ public class Node {
     }
 
     public boolean isProvisioned() {
-        return state.equals("PROVISIONED");
+        return state.equals("provisioned");
     }
 
     public boolean isFailed() {
-        return state.equals("FAILED");
+        return state.equals("failed");
     }
 }

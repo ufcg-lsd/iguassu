@@ -1,5 +1,7 @@
 package org.fogbowcloud.app.core;
 
+import static org.fogbowcloud.app.core.datastore.managers.QueueDBManager.DEFAULT_QUEUE_ID;
+
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.dtos.ResourceDTOResponse;
 import org.fogbowcloud.app.api.dtos.ResourceNode;
@@ -293,7 +295,7 @@ public class ApplicationFacade {
     }
 
     private void verifyUser(Long queueUserId, Long userId) throws UnauthorizedRequestException {
-        if (!queueUserId.equals(userId)) {
+        if (queueUserId != -1 && !queueUserId.equals(userId)) {
             final String errMsg = "User is not allowed for such operation";
             logger.info(errMsg);
             throw new UnauthorizedRequestException(errMsg);
@@ -302,7 +304,7 @@ public class ApplicationFacade {
 
     public ArrebolQueue getQueue(User user, String queueId) throws UnauthorizedRequestException {
         ArrebolQueue arrebolQueue = QueueDBManager.getInstance().findOne(queueId);
-        if (!queueId.equals(QueueDBManager.DEFAULT_QUEUE_ID)) {
+        if (!queueId.equals(DEFAULT_QUEUE_ID)) {
             verifyUser(arrebolQueue.getOwnerId(), user.getId());
         }
         return arrebolQueue;

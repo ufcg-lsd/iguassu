@@ -73,6 +73,7 @@ public class QueueRequestHelper {
     }
 
     public void addWorkerNode(String queueId, ResourceNode resourceNode) {
+        resourceNode.setResourceAddress("http://" + resourceNode.getResourceAddress() + ":5555");
         final String endpoint = String.format(Endpoint.WORKERS, serviceBaseUrl, queueId);
         StringEntity requestBody;
 
