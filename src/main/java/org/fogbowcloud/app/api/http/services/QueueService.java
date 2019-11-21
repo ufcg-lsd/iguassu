@@ -2,7 +2,7 @@ package org.fogbowcloud.app.api.http.services;
 
 import org.fogbowcloud.app.api.dtos.QueueDTORequest;
 import org.fogbowcloud.app.api.dtos.QueueDTOResponse;
-import org.fogbowcloud.app.api.dtos.ResourceDTORequest;
+import org.fogbowcloud.app.api.dtos.ResourceNode;
 import org.fogbowcloud.app.api.dtos.ResourceDTOResponse;
 import org.fogbowcloud.app.core.ApplicationFacade;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
@@ -27,7 +27,7 @@ public class QueueService {
         return this.applicationFacade.getQueues(user);
     }
 
-    public ResourceDTOResponse addNode(User user, String queueId, ResourceDTORequest node) throws UnauthorizedRequestException {
+    public ResourceDTOResponse addNode(User user, String queueId, ResourceNode node) throws UnauthorizedRequestException {
         return this.applicationFacade.addNode(user, queueId, node);
     }
 

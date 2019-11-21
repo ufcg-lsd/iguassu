@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.ps.dto;
+package org.fogbowcloud.app.ps.models;
 
 import com.google.gson.annotations.SerializedName;
 import java.util.List;

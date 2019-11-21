@@ -13,7 +13,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.constants.ConfProperty;
 import org.fogbowcloud.app.ps.Constants.Endpoint;
-import org.fogbowcloud.app.ps.dto.Pool;
+import org.fogbowcloud.app.ps.models.Pool;
 import org.fogbowcloud.app.utils.HttpWrapper;
 
 public class ProvisioningRequestHelper {

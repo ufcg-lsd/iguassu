@@ -1,4 +1,4 @@
-package org.fogbowcloud.app.ps.dto;
+package org.fogbowcloud.app.ps.models;
 
 import com.google.gson.annotations.SerializedName;
 
@@ -20,5 +20,9 @@ public class Node {
 
     public boolean isProvisioned() {
         return state.equals("PROVISIONED");
+    }
+
+    public boolean isFailed() {
+        return state.equals("FAILED");
     }
 }
