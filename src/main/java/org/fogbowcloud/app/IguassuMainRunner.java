@@ -1,6 +1,9 @@
 package org.fogbowcloud.app;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Objects;
 import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.ApplicationFacade;
@@ -57,14 +60,39 @@ public class IguassuMainRunner implements CommandLineRunner {
 	}
 
 	private void loadProperties() {
+		String confFilePath = System.getProperty(AppConstant.CONF_FILE_PROPERTY);
 		try {
-			properties.load(IguassuApplication.class.getClassLoader()
-				.getResourceAsStream(AppConstant.CONF_FILE_NAME));
-			logger.info("Configuration file " + AppConstant.CONF_FILE_NAME + " was loaded with success.");
+			if (Objects.isNull(confFilePath)) {
+				properties.load(IguassuApplication.class.getClassLoader()
+					.getResourceAsStream(AppConstant.CONF_FILE_NAME));
+				logger.info("Configuration file " + AppConstant.CONF_FILE_NAME + " was loaded with success.");
+			} else {
+				properties = loadProperties(confFilePath);
+				logger.info("Configuration file " + confFilePath + " was loaded with success.");
+			}
 			ConfValidator.validate(this.properties);
 		} catch (Exception e) {
 			logger.info("Configuration file was not founded or not loaded with success.");
 			System.exit(ExitCode.FAIL.getCode());
 		}
+	}
+
+	public static Properties loadProperties(String confFilePath) throws Exception {
+		Properties prop = new Properties();
+		FileInputStream fileInputStream = null;
+
+		try {
+			fileInputStream = new FileInputStream(confFilePath);
+			prop.load(fileInputStream);
+		} catch (FileNotFoundException fnfe) {
+			throw new Exception(String.format("Property file %s not found.", confFilePath), fnfe);
+		} catch (IOException ioe) {
+			throw new Exception(ioe.getMessage(), ioe);
+		} finally {
+			if (fileInputStream != null) {
+				fileInputStream.close();
+			}
+		}
+		return prop;
 	}
 }

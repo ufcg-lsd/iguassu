@@ -12,4 +12,5 @@ public class AppConstant {
      */
     public static final String CONF_FILE_NAME = "iguassu.conf";
     public static final String JDF_FILE_PATH = "jdffilepath";
+    public static final String CONF_FILE_PROPERTY = "conf_file";
 }
