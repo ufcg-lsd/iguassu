@@ -1,9 +1,13 @@
 package org.fogbowcloud.app.core.auth;
 
-import java.security.GeneralSecurityException;
-
+import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
 import org.fogbowcloud.app.core.exceptions.UserNotExistException;
-import org.fogbowcloud.app.core.models.user.*;
+import org.fogbowcloud.app.core.models.user.OAuth2Identifiers;
+import org.fogbowcloud.app.core.models.user.OAuthToken;
+import org.fogbowcloud.app.core.models.user.RequesterCredential;
+import org.fogbowcloud.app.core.models.user.User;
+
+import java.security.GeneralSecurityException;
 
 /**
  * This interface defines the operations that an authentication and authorization manager must have.
@@ -13,10 +17,10 @@ public interface AuthManager {
     /**
      * Registers a user if there's no already exist or update it credentials case already exists.
      *
-     * @return a user with credentials updated.
      * @param oAuth2Identifiers is the information provided by the OAuth2 protocol.
      * @param authorizationCode is the code that allows requesting an authentication.
-     * @param nonce a nonce code represents the hash of the request.
+     * @param nonce             a nonce code represents the hash of the request.
+     * @return a user with credentials updated.
      */
     User authenticate(OAuth2Identifiers oAuth2Identifiers, String authorizationCode, int nonce)
             throws GeneralSecurityException;
@@ -37,7 +41,7 @@ public interface AuthManager {
      *
      * @param requesterCredential the credentials of the user.
      * @return an authorized user instance.
-     * @throws GeneralSecurityException if any information has a wrong shape or is expired.
+     * @throws UnauthorizedRequestException if any information has a wrong shape or is expired.
      */
-    User authorize(RequesterCredential requesterCredential) throws GeneralSecurityException, UserNotExistException;
+    User authorize(RequesterCredential requesterCredential) throws UnauthorizedRequestException, UserNotExistException;
 }

@@ -115,18 +115,23 @@ public class ApplicationFacade {
 
     @Transactional
     public synchronized User authorizeUser(RequesterCredential requesterCredentials)
-        throws GeneralSecurityException, UserNotExistException {
+        throws UnauthorizedRequestException, UserNotExistException {
         if (Objects.isNull(requesterCredentials.getIguassuToken())) {
-            throw new IllegalArgumentException("Iguassu Token missing.");
+            throw new IllegalArgumentException("Iguassu Token missing");
         }
 
         User authenticatedUser;
-        logger.info("Checking nonce.");
-        if (this.nonceList.contains(requesterCredentials.getNonce())) {
-            this.nonceList.remove(requesterCredentials.getNonce());
-            authenticatedUser = this.authManager.authorize(requesterCredentials);
-        } else {
-            throw new GeneralSecurityException("Invalid nonce for this request.");
+        try {
+            logger.info("Checking nonce.");
+
+            if (this.nonceList.contains(requesterCredentials.getNonce())) {
+                this.nonceList.remove(requesterCredentials.getNonce());
+                authenticatedUser = this.authManager.authorize(requesterCredentials);
+            } else {
+                throw new UnauthorizedRequestException("Invalid nonce for this request");
+            }
+        } catch (UserNotExistException e)  {
+            throw new UserNotExistException();
         }
         return authenticatedUser;
     }
@@ -199,7 +204,7 @@ public class ApplicationFacade {
             this.jobDBManager.save(job);
         } else {
             throw new UnauthorizedRequestException(
-                "User with id [" + userId + "] does not own this job.");
+                "User with id [" + userId + "] does not own this job");
         }
 
         return job.getId();
@@ -211,14 +216,14 @@ public class ApplicationFacade {
         ArrebolQueue queue = QueueDBManager.getInstance().findOne(queueId);
         List<Job> jobs = queue.getJobs().stream().filter(job1 -> job1.getId().equals(jobId)).collect(Collectors.toList());
         if (jobs.isEmpty()) {
-            logger.error("Could not find job with id [" + jobId + "].");
-            throw new JobNotFoundException("Could not find job with id [" + jobId + "].");
+            logger.error("Could not find job with id [" + jobId + "]");
+            throw new JobNotFoundException("Could not find job with id [" + jobId + "]");
         }
         job = jobs.get(0);
 
         if (!match(job, user.getId())) {
             throw new UnauthorizedRequestException(
-                "User with id [" + user.getId() + "] does not own this job.");
+                "User with id [" + user.getId() + "] does not own this job");
         }
         return job;
     }

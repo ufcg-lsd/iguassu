@@ -12,6 +12,7 @@ import org.fogbowcloud.app.api.http.services.QueueService;
 import org.fogbowcloud.app.core.constants.AppConstant;
 import org.fogbowcloud.app.core.exceptions.JobNotFoundException;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
+import org.fogbowcloud.app.core.exceptions.UserNotExistException;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.queue.ArrebolQueue;
 import org.fogbowcloud.app.core.models.task.Task;
@@ -65,9 +66,9 @@ public class QueueAPI {
 
         try {
             user = this.authService.authorizeUser(userCredentials);
-        } catch (UnauthorizedRequestException ure) {
+        } catch (UnauthorizedRequestException | UserNotExistException ure) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("The authentication failed with error [" + ure.getMessage() + "]");
+                    .body("The authentication failed with error [" + ure + "]");
         }
 
         String queueId;
@@ -93,9 +94,9 @@ public class QueueAPI {
 
         try {
             user = this.authService.authorizeUser(userCredentials);
-        } catch (UnauthorizedRequestException ure) {
+        } catch (UnauthorizedRequestException | UserNotExistException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("The authentication failed with error [" + ure.getMessage() + "]");
+                    .body("The authentication failed with error [" + e + "]");
         }
 
         List<QueueDTO> queues;
@@ -117,9 +118,9 @@ public class QueueAPI {
 
         try {
             user = this.authService.authorizeUser(userCredentials);
-        } catch (UnauthorizedRequestException ure) {
+        } catch (UnauthorizedRequestException | UserNotExistException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("The authentication failed with error [" + ure.getMessage() + "]");
+                    .body("The authentication failed with error [" + e + "]");
         }
 
         QueueDTOResponse response;
@@ -151,9 +152,9 @@ public class QueueAPI {
 
         try {
             user = this.authService.authorizeUser(userCredentials);
-        } catch (UnauthorizedRequestException ure) {
+        } catch (UnauthorizedRequestException | UserNotExistException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("The authentication failed with error [" + ure.getMessage() + "]");
+                    .body("The authentication failed with error [" + e + "]");
         }
 
         String jobId;
@@ -184,9 +185,9 @@ public class QueueAPI {
 
         try {
             user = this.authService.authorizeUser(credentials);
-        } catch (UnauthorizedRequestException ure) {
+        } catch (UnauthorizedRequestException | UserNotExistException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                    .body("The authentication failed with error [" + ure.getMessage() + "]");
+                    .body("The authentication failed with error [" + e + "]");
         }
 
         final Collection<Job> allJobsOfUser = this.jobService.getActiveJobsFromQueueByUser(queueId, user);
@@ -207,7 +208,7 @@ public class QueueAPI {
 
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
-            @Valid @NotBlank String userCredentials) {
+            @Valid @NotBlank String userCredentials) throws UserNotExistException {
 
         Job job;
         try {
@@ -241,9 +242,9 @@ public class QueueAPI {
         try {
             job = getJDFJob(queueId, jobId, userCredentials);
 
-        } catch (UnauthorizedRequestException ure) {
+        } catch (UnauthorizedRequestException | UserNotExistException ure) {
             return new ResponseEntity<>(
-                    "The authentication failed with error [" + ure.getMessage() + "]",
+                    "The authentication failed with error [" + ure + "]",
                     HttpStatus.UNAUTHORIZED);
         } catch (JobNotFoundException e) {
             return new ResponseEntity<>(
@@ -271,10 +272,9 @@ public class QueueAPI {
 
         try {
             user = this.authService.authorizeUser(userCredentials);
-        } catch (UnauthorizedRequestException ure) {
-            return new ResponseEntity<>(
-                    "The authentication failed with error [" + ure.getMessage() + "]",
-                    HttpStatus.UNAUTHORIZED);
+        } catch (UnauthorizedRequestException | UserNotExistException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("The authentication failed with error [" + e + "]");
         }
 
         String removedJob;
@@ -300,10 +300,9 @@ public class QueueAPI {
         User user;
         try {
             user = this.authService.authorizeUser(userCredentials);
-        } catch (UnauthorizedRequestException ure) {
-            return new ResponseEntity<>(
-                    "The authentication failed with error [" + ure.getMessage() + "]",
-                    HttpStatus.UNAUTHORIZED);
+        } catch (UnauthorizedRequestException | UserNotExistException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("The authentication failed with error [" + e + "]");
         }
 
         ResourceDTOResponse resourceDTOResponse;
@@ -329,10 +328,9 @@ public class QueueAPI {
         User user;
         try {
             user = this.authService.authorizeUser(userCredentials);
-        } catch (UnauthorizedRequestException ure) {
-            return new ResponseEntity<>(
-                    "The authentication failed with error [" + ure.getMessage() + "]",
-                    HttpStatus.UNAUTHORIZED);
+        } catch (UnauthorizedRequestException | UserNotExistException e) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body("The authentication failed with error [" + e + "]");
         }
 
         ResourceDTOResponse resourceDTOResponse;
@@ -356,8 +354,13 @@ public class QueueAPI {
     }
 
     private Job getJDFJob(String queueId, String jobId, String userCredentials)
-            throws UnauthorizedRequestException, JobNotFoundException {
-        final User user = this.authService.authorizeUser(userCredentials);
+            throws UnauthorizedRequestException, JobNotFoundException, UserNotExistException {
+        final User user;
+        try {
+            user = this.authService.authorizeUser(userCredentials);
+        } catch (UserNotExistException e) {
+            throw new UserNotExistException();
+        }
 
         return this.jobService.getJobFromQueueById(queueId, jobId, user);
     }
