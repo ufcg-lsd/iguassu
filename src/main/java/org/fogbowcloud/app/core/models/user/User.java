@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.util.Objects;
 
 @Entity
-@Table(name = "user")
+@Table(name = "iguassu_user")
 public class User {
 
     private static final String SESSION_STATE_COLUMN_NAME = "session_state";

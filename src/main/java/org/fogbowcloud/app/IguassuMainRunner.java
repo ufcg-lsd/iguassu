@@ -1,6 +1,9 @@
 package org.fogbowcloud.app;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Objects;
 import java.util.Properties;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.ApplicationFacade;
@@ -20,7 +23,6 @@ import org.springframework.boot.CommandLineRunner;
 public class IguassuMainRunner implements CommandLineRunner {
 
 	private static final Logger logger = Logger.getLogger(IguassuMainRunner.class);
-	private static String CONF_FILE_PATH = AppConstant.CONF_FILE_PATH;
 
 	@Autowired Properties properties;
 
@@ -46,14 +48,7 @@ public class IguassuMainRunner implements CommandLineRunner {
 		QueueDBManager.getInstance().init();
 
 		logger.info("Running " + IguassuMainRunner.class.getName());
-		if (args.length > 0) {
-			CONF_FILE_PATH = args[0];
-			logger.info("Configuration file found in path " + CONF_FILE_PATH + ".");
-
-		} else {
-			logger.info("Configuration file found in default path " + CONF_FILE_PATH + ".");
-		}
-		loadProperties(CONF_FILE_PATH);
+		loadProperties();
 
 		try {
 			ApplicationFacade.getInstance().init(this.properties);
@@ -64,14 +59,38 @@ public class IguassuMainRunner implements CommandLineRunner {
 
 	}
 
-	private void loadProperties(String iguassuConfFilePath) {
+	private void loadProperties() {
+		String confFilePath = System.getProperty(AppConstant.CONF_FILE_PROPERTY);
 		try {
-			properties.load(new FileInputStream(iguassuConfFilePath));
-			logger.info("Configuration file " + iguassuConfFilePath + " was loaded with success.");
+			if (Objects.isNull(confFilePath)) {
+				properties.load(IguassuApplication.class.getClassLoader()
+					.getResourceAsStream(AppConstant.CONF_FILE_NAME));
+				logger.info("Configuration file " + AppConstant.CONF_FILE_NAME + " was loaded with success.");
+			} else {
+				loadProperties(confFilePath);
+				logger.info("Configuration file " + confFilePath + " was loaded with success.");
+			}
 			ConfValidator.validate(this.properties);
 		} catch (Exception e) {
 			logger.info("Configuration file was not founded or not loaded with success.");
 			System.exit(ExitCode.FAIL.getCode());
+		}
+	}
+
+	private void loadProperties(String confFilePath) throws Exception {
+		FileInputStream fileInputStream = null;
+
+		try {
+			fileInputStream = new FileInputStream(confFilePath);
+			properties.load(fileInputStream);
+		} catch (FileNotFoundException fnfe) {
+			throw new Exception(String.format("Property file %s not found.", confFilePath), fnfe);
+		} catch (IOException ioe) {
+			throw new Exception(ioe.getMessage(), ioe);
+		} finally {
+			if (fileInputStream != null) {
+				fileInputStream.close();
+			}
 		}
 	}
 }
