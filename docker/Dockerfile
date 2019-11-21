@@ -1,4 +1,7 @@
-FROM openjdk:8
+FROM ubuntu:latest
+
+RUN apt-get update -y
+RUN apt-get install -y openjdk-8-jdk
 
 #Define working directory
 WORKDIR /service
