@@ -19,12 +19,13 @@
                 <artifactId>maven-dependency-plugin</artifactId>
                 <executions>
                     <execution>
-                        <phase>install</phase>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
                         <goals>
                             <goal>copy-dependencies</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <outputDirectory>${basedir}/bin/lib</outputDirectory>
                         </configuration>
                     </execution>
                 </executions>
@@ -49,9 +50,12 @@
                 <configuration>
                     <archive>
                         <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
                             <mainClass>org.fogbowcloud.app.IguassuApplication</mainClass>
                         </manifest>
                     </archive>
+                    <outputDirectory>${basedir}/bin</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>
