@@ -67,7 +67,7 @@ public class IguassuMainRunner implements CommandLineRunner {
 					.getResourceAsStream(AppConstant.CONF_FILE_NAME));
 				logger.info("Configuration file " + AppConstant.CONF_FILE_NAME + " was loaded with success.");
 			} else {
-				properties = loadProperties(confFilePath);
+				loadProperties(confFilePath);
 				logger.info("Configuration file " + confFilePath + " was loaded with success.");
 			}
 			ConfValidator.validate(this.properties);
@@ -77,13 +77,12 @@ public class IguassuMainRunner implements CommandLineRunner {
 		}
 	}
 
-	public static Properties loadProperties(String confFilePath) throws Exception {
-		Properties prop = new Properties();
+	private void loadProperties(String confFilePath) throws Exception {
 		FileInputStream fileInputStream = null;
 
 		try {
 			fileInputStream = new FileInputStream(confFilePath);
-			prop.load(fileInputStream);
+			properties.load(fileInputStream);
 		} catch (FileNotFoundException fnfe) {
 			throw new Exception(String.format("Property file %s not found.", confFilePath), fnfe);
 		} catch (IOException ioe) {
@@ -93,6 +92,5 @@ public class IguassuMainRunner implements CommandLineRunner {
 				fileInputStream.close();
 			}
 		}
-		return prop;
 	}
 }
