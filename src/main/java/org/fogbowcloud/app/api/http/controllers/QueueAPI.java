@@ -319,7 +319,7 @@ public class QueueAPI {
 
     @GetMapping(value = Documentation.Endpoint.NODE_ENDPOINT)
     @ApiOperation(value = Documentation.Queue.RETRIEVES_NODES)
-    public ResponseEntity<?> getWorkers(
+    public ResponseEntity<?> getNodes(
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String userCredentials,
 

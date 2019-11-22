@@ -36,7 +36,7 @@ public class ProvisioningRequestHelper {
 
         String jsonResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, url, new LinkedList<>(), body);
         JsonObject response = this.jsonUtil.fromJson(jsonResponse, JsonObject.class);
-        logger.info("Response message: " + response.get(Constants.MSG_KEY));
+        logger.info("Response message: " + response.get(Constants.MSG_KEY).getAsString());
     }
 
     public Pool getPool(String poolName) throws Exception {
@@ -56,7 +56,7 @@ public class ProvisioningRequestHelper {
 
         String jsonResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, url, new LinkedList<>(), body);
         JsonObject response = this.jsonUtil.fromJson(jsonResponse, JsonObject.class);
-        logger.info("Response message: " + response.get(Constants.MSG_KEY));
+        logger.info("Response message: " + response.get(Constants.MSG_KEY).getAsString());
     }
 
     public boolean containsPool(String poolName) throws Exception {
@@ -71,4 +71,10 @@ public class ProvisioningRequestHelper {
         return answer;
     }
 
+    public String getPublicKey() throws Exception {
+        String url = serviceBaseUrl + Endpoint.PUBLIC_KEY;
+        String jsonResponse = HttpWrapper.doRequest(HttpGet.METHOD_NAME, url, new LinkedList<>());
+        JsonObject response = this.jsonUtil.fromJson(jsonResponse, JsonObject.class);
+        return response.get("public_key").getAsString();
+    }
 }

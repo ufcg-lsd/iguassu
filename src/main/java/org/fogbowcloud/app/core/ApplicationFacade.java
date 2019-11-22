@@ -305,4 +305,8 @@ public class ApplicationFacade {
         }
         return arrebolQueue;
     }
+
+    public String getPublicKeyFromProviderService() throws Exception {
+        return provisioningRequestHelper.getPublicKey();
+    }
 }
