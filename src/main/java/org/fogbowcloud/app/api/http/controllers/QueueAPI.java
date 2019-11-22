@@ -333,14 +333,14 @@ public class QueueAPI {
                     .body("The authentication failed with error [" + e + "]");
         }
 
-        ResourceDTOResponse resourceDTOResponse;
+        Pool pool;
         try {
-            resourceDTOResponse = queueService.getNodes(user, queueId);
-            return new ResponseEntity<>(resourceDTOResponse, HttpStatus.OK);
-        } catch (UnauthorizedRequestException t) {
-            logger.error(String.format("Operation returned error: %s", t.getMessage()), t);
+            pool = queueService.getNodes(user, queueId);
+            return new ResponseEntity<>(pool, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(String.format("Operation returned error: %s", e.getMessage()), e);
             return new ResponseEntity<>(
-                    "The authentication failed with error [" + t.getMessage() + "]",
+                    "The authentication failed with error [" + e.getMessage() + "]",
                     HttpStatus.UNAUTHORIZED);
         }
     }

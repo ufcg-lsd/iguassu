@@ -283,15 +283,11 @@ public class ApplicationFacade {
         return pool;
     }
 
-    public ResourceDTOResponse getNodes(User user, String queueId) throws UnauthorizedRequestException {
+    public Pool getNodes(User user, String queueId) throws Exception {
         ArrebolQueue arrebolQueue = QueueDBManager.getInstance().findOne(queueId);
-
         verifyUser(arrebolQueue.getOwnerId(), user.getId());
-
-        QueueDTO queueDTO = this.queueRequestHelper.getQueue(arrebolQueue.getQueueId());
-
-
-        return null;
+        Pool pool = provisioningRequestHelper.getPool(queueId);
+        return pool;
     }
 
     private void verifyUser(Long queueUserId, Long userId) throws UnauthorizedRequestException {

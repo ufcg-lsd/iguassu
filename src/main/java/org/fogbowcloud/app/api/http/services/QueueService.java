@@ -32,7 +32,7 @@ public class QueueService {
         return this.applicationFacade.addNode(user, queueId, node);
     }
 
-    public ResourceDTOResponse getNodes(User user, String queueId) throws UnauthorizedRequestException {
+    public Pool getNodes(User user, String queueId) throws Exception {
 
         return this.applicationFacade.getNodes(user, queueId);
     }
