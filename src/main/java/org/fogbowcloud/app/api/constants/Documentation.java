@@ -15,6 +15,7 @@ public class Documentation {
         public static final String VERSION = "version";
         public static final String NONCE = "nonce";
         public static final String QUEUES = "queues";
+        public static final String PUBLIC_KEY = "publicKey";
 
         static final String JOBS = "/jobs";
         static final String TASKS = "/tasks";

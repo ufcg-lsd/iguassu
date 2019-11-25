@@ -14,11 +14,11 @@ import org.fogbowcloud.app.core.exceptions.JobNotFoundException;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
 import org.fogbowcloud.app.core.exceptions.UserNotExistException;
 import org.fogbowcloud.app.core.models.job.Job;
-import org.fogbowcloud.app.core.models.queue.ArrebolQueue;
 import org.fogbowcloud.app.core.models.task.Task;
 import org.fogbowcloud.app.core.models.user.User;
 import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jes.arrebol.dtos.QueueDTO;
+import org.fogbowcloud.app.ps.models.Pool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
@@ -295,7 +295,7 @@ public class QueueAPI {
             @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String userCredentials,
 
             @ApiParam(value = Documentation.Queue.QUEUE_ID) @Valid @NotBlank @PathVariable String queueId,
-            @Valid @RequestBody ResourceDTORequest resourceDTORequest) {
+            @Valid @RequestBody ResourceNode resourceNode) {
 
         User user;
         try {
@@ -305,21 +305,21 @@ public class QueueAPI {
                     .body("The authentication failed with error [" + e + "]");
         }
 
-        ResourceDTOResponse resourceDTOResponse;
+        Pool pool;
         try {
-            resourceDTOResponse = queueService.addNode(user, queueId, resourceDTORequest);
-            return new ResponseEntity<>(resourceDTOResponse, HttpStatus.CREATED);
-        } catch (UnauthorizedRequestException t) {
-            logger.error(String.format("Operation returned error: %s", t.getMessage()), t);
+            pool = queueService.addNode(user, queueId, resourceNode);
+            return new ResponseEntity<>(pool, HttpStatus.CREATED);
+        } catch (Exception e) {
+            logger.error(String.format("Operation returned error: %s", e.getMessage()), e);
             return new ResponseEntity<>(
-                    "The authentication failed with error [" + t.getMessage() + "]",
+                    "The authentication failed with error [" + e.getMessage() + "]",
                     HttpStatus.UNAUTHORIZED);
         }
     }
 
     @GetMapping(value = Documentation.Endpoint.NODE_ENDPOINT)
     @ApiOperation(value = Documentation.Queue.RETRIEVES_NODES)
-    public ResponseEntity<?> getWorkers(
+    public ResponseEntity<?> getNodes(
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String userCredentials,
 
@@ -333,14 +333,14 @@ public class QueueAPI {
                     .body("The authentication failed with error [" + e + "]");
         }
 
-        ResourceDTOResponse resourceDTOResponse;
+        Pool pool;
         try {
-            resourceDTOResponse = queueService.getNodes(user, queueId);
-            return new ResponseEntity<>(resourceDTOResponse, HttpStatus.OK);
-        } catch (UnauthorizedRequestException t) {
-            logger.error(String.format("Operation returned error: %s", t.getMessage()), t);
+            pool = queueService.getNodes(user, queueId);
+            return new ResponseEntity<>(pool, HttpStatus.OK);
+        } catch (Exception e) {
+            logger.error(String.format("Operation returned error: %s", e.getMessage()), e);
             return new ResponseEntity<>(
-                    "The authentication failed with error [" + t.getMessage() + "]",
+                    "The authentication failed with error [" + e.getMessage() + "]",
                     HttpStatus.UNAUTHORIZED);
         }
     }

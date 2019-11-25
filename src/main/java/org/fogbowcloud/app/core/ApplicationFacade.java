@@ -1,8 +1,10 @@
 package org.fogbowcloud.app.core;
 
+import static org.fogbowcloud.app.core.datastore.managers.QueueDBManager.DEFAULT_QUEUE_ID;
+
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.dtos.ResourceDTOResponse;
-import org.fogbowcloud.app.api.dtos.ResourceDTORequest;
+import org.fogbowcloud.app.api.dtos.ResourceNode;
 import org.fogbowcloud.app.api.dtos.QueueDTORequest;
 import org.fogbowcloud.app.core.auth.AuthManager;
 import org.fogbowcloud.app.core.auth.DefaultAuthManager;
@@ -28,6 +30,9 @@ import org.fogbowcloud.app.jdfcompiler.main.CompilerException;
 import org.fogbowcloud.app.jes.arrebol.dtos.QueueDTO;
 import org.fogbowcloud.app.jes.arrebol.helpers.QueueRequestHelper;
 import org.fogbowcloud.app.jes.exceptions.QueueNotFoundException;
+import org.fogbowcloud.app.ps.ProvisioningRequestHelper;
+import org.fogbowcloud.app.ps.ResourceProvideThread;
+import org.fogbowcloud.app.ps.models.Pool;
 import org.fogbowcloud.app.utils.JDFUtil;
 import org.fogbowcloud.app.utils.Pair;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +50,7 @@ public class ApplicationFacade {
     private final List<Integer> nonceList;
     private final Queue<Pair<String, Job>> jobsToSubmit;
     private QueueRequestHelper queueRequestHelper;
+    private ProvisioningRequestHelper provisioningRequestHelper;
     private AuthManager authManager;
     private JobBuilder jobBuilder;
     private JobDBManager jobDBManager;
@@ -73,6 +79,7 @@ public class ApplicationFacade {
             this.jobsToSubmit);
         routineManager.startAll();
         this.queueRequestHelper = new QueueRequestHelper(properties);
+        this.provisioningRequestHelper = new ProvisioningRequestHelper(properties);
     }
 
     @Transactional
@@ -240,6 +247,7 @@ public class ApplicationFacade {
             queueId = queueRequestHelper.createQueue(queue);
             QueueDTO queueCreated = queueRequestHelper.getQueue(queueId);
             QueueDBManager.getInstance().save(queueId, user.getId(), queueCreated.getName());
+            provisioningRequestHelper.createPool(queueId);
             return queueId;
         } catch (Exception e) {
             logger.error("Error while creating queue on Arrebol");
@@ -260,33 +268,31 @@ public class ApplicationFacade {
         return queues;
     }
 
-    public ResourceDTOResponse addNode(User user, String queueId, ResourceDTORequest node) throws UnauthorizedRequestException {
+    public Pool addNode(User user, String queueId, ResourceNode node)
+        throws Exception {
         ArrebolQueue arrebolQueue = QueueDBManager.getInstance().findOne(queueId);
 
         verifyUser(arrebolQueue.getOwnerId(), user.getId());
 
-        arrebolQueue.addNode(node.getAddress());
+        arrebolQueue.addNode(node.getResourceAddress());
 
-        QueueDTO queue = this.queueRequestHelper.getQueue(arrebolQueue.getQueueId());
+        Thread resourceProvideThread = new ResourceProvideThread("Thread-Resource-Provide-" + user.getAlias() + "-" + queueId,
+            queueId, node, provisioningRequestHelper, queueRequestHelper);
+        resourceProvideThread.start();
 
-        // submit the node to be provisioned
-        // create a thread to pooling the provisioning service until the node is not provisioned
-        return null;
+        Pool pool = this.provisioningRequestHelper.getPool(queueId);
+        return pool;
     }
 
-    public ResourceDTOResponse getNodes(User user, String queueId) throws UnauthorizedRequestException {
+    public Pool getNodes(User user, String queueId) throws Exception {
         ArrebolQueue arrebolQueue = QueueDBManager.getInstance().findOne(queueId);
-
         verifyUser(arrebolQueue.getOwnerId(), user.getId());
-
-        QueueDTO queueDTO = this.queueRequestHelper.getQueue(arrebolQueue.getQueueId());
-
-
-        return null;
+        Pool pool = provisioningRequestHelper.getPool(queueId);
+        return pool;
     }
 
     private void verifyUser(Long queueUserId, Long userId) throws UnauthorizedRequestException {
-        if (!queueUserId.equals(userId)) {
+        if (queueUserId != -1 && !queueUserId.equals(userId)) {
             final String errMsg = "User is not allowed for such operation";
             logger.info(errMsg);
             throw new UnauthorizedRequestException(errMsg);
@@ -295,9 +301,13 @@ public class ApplicationFacade {
 
     public ArrebolQueue getQueue(User user, String queueId) throws UnauthorizedRequestException {
         ArrebolQueue arrebolQueue = QueueDBManager.getInstance().findOne(queueId);
-        if (!queueId.equals(QueueDBManager.DEFAULT_QUEUE_ID)) {
+        if (!queueId.equals(DEFAULT_QUEUE_ID)) {
             verifyUser(arrebolQueue.getOwnerId(), user.getId());
         }
         return arrebolQueue;
+    }
+
+    public String getPublicKeyFromProviderService() throws Exception {
+        return provisioningRequestHelper.getPublicKey();
     }
 }
