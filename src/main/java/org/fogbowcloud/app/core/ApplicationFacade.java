@@ -247,6 +247,7 @@ public class ApplicationFacade {
             queueId = queueRequestHelper.createQueue(queue);
             QueueDTO queueCreated = queueRequestHelper.getQueue(queueId);
             QueueDBManager.getInstance().save(queueId, user.getId(), queueCreated.getName());
+            provisioningRequestHelper.createPool(queueId);
             return queueId;
         } catch (Exception e) {
             logger.error("Error while creating queue on Arrebol");
