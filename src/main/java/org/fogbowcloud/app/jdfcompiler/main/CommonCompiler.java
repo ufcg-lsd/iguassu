@@ -20,7 +20,6 @@
 package org.fogbowcloud.app.jdfcompiler.main;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,7 +53,7 @@ public class CommonCompiler implements Compiler {
 	
 	public enum FileType{ JDF, JDL, SDF };
 
-	private String JDF_FILE_NAME = "resources/specs/JDFGrammar.gals";
+	private String JDF_FILE_NAME = "JDFGrammar.gals";
 
 	private static File sourceFile;
 
@@ -198,13 +197,15 @@ public class CommonCompiler implements Compiler {
 
 		// Validating the files
 		CommonCompiler.sourceFile = new File( source );
-		if ( (!sourceFile.exists()) || (!sourceFile.canRead()) ) {			
+		if ( (!sourceFile.exists()) || (!sourceFile.canRead()) ) {
+
 			IOException ioex = new IOException( CompilerMessages.BAD_SOURCE_FILE( sourceFile.getAbsolutePath() ) );
 			throw new CompilerException( ioex.getMessage(), ioex );
 		}
 
 		String resourceURL = JDF_FILE_NAME;
-		this.grammarFileStream = new FileInputStream(new File(resourceURL));
+		this.grammarFileStream = getClass().getClassLoader().getResourceAsStream(resourceURL);
+
 //		switch ( languageType ) {
 //			case JDF:
 //				break;

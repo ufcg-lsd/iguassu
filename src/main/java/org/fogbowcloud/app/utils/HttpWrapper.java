@@ -1,5 +1,6 @@
 package org.fogbowcloud.app.utils;
 
+import java.io.IOException;
 import org.apache.http.Header;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -23,6 +24,14 @@ public class HttpWrapper {
     private static final String APPLICATION_JSON = "application/json";
     private static final String CONTENT_TYPE = "Content-Type";
 
+    public static Integer getStatusCode(String method, String endpoint, List<Header> additionalHeaders)
+        throws IOException {
+        HttpUriRequest request = instantiateRequest(method, endpoint, null);
+        putHeaders(request, additionalHeaders);
+        HttpResponse response = HttpClients.createMinimal().execute(request);
+        return response.getStatusLine().getStatusCode();
+    }
+
     public static String doRequest(String method, String endpoint, List<Header> additionalHeaders)
             throws Exception {
         return doRequest(method, endpoint, additionalHeaders, null);
@@ -33,6 +42,14 @@ public class HttpWrapper {
             throws Exception {
         HttpUriRequest request = instantiateRequest(method, endpoint, body);
 
+        putHeaders(request, additionalHeaders);
+
+        final HttpResponse response = HttpClients.createMinimal().execute(request);
+
+        return extractHttpEntity(response, request);
+    }
+
+    private static void putHeaders(HttpUriRequest request, List<Header> additionalHeaders) {
         if (request != null) {
             request.setHeader(CONTENT_TYPE, APPLICATION_JSON);
             if (additionalHeaders != null) {
@@ -41,10 +58,6 @@ public class HttpWrapper {
                 }
             }
         }
-
-        final HttpResponse response = HttpClients.createMinimal().execute(request);
-
-        return extractHttpEntity(response, request);
     }
 
     private static String extractHttpEntity(HttpResponse response, HttpUriRequest request) {

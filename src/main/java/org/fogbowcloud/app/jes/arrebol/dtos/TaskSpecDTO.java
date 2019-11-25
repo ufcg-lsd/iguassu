@@ -12,8 +12,7 @@ public class TaskSpecDTO implements Serializable {
     private List<String> commands;
     private Map<String, String> metadata;
 
-    public TaskSpecDTO(Long id, Map<String, String> requirements, List<String> commands,
-                       Map<String, String> metadata) {
+    TaskSpecDTO(Long id, Map<String, String> requirements, List<String> commands, Map<String, String> metadata) {
         this.id = id;
         this.requirements = requirements;
         this.commands = commands;

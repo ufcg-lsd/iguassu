@@ -2,8 +2,9 @@ package org.fogbowcloud.app.jdfcompiler.job;
 
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.core.constants.ConfProperty;
-import org.fogbowcloud.app.core.constants.DockerConstants;
+import org.fogbowcloud.app.core.constants.DockerConstant;
 import org.fogbowcloud.app.core.constants.JsonKey;
+import org.fogbowcloud.app.core.datastore.managers.JobDBManager;
 import org.fogbowcloud.app.core.models.command.Command;
 import org.fogbowcloud.app.core.models.job.Job;
 import org.fogbowcloud.app.core.models.task.Task;
@@ -80,8 +81,11 @@ public class JobBuilder {
                     parseFinalCommands(
                             taskSpec, task, job.getOwnerId(), externalOAuthToken, tokenVersion);
 
+
                     tasks.add(task);
+                    JobDBManager.getInstance().save(task);
                 }
+
                 job.setTasks(tasks);
             } else {
                 throw new IllegalArgumentException(
@@ -97,14 +101,14 @@ public class JobBuilder {
     private void addAllRequirements(String jobRequirements, Map<String, String> requirements) {
         for (String jobRequirement : jobRequirements.split(REQUIREMENTS_SEPARATOR)) {
             if (jobRequirement != null && !jobRequirement.isEmpty()) {
-                if (jobRequirement.startsWith(DockerConstants.PREFIX_DOCKER_REQUIREMENTS)) {
-                    String dockerValue = requirements.get(DockerConstants.METADATA_DOCKER_REQUIREMENTS);
+                if (jobRequirement.startsWith(DockerConstant.PREFIX_DOCKER_REQUIREMENTS)) {
+                    String dockerValue = requirements.get(DockerConstant.METADATA_DOCKER_REQUIREMENTS);
 
                     if (Objects.nonNull(dockerValue)) {
-                        requirements.put(DockerConstants.METADATA_DOCKER_REQUIREMENTS,
+                        requirements.put(DockerConstant.METADATA_DOCKER_REQUIREMENTS,
                                 requirements + REQUIREMENTS_CONCAT_STR + jobRequirement);
                     } else {
-                        requirements.put(DockerConstants.METADATA_DOCKER_REQUIREMENTS, jobRequirement);
+                        requirements.put(DockerConstant.METADATA_DOCKER_REQUIREMENTS, jobRequirement);
                     }
                 }
             }

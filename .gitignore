@@ -15,8 +15,8 @@ datastores/
 bin/shutdown.pid
 
 
+src/main/resources/iguassu.conf
 iguassu.conf
-sched.conf
 iguassu.iml
 
 test/test.conf
@@ -29,3 +29,6 @@ logs/
 
 iguassu.iml
 nohup.out
+
+bin/iguassu-1.0.0.jar
+bin/lib/

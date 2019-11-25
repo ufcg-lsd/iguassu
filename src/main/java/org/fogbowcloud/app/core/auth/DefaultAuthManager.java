@@ -1,6 +1,7 @@
 package org.fogbowcloud.app.core.auth;
 
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
 import org.fogbowcloud.app.core.exceptions.UserNotExistException;
 import org.fogbowcloud.app.core.models.user.*;
 import org.fogbowcloud.app.core.datastore.managers.UserDBManager;
@@ -63,18 +64,18 @@ public class DefaultAuthManager implements AuthManager {
     }
 
     @Override
-    public User authorize(RequesterCredential requesterCredentials) throws GeneralSecurityException, UserNotExistException {
+    public User authorize(RequesterCredential requesterCredentials) throws UnauthorizedRequestException, UserNotExistException {
         User user;
         try {
             user = Objects.requireNonNull(this.userDBManager.findById(requesterCredentials.getUserId()));
         } catch (NullPointerException npe) {
-            throw new UserNotExistException("The user could not be recovered because it has not yet been stored.");
+            throw new UserNotExistException();
         }
 
         logger.info("Authorizing user " + user.getAlias() + ".");
 
         if (!user.getCredentials().getIguassuToken().equalsIgnoreCase(requesterCredentials.getIguassuToken())) {
-            throw new GeneralSecurityException("User " + user.getAlias() + " not has a valid Iguassu token.");
+            throw new UnauthorizedRequestException("User " + user.getAlias() + " not has a valid Iguassu token.");
         }
 
         user.resetSession();
@@ -84,7 +85,7 @@ public class DefaultAuthManager implements AuthManager {
     }
 
     @Override
-    public OAuthToken refreshOAuth2Token(OAuthToken oAuthToken) throws GeneralSecurityException {
+    public OAuthToken refreshOAuth2Token(OAuthToken oAuthToken) {
         return this.requestsHelper.refreshToken(oAuthToken);
     }
 

@@ -1,13 +1,6 @@
 package org.fogbowcloud.app.core.constants;
 
-public class GeneralConstants {
-
-    /*
-     *  Users datastore location.
-     */
-    public static final String DATASTORES_USERS_FILE_PATH = "datastores/users";
-    public static final String DATASTORES_USERS_DB_FILE_PATH = "datastores/users.db";
-
+public class AppConstant {
     /*
      *  Authentication and authorization custom headers.
      */
@@ -17,6 +10,7 @@ public class GeneralConstants {
     /*
      *  General useful paths.
      */
-    public static final String IGUASSU_CONF_FILE = "iguassu.conf";
+    public static final String CONF_FILE_NAME = "iguassu.conf";
     public static final String JDF_FILE_PATH = "jdffilepath";
+    public static final String CONF_FILE_PROPERTY = "conf_file";
 }
