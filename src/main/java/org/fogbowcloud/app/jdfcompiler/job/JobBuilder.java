@@ -121,6 +121,7 @@ public class JobBuilder {
         for (String req : requirements.split(REQUIREMENTS_SEPARATOR)) {
             if (req.trim().startsWith(REQUIREMENTS_IMAGE_KEY)) {
                 image = req.split("==")[1].trim();
+                image += ":latest";
             }
         }
 
