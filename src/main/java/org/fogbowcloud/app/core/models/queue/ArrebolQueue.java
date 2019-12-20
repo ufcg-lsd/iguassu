@@ -17,6 +17,8 @@ public class ArrebolQueue {
 
     private Long ownerId;
 
+    private String poolId;
+
     @ElementCollection(fetch = FetchType.EAGER)
     private List<String> pool;
 
@@ -25,10 +27,12 @@ public class ArrebolQueue {
     @Fetch(FetchMode.SUBSELECT)
     private List<Job> jobs;
 
-    public ArrebolQueue(String queueId, Long ownerId, List<Job> jobs, String name, List<String> pool) {
+    public ArrebolQueue(String queueId, Long ownerId, List<Job> jobs, String name, String poolId,
+        List<String> pool) {
         this.queueId = queueId;
         this.ownerId = ownerId;
         this.jobs = jobs;
+        this.poolId = poolId;
         this.pool = pool;
         this.name = name;
     }
@@ -61,6 +65,10 @@ public class ArrebolQueue {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getPoolId() {
+        return poolId;
     }
 
     public synchronized void addNode(String address) {
