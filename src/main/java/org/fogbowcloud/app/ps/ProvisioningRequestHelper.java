@@ -27,8 +27,9 @@ public class ProvisioningRequestHelper {
         this.jsonUtil = new Gson();
     }
 
-    public void createPool(String poolName) throws Exception {
-        String url = String.format(serviceBaseUrl + Endpoint.POOLS);
+    public String createPool(String poolName) throws Exception {
+        String poolId;
+        String url = serviceBaseUrl + Endpoint.POOLS;
 
         JsonObject poolBody = new JsonObject();
         poolBody.addProperty(Constants.POOL_NAME_KEY, poolName);
@@ -36,7 +37,9 @@ public class ProvisioningRequestHelper {
 
         String jsonResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, url, new LinkedList<>(), body);
         JsonObject response = this.jsonUtil.fromJson(jsonResponse, JsonObject.class);
-        logger.info("Response message: " + response.get(Constants.MSG_KEY).getAsString());
+        poolId = response.get(Constants.ID_KEY).getAsString();
+        logger.info("Created pool [" + poolName + "] on provider service: " + poolId);
+        return poolId;
     }
 
     public Pool getPool(String poolName) throws Exception {
