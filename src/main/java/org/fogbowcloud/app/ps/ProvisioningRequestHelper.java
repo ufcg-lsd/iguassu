@@ -15,6 +15,7 @@ import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.dtos.ResourceNode;
 import org.fogbowcloud.app.core.constants.ConfProperty;
 import org.fogbowcloud.app.ps.Constants.Endpoint;
+import org.fogbowcloud.app.ps.models.Node;
 import org.fogbowcloud.app.ps.models.Pool;
 import org.fogbowcloud.app.utils.HttpWrapper;
 
@@ -52,7 +53,7 @@ public class ProvisioningRequestHelper {
     }
 
     public String addNode(String poolId, ResourceNode node) throws Exception {
-        String url = String.format(serviceBaseUrl + Endpoint.NODE, poolId);
+        String url = String.format(serviceBaseUrl + Endpoint.NODES, poolId);
 
         JsonElement jsonNode = jsonUtil.toJsonTree(node);
         StringEntity body = new StringEntity(jsonNode.toString());
@@ -62,6 +63,13 @@ public class ProvisioningRequestHelper {
         String nodeId = response.get(Constants.ID_KEY).getAsString();
         logger.info("Created node [" + nodeId + "] pool [" + poolId + "] on provider service");
         return nodeId;
+    }
+
+    public Node getNode(String poolId, String nodeId) throws Exception {
+        String url = String.format(serviceBaseUrl + Endpoint.NODE, poolId, nodeId);
+        String jsonResponse = HttpWrapper.doRequest(HttpGet.METHOD_NAME, url, new LinkedList<>());
+        Node node = this.jsonUtil.fromJson(jsonResponse, Node.class);
+        return node;
     }
 
     public boolean containsPool(String poolName) throws Exception {
