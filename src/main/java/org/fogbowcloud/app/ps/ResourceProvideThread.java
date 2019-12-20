@@ -8,15 +8,17 @@ public class ResourceProvideThread extends Thread {
 
     private static final Logger logger = Logger.getLogger(ResourceProvideThread.class);
     private String queueId;
+    private String poolId;
     private ResourceNode resourceNode;
     private ProvisioningRequestHelper provisioningRequestHelper;
     private QueueRequestHelper queueRequestHelper;
 
-    public ResourceProvideThread(String name, String queueId,
+    public ResourceProvideThread(String threadName, String queueId, String poolId,
         ResourceNode resourceNode, ProvisioningRequestHelper provisioningRequestHelper,
         QueueRequestHelper queueRequestHelper) {
-        super(name);
+        super(threadName);
         this.queueId = queueId;
+        this.poolId = poolId;
         this.resourceNode = resourceNode;
         this.provisioningRequestHelper = provisioningRequestHelper;
         this.queueRequestHelper = queueRequestHelper;
@@ -29,14 +31,23 @@ public class ResourceProvideThread extends Thread {
                 logger.info("Creating pool [" + queueId + "] on provider service");
                 provisioningRequestHelper.createPool(queueId);
             }
-            provisioningRequestHelper.addNode(queueId, resourceNode.getResourceAddress());
-            boolean isProvisioned = provisioningRequestHelper.getPool(queueId).getNode(resourceNode.getResourceAddress()).isProvisioned();
-            if(isProvisioned){
-                logger.info("Provide service was provider resource node [" + resourceNode.getResourceAddress() + "]");
-                queueRequestHelper.addWorkerNode(queueId, resourceNode);
-            } else {
-                logger.error("Provide service was not provider resource node [" + resourceNode.getResourceAddress() + "]");
+            String nodeId = provisioningRequestHelper.addNode(poolId, resourceNode);
+            while (true) {
+                boolean isReady = provisioningRequestHelper.getNode(queueId, nodeId).isReady();
+                boolean isFailed = provisioningRequestHelper.getNode(queueId, nodeId).isFailed();
+                if (isReady) {
+                    logger.info("Provide service was provider resource node [" + resourceNode
+                        .getResourceAddress() + "]");
+                    queueRequestHelper.addWorkerNode(queueId, resourceNode);
+                    break;
+                }
+                else if (isFailed) {
+                    break;
+                } else {
+                    sleep(5000);
+                }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
