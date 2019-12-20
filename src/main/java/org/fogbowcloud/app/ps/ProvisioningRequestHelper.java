@@ -1,6 +1,7 @@
 package org.fogbowcloud.app.ps;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.lang.reflect.Type;
@@ -11,6 +12,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.api.dtos.ResourceNode;
 import org.fogbowcloud.app.core.constants.ConfProperty;
 import org.fogbowcloud.app.ps.Constants.Endpoint;
 import org.fogbowcloud.app.ps.models.Pool;
@@ -49,17 +51,17 @@ public class ProvisioningRequestHelper {
         return pool;
     }
 
-    public void addNode(String poolName, String nodeAddress) throws Exception {
-        String url = String.format(serviceBaseUrl + Endpoint.POOL, poolName);
+    public String addNode(String poolId, ResourceNode node) throws Exception {
+        String url = String.format(serviceBaseUrl + Endpoint.NODE, poolId);
 
-        JsonObject nodeBody = new JsonObject();
-        nodeBody.addProperty(Constants.PROVIDER_KEY, "ansible");
-        nodeBody.addProperty(Constants.ADDRESS_KEY, nodeAddress);
-        StringEntity body = new StringEntity(nodeBody.toString());
+        JsonElement jsonNode = jsonUtil.toJsonTree(node);
+        StringEntity body = new StringEntity(jsonNode.toString());
 
         String jsonResponse = HttpWrapper.doRequest(HttpPost.METHOD_NAME, url, new LinkedList<>(), body);
         JsonObject response = this.jsonUtil.fromJson(jsonResponse, JsonObject.class);
-        logger.info("Response message: " + response.get(Constants.MSG_KEY).getAsString());
+        String nodeId = response.get(Constants.ID_KEY).getAsString();
+        logger.info("Created node [" + nodeId + "] pool [" + poolId + "] on provider service");
+        return nodeId;
     }
 
     public boolean containsPool(String poolName) throws Exception {
