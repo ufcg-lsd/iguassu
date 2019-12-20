@@ -1,34 +1,30 @@
 package org.fogbowcloud.app.api.dtos;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.google.gson.annotations.SerializedName;
-import javax.validation.constraints.NotBlank;
 import java.io.Serializable;
-import javax.validation.constraints.NotNull;
+import java.util.Map;
+import javax.validation.constraints.NotBlank;
 
 public class ResourceNode implements Serializable {
 
     @NotBlank
-    @JsonProperty("resource_address")
-    @SerializedName("resource_address")
-    private String resourceAddress;
+    private String driver;
 
-    @NotNull
-    @JsonProperty("pool_size")
-    @SerializedName("pool_size")
-    private String poolSize;
+    private String template;
 
-    public ResourceNode() {}
+    private Map<String, String> spec;
 
-    public String getResourceAddress() {
-        return resourceAddress;
+    public ResourceNode() {
     }
 
-    public String getPoolSize() {
-        return poolSize;
+    public String getDriver() {
+        return driver;
     }
 
-    public void setResourceAddress(String resourceAddress) {
-        this.resourceAddress = resourceAddress;
+    public String getTemplate() {
+        return template;
+    }
+
+    public Map<String, String> getSpec() {
+        return spec;
     }
 }
