@@ -274,13 +274,13 @@ public class ApplicationFacade {
 
         verifyUser(arrebolQueue.getOwnerId(), user.getId());
 
-        arrebolQueue.addNode(node.getResourceAddress());
+//        arrebolQueue.addNode(node.getResourceAddress());
 
         Thread resourceProvideThread = new ResourceProvideThread("Thread-Resource-Provide-" + user.getAlias() + "-" + queueId,
-            queueId, node, provisioningRequestHelper, queueRequestHelper);
+            queueId, arrebolQueue.getPoolId(), node, provisioningRequestHelper, queueRequestHelper);
         resourceProvideThread.start();
 
-        Pool pool = this.provisioningRequestHelper.getPool(queueId);
+        Pool pool = this.provisioningRequestHelper.getPool(arrebolQueue.getPoolId());
         return pool;
     }
 
