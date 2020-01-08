@@ -15,6 +15,7 @@ import org.fogbowcloud.app.jes.arrebol.constants.Constants.Endpoint;
 import org.fogbowcloud.app.jes.arrebol.dtos.QueueDTO;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 import org.fogbowcloud.app.jes.exceptions.QueueCreationException;
+import org.fogbowcloud.app.ps.models.Node;
 import org.fogbowcloud.app.utils.HttpWrapper;
 
 import java.io.UnsupportedEncodingException;
@@ -72,13 +73,17 @@ public class QueueRequestHelper {
         }
     }
 
-    public void addWorkerNode(String queueId, ResourceNode resourceNode) {
-        resourceNode.setResourceAddress("http://" + resourceNode.getResourceAddress() + ":5555");
+    public void addWorkerNode(String queueId, Node node) {
+        String workerAddressPattern = "http://%s:5555";
+        String address = String.format(workerAddressPattern, node.getAddress());
         final String endpoint = String.format(Endpoint.WORKERS, serviceBaseUrl, queueId);
         StringEntity requestBody;
 
         try {
-            requestBody = makeJSONBody(resourceNode);
+            JsonObject jsonObject = new JsonObject();
+            jsonObject.addProperty("address", address);
+            jsonObject.addProperty("pool_size", 5);
+            requestBody = new StringEntity(jsonObject.toString());
             HttpWrapper.doRequest(HttpPost.METHOD_NAME, endpoint, new LinkedList<>(), requestBody);
         } catch (HttpHostConnectException e) {
             throw new ArrebolConnectException("Failed connect to Arrebol: " + e.getMessage(), e);
