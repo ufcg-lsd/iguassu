@@ -3,6 +3,7 @@ package org.fogbowcloud.app.ps;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.dtos.ResourceNode;
 import org.fogbowcloud.app.jes.arrebol.helpers.QueueRequestHelper;
+import org.fogbowcloud.app.ps.models.Node;
 
 public class ResourceProvideThread extends Thread {
 
@@ -27,18 +28,14 @@ public class ResourceProvideThread extends Thread {
     @Override
     public void run() {
         try {
-            if (!provisioningRequestHelper.containsPool(queueId)) {
-                logger.info("Creating pool [" + queueId + "] on provider service");
-                provisioningRequestHelper.createPool(queueId);
-            }
             String nodeId = provisioningRequestHelper.addNode(poolId, resourceNode);
             while (true) {
-                boolean isReady = provisioningRequestHelper.getNode(queueId, nodeId).isReady();
-                boolean isFailed = provisioningRequestHelper.getNode(queueId, nodeId).isFailed();
+                Node node = provisioningRequestHelper.getNode(queueId, nodeId);
+                boolean isReady = node.isReady();
+                boolean isFailed = node.isFailed();
                 if (isReady) {
-                    logger.info("Provide service was provider resource node [" + resourceNode
-                        .getResourceAddress() + "]");
-                    queueRequestHelper.addWorkerNode(queueId, resourceNode);
+                    logger.info("Provide service was provider resource node [" + nodeId + "]");
+                    queueRequestHelper.addWorkerNode(queueId, node);
                     break;
                 }
                 else if (isFailed) {
