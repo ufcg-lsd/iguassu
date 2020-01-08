@@ -9,6 +9,7 @@ public class ResourceNode implements Serializable {
     @NotBlank
     private String driver;
 
+    @NotBlank
     private String template;
 
     private Map<String, String> spec;
