@@ -3,24 +3,23 @@ package org.fogbowcloud.app.jes.arrebol.helpers;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
+import java.io.UnsupportedEncodingException;
+import java.util.LinkedList;
+import java.util.Properties;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.entity.StringEntity;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.dtos.QueueDTORequest;
-import org.fogbowcloud.app.api.dtos.ResourceNode;
 import org.fogbowcloud.app.core.constants.ConfProperty;
 import org.fogbowcloud.app.jes.arrebol.constants.Constants.Endpoint;
+import org.fogbowcloud.app.jes.arrebol.constants.Constants.JsonField;
 import org.fogbowcloud.app.jes.arrebol.dtos.QueueDTO;
 import org.fogbowcloud.app.jes.exceptions.ArrebolConnectException;
 import org.fogbowcloud.app.jes.exceptions.QueueCreationException;
 import org.fogbowcloud.app.ps.models.Node;
 import org.fogbowcloud.app.utils.HttpWrapper;
-
-import java.io.UnsupportedEncodingException;
-import java.util.LinkedList;
-import java.util.Properties;
 
 public class QueueRequestHelper {
 
@@ -74,21 +73,18 @@ public class QueueRequestHelper {
     }
 
     public void addWorkerNode(String queueId, Node node) {
-        String workerAddressPattern = "http://%s:5555";
-        String address = String.format(workerAddressPattern, node.getAddress());
+
         final String endpoint = String.format(Endpoint.WORKERS, serviceBaseUrl, queueId);
         StringEntity requestBody;
 
         try {
-            JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("address", address);
-            jsonObject.addProperty("pool_size", 5);
-            requestBody = new StringEntity(jsonObject.toString());
+            requestBody = makeJSONBody(node);
             HttpWrapper.doRequest(HttpPost.METHOD_NAME, endpoint, new LinkedList<>(), requestBody);
         } catch (HttpHostConnectException e) {
             throw new ArrebolConnectException("Failed connect to Arrebol: " + e.getMessage(), e);
         } catch (Exception e) {
-            throw new RuntimeException("Adding Worker Node to Queue from Arrebol has FAILED: " + e.getMessage());
+            throw new RuntimeException(
+                "Adding Worker Node to Queue from Arrebol has FAILED: " + e.getMessage());
         }
     }
 
@@ -100,4 +96,14 @@ public class QueueRequestHelper {
 
         return new StringEntity(json);
     }
+
+    private StringEntity makeJSONBody(Node node) throws UnsupportedEncodingException {
+        String dockerAddressPattern = "http://%s:5555";
+        String address = String.format(dockerAddressPattern, node.getAddress());
+        JsonObject jsonObject = new JsonObject();
+        jsonObject.addProperty(JsonField.Node.ADDRESS, address);
+        jsonObject.addProperty(JsonField.Node.POOL_SIZE, 5);
+        return new StringEntity(jsonObject.toString());
+    }
+
 }

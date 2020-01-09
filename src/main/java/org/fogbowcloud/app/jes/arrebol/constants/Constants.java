@@ -11,4 +11,11 @@ public class Constants {
         public static final String WORKERS = QUEUE + "/workers";
     }
 
+    public static class JsonField {
+        public static class Node {
+            public static final String ADDRESS = "address";
+            public static final String POOL_SIZE = "pool_size";
+        }
+    }
+
 }
