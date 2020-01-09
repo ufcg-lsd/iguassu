@@ -100,13 +100,4 @@ public class QueueRequestHelper {
 
         return new StringEntity(json);
     }
-
-    private StringEntity makeJSONBody(ResourceNode resourceNode)
-        throws UnsupportedEncodingException {
-        LOGGER.info("Building JSON body of Worker Node");
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        String json = gson.toJson(resourceNode);
-
-        return new StringEntity(json);
-    }
 }
