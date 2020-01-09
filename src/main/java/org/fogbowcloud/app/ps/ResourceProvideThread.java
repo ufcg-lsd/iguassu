@@ -30,7 +30,7 @@ public class ResourceProvideThread extends Thread {
         try {
             String nodeId = provisioningRequestHelper.addNode(poolId, resourceNode);
             while (true) {
-                Node node = provisioningRequestHelper.getNode(queueId, nodeId);
+                Node node = provisioningRequestHelper.getNode(poolId, nodeId);
                 boolean isReady = node.isReady();
                 boolean isFailed = node.isFailed();
                 if (isReady) {
