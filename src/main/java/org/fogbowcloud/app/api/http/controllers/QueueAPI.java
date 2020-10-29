@@ -1,8 +1,6 @@
 package org.fogbowcloud.app.api.http.controllers;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.Documentation;
 import org.fogbowcloud.app.api.dtos.*;
@@ -57,9 +55,10 @@ public class QueueAPI {
     }
 
     @PostMapping
-    @ApiOperation(value = Documentation.Queue.CREATE_QUEUE)
+    @ApiOperation(value = Documentation.Queue.CREATE_QUEUE, produces = "application/json")
     public ResponseEntity<?> addQueue(
             @Valid @RequestBody QueueDTORequest queueDTORequest,
+            @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String userCredentials) {
 
         User user;
@@ -88,7 +87,9 @@ public class QueueAPI {
     @GetMapping
     @ApiOperation(value = Documentation.Queue.RETRIEVES_QUEUES)
     public ResponseEntity<?> getQueues(
-            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String userCredentials) {
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
+            @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
+            @Valid @NotBlank String userCredentials) {
 
         User user;
 
@@ -111,6 +112,7 @@ public class QueueAPI {
     @GetMapping(Documentation.Endpoint.QUEUE)
     @ApiOperation(value = Documentation.Queue.RETRIEVE_QUEUE)
     public ResponseEntity<?> getQueue(
+            @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String userCredentials,
             @ApiParam(value = Documentation.Queue.QUEUE_ID) @PathVariable @Valid @NotBlank String queueId) {
 
