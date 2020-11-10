@@ -45,7 +45,7 @@ public class Documentation {
     }
 
     public static class Queue {
-
+        public static final String TAG = "Queue API";
         public static final String DESCRIPTION = "Manages queues";
         public static final String SUBMIT_JOB = "Compiles and submits a job to execution";
         public static final String RETRIEVE_ALL_JOBS = "Retrieves the current state of all jobs of a given queue by user";
@@ -59,7 +59,7 @@ public class Documentation {
 
         public static final String JOB_ID = "The ID of the specific job";
         public static final String QUEUE_ID = "The ID of the specific queue";
-        public static final String CREATE_REQUEST_PARAM = "Request parameter of URL";
+        public static final String JDF_FILE_PATH = "The path to the jdf file";
 
         public static final String RETRIEVE_QUEUE = "Retrieve a specific queue";
     }
@@ -102,6 +102,6 @@ public class Documentation {
 
         public static final String USER_CREDENTIALS =
                 "The header of the request must specify a valid Iguassu Token, "
-                        + "a User Identifier and a Nonce. It is a raw json with the \"user_id\", \"iguassu_token\" and \"nonce keys\".";
+                        + "a User Identifier and a Nonce. It is a raw json with the \"user_id\", \"iguassu_token\" and \"nonce\" keys.";
     }
 }
