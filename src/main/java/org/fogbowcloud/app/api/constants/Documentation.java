@@ -65,7 +65,7 @@ public class Documentation {
     }
 
     public static class Nonce {
-
+        public static final String TAG = "Nonce API";
         public static final String DESCRIPTION = "Manages nonces";
         public static final String GENERATE = "Generates a nonce";
     }
