@@ -17,7 +17,7 @@ public class QueueDTO {
     @SerializedName("waiting_jobs")
     private long waitingJobs;
 
-    @ApiModelProperty(notes = "The number of hosts used as a worker.", position = 4, example = "10")
+    @ApiModelProperty(notes = "The number of hosts used as workers.", position = 4, example = "10")
     @JsonProperty("nodes")
     @SerializedName("worker_pools")
     private Integer workerPools;
