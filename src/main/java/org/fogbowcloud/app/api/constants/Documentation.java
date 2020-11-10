@@ -92,6 +92,12 @@ public class Documentation {
                 + " e.g.: \"{\"client_id\":\"FMMIxZy1Zwm0LbSxLrTvXQ1J9HChFaBDbICNrAxa2wNfe6ePSMgQWCPLbIcV74EX\", \"secret\":\"OO1vnx8xV8zmfrmgfSQDS7w3ZNmaztxPKEos7k9K6hX1aPB2H9Qpca0yYo5OiTvF\", \"redirect_uri\":\"http://127.0.0.1/auth\"}\"";
     }
 
+    public static class PublicKey {
+        public static final String TAG = "Public Key API";
+        public static final String DESCRIPTION = "Provides Iguassu's public key";
+        public static final String GET = "Get the public key from Iguassu";
+    }
+
     public static class CommonParameters {
 
         public static final String USER_CREDENTIALS =

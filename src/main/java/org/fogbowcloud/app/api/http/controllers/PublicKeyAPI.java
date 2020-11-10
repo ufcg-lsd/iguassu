@@ -1,7 +1,9 @@
 package org.fogbowcloud.app.api.http.controllers;
 
-import java.util.HashMap;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.apache.log4j.Logger;
+import org.fogbowcloud.app.api.constants.Documentation;
 import org.fogbowcloud.app.api.constants.Documentation.Endpoint;
 import org.fogbowcloud.app.api.http.services.PublicKeyService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = Endpoint.PUBLIC_KEY)
+@Api(value = Documentation.PublicKey.DESCRIPTION, tags = Documentation.PublicKey.TAG)
 public class PublicKeyAPI {
 
     private final Logger logger = Logger.getLogger(PublicKeyAPI.class);
@@ -27,6 +30,7 @@ public class PublicKeyAPI {
     }
 
     @GetMapping
+    @ApiOperation(value = Documentation.PublicKey.GET, tags = Documentation.PublicKey.TAG, response = String.class)
     public ResponseEntity<?> getPublicKey() {
         logger.info("Getting public key from Provider Service");
         String publicKey;
