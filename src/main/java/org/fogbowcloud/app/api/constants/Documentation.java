@@ -79,12 +79,17 @@ public class Documentation {
 
     public static class Auth {
 
+        public static final String TAG = "Auth API";
         public static final String DESCRIPTION = "Manages authentication and authorization";
         public static final String AUTHENTICATE_USER =
                 "Authenticate an user returning an Iguassu Token "
                         + "from OAuth2 Authorization Code";
         public static final String AUTHORIZATION_CODE =
-                "The body of the request must specify a valid OAuth2" + "Authorization Code";
+                "The body of the request must specify a valid OAuth2 Authorization Code. e.g.: \"{\"authorization_code\":\"my_oauth_code\"}\"";
+        public static final String REFRESH_TOKEN =
+                "Refresh a OAuth Access Token";
+        public static final String APPLICATION_IDENTIFIERS = "The header of request must contain the application identifiers."
+                + " e.g.: \"{\"client_id\":\"FMMIxZy1Zwm0LbSxLrTvXQ1J9HChFaBDbICNrAxa2wNfe6ePSMgQWCPLbIcV74EX\", \"secret\":\"OO1vnx8xV8zmfrmgfSQDS7w3ZNmaztxPKEos7k9K6hX1aPB2H9Qpca0yYo5OiTvF\", \"redirect_uri\":\"http://127.0.0.1/auth\"}\"";
     }
 
     public static class CommonParameters {
@@ -92,8 +97,5 @@ public class Documentation {
         public static final String USER_CREDENTIALS =
                 "The header of the request must specify a valid Iguassu Token, "
                         + "a User Identifier and a Nonce. It is a raw json with the \"user_id\", \"iguassu_token\" and \"nonce keys\".";
-        public static final String OAUTH_CREDENTIALS =
-                "The header of the request must contain the right client id, "
-                        + "secret and redirect uri";
     }
 }
