@@ -71,7 +71,7 @@ public class Documentation {
     }
 
     public static class Version {
-
+        public static final String TAG = "Version API";
         public static final String DESCRIPTION =
                 "Describes the current version of the Iguassu.";
         public static final String CURRENT_VERSION = "Returns the current version.";
