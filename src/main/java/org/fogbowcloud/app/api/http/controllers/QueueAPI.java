@@ -1,8 +1,6 @@
 package org.fogbowcloud.app.api.http.controllers;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.Documentation;
 import org.fogbowcloud.app.api.dtos.*;
@@ -22,6 +20,7 @@ import org.fogbowcloud.app.ps.models.Pool;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -35,7 +34,7 @@ import java.util.*;
 
 @RestController
 @RequestMapping(value = Documentation.Endpoint.QUEUES)
-@Api(Documentation.Queue.DESCRIPTION)
+@Api(value = Documentation.Queue.DESCRIPTION, tags = Documentation.Queue.TAG)
 public class QueueAPI {
 
     private final Logger logger = Logger.getLogger(QueueAPI.class);
@@ -56,10 +55,11 @@ public class QueueAPI {
         this.queueService = queueService;
     }
 
-    @PostMapping
-    @ApiOperation(value = Documentation.Queue.CREATE_QUEUE)
+    @PostMapping(produces = { MediaType.APPLICATION_JSON_VALUE })
+    @ApiOperation(value = Documentation.Queue.CREATE_QUEUE, response = QueueDTO.class, tags = Documentation.Queue.TAG)
     public ResponseEntity<?> addQueue(
             @Valid @RequestBody QueueDTORequest queueDTORequest,
+            @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String userCredentials) {
 
         User user;
@@ -85,10 +85,12 @@ public class QueueAPI {
         }
     }
 
-    @GetMapping
-    @ApiOperation(value = Documentation.Queue.RETRIEVES_QUEUES)
+    @GetMapping(produces = { MediaType.APPLICATION_JSON_VALUE })
+    @ApiOperation(value = Documentation.Queue.RETRIEVES_QUEUES, response = QueueDTO.class, responseContainer = "List", tags = Documentation.Queue.TAG)
     public ResponseEntity<?> getQueues(
-            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String userCredentials) {
+            @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS)
+            @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
+            @Valid @NotBlank String userCredentials) {
 
         User user;
 
@@ -108,9 +110,10 @@ public class QueueAPI {
         }
     }
 
-    @GetMapping(Documentation.Endpoint.QUEUE)
-    @ApiOperation(value = Documentation.Queue.RETRIEVE_QUEUE)
+    @GetMapping(value = Documentation.Endpoint.QUEUE, produces = { MediaType.APPLICATION_JSON_VALUE })
+    @ApiOperation(value = Documentation.Queue.RETRIEVE_QUEUE, response = QueueDTOResponse.class, tags = Documentation.Queue.TAG)
     public ResponseEntity<?> getQueue(
+            @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String userCredentials,
             @ApiParam(value = Documentation.Queue.QUEUE_ID) @PathVariable @Valid @NotBlank String queueId) {
 
@@ -132,10 +135,10 @@ public class QueueAPI {
         }
     }
 
-    @PostMapping(value = Documentation.Endpoint.SUBMIT_JOB)
-    @ApiOperation(value = Documentation.Queue.SUBMIT_JOB)
+    @PostMapping(value = Documentation.Endpoint.SUBMIT_JOB, produces = { MediaType.APPLICATION_JSON_VALUE })
+    @ApiOperation(value = Documentation.Queue.SUBMIT_JOB, response = SimpleJobResponse.class, tags = Documentation.Queue.TAG)
     public ResponseEntity<?> submitJob(
-            @ApiParam(value = Documentation.Queue.CREATE_REQUEST_PARAM)
+            @ApiParam(value = Documentation.Queue.JDF_FILE_PATH)
             @RequestParam(AppConstant.JDF_FILE_PATH) @Valid @NotNull MultipartFile rawJDF,
 
             @ApiParam(value = Documentation.Queue.QUEUE_ID) @PathVariable @Valid @NotBlank String queueId,
@@ -172,8 +175,8 @@ public class QueueAPI {
         return ResponseEntity.created(location).body(new SimpleJobResponse(jobId));
     }
 
-    @GetMapping(value = Documentation.Endpoint.RETRIEVE_ALL_JOBS)
-    @ApiOperation(value = Documentation.Queue.RETRIEVE_ALL_JOBS)
+    @GetMapping(value = Documentation.Endpoint.RETRIEVE_ALL_JOBS, produces = {MediaType.APPLICATION_JSON_VALUE})
+    @ApiOperation(value = Documentation.Queue.RETRIEVE_ALL_JOBS, response = JobDTO.class, responseContainer = "List", tags = Documentation.Queue.TAG)
     public ResponseEntity<?> getAllJobs(
             @ApiParam(value = Documentation.Queue.QUEUE_ID) @Valid @NotBlank @PathVariable String queueId,
 
@@ -199,8 +202,8 @@ public class QueueAPI {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping(value = Documentation.Endpoint.RETRIEVE_JOB_BY_ID)
-    @ApiOperation(value = Documentation.Queue.RETRIEVE_JOB_BY_ID)
+    @GetMapping(value = Documentation.Endpoint.RETRIEVE_JOB_BY_ID, produces = { MediaType.APPLICATION_JSON_VALUE })
+    @ApiOperation(value = Documentation.Queue.RETRIEVE_JOB_BY_ID, response = JobDTO.class, tags = Documentation.Queue.TAG)
     public ResponseEntity<?> getJobById(
             @ApiParam(value = Documentation.Queue.QUEUE_ID) @Valid @NotBlank @PathVariable String queueId,
 
@@ -227,8 +230,8 @@ public class QueueAPI {
         return new ResponseEntity<>(new JobDTO(job, queueId), HttpStatus.OK);
     }
 
-    @GetMapping(value = Documentation.Endpoint.RETRIEVE_TASKS_BY_JOB)
-    @ApiOperation(value = Documentation.Queue.RETRIEVE_TASKS_BY_JOB)
+    @GetMapping(value = Documentation.Endpoint.RETRIEVE_TASKS_BY_JOB, produces = { MediaType.APPLICATION_JSON_VALUE })
+    @ApiOperation(value = Documentation.Queue.RETRIEVE_TASKS_BY_JOB, response = TaskDTO.class, responseContainer = "List", tags = Documentation.Queue.TAG)
     public ResponseEntity<?> getJobTasks(
             @ApiParam(value = Documentation.Queue.QUEUE_ID) @Valid @NotBlank @PathVariable String queueId,
 
@@ -256,8 +259,8 @@ public class QueueAPI {
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
-    @DeleteMapping(value = Documentation.Endpoint.DELETE_JOB_BY_ID)
-    @ApiOperation(value = Documentation.Queue.DELETE_JOB_BY_ID)
+    @DeleteMapping(value = Documentation.Endpoint.DELETE_JOB_BY_ID, produces = { MediaType.APPLICATION_JSON_VALUE })
+    @ApiOperation(value = Documentation.Queue.DELETE_JOB_BY_ID, response = SimpleJobResponse.class, tags = Documentation.Queue.TAG)
     public ResponseEntity<?> stopJob(
             @ApiParam(value = Documentation.Queue.QUEUE_ID) @Valid @NotBlank @PathVariable String queueId,
 
@@ -288,8 +291,8 @@ public class QueueAPI {
         return new ResponseEntity<>(new SimpleJobResponse(removedJob), HttpStatus.ACCEPTED);
     }
 
-    @PostMapping(value = Documentation.Endpoint.NODE_ENDPOINT)
-    @ApiOperation(value = Documentation.Queue.SUBMIT_NODES)
+    @PostMapping(value = Documentation.Endpoint.NODE_ENDPOINT, produces = { MediaType.APPLICATION_JSON_VALUE })
+    @ApiOperation(value = Documentation.Queue.SUBMIT_NODES, response = Pool.class, tags = Documentation.Queue.TAG)
     public ResponseEntity<?> addWorkers(
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String userCredentials,
@@ -317,8 +320,8 @@ public class QueueAPI {
         }
     }
 
-    @GetMapping(value = Documentation.Endpoint.NODE_ENDPOINT)
-    @ApiOperation(value = Documentation.Queue.RETRIEVES_NODES)
+    @GetMapping(value = Documentation.Endpoint.NODE_ENDPOINT, produces = { MediaType.APPLICATION_JSON_VALUE })
+    @ApiOperation(value = Documentation.Queue.RETRIEVES_NODES, response = Pool.class, tags = Documentation.Queue.TAG)
     public ResponseEntity<?> getNodes(
             @ApiParam(value = Documentation.CommonParameters.USER_CREDENTIALS)
             @RequestHeader(value = AppConstant.X_AUTH_USER_CREDENTIALS) @Valid @NotBlank String userCredentials,
@@ -367,6 +370,7 @@ public class QueueAPI {
 
     static class SimpleJobResponse {
 
+        @ApiModelProperty(notes = "The job id", position = 1, example = "3eec48d3-b387-4610-ac4c-2c1b006deeb9")
         private String id;
 
         SimpleJobResponse(String id) {

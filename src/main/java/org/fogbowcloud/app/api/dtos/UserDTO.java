@@ -1,5 +1,6 @@
 package org.fogbowcloud.app.api.dtos;
 
+import io.swagger.annotations.ApiModelProperty;
 import org.fogbowcloud.app.core.models.user.User;
 
 import java.io.Serializable;
@@ -8,10 +9,13 @@ import java.util.Objects;
 /** Data transfer object projection */
 public class UserDTO implements Serializable {
 
+    @ApiModelProperty(notes = "The User ID", position = 1, example = "1")
     private Long id;
 
+    @ApiModelProperty(notes = "The Alias of User", position = 2, example = "iguassu-admin")
     private String alias;
 
+    @ApiModelProperty(notes = "The User Credentials", position = 3, dataType = "CredentialDTO")
     private CredentialDTO credentials;
 
     public UserDTO(User user) {
