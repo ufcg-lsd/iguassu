@@ -1,0 +1,79 @@
+version: '3.7'
+services:
+  postgresql:
+    image: postgres
+    env_file: ./postgres/postgres.env
+    ports: 
+      - 5432:5432
+    networks: 
+      - iguassu-net
+    volumes: 
+      - postgresdata:/var/lib/postgresql/data
+      - ./postgres/init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
+
+  pgadmin:
+    image: dpage/pgadmin4
+    env_file: ./pgadmin/pgadmin.env
+    ports:
+      - 15432:80
+    networks:
+      - iguassu-net
+
+  arrebol:
+    image: ufcglsd/arrebol
+    ports:
+      - 8080:8080
+    networks: 
+      - iguassu-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./arrebol/arrebol.json:/service/config/arrebol.json
+      - ./arrebol/application.properties:/service/config/application.properties
+    deploy:
+      mode: global
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 3
+
+  iguassu:
+    image: ufcglsd/iguassu
+    ports:
+      - 8081:8081
+    networks:
+      - iguassu-net
+    volumes:
+      - ./iguassu/iguassu.conf:/service/config/iguassu.conf
+      - ./iguassu/application.properties:/service/config/application.properties
+    deploy:
+      mode: replicated
+      replicas: 1
+      restart_policy:
+        condition: on-failure
+        delay: 30s
+        max_attempts: 3
+
+  iguassu-dashboard:
+    image: ufcglsd/iguassu-dashboard
+    ports:
+      - 80:80
+    networks:
+      - iguassu-net
+  
+  provider-service:
+    image: wesleymonte/provider-service:queues
+    ports:
+      - 5000:5000
+    volumes:
+      - ./provider/keys/pp:/service/keys/pp
+      - ./provider/keys/pp.pub:/service/keys/pp.pub
+    networks:
+      - iguassu-net
+
+volumes:
+  postgresdata: {}
+
+
+networks:
+  iguassu-net:
+    driver: overlay
