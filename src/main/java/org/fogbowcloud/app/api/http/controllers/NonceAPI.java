@@ -12,13 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = Documentation.Endpoint.NONCE)
-@Api(Documentation.Nonce.DESCRIPTION)
-public class NonceController {
+@Api(value = Documentation.Nonce.DESCRIPTION, tags = Documentation.Nonce.TAG)
+public class NonceAPI {
 
     private ApplicationFacade applicationFacade = ApplicationFacade.getInstance();
 
     @GetMapping
-    @ApiOperation(value = Documentation.Nonce.GET_OPERATION)
+    @ApiOperation(value = Documentation.Nonce.GENERATE, tags = Documentation.Nonce.TAG, response = String.class)
     public ResponseEntity<String> getNonce() {
         return new ResponseEntity<>(String.valueOf(this.applicationFacade.getNonce()), HttpStatus.OK);
     }

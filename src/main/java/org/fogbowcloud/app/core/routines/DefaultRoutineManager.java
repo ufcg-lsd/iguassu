@@ -12,6 +12,7 @@ import java.util.Arrays;
 import java.util.Properties;
 import java.util.Queue;
 import java.util.concurrent.Executors;
+import org.fogbowcloud.app.utils.Pair;
 
 /**
  * Default implementation of the RoutineManager
@@ -24,9 +25,9 @@ public class DefaultRoutineManager implements RoutineManager {
 
     private final JobExecutionService jobExecutionService;
     private final Properties properties;
-    private final Queue<Job> jobsToSubmit;
+    private final Queue<Pair<String, Job>> jobsToSubmit;
 
-    public DefaultRoutineManager(Properties properties, Queue<Job> jobsToSubmit) {
+    public DefaultRoutineManager(Properties properties, Queue<Pair<String, Job>> jobsToSubmit) {
         this.properties = properties;
         this.jobExecutionService = new ArrebolJobExecutionService(this.properties);
         this.jobsToSubmit = jobsToSubmit;
@@ -77,16 +78,7 @@ public class DefaultRoutineManager implements RoutineManager {
 
     private void startJobSubmissionRoutine() {
         logger.info("----> Starting Job Submission Routine...");
-        final long SUBMISSION_PERIOD = Long.parseLong(
-                this.properties.getProperty(ConfProperty.JOB_SUBMISSION_MONITOR_PERIOD.getProp()));
-        final String JOB_SUBMISSION = "job_submission";
-        final long JOB_SUBMISSION_ROUTINE_ID = 3;
-
-        final ManagerTimer submissionJobTimer =
-                new ManagerTimer(Executors.newScheduledThreadPool(DEFAULT_POOL_THREAD_NUMBER));
-        JobSubmissionRoutine jobSubmissionRoutine = new JobSubmissionRoutine(JOB_SUBMISSION_ROUTINE_ID, JOB_SUBMISSION,
-                this.jobExecutionService, this.jobsToSubmit);
-        submissionJobTimer.scheduleAtFixedRate(
-                jobSubmissionRoutine, DEFAULT_INITIAL_DELAY_MS, SUBMISSION_PERIOD);
+        JobSubmissionRoutine jobSubmissionRoutine = new JobSubmissionRoutine(this.jobExecutionService, this.jobsToSubmit);
+        jobSubmissionRoutine.start();
     }
 }

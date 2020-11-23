@@ -14,11 +14,12 @@ import org.fogbowcloud.app.jes.exceptions.JobExecStatusException;
 
 import java.util.List;
 import java.util.Objects;
+import org.fogbowcloud.app.utils.Pair;
 
 /**
  * Sync local job state with it execution.
  */
-public class JobSynchronizer implements Synchronizer<Job> {
+public class JobSynchronizer implements Synchronizer<Pair<String, Job>> {
 
     private static final Logger logger = Logger.getLogger(JobSynchronizer.class);
 
@@ -29,13 +30,15 @@ public class JobSynchronizer implements Synchronizer<Job> {
     }
 
     @Override
-    public Job sync(Job job) {
+    public Pair<String, Job> sync(Pair<String, Job> pair) {
 
+        final String queueId = pair.getKey();
+        final Job job = pair.getValue();
         final String executionId = job.getExecutionId();
         if (Objects.nonNull(executionId) && !executionId.trim().isEmpty()) {
             JobExecArrebol jobExecArrebol = null;
             try {
-                jobExecArrebol = this.jobExecutionService.status(executionId);
+                jobExecArrebol = this.jobExecutionService.status(queueId, executionId);
             } catch (ArrebolConnectException ace) {
                 logger.error("Error to get status for execution [" + executionId + "] with message + " + ace.getMessage());
             } catch (RuntimeException e) {
@@ -51,7 +54,7 @@ public class JobSynchronizer implements Synchronizer<Job> {
         } else {
             logger.error("Execution identifier from Job [" + job.getId() + "] is null.");
         }
-        return job;
+        return new Pair<>(queueId, job);
     }
 
     private void updateJob(Job job, JobExecArrebol jobExecArrebol) {

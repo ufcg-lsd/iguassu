@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" <<-EOSQL
+    CREATE DATABASE iguassu;
+    CREATE DATABASE arrebol;
+    GRANT ALL PRIVILEGES ON DATABASE iguassu TO "$POSTGRES_USER";
+    GRANT ALL PRIVILEGES ON DATABASE arrebol TO "$POSTGRES_USER";
+EOSQL

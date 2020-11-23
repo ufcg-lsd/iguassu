@@ -7,6 +7,7 @@ import org.fogbowcloud.app.core.ApplicationFacade;
 import org.fogbowcloud.app.core.constants.ConfProperty;
 import org.fogbowcloud.app.core.constants.JsonKey;
 import org.fogbowcloud.app.core.exceptions.UnauthorizedRequestException;
+import org.fogbowcloud.app.core.exceptions.UserNotExistException;
 import org.fogbowcloud.app.core.models.user.OAuth2Identifiers;
 import org.fogbowcloud.app.core.models.user.OAuthToken;
 import org.fogbowcloud.app.core.models.user.RequesterCredential;
@@ -57,14 +58,16 @@ public class AuthService {
         }
     }
 
-    public User authorizeUser(String credentials) throws UnauthorizedRequestException {
+    public User authorizeUser(String credentials) throws UnauthorizedRequestException, UserNotExistException {
         User user;
         Gson gson = new Gson();
         try {
             user = this.applicationFacade.authorizeUser(gson.fromJson(credentials, RequesterCredential.class));
-        } catch (Exception e) {
+        } catch (UnauthorizedRequestException e) {
             logger.error("Error while trying authorize", e);
             throw new UnauthorizedRequestException("Unauthorized operation. Credentials are not valid.");
+        } catch (UserNotExistException e) {
+            throw new UserNotExistException();
         }
         return user;
     }

@@ -21,3 +21,6 @@ logs/
 
 iguassu.iml
 nohup.out
+
+bin/iguassu-1.0.0.jar
+bin/lib/

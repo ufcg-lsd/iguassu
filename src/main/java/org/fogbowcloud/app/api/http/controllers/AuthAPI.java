@@ -1,13 +1,11 @@
 package org.fogbowcloud.app.api.http.controllers;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiParam;
+import io.swagger.annotations.*;
 import org.apache.log4j.Logger;
 import org.fogbowcloud.app.api.constants.Documentation;
 import org.fogbowcloud.app.api.dtos.UserDTO;
 import org.fogbowcloud.app.api.http.services.AuthService;
-import org.fogbowcloud.app.core.constants.GeneralConstants;
+import org.fogbowcloud.app.core.constants.AppConstant;
 import org.fogbowcloud.app.core.exceptions.StorageServiceConnectException;
 import org.fogbowcloud.app.core.models.user.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,27 +19,26 @@ import java.util.Objects;
 
 @RestController
 @RequestMapping(value = Documentation.Endpoint.AUTH)
-@Api(Documentation.Auth.DESCRIPTION)
-public class AuthController {
+@Api(value = Documentation.Auth.DESCRIPTION, tags = Documentation.Auth.TAG)
+public class AuthAPI {
 
-    private final Logger logger = Logger.getLogger(AuthController.class);
+    private final Logger logger = Logger.getLogger(AuthAPI.class);
 
     @Lazy
     private AuthService authService;
 
     @Autowired
-    public AuthController(AuthService authService) {
+    public AuthAPI(AuthService authService) {
         this.authService = authService;
     }
 
-    @PostMapping(value = Documentation.Endpoint.OAUTH_2)
-    @ApiOperation(value = Documentation.Auth.AUTHENTICATE_USER)
+    @PostMapping(value = Documentation.Endpoint.OAUTH_2, consumes = {"text/plain"})
+    @ApiOperation(value = Documentation.Auth.AUTHENTICATE_USER, response = UserDTO.class, tags = Documentation.Auth.TAG)
     public ResponseEntity<?> authenticate(
-            @ApiParam(value = Documentation.Auth.AUTHORIZATION_CODE) @RequestBody
-                    String authorizationCode,
-            @ApiParam(value = Documentation.CommonParameters.OAUTH_CREDENTIALS)
-            @RequestHeader(value = GeneralConstants.X_AUTH_APP_IDENTIFIERS)
-                    String applicationIdentifiers) {
+            @ApiParam(value = Documentation.Auth.AUTHORIZATION_CODE, type = "String")
+            @RequestBody String authorizationCode,
+            @ApiParam(value = Documentation.Auth.APPLICATION_IDENTIFIERS)
+            @RequestHeader(value = AppConstant.X_AUTH_APP_IDENTIFIERS) String applicationIdentifiers) {
         logger.info("Authentication request received.");
         try {
             if (Objects.nonNull(authorizationCode) && !authorizationCode.trim().isEmpty()) {
@@ -75,9 +72,11 @@ public class AuthController {
         }
     }
 
+    @ApiOperation(value = Documentation.Auth.REFRESH_TOKEN, response = String.class, tags = Documentation.Auth.TAG)
     @PostMapping(Documentation.Endpoint.REFRESH_TOKEN_VERSION)
     public ResponseEntity<?> refreshToken(
-            @PathVariable String userId, @PathVariable Long tokenVersion) {
+            @ApiParam(value = "The user id", required = true) @PathVariable String userId,
+            @ApiParam(value = "The token version to be refreshed", required = true) @PathVariable Long tokenVersion) {
         logger.info("Refresh OAuth2 tokens request received.");
         try {
             String refreshedAccessToken = this.authService.refreshToken(userId, tokenVersion);

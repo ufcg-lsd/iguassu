@@ -11,13 +11,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping(value = Documentation.Endpoint.VERSION)
-@Api(Documentation.Version.DESCRIPTION)
-public class VersionController {
+@Api(value = Documentation.Version.DESCRIPTION, tags = Documentation.Version.TAG)
+public class VersionAPI {
 
     @GetMapping
-    @ApiOperation(value = Documentation.Version.GET_OPERATION)
+    @ApiOperation(value = Documentation.Version.CURRENT_VERSION, tags = Documentation.Version.TAG)
     public ResponseEntity<String> getNonce() {
-        return new ResponseEntity<>("{\"version\": \"1.0.0\"}",
+        return new ResponseEntity<>("{\"version\": \"2.3.1\"}",
                 HttpStatus.OK);
     }
 }
